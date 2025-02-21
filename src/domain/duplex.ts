@@ -1,8 +1,4 @@
-import { allUserAtom, userAtom } from './user/userModel'
 import { Signal } from '@preact/signals-core'
-import { currentSectionAtom, hotTopicListAtom, sectionAtom, sectionListAtom } from './section/sectionModel'
-import { memoAtom, memoListAtom, memosAtom } from './memo/memoModel'
-import { categoryAtom, currentCategoryAtom } from './category/categoryModel'
 
 /** 이 타입이 중앙 관제 타입 v1 */
 // export const duplexKeysV1 = {
@@ -15,18 +11,7 @@ import { categoryAtom, currentCategoryAtom } from './category/categoryModel'
 /** 이 타입이 중앙 관제 타입 v2
  * 시그널 데이터를 매핑해서 공수를 줄이고 확장성을 높임
  */
-export const duplexKeysAndSignal = {
-	user: userAtom,
-	allUser: allUserAtom,
-	memo: memoAtom,
-	memos: memosAtom,
-	memoList: memoListAtom,
-	section: sectionAtom,
-	sectionList: sectionListAtom,
-	hotTopicList: hotTopicListAtom,
-	currentSection: currentSectionAtom,
-	category: categoryAtom,
-} as const
+export const duplexKeysAndSignal = {} as const
 
 // duplexKeysAndSignal 는 아톰이 있는 구조에서 추론하는 거라 ..
 // ui에서 가공된 데이터는 어떻게 처리할지..

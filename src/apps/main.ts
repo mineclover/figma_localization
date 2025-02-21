@@ -2,13 +2,20 @@ import { on, once, showUI } from '@create-figma-plugin/utilities'
 import { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
 
 import { nodeZoom_Adapter } from '@/figmaPluginUtils/utilAdapter'
-import { onGetDomainSetting, onSetDomainSetting } from '@/domain/Setting/SettingModel'
+import {
+	onGetDomainSetting,
+	onGetLanguageCodes,
+	onSetDomainSetting,
+	onSetLanguageCodes,
+} from '@/domain/Setting/SettingModel'
 
 export default function () {
 	// 세팅
 
 	onGetDomainSetting()
 	onSetDomainSetting()
+	onGetLanguageCodes()
+	onSetLanguageCodes()
 
 	// 유틸
 	nodeZoom_Adapter()

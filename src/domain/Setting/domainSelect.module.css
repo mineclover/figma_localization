@@ -1,0 +1,29 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.domainContainer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
+}
+
+.button {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px;
+
+	width: 100%;
+	border: 1px solid var(--figma-color-border);
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+}
+
+.tag {
+	color: var(--figma-color-text-secondary);
+}

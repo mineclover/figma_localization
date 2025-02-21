@@ -20,7 +20,7 @@
 	"scripts": {
 		"build": "build-figma-plugin --typecheck --minify",
 		"watch": "build-figma-plugin --typecheck --watch",
-		"types": "npx openapi-typescript https://raw.githubusercontent.com/figma/rest-api-spec/main/openapi/openapi.yaml -o types/restApi.d.ts && npx openapi-typescript swagger.json -o types/i18n.d.ts",
+		"types": "npx openapi-typescript https://raw.githubusercontent.com/figma/rest-api-spec/main/openapi/openapi.yaml -o types/restApi.d.ts && npx openapi-typescript http://localhost:6543/yaml/config -o types/i18n.d.ts",
 		"prepare": "husky"
 	},
 	"figma-plugin": {

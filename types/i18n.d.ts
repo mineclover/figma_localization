@@ -250,7 +250,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 임시 키 이름으로 현재 키 검색 */
+        /**
+         * 임시 키 이름으로 현재 키 검색
+         * @description 보통 아이디로 임시 값 검색하는데 저장된 아이디가 없을 때 사용
+         */
         get: operations["FindKeyByTemporaryName"];
         put?: never;
         post?: never;
@@ -444,6 +447,41 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/domains/{name}/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 도메인의 언어 코드 목록을 조회합니다. */
+        get: operations["GetDomainLanguages"];
+        /** @description 도메인에 새로운 언어를 추가합니다. */
+        put: operations["UpdateDomainLanguages"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/domains/{name}/languages/{languageCode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description 도메인에서 특정 언어를 제거합니다. */
+        delete: operations["RemoveDomainLanguage"];
         options?: never;
         head?: never;
         patch?: never;
@@ -645,6 +683,7 @@ export interface components {
             /** Format: double */
             domain_id: number;
             domain_name: string;
+            language_codes: string[];
             created_at: string;
             updated_at: string;
         };
@@ -653,6 +692,16 @@ export interface components {
         };
         UpdateDomainDTO: {
             domain?: string;
+        };
+        UpdateDomainLanguagesDTO: {
+            /**
+             * @description 추가할 언어 코드 배열
+             * @example [
+             *       "en",
+             *       "ja"
+             *     ]
+             */
+            languageCodes: string[];
         };
         UserResponse: {
             /** Format: double */
@@ -1576,6 +1625,75 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Section"][];
                 };
+            };
+        };
+    };
+    GetDomainLanguages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    UpdateDomainLanguages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDomainLanguagesDTO"];
+            };
+        };
+        responses: {
+            /** @description Ok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    RemoveDomainLanguage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+                languageCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

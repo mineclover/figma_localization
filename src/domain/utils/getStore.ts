@@ -7,20 +7,20 @@ export function safeJsonParse<T>(json: string): T | undefined {
 	}
 }
 
-export function getRootStore<T>(key: string): T | undefined {
+export function getFigmaRootStore<T>(key: string): T | undefined {
 	const value = figma.root.getPluginData(key)
 	return safeJsonParse<T>(value)
 }
 
-export function getCurrentPageStore<T>(key: string): T | undefined {
+export function getFigmaCurrentPageStore<T>(key: string): T | undefined {
 	const value = figma.currentPage.getPluginData(key)
 	return safeJsonParse<T>(value)
 }
 
-export function setRootStore<T>(key: string, value: T) {
+export function setFigmaRootStore<T>(key: string, value: T) {
 	figma.root.setPluginData(key, JSON.stringify(value))
 }
 
-export function setCurrentPageStore<T>(key: string, value: T) {
+export function setFigmaCurrentPageStore<T>(key: string, value: T) {
 	figma.currentPage.setPluginData(key, JSON.stringify(value))
 }

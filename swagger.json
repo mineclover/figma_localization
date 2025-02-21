@@ -1,0 +1,1882 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Section": {
+				"properties": {
+					"section_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"domain_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"section_name": {
+						"type": "string"
+					},
+					"doc_link": {
+						"type": "string"
+					},
+					"created_at": {
+						"type": "string"
+					},
+					"updated_at": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"section_id",
+					"domain_id",
+					"section_name",
+					"created_at",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateSectionDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"domainId": {
+						"type": "string"
+					},
+					"link": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"domainId",
+					"link"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateSectionDTO": {
+				"properties": {
+					"link": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateResourceDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name",
+					"type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateResourceDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LocalizationKeyDetail": {
+				"properties": {
+					"key_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"domain_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"domain_name": {
+						"type": "string"
+					},
+					"section_id": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"section_name": {
+						"type": "string",
+						"nullable": true
+					},
+					"parent_key_id": {
+						"type": "number",
+						"format": "double",
+						"nullable": true,
+						"description": "변수 정의나 스타일 키를 정의하게 되면 부모 키가 생성되는데, 이 때 부모 키의 ID가 저장됩니다."
+					},
+					"is_variable": {
+						"type": "boolean",
+						"description": "키가 변수 키라면 true 로 설정\n변수 키는 로컬라이제이션 텍스트가 없어도 됨"
+					},
+					"created_at": {
+						"type": "string"
+					},
+					"updated_at": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"key_id",
+					"name",
+					"domain_id",
+					"domain_name",
+					"section_id",
+					"section_name",
+					"parent_key_id",
+					"is_variable",
+					"created_at",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateLocalizationKeyDTO": {
+				"properties": {
+					"domainId": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"parentKeyId": {
+						"type": "number",
+						"format": "double"
+					},
+					"isVariable": {
+						"type": "boolean"
+					},
+					"sectionId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"domainId",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateLocalizationKeyDTO": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"domainId": {
+						"type": "string"
+					},
+					"parentKeyId": {
+						"type": "string"
+					},
+					"isVariable": {
+						"type": "boolean"
+					},
+					"sectionId": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Localization": {
+				"properties": {
+					"localization_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"key_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"language_code": {
+						"type": "string"
+					},
+					"text": {
+						"type": "string"
+					},
+					"created_at": {
+						"type": "string"
+					},
+					"updated_at": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"localization_id",
+					"key_id",
+					"language_code",
+					"text",
+					"created_at",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateTranslationDTO": {
+				"properties": {
+					"keyId": {
+						"type": "string"
+					},
+					"language": {
+						"type": "string"
+					},
+					"translation": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"keyId",
+					"language",
+					"translation"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"FigmaLocation": {
+				"properties": {
+					"location_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"project_id": {
+						"type": "string",
+						"description": "피그마 프로젝트 ID"
+					},
+					"page_id": {
+						"type": "string",
+						"description": "피그마 페이지 ID"
+					},
+					"node_id": {
+						"type": "string",
+						"description": "피그마 노드 ID"
+					},
+					"is_pinned": {
+						"type": "boolean"
+					},
+					"created_at": {
+						"type": "string"
+					},
+					"updated_at": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"location_id",
+					"project_id",
+					"page_id",
+					"node_id",
+					"is_pinned",
+					"created_at",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateFigmaLocationDTO": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"pageId": {
+						"type": "string"
+					},
+					"nodeId": {
+						"type": "string"
+					},
+					"isPinned": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"projectId",
+					"pageId",
+					"nodeId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateFigmaLocationDTO": {
+				"properties": {
+					"projectId": {
+						"type": "string"
+					},
+					"pageId": {
+						"type": "string"
+					},
+					"nodeId": {
+						"type": "string"
+					},
+					"isPinned": {
+						"type": "boolean"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Domain": {
+				"properties": {
+					"domain_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"domain_name": {
+						"type": "string"
+					},
+					"created_at": {
+						"type": "string"
+					},
+					"updated_at": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"domain_id",
+					"domain_name",
+					"created_at",
+					"updated_at"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateDomainDTO": {
+				"properties": {
+					"domain": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"domain"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateDomainDTO": {
+				"properties": {
+					"domain": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserResponse": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"user_id",
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RegisterDTO": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ValidateDTO": {
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password_hash": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password_hash"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateUsernameDTO": {
+				"properties": {
+					"currentUsername": {
+						"type": "string"
+					},
+					"password_hash": {
+						"type": "string"
+					},
+					"newUsername": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"currentUsername",
+					"password_hash",
+					"newUsername"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "i18n-db",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/sections": {
+			"get": {
+				"operationId": "GetSections",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Section"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateSection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Section"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateSectionDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sections/{name}": {
+			"get": {
+				"operationId": "GetSection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Section"
+								}
+							}
+						}
+					}
+				},
+				"description": "검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>\n도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>\nsection 이름은 수정 불가",
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "X-Domain-Id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/sections/{id}": {
+			"put": {
+				"operationId": "UpdateSection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Section"
+								}
+							}
+						}
+					}
+				},
+				"description": "문서 정보 변경",
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateSectionDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteSection",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/sections/{id}/keys": {
+			"get": {
+				"operationId": "GetKeysBySection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Section Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/resources": {
+			"get": {
+				"operationId": "GetResources",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateResource",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateResourceDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/resources/{id}": {
+			"get": {
+				"operationId": "GetResource",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateResource",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateResourceDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteResource",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/resources/{id}/keys": {
+			"get": {
+				"operationId": "GetKeysByResource",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Resource Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/all": {
+			"get": {
+				"operationId": "GetKeys",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"summary": "전체 키 리스트 조회",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/localization/keys": {
+			"get": {
+				"operationId": "GetKeysByDomain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LocalizationKeyDetail"
+								}
+							}
+						}
+					}
+				},
+				"summary": "도메인 내 키 리스트 조회",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "X-Domain-Id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "CreateKey",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"summary": "키 생성",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateLocalizationKeyDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/localization/keys/section/{sectionId}": {
+			"get": {
+				"operationId": "GetKeysByDomainAndSection",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LocalizationKeyDetail"
+								}
+							}
+						}
+					}
+				},
+				"summary": "도메인 내 섹션 내 키 리스트 조회",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "X-Domain-Id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "sectionId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/name/{name}": {
+			"get": {
+				"operationId": "GetKeyByNameSearch",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LocalizationKeyDetail"
+								}
+							}
+						}
+					}
+				},
+				"summary": "이름으로 검색",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "X-Domain-Id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/id/{id}": {
+			"get": {
+				"operationId": "GetKeyById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LocalizationKeyDetail"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/{id}": {
+			"put": {
+				"operationId": "UpdateKey",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"summary": "변수나 스타일에 대한 키 수정",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateLocalizationKeyDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteKey",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "하위 키 삭제 같이 해야 함",
+				"summary": "키 삭제",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/{id}/translations": {
+			"get": {
+				"operationId": "GetTranslationsByKey",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"summary": "키 번역 목록 조회",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/keys/by-temporary-name/{tempName}": {
+			"get": {
+				"operationId": "FindKeyByTemporaryName",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LocalizationKeyDetail"
+								}
+							}
+						}
+					}
+				},
+				"summary": "임시 키 이름으로 현재 키 검색",
+				"tags": [
+					"Localization Key Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "tempName",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/translations": {
+			"get": {
+				"operationId": "GetTranslations",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Localization"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Localization Management"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateTranslation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Localization"
+								}
+							}
+						}
+					}
+				},
+				"description": "있으면 수정하고 없으면 추가함",
+				"tags": [
+					"Localization Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTranslationDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/localization/translations/key/{keyId}": {
+			"get": {
+				"operationId": "GetTranslation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Localization"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"description": "키 아이디 기반으로 번역 목록 조회",
+				"tags": [
+					"Localization Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "keyId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/localization/translations/{id}": {
+			"get": {
+				"operationId": "GetTranslationById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Localization"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Localization Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "DeleteTranslation",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"description": "번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~",
+				"tags": [
+					"Localization Management"
+				],
+				"deprecated": true,
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/figma/locations": {
+			"get": {
+				"operationId": "GetLocations",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/FigmaLocation"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Figma Management"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateLocation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FigmaLocation"
+								}
+							}
+						}
+					}
+				},
+				"description": "피그마 위치를 식별하는 키 생성</br>\n완전히 겹치면 추가할 필요 없으니 있는 값 반환함",
+				"tags": [
+					"Figma Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateFigmaLocationDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/figma/locations/{nodeId}": {
+			"get": {
+				"operationId": "GetLocation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FigmaLocation"
+								}
+							}
+						}
+					}
+				},
+				"description": "쓸 일 없어서 설계 안함",
+				"tags": [
+					"Figma Management"
+				],
+				"deprecated": true,
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "nodeId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/figma/locations/{id}": {
+			"put": {
+				"operationId": "UpdateLocation",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FigmaLocation"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Figma Management"
+				],
+				"deprecated": true,
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateFigmaLocationDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteLocation",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Figma Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/figma/locations/mapping": {
+			"post": {
+				"operationId": "CreateMapping",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Figma Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"locationId": {
+										"type": "string"
+									},
+									"keyId": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"locationId",
+									"keyId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/figma/locations/mapping/{keyId}/{locationId}": {
+			"delete": {
+				"operationId": "DeleteMapping",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Figma Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "keyId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "locationId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/domains": {
+			"get": {
+				"operationId": "GetDomains",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Domain"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateDomain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Domain"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateDomainDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/domains/{name}": {
+			"get": {
+				"operationId": "GetDomain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Domain"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "UpdateDomain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Domain"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateDomainDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeleteDomain",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/domains/{name}/sections": {
+			"get": {
+				"operationId": "GetSectionsByDomain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Section"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Domain Management"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/register": {
+			"post": {
+				"operationId": "Register",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					}
+				},
+				"summary": "사용자 등록",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegisterDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/validate": {
+			"post": {
+				"operationId": "Validate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isValid": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isValid"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"summary": "사용자 인증 검증",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ValidateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/refresh-hash": {
+			"post": {
+				"operationId": "RefreshHash",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"new_hash": {
+											"type": "string"
+										},
+										"isSuccess": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isSuccess"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ValidateDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/{username}": {
+			"get": {
+				"operationId": "GetUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					}
+				},
+				"summary": "사용자 정보 조회",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "username",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/username": {
+			"put": {
+				"operationId": "UpdateUsername",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					}
+				},
+				"summary": "사용자 이름 변경",
+				"tags": [
+					"Authentication"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateUsernameDTO"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

@@ -8,6 +8,7 @@ import { AppProvider } from '@/domain/Provider'
 import { NonNullableComponentTypeExtract } from 'types/utilType'
 import { useState } from 'preact/hooks'
 import LabelPage from '@/domain/Label/LabelPage'
+import SettingPage from '@/domain/Setting/SettingPage'
 
 const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting']
 
@@ -35,6 +36,11 @@ function Plugin() {
 		{
 			children: <LabelPage />,
 			value: nav[0],
+		},
+
+		{
+			children: <SettingPage />,
+			value: nav[4],
 		},
 		// {
 		//   children: <Inspect></Inspect>,

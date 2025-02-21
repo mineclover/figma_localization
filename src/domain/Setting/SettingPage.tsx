@@ -12,13 +12,14 @@ import {
 } from './SettingModel'
 import DomainSelect from './DomainSelect'
 import { useSignal } from '@/hooks/useSignal'
-import { Bold, Button, Container, Stack, VerticalSpace } from '@create-figma-plugin/ui'
+import { Bold, Button, Container, Stack, Text, Textbox, VerticalSpace } from '@create-figma-plugin/ui'
 import styles from './domainSelect.module.css'
+import { SET_LANGUAGE_CODES } from '../constant'
+import { emit } from '@create-figma-plugin/utilities'
 
 function SettingPage() {
 	const { data, loading, error, fetchData } = useFetch<components['schemas']['Domain'][]>()
 	const domainSetting = useSignal(domainSettingSignal)
-
 	const languageCodes = useSignal(languageCodesSignal)
 
 	useEffect(() => {
@@ -26,6 +27,7 @@ function SettingPage() {
 			const domain = data.find((domain) => domain.domain_id === domainSetting.domainId)
 			if (domain) {
 				languageCodesSignal.value = domain.language_codes
+				emit(SET_LANGUAGE_CODES.REQUEST_KEY, domain.language_codes)
 			}
 		}
 	}, [domainSetting])
@@ -85,6 +87,14 @@ function SettingPage() {
 						)
 					})}
 				</div>
+			</div>
+			<VerticalSpace space="extraSmall" />
+			<div className={styles.container}>
+				<div className={styles.domainContainer}>
+					<Bold>Project ID</Bold>
+				</div>
+				<Text>Section URL 복사해서 붙여넣기</Text>
+				<Textbox value={projectId} onChange={(e) => setProjectId(e.target.value)} />
 			</div>
 		</Container>
 	)

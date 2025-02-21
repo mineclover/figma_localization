@@ -1,5 +1,3 @@
-import { MEMO_KEY, UUID } from '../types'
-
 /** 화면 이동 */
 export type ViewMoveType = {
 	pageId: string
@@ -8,6 +6,7 @@ export type ViewMoveType = {
 
 /** 현재 커서 정보 */
 export type CurrentCursorType = {
+	projectId: string
 	sectionName: string
 	sectionId: string
 

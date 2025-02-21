@@ -72,6 +72,19 @@ function SettingPage() {
 				<div className={styles.domainContainer}>
 					<Bold>Language Codes</Bold>
 				</div>
+				<div className={styles.languageCodesContainer}>
+					{languageCodes.map((languageCode, index) => {
+						if (index === 0) {
+							return <span key={index}>{languageCode}</span>
+						}
+						return (
+							<Fragment key={index}>
+								<span>/</span>
+								<span>{languageCode}</span>
+							</Fragment>
+						)
+					})}
+				</div>
 			</div>
 		</Container>
 	)

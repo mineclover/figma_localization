@@ -1,0 +1,80 @@
+.memoBlock {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+	padding: 4px;
+	gap: 4px;
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+}
+
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+}
+
+.top {
+	display: flex;
+	flex-direction: row;
+}
+.title {
+	text-align: left;
+}
+.bottom {
+	display: flex;
+	flex-direction: row;
+}
+
+.link {
+	position: relative;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	&:hover {
+		background-color: var(--figma-color-bg-brand);
+	}
+}
+
+.componentLink {
+	display: flex;
+	flex-direction: row;
+	gap: 4px;
+}
+
+.component {
+	&:hover {
+		background-color: var(--figma-color-bg-component);
+	}
+}
+
+.delete {
+	&:hover {
+		background-color: var(--figma-color-bg-danger);
+	}
+}
+
+.url {
+	position: absolute;
+	left: calc(100% + 4px);
+	top: 0;
+	width: calc(100vw - 64px);
+
+	max-width: calc(100vw - 64px);
+	text-align: left;
+	background-color: var(--figma-color-bg);
+	padding: 2px 4px;
+	border: 1px solid var(--figma-color-border);
+	border-radius: 4px;
+	word-break: break-all;
+	display: none;
+	&.open {
+		display: block;
+	}
+}

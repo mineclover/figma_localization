@@ -1,0 +1,39 @@
+{
+	"dependencies": {
+		"@create-figma-plugin/ui": "^3.2.1",
+		"@create-figma-plugin/utilities": "^3.2.1",
+		"@preact/signals-core": "^1.8.0",
+		"preact": "^10.24.3"
+	},
+	"devDependencies": {
+		"@create-figma-plugin/build": "^3.2.1",
+		"@create-figma-plugin/tsconfig": "^3.2.1",
+		"@figma/plugin-typings": "1.100.2",
+		"@figma/widget-typings": "^1.9.2",
+		"@types/lodash": "^4.17.13",
+		"@types/node": "^22.7.7",
+		"husky": "^9.1.6",
+		"lint-staged": "^15.2.10",
+		"prettier": "^3.3.3",
+		"typescript": "^5.6.3"
+	},
+	"scripts": {
+		"build": "build-figma-plugin --typecheck --minify",
+		"watch": "build-figma-plugin --typecheck --watch",
+		"types": "npx openapi-typescript https://raw.githubusercontent.com/figma/rest-api-spec/main/openapi/openapi.yaml -o types/restApi.d.ts",
+		"prepare": "husky"
+	},
+	"figma-plugin": {
+		"editorType": [
+			"figma",
+			"dev"
+		],
+		"id": "11111",
+		"capabilities": [
+			"inspect"
+		],
+		"name": "Document System",
+		"main": "src/apps/main.ts",
+		"ui": "src/apps/ui.tsx"
+	}
+}

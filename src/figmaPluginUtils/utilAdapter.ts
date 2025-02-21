@@ -1,0 +1,25 @@
+import { on } from '@create-figma-plugin/utilities'
+import { NodeZoomHandler } from './types'
+
+/** 특정 값으로 노드 줌 */
+export const nodeZoom_Adapter = () => {
+	on<NodeZoomHandler>('NODE_ZOOM', async ({ nodeId, pageId }) => {
+		const page = figma.root.findChild((node) => node.id === pageId && node.type === 'PAGE') as PageNode | null
+		if (!page) {
+			return
+		}
+		// 페이지 이동 시켜줘야 줌이 됨
+		await figma.setCurrentPageAsync(page)
+		// 현재 페이지를 찾은 페이지로 설정
+		// figma 내에서 노드 찾기
+		const node = (await figma.getNodeByIdAsync(nodeId)) as SceneNode
+		// 아래 코드보다 위 코드가 빠름
+		// const node = page.findOne((n) => n.id === nodeId);
+
+		if (node) {
+			// 노드로 화면 줌
+			figma.currentPage.selection = [node]
+			figma.viewport.scrollAndZoomIntoView([node])
+		}
+	})
+}

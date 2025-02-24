@@ -1,15 +1,16 @@
 import { signal } from '@preact/signals-core'
 import { CurrentCursorType } from '../utils/featureType'
 import { emit, on } from '@create-figma-plugin/utilities'
-import { GET_CURSOR_POSITION, SET_CURSOR_POSITION, SET_PROJECT_ID, STORE_KEY } from '../constant'
+import { GET_CURSOR_POSITION, GET_PROJECT_ID, SET_CURSOR_POSITION, SET_PROJECT_ID, STORE_KEY } from '../constant'
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore'
 import { FileMetaSearch, FilePathNodeSearch, FilePathSearch, notify } from '@/figmaPluginUtils'
 
 export const currentPointerSignal = signal<CurrentCursorType | null>(null)
+export const projectIdSignal = signal<string>('')
 
 // inspect 모드에서 figma.fileKey가 없기 때문에 프로젝트 아이디를 STORE_KEY에 추가함
 
-const getFileKey = () => {
+const getProjectId = () => {
 	const fileKey = figma.fileKey
 	if (fileKey) {
 		return fileKey
@@ -23,9 +24,26 @@ const getFileKey = () => {
 	notify('editor 최초 설정 필요', 'error')
 }
 
-export const onSetFileKey = () => {
-	on(SET_PROJECT_ID.REQUEST_KEY, (projectId: string) => {
+export const onGetProjectId = () => {
+	on(GET_PROJECT_ID.REQUEST_KEY, () => {
+		const projectId = getProjectId()
+		if (projectId) {
+			emit(GET_PROJECT_ID.RESPONSE_KEY, projectId)
+		}
+	})
+}
+
+export const onSetProjectId = () => {
+	return on(SET_PROJECT_ID.REQUEST_KEY, (projectId: string) => {
 		figma.root.setPluginData(STORE_KEY.PROJECT_ID, projectId)
+		emit(GET_PROJECT_ID.RESPONSE_KEY, projectId)
+	})
+}
+
+export const onSetProjectIdResponse = () => {
+	emit(GET_PROJECT_ID.REQUEST_KEY)
+	return on(GET_PROJECT_ID.RESPONSE_KEY, (projectId: string) => {
+		projectIdSignal.value = projectId
 	})
 }
 
@@ -43,7 +61,7 @@ export const onGetCursorPosition = () => {
 				return
 			}
 
-			const projectId = getFileKey()
+			const projectId = getProjectId()
 			if (!projectId) {
 				return
 			}
@@ -57,6 +75,7 @@ export const onGetCursorPosition = () => {
 				nodeName: temp.name,
 				nodeId: temp.id,
 			}
+			console.log('🚀 ~ on ~ cursorPosition:', cursorPosition)
 			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 		}
 	})

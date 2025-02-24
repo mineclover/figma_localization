@@ -8,11 +8,12 @@ import {
 	onSetDomainSetting,
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel'
-import { onGetCursorPosition, onSetFileKey } from '@/domain/Label/LabelModel'
+import { onGetCursorPosition, onGetProjectId, onSetProjectId } from '@/domain/Label/LabelModel'
 
 export default function () {
 	// 세팅
-	onSetFileKey()
+	onSetProjectId()
+	onGetProjectId()
 
 	onGetDomainSetting()
 	onSetDomainSetting()

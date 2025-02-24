@@ -24,6 +24,7 @@ export const onGetDomainSetting = () => {
 
 /** UI */
 export const onGetDomainSettingResponse = () => {
+	emit(GET_DOMAIN_PAIR.REQUEST_KEY)
 	return on(GET_DOMAIN_PAIR.RESPONSE_KEY, (domainSetting: DomainSettingType) => {
 		domainSettingSignal.value = domainSetting
 	})
@@ -49,6 +50,7 @@ export const onGetLanguageCodes = () => {
 
 /** UI */
 export const onGetLanguageCodesResponse = () => {
+	emit(GET_LANGUAGE_CODES.REQUEST_KEY)
 	return on(GET_LANGUAGE_CODES.RESPONSE_KEY, (languageCodes: string[]) => {
 		languageCodesSignal.value = languageCodes
 	})

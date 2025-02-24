@@ -14,11 +14,16 @@ import DomainSelect from './DomainSelect'
 import { useSignal } from '@/hooks/useSignal'
 import { Bold, Button, Container, Stack, Text, Textbox, VerticalSpace } from '@create-figma-plugin/ui'
 import styles from './domainSelect.module.css'
-import { SET_LANGUAGE_CODES } from '../constant'
+import { GET_PROJECT_ID, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
+import { onSetProjectIdResponse, projectIdSignal } from '../Label/LabelModel'
 
 function SettingPage() {
 	const { data, loading, error, fetchData } = useFetch<components['schemas']['Domain'][]>()
+
+	const projectId = useSignal(projectIdSignal)
+	console.log('🚀 ~ SettingPage ~ projectId:', projectId)
+
 	const domainSetting = useSignal(domainSettingSignal)
 	const languageCodes = useSignal(languageCodesSignal)
 
@@ -36,11 +41,14 @@ function SettingPage() {
 		fetchData('/domains', {
 			method: 'GET',
 		})
+
 		const event = onGetDomainSettingResponse()
 		const event2 = onGetLanguageCodesResponse()
+		const event3 = onSetProjectIdResponse()
 		return () => {
 			event()
 			event2()
+			event3()
 		}
 	}, [])
 
@@ -93,8 +101,30 @@ function SettingPage() {
 				<div className={styles.domainContainer}>
 					<Bold>Project ID</Bold>
 				</div>
-				<Text>Section URL 복사해서 붙여넣기</Text>
-				<Textbox value={projectId} onChange={(e) => setProjectId(e.target.value)} />
+				<Text>현재 페이지의 Section URL을 복사하여 입력해주세요. (최초 1회)</Text>
+				<Textbox
+					placeholder={'project Id'}
+					variant="border"
+					value={projectId}
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') {
+							// /design/IHkXokQlhcNvBPOFO7h0WY/Untitled?node-id=10-9&m=dev
+							const regex = /https:\/\/www\.figma\.com\/design\/([^/]+)\//
+							const match = e.currentTarget.value.match(regex)
+							const designId = match ? match[1] : null
+							projectIdSignal.value = 'loading'
+
+							if (designId) {
+								emit(SET_PROJECT_ID.REQUEST_KEY, designId)
+							} else {
+								projectIdSignal.value = '유효하지 않은 값'
+							}
+						}
+					}}
+					onBlur={(e) => {
+						emit(GET_PROJECT_ID.REQUEST_KEY)
+					}}
+				/>
 			</div>
 		</Container>
 	)

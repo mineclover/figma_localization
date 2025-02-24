@@ -9,6 +9,7 @@ import {
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel'
 import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel'
+import { onTargetSetNodeLocation } from '@/domain/Label/TextPluginDataModel'
 
 export default function () {
 	// 세팅
@@ -20,6 +21,9 @@ export default function () {
 	onGetLanguageCodes()
 	onSetLanguageCodes()
 	onGetCursorPosition()
+	// 플러그인 데이터 세팅
+
+	onTargetSetNodeLocation()
 
 	// 유틸
 	onNodeSelectionChange()

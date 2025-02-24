@@ -1,7 +1,6 @@
+import { baseURL } from '@/domain/constant'
 import { useState } from 'preact/hooks'
 import { paths } from 'types/i18n'
-
-const baseURL = 'http://localhost:6543'
 
 interface FetchState<T> {
 	data: T | null

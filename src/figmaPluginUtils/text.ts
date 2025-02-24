@@ -15,24 +15,37 @@ interface RangeMethods {
 	getRangeTextDecoration(start: number, end: number): StyleRange<TextDecoration>[]
 	getRangeTextCase(start: number, end: number): StyleRange<TextCase>[]
 	getRangeTextStyleId(start: number, end: number): StyleRange<string>[]
+	getRangeAllFontNames(start: number, end: number): StyleRange<FontName[]>[]
+	getRangeOpenTypeFeatures(start: number, end: number): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
+	getRangeHyperlink(start: number, end: number): StyleRange<HyperlinkTarget | null>[]
+	getRangeFills(start: number, end: number): StyleRange<Paint[]>[]
+	getRangeFillStyleId(start: number, end: number): StyleRange<string>[]
+	getRangeListOptions(start: number, end: number): StyleRange<TextListOptions>[]
+	getRangeIndentation(start: number, end: number): StyleRange<number>[]
 }
 function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, end: number) => any) {
 	const length = textNode.characters.length
 
 	let start = 0
+	let end = 1
 	const ranges: StyleRange<T>[] = []
 
 	while (start < length) {
-		const initialStyle = getRangeMethod.call(textNode, start, start + 1)
-		let end = start + 1
+		const initialStyle = getRangeMethod.call(textNode, start, end)
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
+			console.log('🚀 ~ 탐색:', start, end)
 			const currentStyle = getRangeMethod.call(textNode, start, end)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
-			if (currentStyle === figma.mixed || currentStyle !== initialStyle) {
-				// 마지막 구간이 처리 안되서 -1을 밖에서 처리 함
+			if (currentStyle === figma.mixed) {
+				console.log('🚀 ~ 종료  :', start, end, currentStyle)
+				end = end - 1
+				break
+			}
+			if (end === length) {
+				end = length
 				break
 			}
 			end++
@@ -41,12 +54,13 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 		// 범위 정보 저장
 		ranges.push({
 			start,
-			end: end - 1, // end는 변경지점이므로 -1
+			end: end, // end는 변경지점이므로 -1
 			value: initialStyle,
 		})
 
-		// 다음 범위의 시작점으로 이동
-		start = end - 1
+		// 다음 범위의 시작점으로 이동 (수정된 부분)
+		start = end // end - 1 대신 end를 사용
+		end = start + 1
 	}
 
 	return ranges
@@ -144,15 +158,83 @@ function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	]
 }
 
+function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.fontWeight === figma.mixed) {
+		return getStyleRanges<number>(textNode, textNode.getRangeFontWeight)
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.fontWeight,
+		},
+	]
+}
+
+function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName[]>[] | null {
+	return getStyleRanges<FontName[]>(textNode, textNode.getRangeAllFontNames)
+}
+
+function getOpenTypeFeaturesRanges(textNode: TextNode): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null {
+	return getStyleRanges(textNode, textNode.getRangeOpenTypeFeatures)
+}
+
+function getHyperlinkRanges(textNode: TextNode): StyleRange<HyperlinkTarget | null>[] | null {
+	if (textNode.hyperlink === figma.mixed) {
+		return getStyleRanges<HyperlinkTarget | null>(textNode, textNode.getRangeHyperlink)
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.hyperlink,
+		},
+	]
+}
+
+function getFillsRanges(textNode: TextNode): StyleRange<Paint[]>[] | null {
+	if (textNode.fills === figma.mixed) {
+		return getStyleRanges<Paint[]>(textNode, textNode.getRangeFills)
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.fills as Paint[],
+		},
+	]
+}
+
+function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
+	if (textNode.fillStyleId === figma.mixed) {
+		return getStyleRanges<string>(textNode, textNode.getRangeFillStyleId)
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.fillStyleId,
+		},
+	]
+}
+
 // 모든 스타일 Range를 가져오는 함수
 interface AllStyleRanges {
-	fontSize: StyleRange<number>[] | null
-	fontName: StyleRange<FontName>[] | null
-	lineHeight: StyleRange<LineHeight>[] | null
-	letterSpacing: StyleRange<LetterSpacing>[] | null
-	textDecoration: StyleRange<TextDecoration>[] | null
-	textCase: StyleRange<TextCase>[] | null
-	textStyleId: StyleRange<string>[] | null
+	fontSize?: StyleRange<number>[] | null
+	fontName?: StyleRange<FontName>[] | null
+	lineHeight?: StyleRange<LineHeight>[] | null
+	letterSpacing?: StyleRange<LetterSpacing>[] | null
+	textDecoration?: StyleRange<TextDecoration>[] | null
+	textCase?: StyleRange<TextCase>[] | null
+	textStyleId?: StyleRange<string>[] | null
+	fontWeight?: StyleRange<number>[] | null
+	allFontNames?: StyleRange<FontName[]>[] | null
+	openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null
+	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
+	fills?: StyleRange<Paint[]>[] | null
+	fillStyleId?: StyleRange<string>[] | null
+	// listOptions: StyleRange<TextListOptions>[] | null
+	// indentation: StyleRange<number>[] | null
 }
 
 export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
@@ -164,5 +246,11 @@ export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
 		textDecoration: getTextDecorationRanges(textNode),
 		textCase: getTextCaseRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
+		fontWeight: getFontWeightRanges(textNode),
+		allFontNames: getAllFontNamesRanges(textNode),
+		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
+		hyperlink: getHyperlinkRanges(textNode),
+		fills: getFillsRanges(textNode),
+		fillStyleId: getFillStyleIdRanges(textNode),
 	}
 }

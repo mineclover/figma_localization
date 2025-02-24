@@ -15,7 +15,7 @@ interface RangeMethods {
 	getRangeTextDecoration(start: number, end: number): StyleRange<TextDecoration>[]
 	getRangeTextCase(start: number, end: number): StyleRange<TextCase>[]
 	getRangeTextStyleId(start: number, end: number): StyleRange<string>[]
-	getRangeAllFontNames(start: number, end: number): StyleRange<FontName[]>[]
+	// getRangeAllFontNames(start: number, end: number): StyleRange<FontName>[]
 	getRangeOpenTypeFeatures(start: number, end: number): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
 	getRangeHyperlink(start: number, end: number): StyleRange<HyperlinkTarget | null>[]
 	getRangeFills(start: number, end: number): StyleRange<Paint[]>[]
@@ -195,21 +195,22 @@ function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
 	]
 }
 
-function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName>[] | null {
-	if (textNode.fontName === figma.mixed) {
-		return getStyleRanges<FontName>(textNode, textNode.getRangeAllFontNames)
-	}
-	if (textNode.fontName == null) {
-		return null
-	}
-	return [
-		{
-			start: 0,
-			end: textNode.characters.length,
-			value: textNode.fontName,
-		},
-	]
-}
+/** 제대로 동작하지 않음 */
+// function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName>[] | null {
+// 	if (textNode.fontName === figma.mixed) {
+// 		return getStyleRanges<FontName>(textNode, textNode.getRangeAllFontNames)
+// 	}
+// 	if (textNode.fontName == null) {
+// 		return null
+// 	}
+// 	return [
+// 		{
+// 			start: 0,
+// 			end: textNode.characters.length,
+// 			value: textNode.fontName,
+// 		},
+// 	]
+// }
 
 function getOpenTypeFeaturesRanges(textNode: TextNode): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null {
 	if (textNode.openTypeFeatures === figma.mixed) {
@@ -285,7 +286,7 @@ interface AllStyleRanges {
 	textCase?: StyleRange<TextCase>[] | null
 	textStyleId?: StyleRange<string>[] | null
 	fontWeight?: StyleRange<number>[] | null
-	allFontNames?: StyleRange<FontName>[] | null
+	fontNames?: StyleRange<FontName>[] | null
 	openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null
 	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
 	fills?: StyleRange<Paint[]>[] | null
@@ -294,17 +295,19 @@ interface AllStyleRanges {
 	// indentation: StyleRange<number>[] | null
 }
 
+// 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
+
 export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
 	const temp: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
 		fontName: getFontNameRanges(textNode),
+		// fontNames: getAllFontNamesRanges(textNode),
 		lineHeight: getLineHeightRanges(textNode),
 		letterSpacing: getLetterSpacingRanges(textNode),
 		textDecoration: getTextDecorationRanges(textNode),
 		textCase: getTextCaseRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
 		fontWeight: getFontWeightRanges(textNode),
-		allFontNames: getAllFontNamesRanges(textNode),
 		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),

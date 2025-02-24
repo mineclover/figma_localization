@@ -35,12 +35,12 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
-			console.log('🚀 ~ 탐색:', start, end)
+			// console.log('🚀 ~ 탐색:', start, end)
 			const currentStyle = getRangeMethod.call(textNode, start, end)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
 			if (currentStyle === figma.mixed) {
-				console.log('🚀 ~ 종료  :', start, end, currentStyle)
+				// console.log('🚀 ~ 종료  :', start, end, currentStyle)
 				end = end - 1
 				break
 			}
@@ -71,6 +71,9 @@ function getFontSizeRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.fontSize === figma.mixed) {
 		return getStyleRanges<number>(textNode, textNode.getRangeFontSize)
 	}
+	if (textNode.fontSize == null) {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -83,6 +86,9 @@ function getFontSizeRanges(textNode: TextNode): StyleRange<number>[] | null {
 function getFontNameRanges(textNode: TextNode): StyleRange<FontName>[] | null {
 	if (textNode.fontName === figma.mixed) {
 		return getStyleRanges<FontName>(textNode, textNode.getRangeFontName)
+	}
+	if (textNode.fontName == null) {
+		return null
 	}
 	return [
 		{
@@ -97,6 +103,9 @@ function getLineHeightRanges(textNode: TextNode): StyleRange<LineHeight>[] | nul
 	if (textNode.lineHeight === figma.mixed) {
 		return getStyleRanges<LineHeight>(textNode, textNode.getRangeLineHeight)
 	}
+	if (textNode.lineHeight == null) {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -109,6 +118,9 @@ function getLineHeightRanges(textNode: TextNode): StyleRange<LineHeight>[] | nul
 function getLetterSpacingRanges(textNode: TextNode): StyleRange<LetterSpacing>[] | null {
 	if (textNode.letterSpacing === figma.mixed) {
 		return getStyleRanges<LetterSpacing>(textNode, textNode.getRangeLetterSpacing)
+	}
+	if (textNode.letterSpacing == null || textNode.letterSpacing.value === 0) {
+		return null
 	}
 	return [
 		{
@@ -123,6 +135,9 @@ function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>
 	if (textNode.textDecoration === figma.mixed) {
 		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration)
 	}
+	if (textNode.textDecoration == null || textNode.textDecoration === 'NONE') {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -135,6 +150,9 @@ function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>
 function getTextCaseRanges(textNode: TextNode): StyleRange<TextCase>[] | null {
 	if (textNode.textCase === figma.mixed) {
 		return getStyleRanges<TextCase>(textNode, textNode.getRangeTextCase)
+	}
+	if (textNode.textCase == null || textNode.textCase === 'ORIGINAL') {
+		return null
 	}
 	return [
 		{
@@ -149,6 +167,9 @@ function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	if (textNode.textStyleId === figma.mixed) {
 		return getStyleRanges<string>(textNode, textNode.getRangeTextStyleId)
 	}
+	if (textNode.textStyleId == null || textNode.textStyleId === '') {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -162,6 +183,9 @@ function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.fontWeight === figma.mixed) {
 		return getStyleRanges<number>(textNode, textNode.getRangeFontWeight)
 	}
+	if (textNode.fontWeight == null) {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -171,17 +195,44 @@ function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
 	]
 }
 
-function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName[]>[] | null {
-	return getStyleRanges<FontName[]>(textNode, textNode.getRangeAllFontNames)
+function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName>[] | null {
+	if (textNode.fontName === figma.mixed) {
+		return getStyleRanges<FontName>(textNode, textNode.getRangeAllFontNames)
+	}
+	if (textNode.fontName == null) {
+		return null
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.fontName,
+		},
+	]
 }
 
 function getOpenTypeFeaturesRanges(textNode: TextNode): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null {
-	return getStyleRanges(textNode, textNode.getRangeOpenTypeFeatures)
+	if (textNode.openTypeFeatures === figma.mixed) {
+		return getStyleRanges<{ [feature in OpenTypeFeature]: boolean }>(textNode, textNode.getRangeOpenTypeFeatures)
+	}
+	if (textNode.openTypeFeatures == null || Object.keys(textNode.openTypeFeatures).length === 0) {
+		return null
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.openTypeFeatures,
+		},
+	]
 }
 
 function getHyperlinkRanges(textNode: TextNode): StyleRange<HyperlinkTarget | null>[] | null {
 	if (textNode.hyperlink === figma.mixed) {
 		return getStyleRanges<HyperlinkTarget | null>(textNode, textNode.getRangeHyperlink)
+	}
+	if (textNode.hyperlink == null || textNode.hyperlink.value === '') {
+		return null
 	}
 	return [
 		{
@@ -196,6 +247,9 @@ function getFillsRanges(textNode: TextNode): StyleRange<Paint[]>[] | null {
 	if (textNode.fills === figma.mixed) {
 		return getStyleRanges<Paint[]>(textNode, textNode.getRangeFills)
 	}
+	if (textNode.fills == null || textNode.fills.length === 0) {
+		return null
+	}
 	return [
 		{
 			start: 0,
@@ -208,6 +262,9 @@ function getFillsRanges(textNode: TextNode): StyleRange<Paint[]>[] | null {
 function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	if (textNode.fillStyleId === figma.mixed) {
 		return getStyleRanges<string>(textNode, textNode.getRangeFillStyleId)
+	}
+	if (textNode.fillStyleId == null || textNode.fillStyleId === '') {
+		return null
 	}
 	return [
 		{
@@ -228,7 +285,7 @@ interface AllStyleRanges {
 	textCase?: StyleRange<TextCase>[] | null
 	textStyleId?: StyleRange<string>[] | null
 	fontWeight?: StyleRange<number>[] | null
-	allFontNames?: StyleRange<FontName[]>[] | null
+	allFontNames?: StyleRange<FontName>[] | null
 	openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null
 	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
 	fills?: StyleRange<Paint[]>[] | null
@@ -238,7 +295,7 @@ interface AllStyleRanges {
 }
 
 export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
-	return {
+	const temp: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
 		fontName: getFontNameRanges(textNode),
 		lineHeight: getLineHeightRanges(textNode),
@@ -252,5 +309,13 @@ export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),
 		fillStyleId: getFillStyleIdRanges(textNode),
+	} as const
+
+	for (const key in temp) {
+		if (temp[key as keyof AllStyleRanges] == null) {
+			delete temp[key as keyof AllStyleRanges]
+		}
 	}
+
+	return temp
 }

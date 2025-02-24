@@ -26,7 +26,9 @@ const getProjectId = () => {
 
 export const onGetProjectId = () => {
 	on(GET_PROJECT_ID.REQUEST_KEY, () => {
+		console.log('🚀 ~ onGetProjectId ~ projectId:')
 		const projectId = getProjectId()
+
 		if (projectId) {
 			emit(GET_PROJECT_ID.RESPONSE_KEY, projectId)
 		}
@@ -35,6 +37,7 @@ export const onGetProjectId = () => {
 
 export const onSetProjectId = () => {
 	return on(SET_PROJECT_ID.REQUEST_KEY, (projectId: string) => {
+		console.log('🚀 ~ onSetProjectId ~ projectId:', projectId)
 		figma.root.setPluginData(STORE_KEY.PROJECT_ID, projectId)
 		emit(GET_PROJECT_ID.RESPONSE_KEY, projectId)
 	})
@@ -43,47 +46,63 @@ export const onSetProjectId = () => {
 export const onSetProjectIdResponse = () => {
 	emit(GET_PROJECT_ID.REQUEST_KEY)
 	return on(GET_PROJECT_ID.RESPONSE_KEY, (projectId: string) => {
+		console.log('🚀 ~ onSetProjectIdResponse ~ projectId:', projectId)
 		projectIdSignal.value = projectId
+	})
+}
+
+export const getCursorPosition = () => {
+	const temp = figma.currentPage.selection[0]
+
+	if (temp && temp.type === 'TEXT') {
+		const result = FilePathNodeSearch(temp)
+
+		// 첫번째 섹션
+		const sectionNode = result.find((node) => node.type === 'SECTION')
+		// if (!sectionNode) {
+		// 섹션이 없을 때 제약을 줄 것인가 여부
+		// 	return
+		// }
+
+		const projectId = getProjectId()
+		if (!projectId) {
+			return
+		}
+
+		const cursorPosition: CurrentCursorType = {
+			projectId,
+			sectionName: sectionNode?.name ?? '',
+			sectionId: sectionNode?.id ?? '',
+			pageName: figma.currentPage.name,
+			pageId: figma.currentPage.id,
+			nodeName: temp.name,
+			nodeId: temp.id,
+		}
+
+		return cursorPosition
+	}
+}
+
+export const onNodeSelectionChange = () => {
+	figma.on('selectionchange', () => {
+		const cursorPosition = getCursorPosition()
+		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 	})
 }
 
 /** Main */
 export const onGetCursorPosition = () => {
 	on(GET_CURSOR_POSITION.REQUEST_KEY, () => {
-		const temp = figma.currentPage.selection[0]
-
-		if (temp && temp.type === 'TEXT') {
-			const result = FilePathNodeSearch(temp)
-
-			// 첫번째 섹션
-			const sectionNode = result.find((node) => node.type === 'SECTION')
-			if (!sectionNode) {
-				return
-			}
-
-			const projectId = getProjectId()
-			if (!projectId) {
-				return
-			}
-
-			const cursorPosition: CurrentCursorType = {
-				projectId,
-				sectionName: sectionNode.name,
-				sectionId: sectionNode.id,
-				pageName: figma.currentPage.name,
-				pageId: figma.currentPage.id,
-				nodeName: temp.name,
-				nodeId: temp.id,
-			}
-			console.log('🚀 ~ on ~ cursorPosition:', cursorPosition)
-			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
-		}
+		const cursorPosition = getCursorPosition()
+		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 	})
 }
 
 /** UI */
 export const onGetCursorPositionResponse = () => {
+	emit(GET_CURSOR_POSITION.REQUEST_KEY)
 	return on(GET_CURSOR_POSITION.RESPONSE_KEY, (cursorPosition: CurrentCursorType) => {
+		console.log('🚀 ~ onGetCursorPositionResponse ~ cursorPosition:', cursorPosition)
 		currentPointerSignal.value = cursorPosition
 	})
 }

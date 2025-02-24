@@ -24,6 +24,13 @@ function LabelPage() {
 			LabelPage
 			<button onClick={() => emit(GET_CURSOR_POSITION.REQUEST_KEY)}>emit</button>
 			{JSON.stringify(currentPointer)}
+			<div>
+				<div>
+					<div></div>
+				</div>
+			</div>
+			<hr></hr>
+			<button onClick={() => emit(GET_CURSOR_POSITION.REQUEST_KEY)}>플러그인 데이터 추가</button>
 		</div>
 	)
 }

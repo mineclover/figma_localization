@@ -8,7 +8,7 @@ import {
 	onSetDomainSetting,
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel'
-import { onGetCursorPosition, onGetProjectId, onSetProjectId } from '@/domain/Label/LabelModel'
+import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel'
 
 export default function () {
 	// 세팅
@@ -22,6 +22,7 @@ export default function () {
 	onGetCursorPosition()
 
 	// 유틸
+	onNodeSelectionChange()
 	nodeZoom_Adapter()
 
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )

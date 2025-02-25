@@ -16,6 +16,9 @@ export type CurrentCursorType = {
 	 *
 	 */
 	sectionName: string
+	/**
+	 * DB 섹션 아이디
+	 */
 	sectionId: number
 	pageName: string
 	pageId: string
@@ -25,7 +28,7 @@ export type CurrentCursorType = {
 	autoRename: boolean
 
 	data: NodeData
-	styleData: ValidAllStyleRangesType
+	styleData?: ValidAllStyleRangesType
 }
 
 // 저장을 어떻게 할까

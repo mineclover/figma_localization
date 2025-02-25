@@ -4,6 +4,7 @@ import {
 	GET_CURSOR_POSITION,
 	GET_PROJECT_ID,
 	NODE_STORE_KEY,
+	RELOAD_NODE,
 	SET_NODE_LOCATION,
 	SET_PROJECT_ID,
 	STORE_KEY,
@@ -14,6 +15,8 @@ import { getCursorPosition } from './LabelModel'
 import { fetchDB } from '../utils/fetchDB'
 import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel'
 import { getFigmaRootStore } from '../utils/getStore'
+import { ERROR_CODE } from '../errorCode'
+import { textFontLoad } from '@/figmaPluginUtils/text'
 
 export type LocationDTO = {
 	created_at: string
@@ -128,6 +131,19 @@ export type LocalizationKeyProps = {
 	isTemporary?: boolean
 }
 
+// TextPluginDataModel 타입 정의
+export type LocalizationTranslationDTO = {
+	created_at: string
+	is_deleted: number
+	key_id: number
+	language_code: string
+	last_modified_by: null | string
+	localization_id: number
+	text: string
+	updated_at: string
+	version: number
+}
+
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
 	/** 임시 값이면 @ 붙이고 아니면 # 붙임 */
 	const prefix = keyData.is_temporary ? '@' : '#'
@@ -136,22 +152,148 @@ export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
 	return name
 }
 
+/**
+ * 로컬라이제이션 키를 기준으로 이름 리로드
+ */
 export const reloadLocalizationName = async (node: BaseNode) => {
-	const nodeData = await getNodeData(node)
+	const nodeData = getNodeData(node)
 	if (nodeData.localizationKey === '') {
 		return
 	}
-
 	const result = await fetchDB(('/localization/keys/id/' + nodeData.localizationKey) as '/localization/keys/id/{id}', {
+		method: 'GET',
+	})
+
+	if (!result || result.status === 500) {
+		return
+	}
+	const data = (await result.json()) as LocalizationKeyDTO
+
+	if (result.status === 200) {
+		node.name = generateLocalizationName(data)
+	}
+}
+
+export const getTargetLocalizationName = async (id: string) => {
+	const result = await fetchDB(('/localization/translations/' + id) as '/localization/translations/{id}', {
 		method: 'GET',
 	})
 
 	if (!result) {
 		return
 	}
-	const data = (await result.json()) as LocalizationKeyDTO
 
-	node.name = generateLocalizationName(data)
+	const data = (await result.json()) as LocalizationTranslationDTO
+	console.log('🚀 ~ getTargetLocalizationName ~ data:', data)
+	return data.text
+}
+
+export const putTargetLocalizationName = async (id: string, language: string, text: string) => {
+	const result = await fetchDB('/localization/translations', {
+		method: 'PUT',
+		body: JSON.stringify({
+			keyId: id,
+			language: language,
+			translation: text,
+		}),
+	})
+
+	if (!result) {
+		return
+	}
+
+	const data = (await result.json()) as LocalizationTranslationDTO
+	console.log('🚀 ~ getTargetLocalizationName ~ data:', data)
+	return data.text
+}
+
+/**
+ * 오리지널 로컬라이제이션 키를 기준으로 값 일괄 수정
+ */
+export const reloadOriginalLocalizationName = async (node: BaseNode) => {
+	const nodeData = getNodeData(node)
+	if (nodeData.localizationKey === '') {
+		return
+	}
+	const localizationKey = nodeData.localizationKey
+	figma.skipInvisibleInstanceChildren = true
+
+	const arr = figma.currentPage.findAllWithCriteria({
+		types: ['TEXT'],
+		pluginData: {
+			keys: [NODE_STORE_KEY.LOCALIZATION_KEY],
+		},
+	})
+
+	const targetOrigin = new Map<string, Set<TextNode>>()
+
+	// 안써서 없어도 될지도?
+	const targetTextArr = arr
+		.filter((item) => {
+			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
+			if (localizationKey === currentLocalizationKey) {
+				return true
+			}
+			return false
+		})
+		.map((item) => {
+			const nodeData = getNodeData(item)
+			if (nodeData.originalLocalizeId !== '') {
+				let temp = targetOrigin.get(nodeData.originalLocalizeId)
+				if (temp == null) {
+					temp = new Set<TextNode>()
+				}
+
+				targetOrigin.set(nodeData.originalLocalizeId, temp.add(item))
+			}
+			return {
+				node: item,
+				data: nodeData,
+			}
+		})
+
+	for (const [key, targetNode] of targetOrigin.entries()) {
+		const a = await getTargetLocalizationName(key)
+		if (a) {
+			for (const node of targetNode) {
+				await textFontLoad(node)
+				node.characters = a
+			}
+		}
+	}
+}
+
+export const addTranslation = async (node: TextNode) => {
+	const nodeData = getNodeData(node)
+
+	if (nodeData.localizationKey === '') {
+		return
+	}
+
+	const result = await fetchDB('/localization/translations', {
+		method: 'POST',
+		body: JSON.stringify(
+			{
+				keyId: nodeData.localizationKey,
+				language: 'origin',
+				translation: node.characters,
+			},
+			null,
+			2
+		),
+	})
+
+	if (!result) {
+		return
+	}
+
+	const data = (await result.json()) as LocalizationTranslationDTO
+
+	if (result.status === 200) {
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString())
+	} else {
+		notify('Failed to set location', 'error')
+	}
 }
 
 /**
@@ -196,6 +338,9 @@ export const createNormalLocalizationKey = async (
 export const onTargetSetNodeLocation = () => {
 	on(SET_NODE_LOCATION.REQUEST_KEY, async () => {
 		const node = figma.currentPage.selection[0]
+		if (node.type !== 'TEXT') {
+			return
+		}
 		const result = await getCursorPosition(node)
 
 		if (!result) {
@@ -217,6 +362,7 @@ export const onTargetSetNodeLocation = () => {
 		}
 
 		// section은 [sectionName] {기존 제목} 으로 처리 됨
+
 		if (result.data.locationKey === '') {
 			await createNormalLocalizationKey(node, {
 				domainId: domainSetting.domainId,
@@ -227,15 +373,27 @@ export const onTargetSetNodeLocation = () => {
 		await reloadLocalizationName(node)
 
 		// 두번 눌렀을 때 처리 어떻게 할지 정해야 됨
+		await addTranslation(node)
 
-		const NodeData = await getNodeData(node)
+		/** 업데이트 반영 코드 */
+		const cursorPosition = await getCursorPosition(node)
+		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
+	})
+}
 
-		emit(GET_CURSOR_POSITION.RESPONSE_KEY, { ...result, data: NodeData })
+export const onNodeReload = () => {
+	on(RELOAD_NODE.REQUEST_KEY, async () => {
+		const node = figma.currentPage.selection[0]
+		if (!node || node.type !== 'TEXT') {
+			return
+		}
+		await reloadLocalizationName(node)
+		await reloadOriginalLocalizationName(node)
 	})
 }
 
 /** 플러그인 데이터 조회 */
-export const getNodeData = async (node: BaseNode) => {
+export const getNodeData = (node: BaseNode) => {
 	const locationKey = node.getPluginData(NODE_STORE_KEY.LOCATION)
 	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
 	const originalLocalizeId = node.getPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID)

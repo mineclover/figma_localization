@@ -9,7 +9,7 @@ import {
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel'
 import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel'
-import { onTargetSetNodeLocation } from '@/domain/Label/TextPluginDataModel'
+import { onNodeReload, onTargetSetNodeLocation } from '@/domain/Label/TextPluginDataModel'
 
 export default function () {
 	// 세팅
@@ -24,7 +24,7 @@ export default function () {
 	// 플러그인 데이터 세팅
 
 	onTargetSetNodeLocation()
-
+	onNodeReload()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

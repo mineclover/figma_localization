@@ -106,7 +106,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 				const data = (await result.json()) as SectionDTO
 
 				// 값이 정상일 때 이름과 섹션 이름 수정
-				if (data && data.code !== ERROR_CODE.SECTION_NOT_FOUND) {
+				if (data && result.status !== 404) {
 					const nextText = text.replace(`[${sectionName}]`, '').trim()
 					sectionData.section_id = data.section_id
 					sectionData.name = `[${data.section_name}] ${nextText}`
@@ -143,7 +143,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 		if (!projectId) {
 			return
 		}
-		const NodeData = await getNodeData(node)
+		const NodeData = getNodeData(node)
 		console.log('🚀 ~ getCursorPosition ~ node:', node)
 
 		const cursorPosition: CurrentCursorType = {
@@ -167,6 +167,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 export const onNodeSelectionChange = () => {
 	figma.on('selectionchange', async () => {
 		const node = figma.currentPage.selection[0]
+		/** 업데이트 반영 코드 */
 		const cursorPosition = await getCursorPosition(node)
 		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 	})

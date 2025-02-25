@@ -343,3 +343,15 @@ export function getAllStyleRanges(textNode: TextNode): ValidAllStyleRangesType {
 
 	return temp as ValidAllStyleRangesType
 }
+
+export const textFontLoad = async (textNode: TextNode) => {
+	const arr = getFontNameRanges(textNode)
+
+	if (arr) {
+		for (const item of arr) {
+			const fontName = item.value as FontName
+			await figma.loadFontAsync(fontName)
+		}
+	}
+	return
+}

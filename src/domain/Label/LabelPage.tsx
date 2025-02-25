@@ -11,7 +11,7 @@ import {
 	SET_NODE_RESET_KEY,
 } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
-import { currentPointerSignal, onGetCursorPositionResponse } from './LabelModel'
+import { currentPointerSignal, onGetCursorPositionResponse, sectionNameParser } from './LabelModel'
 import { useSignal } from '@/hooks/useSignal'
 import { CurrentCursorType } from '../utils/featureType'
 import {
@@ -45,6 +45,7 @@ const isTemporary = (data: LocalizationKey | null) => {
 
 function LabelPage() {
 	const currentPointer = useSignal(currentPointerSignal)
+	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer)
 	const localizationKeyValue = useSignal(localizationKeySignal)
 
 	useEffect(() => {
@@ -172,9 +173,14 @@ function LabelPage() {
 					disabled={isTemporary(localizationKeyValue)}
 					className={styles.inputText}
 					onChange={(e) => {
+						const sectionPrefix = sectionNameParser(currentPointer?.sectionName ?? '') ?? ''
+						// 입력값이 이미 sectionPrefix로 시작하는지 확인
+						const inputValue = e.currentTarget.value
+						const finalValue = inputValue.startsWith(sectionPrefix + '_') ? inputValue : sectionPrefix + '_'
+
 						const next = {
 							...localizationKeyValue,
-							name: e.currentTarget.value,
+							name: finalValue,
 						} as LocalizationKey
 						localizationKeySignal.value = next
 					}}

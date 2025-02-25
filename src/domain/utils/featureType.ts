@@ -6,6 +6,29 @@ export type ViewMoveType = {
 	nodeId: string
 }
 
+/**
+ * 피그마 figma_locations 키
+ */
+export type LocationKey = string
+/**
+ * 로컬라이제이션 키 값
+ * localizationKey , localization_keys 의 key_id
+ */
+export type LocalizationKey = string
+/**
+ * 원본 로컬라이즈 아이디
+ * 기준이 되는 로컬라이즈 텍스트의 키 ( 변환용이고 피그마 용 )
+ */
+export type OriginalLocalizeId = string
+
+/**  */
+export type NodeData = {
+	locationKey: LocationKey
+	/** 키 값 등록해놓고 저장은 글로벌 스토어에서 처리 */
+	localizationKey: LocalizationKey
+	originalLocalizeId: OriginalLocalizeId
+}
+
 /** 현재 커서 정보 */
 export type CurrentCursorType = {
 	/**
@@ -32,26 +55,3 @@ export type CurrentCursorType = {
 }
 
 // 저장을 어떻게 할까
-
-/**
- * 피그마 figma_locations 키
- */
-export type LocationKey = string
-/**
- * 로컬라이제이션 키 값
- * localizationKey , localization_keys 의 key_id
- */
-export type LocalizationKey = string
-/**
- * 원본 로컬라이즈 아이디
- * 기준이 되는 로컬라이즈 텍스트의 키 ( 변환용이고 피그마 용 )
- */
-export type OriginalLocalizeId = string
-
-/**  */
-export type NodeData = {
-	locationKey: LocationKey
-	/** 키 값 등록해놓고 저장은 글로벌 스토어에서 처리 */
-	localizationKey: LocalizationKey
-	originalLocalizeId: OriginalLocalizeId
-}

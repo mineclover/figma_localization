@@ -1,0 +1,120 @@
+.container {
+	display: flex;
+	flex-direction: column;
+
+	justify-content: flex-start;
+	padding-inline: 4px;
+	gap: 8px;
+	& > div {
+		flex-grow: 1;
+	}
+}
+
+.aliasRow {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+
+	& > div {
+		flex-grow: 1;
+	}
+}
+
+/* #region 라벨 */
+
+.labelRow {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+
+	& > div {
+		flex-grow: 1;
+	}
+}
+
+.labelText {
+	color: var(--figma-color-text-disabled);
+}
+
+.inputText {
+	flex-grow: 1;
+	font-weight: 700;
+	width: 100%;
+	padding: 4px 8px;
+	background-color: var(--figma-color-bg-brand);
+}
+
+/* #endregion */
+
+/* #region 섹션 */
+
+.sectionRow {
+	padding-block: 4px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 4px;
+	width: 100%;
+}
+.sectionTitle {
+	flex-grow: 1;
+	font-weight: 700;
+}
+
+/* #endregion */
+
+/* #region 버튼들 */
+
+.brandButton {
+	height: 24px;
+	padding: 4px 8px;
+	background-color: var(--figma-color-bg-brand);
+	&:hover {
+		background-color: var(--figma-color-bg-brand-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-brand-secondary);
+	}
+}
+
+.dangerButton {
+	height: 24px;
+	padding: 4px 8px;
+	background-color: var(--figma-color-bg-danger);
+	&:hover {
+		background-color: var(--figma-color-bg-danger-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-danger-secondary);
+	}
+}
+
+.normalButton {
+	height: 24px;
+	padding: 4px 8px;
+	background-color: var(--figma-color-bg);
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-selected);
+	}
+}
+
+.componentButton {
+	height: 24px;
+	padding: 4px 8px;
+	background-color: var(--figma-color-bg-component);
+	&:hover {
+		background-color: var(--figma-color-bg-component-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-component-secondary);
+	}
+}
+
+/* #endregion */

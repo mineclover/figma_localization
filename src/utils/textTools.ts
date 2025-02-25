@@ -76,3 +76,13 @@ export const generateRandomText2 = () => {
 	const date = Date.now()
 	return generateRandomText(3) + encodeNumber(date)
 }
+
+/**
+ * 문자열 시작 부분의 # 또는 @ 문자를 모두 제거
+ * @param text
+ * @returns
+ */
+export const removeLeadingSymbols = (text: string) => {
+	// 정규식을 사용하여 문자열 시작 부분의 # 또는 @ 문자를 모두 제거
+	return text.replace(/^[#@]+/, '')
+}

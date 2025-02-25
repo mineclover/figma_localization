@@ -9,7 +9,14 @@ import {
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel'
 import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel'
-import { onNodeReload, onTargetSetNodeLocation } from '@/domain/Label/TextPluginDataModel'
+import {
+	onGetKeyTranslations,
+	onGetLocalizationKeyData,
+	onNodeReload,
+	onPutLocalizationKey,
+	onSetNodeResetKey,
+	onTargetSetNodeLocation,
+} from '@/domain/Label/TextPluginDataModel'
 
 export default function () {
 	// 세팅
@@ -25,6 +32,10 @@ export default function () {
 
 	onTargetSetNodeLocation()
 	onNodeReload()
+	onSetNodeResetKey()
+	onGetKeyTranslations()
+	onGetLocalizationKeyData()
+	onPutLocalizationKey()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

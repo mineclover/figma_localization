@@ -104,7 +104,6 @@ function SettingPage() {
 				<Text>현재 페이지의 Section URL을 복사하여 입력해주세요. (최초 1회)</Text>
 				<Textbox
 					placeholder={'project Id'}
-					variant="border"
 					value={projectId}
 					onKeyUp={(e) => {
 						if (e.key === 'Enter') {

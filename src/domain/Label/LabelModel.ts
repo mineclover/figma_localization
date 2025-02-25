@@ -1,13 +1,21 @@
 import { signal } from '@preact/signals-core'
 import { CurrentCursorType } from '../utils/featureType'
 import { emit, on } from '@create-figma-plugin/utilities'
-import { GET_CURSOR_POSITION, GET_PROJECT_ID, NODE_STORE_KEY, SET_PROJECT_ID, STORE_KEY } from '../constant'
+import {
+	GET_CURSOR_POSITION,
+	GET_LOCALIZATION_KEY_VALUE,
+	GET_PROJECT_ID,
+	NODE_STORE_KEY,
+	SET_PROJECT_ID,
+	STORE_KEY,
+} from '../constant'
 
 import { FilePathNodeSearch, notify } from '@/figmaPluginUtils'
-import { getNodeData } from './TextPluginDataModel'
+import { getNodeData, processTextNodeLocalization } from './TextPluginDataModel'
 import { getAllStyleRanges } from '@/figmaPluginUtils/text'
 import { fetchDB } from '../utils/fetchDB'
 import { ERROR_CODE } from '../errorCode'
+import { removeLeadingSymbols } from '@/utils/textTools'
 
 export const currentPointerSignal = signal<CurrentCursorType | null>(null)
 export const projectIdSignal = signal<string>('')
@@ -40,7 +48,6 @@ export const getProjectId = () => {
 
 export const onGetProjectId = () => {
 	on(GET_PROJECT_ID.REQUEST_KEY, () => {
-		console.log('🚀 ~ onGetProjectId ~ projectId:')
 		const projectId = getProjectId()
 
 		if (projectId) {
@@ -51,7 +58,6 @@ export const onGetProjectId = () => {
 
 export const onSetProjectId = () => {
 	return on(SET_PROJECT_ID.REQUEST_KEY, (projectId: string) => {
-		console.log('🚀 ~ onSetProjectId ~ projectId:', projectId)
 		figma.root.setPluginData(STORE_KEY.PROJECT_ID, projectId)
 		emit(GET_PROJECT_ID.RESPONSE_KEY, projectId)
 	})
@@ -60,7 +66,6 @@ export const onSetProjectId = () => {
 export const onSetProjectIdResponse = () => {
 	emit(GET_PROJECT_ID.REQUEST_KEY)
 	return on(GET_PROJECT_ID.RESPONSE_KEY, (projectId: string) => {
-		console.log('🚀 ~ onSetProjectIdResponse ~ projectId:', projectId)
 		projectIdSignal.value = projectId
 	})
 }
@@ -77,6 +82,9 @@ export const sectionNameParser = (text: string) => {
 	return null
 }
 
+/**
+ * 이 코드가 너무 많은 기능을 갖고 있어서 리펙토링 하게 되면 수정하면 좋을 것 같음
+ */
 export const getCursorPosition = async (node: BaseNode) => {
 	const sectionData = {
 		section_id: 0,
@@ -94,7 +102,6 @@ export const getCursorPosition = async (node: BaseNode) => {
 			const text = sectionNode.name.trim()
 
 			const sectionName = sectionNameParser(text)
-			console.log('🚀 ~ getCursorPosition ~ sectionName:', sectionName)
 			if (sectionName) {
 				const result = await fetchDB(('/sections/' + sectionName) as '/sections/{name}', {
 					method: 'GET',
@@ -144,7 +151,6 @@ export const getCursorPosition = async (node: BaseNode) => {
 			return
 		}
 		const NodeData = getNodeData(node)
-		console.log('🚀 ~ getCursorPosition ~ node:', node)
 
 		const cursorPosition: CurrentCursorType = {
 			projectId,
@@ -152,7 +158,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 			sectionId: sectionData.section_id,
 			pageName: figma.currentPage.name,
 			pageId: figma.currentPage.id,
-			nodeName: node.name,
+			nodeName: removeLeadingSymbols(node.name),
 			nodeId: node.id,
 			characters: node.characters,
 			autoRename: node.autoRename,
@@ -170,6 +176,8 @@ export const onNodeSelectionChange = () => {
 		/** 업데이트 반영 코드 */
 		const cursorPosition = await getCursorPosition(node)
 		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
+		const localizationKey = await processTextNodeLocalization(node)
+		emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey)
 	})
 }
 

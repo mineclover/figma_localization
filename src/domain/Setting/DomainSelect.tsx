@@ -4,7 +4,7 @@ import { ComponentChildren, Fragment, h } from 'preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import { components } from 'types/i18n'
 import { SET_DOMAIN_PAIR } from '../constant'
-import { IconControlCheckboxChecked12 } from '@create-figma-plugin/ui'
+import { IconCheck16 } from '@create-figma-plugin/ui'
 import styles from './domainSelect.module.css'
 function DomainSelect({ domainId, domainName, select }: { domainId: number; domainName: string; select: boolean }) {
 	return (
@@ -17,7 +17,7 @@ function DomainSelect({ domainId, domainName, select }: { domainId: number; doma
 				})
 			}}
 		>
-			{select ? <IconControlCheckboxChecked12 /> : <div style={{ width: 12, height: 12 }} />}
+			{select ? <IconCheck16 /> : <div style={{ width: 12, height: 12 }} />}
 			<span>{domainName}</span> <span className={styles.tag}>#{domainId}</span>
 		</button>
 	)

@@ -277,7 +277,7 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 }
 
 // 모든 스타일 Range를 가져오는 함수
-interface AllStyleRanges {
+export interface AllStyleRanges {
 	fontSize?: StyleRange<number>[] | null
 	fontName?: StyleRange<FontName>[] | null
 	lineHeight?: StyleRange<LineHeight>[] | null
@@ -286,7 +286,7 @@ interface AllStyleRanges {
 	textCase?: StyleRange<TextCase>[] | null
 	textStyleId?: StyleRange<string>[] | null
 	fontWeight?: StyleRange<number>[] | null
-	fontNames?: StyleRange<FontName>[] | null
+
 	openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null
 	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
 	fills?: StyleRange<Paint[]>[] | null
@@ -295,13 +295,34 @@ interface AllStyleRanges {
 	// indentation: StyleRange<number>[] | null
 }
 
+interface ValidStyleRange<T> {
+	start: number
+	end: number
+	value: T
+}
+
+export type ValidAllStyleRangesType = {
+	fontSize?: ValidStyleRange<number>[]
+	fontName?: ValidStyleRange<FontName>[]
+	lineHeight?: ValidStyleRange<LineHeight>[]
+	letterSpacing?: ValidStyleRange<LetterSpacing>[]
+	textDecoration?: ValidStyleRange<TextDecoration>[]
+	textCase?: ValidStyleRange<TextCase>[]
+	textStyleId?: ValidStyleRange<string>[]
+	fontWeight?: ValidStyleRange<number>[]
+	openTypeFeatures?: ValidStyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
+	hyperlink?: ValidStyleRange<HyperlinkTarget>[]
+	fills?: ValidStyleRange<Paint[]>[]
+	fillStyleId?: ValidStyleRange<string>[]
+}
+
 // 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
 
-export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
+export function getAllStyleRanges(textNode: TextNode): ValidAllStyleRangesType {
 	const temp: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
 		fontName: getFontNameRanges(textNode),
-		// fontNames: getAllFontNamesRanges(textNode),
+
 		lineHeight: getLineHeightRanges(textNode),
 		letterSpacing: getLetterSpacingRanges(textNode),
 		textDecoration: getTextDecorationRanges(textNode),
@@ -320,5 +341,5 @@ export function getAllStyleRanges(textNode: TextNode): AllStyleRanges {
 		}
 	}
 
-	return temp
+	return temp as ValidAllStyleRangesType
 }

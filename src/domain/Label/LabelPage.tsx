@@ -10,6 +10,7 @@ import { CurrentCursorType } from '../utils/featureType'
 
 function LabelPage() {
 	const currentPointer = useSignal<CurrentCursorType | null>(currentPointerSignal)
+	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer)
 
 	useEffect(() => {
 		const event = onGetCursorPositionResponse()
@@ -23,7 +24,7 @@ function LabelPage() {
 		<div>
 			LabelPage
 			<button onClick={() => emit(GET_CURSOR_POSITION.REQUEST_KEY)}>emit</button>
-			{JSON.stringify(currentPointer)}
+			{JSON.stringify(currentPointer, null, 2)}
 			<div>
 				<div>
 					<div></div>

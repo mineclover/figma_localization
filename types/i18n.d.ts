@@ -39,6 +39,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sections/id/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>
+         *     도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>
+         *     section 이름은 수정 불가 */
+        get: operations["GetSectionById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sections/{id}": {
         parameters: {
             query?: never;
@@ -63,6 +82,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description 섹션에 속한 로컬라이제이션 키 목록을 조회합니다. */
         get: operations["GetKeysBySection"];
         put?: never;
         post?: never;
@@ -381,6 +401,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description 로컬라이제이션 키와 피그마 위치를 매핑함 */
         post: operations["CreateMapping"];
         delete?: never;
         options?: never;
@@ -593,6 +614,30 @@ export interface components {
         UpdateSectionDTO: {
             link?: string;
         };
+        LocalizationKey: {
+            /** Format: double */
+            key_id: number;
+            /** Format: double */
+            domain_id: number;
+            name: string;
+            alias: string | null;
+            /** Format: double */
+            parent_key_id: number | null;
+            is_variable: boolean;
+            is_temporary: boolean;
+            /** Format: double */
+            section_id: number | null;
+            /** Format: double */
+            version: number;
+            is_deleted: boolean;
+            created_at: string;
+            updated_at: string;
+            domain_name: string;
+            section_name: string | null;
+            /** Format: double */
+            translation_count: number;
+            translated_languages: string[];
+        };
         CreateResourceDTO: {
             name: string;
             type: string;
@@ -623,13 +668,28 @@ export interface components {
             updated_at: string;
         };
         CreateLocalizationKeyDTO: {
-            /** Format: double */
+            /**
+             * Format: double
+             * @description 도메인 ID
+             */
             domainId: number;
+            /** @description 키 이름 */
             name: string;
-            /** Format: double */
+            /** @description 키 별칭 (optional) */
+            alias?: string;
+            /**
+             * Format: double
+             * @description 부모 키 ID (optional)
+             */
             parentKeyId?: number;
+            /** @description 변수 포함 여부 (optional) */
             isVariable?: boolean;
-            /** Format: double */
+            /** @description 임시 키 여부 (optional) */
+            isTemporary?: boolean;
+            /**
+             * Format: double
+             * @description 섹션 ID (optional)
+             */
             sectionId?: number;
         };
         UpdateLocalizationKeyDTO: {
@@ -798,6 +858,30 @@ export interface operations {
             };
         };
     };
+    GetSectionById: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Domain-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ok */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Section"];
+                };
+            };
+        };
+    };
     UpdateSection: {
         parameters: {
             query?: never;
@@ -849,19 +933,20 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description - 섹션 ID (0인 경우 section_id가 NULL인 키들을 조회) */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Ok */
+            /** @description 로컬라이제이션 키 목록 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["LocalizationKey"][];
                 };
             };
         };

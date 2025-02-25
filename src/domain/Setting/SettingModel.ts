@@ -12,10 +12,14 @@ export const domainSettingSignal = signal<DomainSettingType | null>(null)
 
 export const languageCodesSignal = signal<string[]>([])
 
+export const getDomainSetting = () => {
+	return getFigmaRootStore<DomainSettingType>(STORE_KEY.DOMAIN)
+}
+
 /** Main */
 export const onGetDomainSetting = () => {
 	on(GET_DOMAIN_PAIR.REQUEST_KEY, () => {
-		const domainSetting = getFigmaRootStore<DomainSettingType>(STORE_KEY.DOMAIN)
+		const domainSetting = getDomainSetting()
 		if (domainSetting) {
 			emit(GET_DOMAIN_PAIR.RESPONSE_KEY, domainSetting)
 		}

@@ -1,3 +1,5 @@
+import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
+
 /** 화면 이동 */
 export type ViewMoveType = {
 	pageId: string
@@ -6,9 +8,15 @@ export type ViewMoveType = {
 
 /** 현재 커서 정보 */
 export type CurrentCursorType = {
+	/**
+	 * 표시 생략해도 됨
+	 */
 	projectId: string
+	/**
+	 *
+	 */
 	sectionName: string
-	sectionId: string
+	sectionId: number
 	pageName: string
 	pageId: string
 	nodeName: string
@@ -17,6 +25,7 @@ export type CurrentCursorType = {
 	autoRename: boolean
 
 	data: NodeData
+	styleData: ValidAllStyleRangesType
 }
 
 // 저장을 어떻게 할까
@@ -39,6 +48,7 @@ export type OriginalLocalizeId = string
 /**  */
 export type NodeData = {
 	locationKey: LocationKey
+	/** 키 값 등록해놓고 저장은 글로벌 스토어에서 처리 */
 	localizationKey: LocalizationKey
 	originalLocalizeId: OriginalLocalizeId
 }

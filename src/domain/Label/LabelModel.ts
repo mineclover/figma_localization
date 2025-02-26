@@ -178,7 +178,7 @@ export const onNodeSelectionChange = () => {
 	figma.on('selectionchange', async () => {
 		const node = figma.currentPage.selection[0]
 		/** 업데이트 반영 코드 */
-		if (tempNode !== node.id) {
+		if (node && tempNode !== node.id) {
 			tempNode = node.id
 			const cursorPosition = await getCursorPosition(node)
 			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)

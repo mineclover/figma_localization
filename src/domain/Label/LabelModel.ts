@@ -2,6 +2,7 @@ import { signal } from '@preact/signals-core'
 import { CurrentCursorType } from '../utils/featureType'
 import { emit, on } from '@create-figma-plugin/utilities'
 import {
+	CURRENT_SECTION_SELECTED,
 	GET_CURSOR_POSITION,
 	GET_LOCALIZATION_KEY_VALUE,
 	GET_PROJECT_ID,
@@ -16,6 +17,7 @@ import { getAllStyleRanges } from '@/figmaPluginUtils/text'
 import { fetchDB } from '../utils/fetchDB'
 import { ERROR_CODE } from '../errorCode'
 import { removeLeadingSymbols } from '@/utils/textTools'
+import { getCurrentSectionSelected } from '../Translate/TranslateModel'
 
 export const currentPointerSignal = signal<CurrentCursorType | null>(null)
 export const projectIdSignal = signal<string>('')
@@ -170,14 +172,22 @@ export const getCursorPosition = async (node: BaseNode) => {
 	}
 }
 
+let tempNode = ''
+
 export const onNodeSelectionChange = () => {
 	figma.on('selectionchange', async () => {
 		const node = figma.currentPage.selection[0]
 		/** 업데이트 반영 코드 */
-		const cursorPosition = await getCursorPosition(node)
-		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
-		const localizationKey = await processTextNodeLocalization(node)
-		emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey)
+		if (tempNode !== node.id) {
+			tempNode = node.id
+			const cursorPosition = await getCursorPosition(node)
+			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
+			const localizationKey = await processTextNodeLocalization(node)
+			emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey)
+
+			const sectionId = getCurrentSectionSelected(node)
+			emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId)
+		}
 	})
 }
 

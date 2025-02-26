@@ -45,6 +45,19 @@ const isTemporary = (data: LocalizationKey | null) => {
 	return !data.is_temporary
 }
 
+/**
+ * 입력 값에 섹션 명을 붙여준다
+ * @param input 입력 값
+ * @param sectionName 기준 섹션 명
+ * @returns
+ */
+export const enforcePrefix = (input: string, sectionName: string): string => {
+	const sectionPrefix = sectionNameParser(sectionName) ?? ''
+	const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
+
+	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input
+}
+
 function LabelPage() {
 	const currentPointer = useSignal(currentPointerSignal)
 
@@ -52,18 +65,6 @@ function LabelPage() {
 	const [search, setSearch] = useState('')
 	const [aliasHover, setAliasHover] = useState(false)
 	const [lockHover, setLockHover] = useState(false)
-
-	useEffect(() => {
-		const event = onGetCursorPositionResponse()
-		// const event2 = onLocalizationKeyTranslationsResponse()
-		const event3 = onGetLocalizationKeyResponse()
-
-		return () => {
-			event()
-			// event2()
-			event3()
-		}
-	}, [])
 
 	return (
 		<div className={styles.container}>
@@ -183,7 +184,7 @@ function LabelPage() {
 							// 그래서 수집함
 							body.sectionId = currentPointer.sectionId.toString()
 						}
-
+						console.log('🚀 ~ LabelPage ~ body:', body)
 						emit(PUT_LOCALIZATION_KEY.REQUEST_KEY, currentPointer?.data.localizationKey, body)
 					}}
 				>
@@ -227,16 +228,9 @@ function LabelPage() {
 					disabled={isTemporary(localizationKeyValue)}
 					// className={styles.inputText}
 					onChange={(e) => {
-						const sectionPrefix = sectionNameParser(currentPointer?.sectionName ?? '') ?? ''
-						// 입력값이 이미 sectionPrefix로 시작하는지 확인
-						const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
-
-						const inputValue = e.currentTarget.value
-						const finalValue = inputValue.startsWith(finalPrefix + '_') ? inputValue : finalPrefix + '_'
-
 						const next = {
 							...localizationKeyValue,
-							name: finalValue,
+							name: enforcePrefix(e.currentTarget.value, currentPointer?.sectionName ?? ''),
 						} as LocalizationKey
 						localizationKeySignal.value = next
 					}}

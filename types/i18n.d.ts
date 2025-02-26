@@ -300,7 +300,7 @@ export interface paths {
 		patch?: never
 		trace?: never
 	}
-	'/localization/translations/{id}': {
+	'/localization/translations/id/{id}': {
 		parameters: {
 			query?: never
 			header?: never
@@ -310,11 +310,7 @@ export interface paths {
 		get: operations['GetTranslationById']
 		put?: never
 		post?: never
-		/**
-		 * @deprecated
-		 * @description 번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~
-		 */
-		delete: operations['DeleteTranslation']
+		delete?: never
 		options?: never
 		head?: never
 		patch?: never
@@ -327,11 +323,32 @@ export interface paths {
 			path?: never
 			cookie?: never
 		}
+		/** @description 키 ID와 언어 코드로 번역 검색</br>
+		 *     하나만 벋음 */
+		get: operations['SearchTranslation']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/translations/{id}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
 		get?: never
 		put?: never
-		/** @description 키 ID와 언어 코드로 번역 검색 */
-		post: operations['SearchTranslation']
-		delete?: never
+		post?: never
+		/**
+		 * @deprecated
+		 * @description 번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~
+		 */
+		delete: operations['DeleteTranslation']
 		options?: never
 		head?: never
 		patch?: never
@@ -656,6 +673,8 @@ export interface components {
 			/** Format: double */
 			section_id: number | null
 			section_name: string | null
+			/** @description 저장된 origin 번역 값 */
+			origin_value: string | null
 			/**
 			 * Format: double
 			 * @description 변수 정의나 스타일 키를 정의하게 되면 부모 키가 생성되는데, 이 때 부모 키의 ID가 저장됩니다.
@@ -664,6 +683,17 @@ export interface components {
 			/** @description 키가 변수 키라면 true 로 설정
 			 *     변수 키는 로컬라이제이션 텍스트가 없어도 됨 */
 			is_variable: boolean
+			/** @description 임시 키인지 여부 */
+			is_temporary: boolean
+			/**
+			 * Format: double
+			 * @description 키의 버전
+			 */
+			version: number
+			/** @description 삭제된 키인지 여부 */
+			is_deleted: boolean
+			/** @description 별칭 */
+			alias: string | null
 			created_at: string
 			updated_at: string
 		}
@@ -1382,6 +1412,29 @@ export interface operations {
 			}
 		}
 	}
+	SearchTranslation: {
+		parameters: {
+			query: {
+				keyId: string
+				language: string
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': components['schemas']['Localization'] | null
+				}
+			}
+		}
+	}
 	DeleteTranslation: {
 		parameters: {
 			query?: never
@@ -1399,33 +1452,6 @@ export interface operations {
 					[name: string]: unknown
 				}
 				content?: never
-			}
-		}
-	}
-	SearchTranslation: {
-		parameters: {
-			query?: never
-			header?: never
-			path?: never
-			cookie?: never
-		}
-		requestBody: {
-			content: {
-				'application/json': {
-					language: string
-					keyId: string
-				}
-			}
-		}
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown
-				}
-				content: {
-					'application/json': components['schemas']['Localization'] | null
-				}
 			}
 		}
 	}

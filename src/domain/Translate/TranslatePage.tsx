@@ -14,7 +14,7 @@ import {
 import { useSignal } from '@/hooks/useSignal'
 import { Bold, Button, Container, Stack, Text, Textbox, TextboxMultiline, VerticalSpace } from '@create-figma-plugin/ui'
 
-import { GET_PROJECT_ID, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
+import { GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import {
 	currentPointerSignal,
@@ -31,6 +31,8 @@ import {
 } from '../Label/TextPluginDataModel'
 import styles from './translate.module.css'
 import { clientFetchDBCurry } from '../utils/fetchDB'
+import { NullDisableText } from '../Label/LabelSearch'
+import { clc } from '@/components/modal/utils'
 // 있든 없든 수정 가능하게 구성
 
 const TranslateItem = ({
@@ -42,9 +44,11 @@ const TranslateItem = ({
 	updated_at,
 	domainId,
 	updateAction,
+	selectedId,
 }: LocalizationTranslation & {
 	domainId: number
 	updateAction: () => Promise<any> | undefined
+	selectedId: string | undefined
 }) => {
 	const [translation, setTranslation] = useState(text)
 
@@ -54,8 +58,10 @@ const TranslateItem = ({
 
 	const clientFetchDB = clientFetchDBCurry(domainId)
 
+	const isSelect = localization_id != null && selectedId === localization_id.toString()
+
 	return (
-		<div className={styles.translateItem}>
+		<div className={clc(styles.translateItem, isSelect && styles.translateBorder)}>
 			<section className={styles.translateLeft}>
 				<Text className={styles.smallText}>#{localization_id ?? 'NaN'}</Text>
 				<Bold>{language_code}</Bold>
@@ -80,6 +86,7 @@ const TranslateItem = ({
 							translation: translation,
 						}),
 					})
+					emit(RELOAD_NODE.REQUEST_KEY)
 					updateAction()
 				}}
 			>
@@ -100,6 +107,7 @@ const TranslatePage = () => {
 	const languageCodes = useSignal(languageCodesSignal)
 
 	const currentPointer = useSignal(currentPointerSignal)
+	console.log('🚀 ~ TranslatePage ~ currentPointer:', currentPointer)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)
@@ -136,36 +144,24 @@ const TranslatePage = () => {
 		updateAction()
 	}, [])
 
-	useEffect(() => {
-		const event = onGetDomainSettingResponse()
-		const event2 = onGetLanguageCodesResponse()
-		const event3 = onGetLocalizationKeyResponse()
-		const event4 = onGetCursorPositionResponse()
-
-		return () => {
-			event()
-			event2()
-			event3()
-			event4()
-		}
-	}, [])
+	if (domainSetting == null) {
+		return <Bold>도메인 설정이 없습니다</Bold>
+	}
 
 	if (localizationKeyValue?.key_id == null) {
 		return <Bold>감지된 키가 없습니다</Bold>
 	}
 
-	if (domainSetting == null) {
-		return <Bold>도메인 설정이 없습니다</Bold>
-	}
-
 	return (
-		<Container space="extraSmall">
+		<div>
 			<VerticalSpace space="extraSmall" />
 			{/* <div>1. 해당 키가 가진 번역 목록을 준다 {'>'} 번역 목록 기반으로 변경 확인</div>
-			<div>2. 번역 가능한 인터페이스를 준다 {'>'} 실시간 번역</div>
-			<div>3. 위치가 있으면 위치를 준다 {'>'} 해당 키를 검색으로 입력 받게 해서 확장 가능</div> */}
+    <div>2. 번역 가능한 인터페이스를 준다 {'>'} 실시간 번역</div>
+    <div>3. 위치가 있으면 위치를 준다 {'>'} 해당 키를 검색으로 입력 받게 해서 확장 가능</div> */}
 
-			<Stack space="extraSmall">
+			<div className={styles.container}>
+				<NullDisableText>{localizationKeyValue.name}</NullDisableText>
+				<VerticalSpace space="extraSmall" />
 				{/* {JSON.stringify(data)} */}
 				{targetArray.map((item) => {
 					return (
@@ -176,11 +172,12 @@ const TranslatePage = () => {
 							key_id={localizationKeyValue.key_id}
 							domainId={domainSetting.domainId}
 							updateAction={updateAction}
+							selectedId={currentPointer?.data.originalLocalizeId}
 						/>
 					)
 				})}
-			</Stack>
-		</Container>
+			</div>
+		</div>
 	)
 }
 export default TranslatePage

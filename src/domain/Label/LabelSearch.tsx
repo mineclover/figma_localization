@@ -76,18 +76,12 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 		</div>
 	)
 }
+/** search bar */
 function LabelSearch() {
 	const [search, setSearch] = useState('')
 	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
 
 	const domainSetting = useSignal(domainSettingSignal)
-
-	useEffect(() => {
-		const event = onGetDomainSettingResponse()
-		return () => {
-			event()
-		}
-	}, [])
 
 	useEffect(() => {
 		console.log('🚀 ~ useEffect ~ loading:', loading)

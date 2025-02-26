@@ -18,6 +18,7 @@ import {
 	onTargetSetNodeLocation,
 	onUpdateNodeStoreKey,
 } from '@/domain/Label/TextPluginDataModel'
+import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel'
 
 export default function () {
 	// 세팅
@@ -38,9 +39,11 @@ export default function () {
 	onGetLocalizationKeyData()
 	onPutLocalizationKey()
 	onUpdateNodeStoreKey()
+	onSetLanguageCode()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()
+	onCurrentSectionSelected()
 
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
 

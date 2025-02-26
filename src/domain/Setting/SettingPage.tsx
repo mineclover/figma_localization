@@ -41,15 +41,6 @@ function SettingPage() {
 		fetchData('/domains', {
 			method: 'GET',
 		})
-
-		const event = onGetDomainSettingResponse()
-		const event2 = onGetLanguageCodesResponse()
-		const event3 = onSetProjectIdResponse()
-		return () => {
-			event()
-			event2()
-			event3()
-		}
 	}, [])
 
 	return (

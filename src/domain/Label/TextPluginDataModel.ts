@@ -16,7 +16,7 @@ import {
 } from '../constant'
 
 import { FilePathNodeSearch, notify } from '@/figmaPluginUtils'
-import { getCursorPosition } from './LabelModel'
+import { getCursorPosition, sectionNameParser } from './LabelModel'
 import { fetchDB } from '../utils/fetchDB'
 import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel'
 import { getFigmaRootStore } from '../utils/getStore'
@@ -24,6 +24,7 @@ import { ERROR_CODE } from '../errorCode'
 import { textFontLoad } from '@/figmaPluginUtils/text'
 import { signal } from '@preact/signals-core'
 import { components } from 'types/i18n'
+import { enforcePrefix } from './LabelPage'
 
 export type LocationDTO = {
 	created_at: string
@@ -218,6 +219,7 @@ export type LocalizationKeyProps = {
 	parentKeyId?: number
 	isVariable?: boolean
 	isTemporary?: boolean
+	sectionName?: string
 }
 
 // TextPluginDataModel 타입 정의
@@ -321,7 +323,7 @@ export const getLocalizationKeyData = async (node: BaseNode, now: number) => {
 
 /** 번역 키 기반 단일 값 조회 */
 export const getTargetLocalizationName = async (id: string) => {
-	const result = await fetchDB(('/localization/translations/' + id) as '/localization/translations/{id}', {
+	const result = await fetchDB(('/localization/translations/id/' + id) as '/localization/translations/id/{id}', {
 		method: 'GET',
 	})
 
@@ -391,6 +393,7 @@ export const getTargetTranslations = async (id: string) => {
 
 /**
  * 오리지널 로컬라이제이션 키를 기준으로 값 일괄 수정
+ * allRefresh
  */
 export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 	const nodeData = getNodeData(node)
@@ -489,14 +492,24 @@ export const addTranslation = async (node: TextNode) => {
  */
 export const createNormalLocalizationKey = async (
 	node: BaseNode,
-	{ domainId, alias, name, sectionId }: LocalizationKeyProps
+	{ domainId, alias, name, sectionId, sectionName }: LocalizationKeyProps
 ) => {
+	const sectionPrefix = sectionNameParser(sectionName ?? '')
+	const targetSection = sectionNameParser(name)
 	const temp = {
 		domainId: domainId,
-		name: name,
+
 		isTemporary: true,
 		sectionId: sectionId,
 	} as LocalizationKeyProps
+	// 섹션이 비지 않았고, 섹션이 같으면
+	if (sectionPrefix != null && sectionPrefix === targetSection) {
+		temp.name = name
+	} else {
+		const finalPrefix = sectionPrefix == null ? 'Default' : sectionPrefix
+		temp.name = [finalPrefix, name].join('_')
+	}
+
 	if (alias) {
 		temp.alias = alias
 	}
@@ -556,6 +569,7 @@ export const onTargetSetNodeLocation = () => {
 				domainId: domainSetting.domainId,
 				name: result.nodeName,
 				sectionId: result.sectionId,
+				sectionName: result.sectionName,
 			})
 		}
 		await getLocalizationKeyData(node, Date.now())
@@ -575,6 +589,9 @@ export const allRefresh = async (node: TextNode) => {
 	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value)
 }
 
+/**
+ * allRefresh
+ */
 export const onNodeReload = () => {
 	on(RELOAD_NODE.REQUEST_KEY, async () => {
 		const node = figma.currentPage.selection[0]

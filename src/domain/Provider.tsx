@@ -1,6 +1,10 @@
 import { ComponentChildren, Fragment, h } from 'preact'
 import { useLayoutEffect } from 'preact/hooks'
 import ClientModalProvider from '@/components/modal/Modal'
+import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/LabelModel'
+import { onGetLocalizationKeyResponse } from './Label/TextPluginDataModel'
+import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel'
+import { onCurrentSectionSelectedResponse } from './Translate/TranslateModel'
 
 /**
  * duplex 전용 어댑터
@@ -14,11 +18,16 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 		// 공식 루트
 		const events = [
 			// uiDuplexEmit('user'),
-			// DuplexEmit('memos') >> clientMemoEmit 로 대체,
+			onGetDomainSettingResponse(),
+			onGetLanguageCodesResponse(),
+			onGetLocalizationKeyResponse(),
+			onGetCursorPositionResponse(),
+			onSetProjectIdResponse(),
+			onCurrentSectionSelectedResponse(),
 		]
 
 		return () => {
-			// events.forEach((event) => event())
+			events.forEach((event) => event())
 		}
 	}, [])
 

@@ -22,12 +22,13 @@
 	}
 }
 .descriptionTag {
-	position: absolute;
+	position: fixed;
+
 	padding: 4px 8px;
 	white-space: nowrap;
 	z-index: 3;
 	top: -100%;
-	right: -100%;
+	left: 100%;
 	background-color: var(--figma-color-bg);
 }
 
@@ -82,6 +83,8 @@
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	max-height: 100vh;
+	overflow-y: auto;
 }
 
 .searchResultItem {
@@ -115,6 +118,7 @@
 }
 
 .searchResultAlias {
+	flex-grow: 1;
 	font-weight: 700;
 }
 .searchResultName {

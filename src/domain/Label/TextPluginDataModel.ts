@@ -100,6 +100,7 @@ export type LocalizationKeyDTO = {
 	key_id: number
 	domain_id: number
 	name: string
+	origin_value?: string
 	alias?: string
 	parent_key_id?: number
 	is_variable: number
@@ -116,6 +117,7 @@ export type LocalizationKey = {
 	key_id: number
 	domain_id: number
 	name: string
+	origin_value?: string
 	alias?: string
 	parent_key_id?: number
 	is_variable: boolean
@@ -184,7 +186,6 @@ export const onGetKeyTranslations = () => {
 		}
 
 		const result = await getNodeTranslations(node)
-		console.log('🚀 ~ on ~ result:', result)
 	})
 }
 
@@ -236,12 +237,26 @@ export type LocalizationTranslation = {
 	created_at: string
 	is_deleted: boolean
 	key_id: number
-	language_code: string[]
+	language_code: string
 	last_modified_by: string | null
 	localization_id: number
 	text: string
 	updated_at: string
 	version: number
+}
+
+export const localizationTranslationMapping = (dto: LocalizationTranslationDTO): LocalizationTranslation => {
+	return {
+		created_at: dto.created_at,
+		is_deleted: dto.is_deleted === 1,
+		key_id: dto.key_id,
+		language_code: dto.language_code,
+		last_modified_by: dto.last_modified_by,
+		localization_id: dto.localization_id,
+		text: dto.text,
+		updated_at: dto.updated_at,
+		version: dto.version,
+	}
 }
 
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
@@ -353,7 +368,6 @@ export const searchTargetLocalization = async (id: string, language: string) => 
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO
-	console.log('🚀 ~ postTargetLocalizationName ~ data:', data)
 
 	return data.text
 }
@@ -371,7 +385,6 @@ export const getTargetTranslations = async (id: string) => {
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO[]
-	console.log('🚀 ~ postTargetLocalizationName ~ data:', data)
 
 	return data
 }
@@ -616,7 +629,6 @@ export type PutLocalizationKeyType = components['schemas']['UpdateLocalizationKe
 export const onPutLocalizationKey = () => {
 	on(PUT_LOCALIZATION_KEY.REQUEST_KEY, async (localizationKey: string, data: PutLocalizationKeyType) => {
 		const result = await putLocalizationKey(localizationKey, data)
-		console.log('🚀 ~ on ~ result:', result)
 
 		if (!result) {
 			return

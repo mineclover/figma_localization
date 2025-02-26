@@ -22,6 +22,8 @@ export const useFetch = <T>() => {
 			const response = await fetch(baseURL + url, options)
 
 			if (!response.ok) {
+				const result = await response.json()
+				console.log('🚀 ~ Error result:', result)
 				throw new Error(`HTTP error! status: ${response.status}`)
 			}
 

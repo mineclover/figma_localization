@@ -1,0 +1,46 @@
+/* #region 트랜스 레이트 */
+
+.translateItem {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	justify-content: space-between;
+	gap: 4px;
+	width: 100%;
+
+	& > div {
+		flex-grow: 1;
+	}
+}
+
+.translateLeft {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+
+	width: 40px;
+}
+
+.smallText {
+	color: var(--figma-color-text-secondary);
+}
+
+.translateRight {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	width: 60px;
+	border-radius: 4px;
+	background-color: var(--figma-color-bg-brand);
+	&:hover {
+		background-color: var(--figma-color-bg-brand-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-brand-active);
+	}
+	padding-bottom: 2px;
+}
+/* #endregion */

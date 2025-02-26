@@ -9,6 +9,7 @@ import { NonNullableComponentTypeExtract } from 'types/utilType'
 import { useState } from 'preact/hooks'
 import LabelPage from '@/domain/Label/LabelPage'
 import SettingPage from '@/domain/Setting/SettingPage'
+import TranslatePage from '@/domain/Translate/TranslatePage'
 
 const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate']
 
@@ -42,12 +43,7 @@ function Plugin() {
 			value: nav[5],
 		},
 		{
-			children: (
-				<Fragment>
-					<div>2. 해당 키가 가진 번역 목록을 준다 {'>'} 번역 목록 기반으로 변경 확인</div>
-					<div>4. 번역 가능한 인터페이스를 준다 {'>'} 실시간 번역</div>
-				</Fragment>
-			),
+			children: <TranslatePage />,
 			value: nav[6],
 		},
 

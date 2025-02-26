@@ -133,6 +133,9 @@ function LabelPage() {
 
 			<div className={styles.aliasRow}>
 				<IconButton
+					style={{
+						zIndex: 3,
+					}}
 					onBlur={() => {
 						setAliasHover(false)
 					}}
@@ -190,6 +193,9 @@ function LabelPage() {
 
 			<div className={styles.labelRow}>
 				<IconButton
+					style={{
+						zIndex: 3,
+					}}
 					onClick={() => {
 						const next = {
 							...localizationKeyValue,
@@ -210,7 +216,7 @@ function LabelPage() {
 					{isTemporary(localizationKeyValue) ? <IconLockLocked16 /> : <IconLockUnlocked16 />}
 					{lockHover && (
 						<div className={styles.descriptionTag}>
-							<Text>잠금</Text>
+							<Text>{isTemporary(localizationKeyValue) ? '잠금 해제 불가' : '잠금'}</Text>
 						</div>
 					)}
 				</IconButton>

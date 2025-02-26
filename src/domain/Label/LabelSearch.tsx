@@ -1,5 +1,14 @@
 import { useFetch } from '@/hooks/useFetch'
-import { IconButton, Textbox, IconChevronDown16, IconChevronUp16, IconPlus24 } from '@create-figma-plugin/ui'
+import {
+	IconButton,
+	Textbox,
+	IconChevronDown16,
+	IconChevronUp16,
+	IconPlus24,
+	IconStar16,
+	IconLockUnlocked16,
+	IconLockLocked16,
+} from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { LocalizationKeyDTO } from './TextPluginDataModel'
@@ -10,8 +19,9 @@ import styles from './LabelPage.module.css'
 import { clc } from '@/components/modal/utils'
 import { UPDATE_NODE_STORE_KEY } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
+import { modalAlert } from '@/components/alert'
 
-const NullDisableText = ({
+export const NullDisableText = ({
 	className,
 	placeholder,
 	children,
@@ -27,21 +37,34 @@ const NullDisableText = ({
 	)
 }
 
-const SearchResultItem = ({ key_id, name, section_name, alias }: LocalizationKeyDTO) => {
-	console.log('🚀 ~ SearchResultItem ~ { key_id, name, section_name, alias }:', { key_id, name, section_name, alias })
+const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
+	if (isNameOpen) {
+		return is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />
+	}
+	return <IconStar16 />
+}
+
+const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, origin_value }: LocalizationKeyDTO) => {
 	const [isOpen, setIsOpen] = useState(false)
+	const [isNameOpen, setIsNameOpen] = useState(true)
 
 	return (
 		<div className={styles.searchResultItem} key={key_id}>
 			<div className={styles.searchResultTop}>
-				<NullDisableText className={styles.searchResultAlias} placeholder="별칭 없음" children={alias} />
+				<IconButton onClick={() => setIsNameOpen(!isNameOpen)}>{nameOrAliasIcon(isNameOpen, is_temporary)}</IconButton>
+
+				{!isNameOpen ? (
+					<NullDisableText className={styles.searchResultAlias} placeholder="별칭 없음" children={alias} />
+				) : (
+					<NullDisableText className={styles.searchResultName} placeholder="이름 없음" children={name} />
+				)}
 				<NullDisableText className={styles.searchSectionTagBox} placeholder="섹션 없음" children={section_name} />
 			</div>
 			<div className={styles.searchResultBottom}>
 				<IconButton onClick={() => setIsOpen(!isOpen)}>
 					{isOpen ? <IconChevronUp16 /> : <IconChevronDown16 />}
 				</IconButton>
-				<NullDisableText className={styles.searchResultName} placeholder="이름 없음" children={name} />
+				<NullDisableText className={styles.searchResultName} placeholder="원본 값 없음" children={origin_value} />
 
 				<IconButton
 					// className={styles.searchResultSubmitButton}
@@ -56,7 +79,7 @@ const SearchResultItem = ({ key_id, name, section_name, alias }: LocalizationKey
 function LabelSearch() {
 	const [search, setSearch] = useState('')
 	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
-	console.log('🚀 ~ LabelSearch ~ data:', data)
+
 	const domainSetting = useSignal(domainSettingSignal)
 
 	useEffect(() => {
@@ -74,6 +97,9 @@ function LabelSearch() {
 		const domainId = domainSetting?.domainId
 		console.log('🚀 ~ useEffect ~ domainId:', domainId)
 		if (!domainId) {
+			return
+		}
+		if (search.length === 0) {
 			return
 		}
 

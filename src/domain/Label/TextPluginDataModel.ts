@@ -12,6 +12,7 @@ import {
 	SET_NODE_RESET_KEY,
 	SET_PROJECT_ID,
 	STORE_KEY,
+	UPDATE_NODE_STORE_KEY,
 } from '../constant'
 
 import { FilePathNodeSearch, notify } from '@/figmaPluginUtils'
@@ -104,6 +105,7 @@ export type LocalizationKeyDTO = {
 	is_variable: number
 	is_temporary: number
 	section_id?: number
+	section_name: string
 	version: number
 	is_deleted: number
 	created_at: string
@@ -119,6 +121,7 @@ export type LocalizationKey = {
 	is_variable: boolean
 	is_temporary: boolean
 	section_id?: number
+	section_name: string
 	version: number
 	is_deleted: boolean
 	created_at: string
@@ -138,6 +141,7 @@ export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey
 		is_variable: dto.is_variable === 1,
 		is_temporary: dto.is_temporary === 1,
 		section_id: dto.section_id,
+		section_name: dto.section_name,
 		version: dto.version,
 		is_deleted: dto.is_deleted === 1,
 		created_at: dto.created_at,
@@ -300,6 +304,7 @@ export const getLocalizationKeyData = async (node: BaseNode, now: number) => {
 	return
 }
 
+/** 번역 키 기반 단일 값 조회 */
 export const getTargetLocalizationName = async (id: string) => {
 	const result = await fetchDB(('/localization/translations/' + id) as '/localization/translations/{id}', {
 		method: 'GET',
@@ -617,6 +622,11 @@ export const onPutLocalizationKey = () => {
 			return
 		}
 
+		if (typeof result === 'string') {
+			notify(result, 'error')
+			return
+		}
+
 		// emit(PUT_LOCALIZATION_KEY.RESPONSE_KEY, result)
 	})
 }
@@ -631,7 +641,34 @@ export const putLocalizationKey = async (localizationKey: string, body: PutLocal
 		return
 	}
 
-	const data = (await result.json()) as LocalizationKeyDTO
+	const data = (await result.json()) as LocalizationKeyDTO | string
 
 	return data
+}
+
+export const onUpdateNodeStoreKey = () => {
+	on(UPDATE_NODE_STORE_KEY.REQUEST_KEY, async (key: number) => {
+		const node = figma.currentPage.selection[0]
+		if (!node || node.type !== 'TEXT') {
+			return
+		}
+		console.log('🚀 ~ on ~ key:', key)
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString())
+
+		const translations = await getTargetTranslations(key.toString())
+		if (!translations || translations.length === 0) {
+			return
+		}
+		console.log('🚀 ~ on ~ translations:', translations)
+
+		const translation = translations[0]
+		if (!translation) {
+			return
+		}
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, translation.localization_id.toString())
+		await allRefresh(node)
+		figma.commitUndo()
+
+		await reloadOriginalLocalizationName(node)
+	})
 }

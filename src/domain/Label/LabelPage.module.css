@@ -21,6 +21,15 @@
 		flex-grow: 1;
 	}
 }
+.descriptionTag {
+	position: absolute;
+	padding: 4px 8px;
+	white-space: nowrap;
+	z-index: 3;
+	top: -100%;
+	right: -100%;
+	background-color: var(--figma-color-bg);
+}
 
 /* #region 라벨 */
 
@@ -63,6 +72,75 @@
 .sectionTitle {
 	flex-grow: 1;
 	font-weight: 700;
+}
+
+/* #endregion */
+
+/* #region 검색 */
+
+.searchResult {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.searchResultItem {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 4px;
+	background-color: var(--figma-color-bg);
+	&:hover {
+		background-color: var(--figma-color-bg-selected-tertiary);
+	}
+}
+.searchResultTop {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	gap: 4px;
+}
+
+.searchResultBottom {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+
+	gap: 4px;
+}
+
+.searchResultAlias {
+	font-weight: 700;
+}
+.searchResultName {
+	flex-grow: 1;
+}
+
+.searchResultSubmitButton {
+	padding: 4px 8px;
+
+	&:hover {
+		background-color: var(--figma-color-bg-success);
+	}
+}
+
+.searchSectionTagBox {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 8px;
+
+	background-color: var(--figma-color-bg-brand-secondary);
+}
+
+.textDisabled {
+	color: var(--figma-color-text-disabled);
 }
 
 /* #endregion */

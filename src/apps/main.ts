@@ -16,6 +16,7 @@ import {
 	onPutLocalizationKey,
 	onSetNodeResetKey,
 	onTargetSetNodeLocation,
+	onUpdateNodeStoreKey,
 } from '@/domain/Label/TextPluginDataModel'
 
 export default function () {
@@ -36,6 +37,7 @@ export default function () {
 	onGetKeyTranslations()
 	onGetLocalizationKeyData()
 	onPutLocalizationKey()
+	onUpdateNodeStoreKey()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

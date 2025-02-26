@@ -36,6 +36,7 @@ import {
 } from './TextPluginDataModel'
 import { removeLeadingSymbols } from '@/utils/textTools'
 import LabelSearch from './LabelSearch'
+import { createStyleSegments } from '../Style/styleModel'
 
 const isTemporary = (data: LocalizationKey | null) => {
 	if (data == null) {
@@ -65,6 +66,11 @@ function LabelPage() {
 	const [search, setSearch] = useState('')
 	const [aliasHover, setAliasHover] = useState(false)
 	const [lockHover, setLockHover] = useState(false)
+
+	if (currentPointer && currentPointer.styleData && currentPointer.characters) {
+		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
+		console.log('🚀 ~ LabelPage ~ segments:', segments)
+	}
 
 	return (
 		<div className={styles.container}>
@@ -239,7 +245,7 @@ function LabelPage() {
 			<Text className={styles.labelText}>* 잠긴 이름은 수정할 수 없습니다</Text>
 			{/* {JSON.stringify(localizationKeyValue, null, 2)} */}
 
-			<div>1. 검색 창을 준다 {'>'} 라벨링 + 번역 키 검색</div>
+			{/* <div>1. 검색 창을 준다 {'>'} 라벨링 + 번역 키 검색</div> */}
 			<LabelSearch />
 		</div>
 	)

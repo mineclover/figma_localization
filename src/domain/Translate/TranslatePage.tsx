@@ -107,7 +107,6 @@ const TranslatePage = () => {
 	const languageCodes = useSignal(languageCodesSignal)
 
 	const currentPointer = useSignal(currentPointerSignal)
-	console.log('🚀 ~ TranslatePage ~ currentPointer:', currentPointer)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)

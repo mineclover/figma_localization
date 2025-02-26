@@ -14,7 +14,7 @@ import {
 import { useSignal } from '@/hooks/useSignal'
 import { Bold, Button, Container, Stack, Text, Textbox, TextboxMultiline, VerticalSpace } from '@create-figma-plugin/ui'
 
-import { GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
+import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import {
 	currentPointerSignal,
@@ -77,8 +77,8 @@ const TranslateItem = ({
 			/>
 			<button
 				className={styles.translateRight}
-				onClick={() => {
-					clientFetchDB('/localization/translations', {
+				onClick={async () => {
+					await clientFetchDB('/localization/translations', {
 						method: 'PUT',
 						body: JSON.stringify({
 							keyId: key_id.toString(),
@@ -141,15 +141,32 @@ const TranslatePage = () => {
 	}, [data])
 
 	useEffect(() => {
+		if (localizationKeyValue?.key_id == null) {
+			return
+		}
 		updateAction()
-	}, [])
+	}, [localizationKeyValue?.key_id])
 
 	if (domainSetting == null) {
 		return <Bold>도메인 설정이 없습니다</Bold>
 	}
 
 	if (localizationKeyValue?.key_id == null) {
-		return <Bold>감지된 키가 없습니다</Bold>
+		return (
+			<div className={styles.translateRow}>
+				{targetArray.map((item) => {
+					return (
+						<Button
+							onClick={() => {
+								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item)
+							}}
+						>
+							{item}
+						</Button>
+					)
+				})}
+			</div>
+		)
 	}
 
 	return (

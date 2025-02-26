@@ -48,7 +48,7 @@ export const searchTranslationCode = async (key: string, code: string) => {
 		}
 	)
 
-	if (!result) {
+	if (!result || result.status !== 200) {
 		return
 	}
 

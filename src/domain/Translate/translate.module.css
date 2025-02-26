@@ -56,3 +56,11 @@
 	/* outline: 1px solid var(--figma-color-bg-success); */
 	background-color: var(--figma-color-bg-success-tertiary);
 }
+
+.translateRow {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 4px;
+}

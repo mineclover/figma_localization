@@ -184,10 +184,9 @@ export const onNodeSelectionChange = () => {
 			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 			const localizationKey = await processTextNodeLocalization(node)
 			emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey)
-
-			const sectionId = getCurrentSectionSelected(node)
-			emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId)
 		}
+		const sectionId = getCurrentSectionSelected(node)
+		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId)
 	})
 }
 

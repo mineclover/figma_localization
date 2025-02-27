@@ -33,6 +33,7 @@ import styles from './translate.module.css'
 import { clientFetchDBCurry } from '../utils/fetchDB'
 import { NullDisableText } from '../Label/LabelSearch'
 import { clc } from '@/components/modal/utils'
+import { currentSectionSignal } from './TranslateModel'
 // 있든 없든 수정 가능하게 구성
 
 const TranslateItem = ({
@@ -107,6 +108,7 @@ const TranslatePage = () => {
 	const languageCodes = useSignal(languageCodesSignal)
 
 	const currentPointer = useSignal(currentPointerSignal)
+	const currentSection = useSignal(currentSectionSignal)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)
@@ -150,7 +152,7 @@ const TranslatePage = () => {
 		return <Bold>도메인 설정이 없습니다</Bold>
 	}
 
-	if (localizationKeyValue?.key_id == null) {
+	if (localizationKeyValue?.key_id == null && currentSection != null) {
 		return (
 			<div className={styles.translateRow}>
 				{targetArray.map((item) => {
@@ -167,9 +169,25 @@ const TranslatePage = () => {
 			</div>
 		)
 	}
+	if (localizationKeyValue?.key_id == null) {
+		return <Bold>선택된 대상이 없습니다</Bold>
+	}
 
 	return (
 		<div>
+			<div className={styles.translateRow}>
+				{targetArray.map((item) => {
+					return (
+						<Button
+							onClick={() => {
+								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item)
+							}}
+						>
+							{item}
+						</Button>
+					)
+				})}
+			</div>
 			<VerticalSpace space="extraSmall" />
 			{/* <div>1. 해당 키가 가진 번역 목록을 준다 {'>'} 번역 목록 기반으로 변경 확인</div>
     <div>2. 번역 가능한 인터페이스를 준다 {'>'} 실시간 번역</div>

@@ -14,6 +14,7 @@ import { signal } from '@preact/signals-core'
 import { getNodeData, LocalizationTranslationDTO } from '../Label/TextPluginDataModel'
 import { fetchDB } from '../utils/fetchDB'
 import { textFontLoad } from '@/figmaPluginUtils/text'
+import { FilePathNodeSearch } from '@/figmaPluginUtils'
 
 /** 현재 섹션이 선택되었는가 여부 판단 */
 export const currentSectionSignal = signal<string | null>(null)
@@ -29,6 +30,16 @@ export const getCurrentSectionSelected = (node: BaseNode) => {
 	if (node && node.type === 'SECTION') {
 		return node.id
 	}
+
+	if (node) {
+		const result = FilePathNodeSearch(node)
+		const sectionNode = result.find((node) => node.type === 'SECTION')
+
+		if (sectionNode) {
+			return sectionNode.id
+		}
+	}
+
 	return null
 }
 export const onCurrentSectionSelected = () => {
@@ -58,7 +69,8 @@ export const searchTranslationCode = async (key: string, code: string) => {
 }
 
 export const changeLocalizationCode = async (sectionNode: SectionNode, code: string) => {
-	figma.skipInvisibleInstanceChildren = true
+	//인스턴스도 탐색해서 수정하기 위함
+	figma.skipInvisibleInstanceChildren = false
 
 	const arr = sectionNode.findAllWithCriteria({
 		types: ['TEXT'],
@@ -116,9 +128,19 @@ export const changeLocalizationCode = async (sectionNode: SectionNode, code: str
 /** 번역을 위한 언어 코드 설정 */
 export const onSetLanguageCode = () => {
 	on(CHANGE_LANGUAGE_CODE.REQUEST_KEY, async (languageCode: string) => {
-		const sectionNode = figma.currentPage.selection[0]
-		if (sectionNode.type === 'SECTION') {
-			await changeLocalizationCode(sectionNode, languageCode)
+		const node = figma.currentPage.selection[0]
+
+		if (node == null) {
+			return
+		}
+		if (node.type === 'SECTION') {
+			await changeLocalizationCode(node, languageCode)
+		} else if (node) {
+			const result = FilePathNodeSearch(node)
+			const sectionNode = result.find((node) => node.type === 'SECTION')
+			if (sectionNode) {
+				await changeLocalizationCode(sectionNode, languageCode)
+			}
 		}
 	})
 }

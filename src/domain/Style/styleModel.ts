@@ -80,3 +80,57 @@ export const createStyleSegments = (characters: string, styleData: ValidAllStyle
 		segments,
 	}
 }
+
+export interface StyleGroup {
+	style: Record<string, any>
+	ranges: { start: number; end: number; text: string }[]
+}
+
+export const groupSegmentsByStyle = (
+	segmentsResult: StyleSegmentsResult
+): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any> } => {
+	const { segments, defaultStyle } = segmentsResult
+
+	// 스타일 기준으로 그룹화하기 위한 맵
+	const styleMap = new Map<string, StyleGroup>()
+
+	segments.forEach((segment) => {
+		// 스타일을 JSON 문자열로 변환하여 키로 사용
+		const styleKey = JSON.stringify(segment.style)
+		console.log('🚀 ~ segments.forEach ~ styleKey:', styleKey)
+
+		if (!styleMap.has(styleKey)) {
+			styleMap.set(styleKey, {
+				style: segment.style,
+				ranges: [],
+			})
+		}
+
+		// 해당 스타일 그룹에 현재 세그먼트의 범위 추가
+		styleMap.get(styleKey)!.ranges.push({
+			start: segment.start,
+			end: segment.end,
+			text: segment.text,
+		})
+	})
+
+	// 맵에서 배열로 변환
+	const styleGroups = Array.from(styleMap.values())
+
+	// // 기본 스타일이 있는 경우 별도 그룹으로 추가
+	// if (Object.keys(defaultStyle).length > 0) {
+	// 	// 전체 텍스트에 적용된 기본 스타일은 맨 앞에 배치
+	// 	styleGroups.unshift({
+	// 		style: defaultStyle,
+	// 		ranges: [
+	// 			{
+	// 				start: 0,
+	// 				end: segments.length > 0 ? segments[segments.length - 1].end : 0,
+	// 				text: segments.map((s) => s.text).join(''),
+	// 			},
+	// 		],
+	// 	})
+	// }
+
+	return { styleGroups, defaultStyle }
+}

@@ -26,7 +26,7 @@ export const onCurrentSectionSelectedResponse = () => {
 }
 
 export const getCurrentSectionSelected = (node: BaseNode) => {
-	if (node.type === 'SECTION') {
+	if (node && node.type === 'SECTION') {
 		return node.id
 	}
 	return null

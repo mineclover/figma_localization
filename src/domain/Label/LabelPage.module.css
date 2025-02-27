@@ -93,10 +93,21 @@
 	gap: 4px;
 	padding: 4px;
 	background-color: var(--figma-color-bg);
+	box-sizing: border-box;
+	border: 2px solid transparent;
 	&:hover {
 		background-color: var(--figma-color-bg-selected-tertiary);
 	}
 }
+
+.searchResultItemSelected {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background-color: var(--figma-color-bg-tertiary);
+	border: 2px solid var(--figma-color-bg-selected);
+}
+
 .searchResultTop {
 	display: flex;
 	flex-direction: row;

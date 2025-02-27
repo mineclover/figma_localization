@@ -35,8 +35,8 @@ import {
 	PutLocalizationKeyType,
 } from './TextPluginDataModel'
 import { removeLeadingSymbols } from '@/utils/textTools'
-import LabelSearch from './LabelSearch'
-import { createStyleSegments } from '../Style/styleModel'
+import LabelSearch, { isBatchSignal } from './LabelSearch'
+import { createStyleSegments, groupSegmentsByStyle } from '../Style/styleModel'
 
 const isTemporary = (data: LocalizationKey | null) => {
 	if (data == null) {
@@ -61,8 +61,9 @@ export const enforcePrefix = (input: string, sectionName: string): string => {
 
 function LabelPage() {
 	const currentPointer = useSignal(currentPointerSignal)
-
 	const localizationKeyValue = useSignal(localizationKeySignal)
+	const isBatch = useSignal(isBatchSignal)
+
 	const [search, setSearch] = useState('')
 	const [aliasHover, setAliasHover] = useState(false)
 	const [lockHover, setLockHover] = useState(false)
@@ -70,7 +71,15 @@ function LabelPage() {
 	if (currentPointer && currentPointer.styleData && currentPointer.characters) {
 		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
 		console.log('🚀 ~ LabelPage ~ segments:', segments)
+		const styleGroups = groupSegmentsByStyle(segments)
+		console.log('🚀 ~ LabelPage ~ styleGroups:', styleGroups)
 	}
+
+	useEffect(() => {
+		return () => {
+			isBatchSignal.value = false
+		}
+	}, [])
 
 	return (
 		<div className={styles.container}>

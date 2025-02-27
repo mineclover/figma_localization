@@ -1,4 +1,4 @@
-import { render, useWindowResize, TabsOption, Tabs } from '@create-figma-plugin/ui'
+import { render, useWindowResize, TabsOption, Tabs, Container } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 
 import { emit } from '@create-figma-plugin/utilities'
@@ -10,10 +10,13 @@ import { useState } from 'preact/hooks'
 import LabelPage from '@/domain/Label/LabelPage'
 import SettingPage from '@/domain/Setting/SettingPage'
 import TranslatePage from '@/domain/Translate/TranslatePage'
+import { isBatchSignal } from '@/domain/Label/LabelSearch'
+import { useSignal } from '@/hooks/useSignal'
 
 const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate']
 
 function Plugin() {
+	const isBatch = useSignal(isBatchSignal)
 	function onWindowResize(windowSize: { width: number; height: number }) {
 		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize)
 	}
@@ -60,7 +63,14 @@ function Plugin() {
 
 	return (
 		<AppProvider>
-			<Tabs options={options} value={value} onChange={handleChange} />
+			<Container
+				space="extraSmall"
+				style={{
+					background: isBatch ? 'var(--figma-color-bg-danger-secondary)' : 'var(--figma-color-bg)',
+				}}
+			>
+				<Tabs options={options} value={value} onChange={handleChange} />
+			</Container>
 		</AppProvider>
 	)
 }

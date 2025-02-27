@@ -2,12 +2,15 @@ import { useFetch } from '@/hooks/useFetch'
 import {
 	IconButton,
 	Textbox,
+	Text,
 	IconChevronDown16,
 	IconChevronUp16,
 	IconPlus24,
 	IconStar16,
 	IconLockUnlocked16,
 	IconLockLocked16,
+	Toggle,
+	VerticalSpace,
 } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
@@ -20,6 +23,7 @@ import { clc } from '@/components/modal/utils'
 import { UPDATE_NODE_STORE_KEY } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import { modalAlert } from '@/components/alert'
+import { signal } from '@preact/signals-core'
 
 export const NullDisableText = ({
 	className,
@@ -36,6 +40,9 @@ export const NullDisableText = ({
 		</span>
 	)
 }
+export const selectedKeySignal = signal<string | null>(null)
+export const isBatchSignal = signal<boolean>(false)
+export const isTravelSignal = signal<boolean>(false)
 
 const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
 	if (isNameOpen) {
@@ -49,10 +56,16 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 	const [isNameOpen, setIsNameOpen] = useState(true)
 
 	return (
-		<div className={styles.searchResultItem} key={key_id}>
+		<div
+			className={clc(
+				styles.searchResultItem,
+				selectedKeySignal.value === key_id.toString() && styles.searchResultItemSelected
+			)}
+			key={key_id}
+			onClick={() => (selectedKeySignal.value = key_id.toString())}
+		>
 			<div className={styles.searchResultTop}>
 				<IconButton onClick={() => setIsNameOpen(!isNameOpen)}>{nameOrAliasIcon(isNameOpen, is_temporary)}</IconButton>
-
 				{!isNameOpen ? (
 					<NullDisableText className={styles.searchResultAlias} placeholder="별칭 없음" children={alias} />
 				) : (
@@ -76,12 +89,26 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 		</div>
 	)
 }
+
 /** search bar */
 function LabelSearch() {
 	const [search, setSearch] = useState('')
 	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
 
+	const isBatch = useSignal(isBatchSignal)
+
+	const isTravel = useSignal(isTravelSignal)
+
 	const domainSetting = useSignal(domainSettingSignal)
+	const currentPointer = useSignal(currentPointerSignal)
+	const selectedKey = useSignal(selectedKeySignal)
+
+	useEffect(() => {
+		if (isBatch && selectedKey && currentPointer) {
+			console.log('🚀 ~ useEffect ~ currentPointer:', currentPointer)
+			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
+		}
+	}, [currentPointer?.nodeId])
 
 	useEffect(() => {
 		console.log('🚀 ~ useEffect ~ loading:', loading)
@@ -104,10 +131,26 @@ function LabelSearch() {
 				'Content-Type': 'application/json',
 			},
 		})
+		return () => {
+			selectedKeySignal.value = null
+		}
 	}, [search])
 
 	return (
 		<Fragment>
+			<div>
+				{/* <Toggle onChange={() => setIsTravel(!isTravel)} value={isTravel}>
+					<Text>유사 패턴 탐색 (등록 시 유사 패턴 일괄 적용)</Text>
+				</Toggle> */}
+				<VerticalSpace space="extraSmall"></VerticalSpace>
+
+				<Toggle onChange={() => (isBatchSignal.value = !isBatch)} value={isBatch}>
+					<Text>즉시 적용 (alt + click 추천)</Text>
+					<VerticalSpace space="extraSmall"></VerticalSpace>
+					<Text>검색 창에서 선택된 상태로 피그마 텍스트 클릭 시 반영</Text>
+				</Toggle>
+			</div>
+
 			<Textbox placeholder="search" value={search} onChange={(e) => setSearch(e.currentTarget.value)}></Textbox>
 			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
 		</Fragment>

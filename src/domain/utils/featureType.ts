@@ -42,7 +42,7 @@ export type CurrentCursorType = {
 	/**
 	 * DB 섹션 아이디
 	 */
-	sectionId: number
+	sectionId: string
 	pageName: string
 	pageId: string
 	nodeName: string

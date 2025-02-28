@@ -90,8 +90,8 @@ export const sectionNameParser = (text: string) => {
 export const getCursorPosition = async (node: BaseNode) => {
 	console.log('🚀 ~ getCursorPosition ~ node:', node)
 	const sectionData = {
-		section_id: 0,
-		name: 'DEFAULT',
+		section_id: '',
+		name: 'NULL',
 	}
 	if (node && node.type === 'TEXT') {
 		const result = FilePathNodeSearch(node)
@@ -100,53 +100,11 @@ export const getCursorPosition = async (node: BaseNode) => {
 		const sectionNode = result.find((node) => node.type === 'SECTION')
 
 		if (sectionNode) {
-			// 1. 이름이 [abc] 처럼 되있다면 섹션 아이디 추출
-			// 1-1 해당 이름으로 검색 > 있으면 섹션 데이터 플러그인 데이터에 오버라이드
 			const text = sectionNode.name.trim()
 
-			const sectionName = sectionNameParser(text)
-			if (sectionName) {
-				const result = await fetchDB(('/sections/' + sectionName) as '/sections/{name}', {
-					method: 'GET',
-					// body: JSON.stringify({ name: sectionName }, null, 2),
-				})
-				if (!result) {
-					return
-				}
-				const data = (await result.json()) as SectionDTO
-
-				// 값이 정상일 때 이름과 섹션 이름 수정
-				if (data && result.status !== 404) {
-					const nextText = text.replace(`[${sectionName}]`, '').trim()
-					sectionData.section_id = data.section_id
-					sectionData.name = `[${data.section_name}] ${nextText}`
-					sectionNode.setPluginData(NODE_STORE_KEY.SECTION, data.section_id.toString())
-				}
-			}
-			//
-			// 2. 섹션이 존재하고 플러그인 데이터가 존재하면
-			// 2-1 플러그인 데이터를 이름에 부여 ( 개발자 플러그인 데이터 오버라이드 ? 인데 개발자모드 쓰는 사람이 없다는 )
-			// 섹션 리스트를 글로벌로 끌어올리는 것도 고려 대상
-			else {
-				const sectionId = sectionNode?.getPluginData(NODE_STORE_KEY.SECTION)
-				if (sectionId) {
-					sectionData.section_id = parseInt(sectionId)
-					const result = await fetchDB(('/sections/id/' + sectionId) as '/sections/id/{id}', {
-						method: 'GET',
-						// body: JSON.stringify({ name: sectionName }, null, 2),
-					})
-					if (!result) {
-						return
-					}
-					const data = (await result.json()) as SectionDTO
-
-					if (data && data.code !== ERROR_CODE.SECTION_NOT_FOUND) {
-						sectionData.section_id = data.section_id
-						sectionData.name = `[${data.section_name}] ${text}`
-						sectionNode.name = sectionData.name
-					}
-				}
-			}
+			const sectionName = text
+			sectionData.name = sectionName
+			sectionData.section_id = sectionNode.id
 		}
 
 		const projectId = getProjectId()

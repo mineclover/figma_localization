@@ -215,7 +215,7 @@ export type LocalizationKeyProps = {
 	domainId: number
 	name: string
 	alias?: string
-	sectionId?: number
+	sectionId?: string
 	parentKeyId?: number
 	isVariable?: boolean
 	isTemporary?: boolean

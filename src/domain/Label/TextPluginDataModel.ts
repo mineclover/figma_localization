@@ -61,42 +61,6 @@ export const locationMapping = (location: LocationDTO): Location => {
 	}
 }
 
-// 오로지 내부 연산용임 signal 쓸 일 없음
-
-/**
- * 로케이션 설정
- * @param node
- * @returns
- */
-export const createNodeLocation = async (node: BaseNode, nodeLocation: CurrentCursorType) => {
-	const targetData = {
-		projectId: nodeLocation.projectId,
-		pageId: nodeLocation.pageId,
-		nodeId: nodeLocation.nodeId,
-		isPinned: false,
-	}
-
-	// targetData
-	const result = await fetchDB('/figma/locations', {
-		method: 'POST',
-		body: JSON.stringify(targetData, null, 2),
-	})
-
-	if (!result) {
-		return
-	}
-
-	const data = (await result.json()) as LocationDTO
-
-	const location = locationMapping(data)
-
-	if (result.status === 200) {
-		node.setPluginData(NODE_STORE_KEY.LOCATION, location.location_id.toString())
-	} else {
-		notify('Failed to set location', 'error')
-	}
-}
-
 export type LocalizationKeyDTO = {
 	key_id: number
 	domain_id: number
@@ -555,7 +519,7 @@ export const onTargetSetNodeLocation = () => {
 		 * result는 이전 값을 가지고 있음 init해도 안바뀜
 		 * 새 값이 고정된 영역에 고정되있음
 		 * */
-		await createNodeLocation(node, result)
+
 		// 임시 키 값 설정
 		// 변경 가능하고 저장 가능하게 임시 값 보여야 함
 		// 섹션 관리 되야 함

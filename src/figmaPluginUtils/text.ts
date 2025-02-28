@@ -14,10 +14,10 @@ interface RangeMethods {
 	getRangeLetterSpacing(start: number, end: number): StyleRange<LetterSpacing>[]
 	getRangeTextDecoration(start: number, end: number): StyleRange<TextDecoration>[]
 	getRangeTextCase(start: number, end: number): StyleRange<TextCase>[]
-	getRangeTextStyleId(start: number, end: number): StyleRange<string>[]
 	// getRangeAllFontNames(start: number, end: number): StyleRange<FontName>[]
 	getRangeOpenTypeFeatures(start: number, end: number): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
 	getRangeHyperlink(start: number, end: number): StyleRange<HyperlinkTarget | null>[]
+	getRangeTextStyleId(start: number, end: number): StyleRange<string>[]
 	getRangeFills(start: number, end: number): StyleRange<Paint[]>[]
 	getRangeFillStyleId(start: number, end: number): StyleRange<string>[]
 	getRangeListOptions(start: number, end: number): StyleRange<TextListOptions>[]
@@ -32,6 +32,7 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 
 	while (start < length) {
 		const initialStyle = getRangeMethod.call(textNode, start, end)
+		console.log('🚀 ~ initialStyle:', initialStyle)
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
@@ -40,6 +41,53 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
 			if (currentStyle === figma.mixed) {
+				// console.log('🚀 ~ 종료  :', start, end, currentStyle)
+				end = end - 1
+				break
+			}
+			if (end === length) {
+				end = length
+				break
+			}
+			end++
+		}
+
+		// 범위 정보 저장
+		ranges.push({
+			start,
+			end: end, // end는 변경지점이므로 -1
+			value: initialStyle,
+		})
+
+		// 다음 범위의 시작점으로 이동 (수정된 부분)
+		start = end // end - 1 대신 end를 사용
+		end = start + 1
+	}
+
+	return ranges
+}
+
+function getBoundVariableStyleRanges<T>(
+	textNode: TextNode,
+	field: VariableBindableTextField,
+	getRangeMethod: (start: number, end: number, field: VariableBindableTextField) => any
+) {
+	const length = textNode.characters.length
+
+	let start = 0
+	let end = 1
+	const ranges: StyleRange<T>[] = []
+
+	while (start < length) {
+		const initialStyle = getRangeMethod.call(textNode, start, end, field)
+
+		// 순차 탐색으로 변경
+		while (end <= length) {
+			// console.log('🚀 ~ 탐색:', start, end)
+			const currentStyle = getRangeMethod.call(textNode, start, end, field)
+
+			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
+			if (currentStyle == figma.mixed) {
 				// console.log('🚀 ~ 종료  :', start, end, currentStyle)
 				end = end - 1
 				break
@@ -276,6 +324,43 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	]
 }
 
+const targetVariableBindableFields = [
+	'fontFamily',
+	'fontSize',
+	'fontStyle',
+	'fontWeight',
+	'letterSpacing',
+	'lineHeight',
+]
+
+function getBoundVariablesRanges(textNode: TextNode): any {
+	const keys = Object.keys(textNode.boundVariables as Record<string, string>)
+	console.log('🚀 ~ getBoundVariablesRanges ~ keys:', keys)
+	const values = {} as Record<
+		string,
+		ValidStyleRange<{
+			type: string
+			id: string
+		}>[]
+	>
+
+	if (keys.length > 0) {
+		for (const key of keys) {
+			if (targetVariableBindableFields.includes(key)) {
+				const value = getBoundVariableStyleRanges<string>(
+					textNode,
+					key as VariableBindableTextField,
+					textNode.getRangeBoundVariable
+				)
+
+				values[key] = value as any
+			}
+		}
+		return values
+	}
+	return {}
+}
+
 // 모든 스타일 Range를 가져오는 함수
 export interface AllStyleRanges {
 	fontSize?: StyleRange<number>[] | null
@@ -291,6 +376,7 @@ export interface AllStyleRanges {
 	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
 	fills?: StyleRange<Paint[]>[] | null
 	fillStyleId?: StyleRange<string>[] | null
+	boundVariables?: any
 	// listOptions: StyleRange<TextListOptions>[] | null
 	// indentation: StyleRange<number>[] | null
 }
@@ -314,12 +400,25 @@ export type ValidAllStyleRangesType = {
 	hyperlink?: ValidStyleRange<HyperlinkTarget>[]
 	fills?: ValidStyleRange<Paint[]>[]
 	fillStyleId?: ValidStyleRange<string>[]
+	boundVariables?: ValidStyleRange<{
+		type: string
+		id: string
+	}>[]
+	// boundVariables?: Record<
+	// 	string,
+	// 	ValidStyleRange<{
+	// 		type: string
+	// 		id: string
+	// 	}>[]
+	// >
 }
 
 // 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
 
-export function getAllStyleRanges(textNode: TextNode): ValidAllStyleRangesType {
-	const temp: AllStyleRanges = {
+export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyleRangesType; boundVariables: any } {
+	const boundVariables = getBoundVariablesRanges(textNode)
+
+	const styleData: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
 		fontName: getFontNameRanges(textNode),
 
@@ -327,21 +426,27 @@ export function getAllStyleRanges(textNode: TextNode): ValidAllStyleRangesType {
 		letterSpacing: getLetterSpacingRanges(textNode),
 		textDecoration: getTextDecorationRanges(textNode),
 		textCase: getTextCaseRanges(textNode),
-		textStyleId: getTextStyleIdRanges(textNode),
+
 		fontWeight: getFontWeightRanges(textNode),
 		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),
-		fillStyleId: getFillStyleIdRanges(textNode),
-	} as const
 
-	for (const key in temp) {
-		if (temp[key as keyof AllStyleRanges] == null) {
-			delete temp[key as keyof AllStyleRanges]
+		//
+	}
+
+	const styleIds = {
+		fillStyleId: getFillStyleIdRanges(textNode),
+		textStyleId: getTextStyleIdRanges(textNode),
+	}
+	textNode.id
+	for (const key in styleData) {
+		if (styleData[key as keyof AllStyleRanges] == null) {
+			delete styleData[key as keyof AllStyleRanges]
 		}
 	}
 
-	return temp as ValidAllStyleRangesType
+	return { styleData: styleData as ValidAllStyleRangesType, boundVariables }
 }
 
 export const textFontLoad = async (textNode: TextNode) => {

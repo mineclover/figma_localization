@@ -12,6 +12,7 @@ import SettingPage from '@/domain/Setting/SettingPage'
 import TranslatePage from '@/domain/Translate/TranslatePage'
 import { isBatchSignal } from '@/domain/Label/LabelSearch'
 import { useSignal } from '@/hooks/useSignal'
+import StylePage from '@/domain/Style/StylePage'
 
 const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate']
 
@@ -42,7 +43,7 @@ function Plugin() {
 			value: nav[0],
 		},
 		{
-			children: <div>3. 스타일 정의에 대한 인터페이스를 준다 {'>'} 스타일에 대한 라벨링</div>,
+			children: <StylePage />,
 			value: nav[5],
 		},
 		{
@@ -59,7 +60,7 @@ function Plugin() {
 		//   value: nav[2],
 		// },
 	] as const
-	const [value, setValue] = useState<string>(nav[0])
+	const [value, setValue] = useState<string>(nav[5])
 
 	return (
 		<AppProvider>

@@ -88,6 +88,7 @@ export const sectionNameParser = (text: string) => {
  * 이 코드가 너무 많은 기능을 갖고 있어서 리펙토링 하게 되면 수정하면 좋을 것 같음
  */
 export const getCursorPosition = async (node: BaseNode) => {
+	console.log('🚀 ~ getCursorPosition ~ node:', node)
 	const sectionData = {
 		section_id: 0,
 		name: 'DEFAULT',
@@ -154,6 +155,8 @@ export const getCursorPosition = async (node: BaseNode) => {
 		}
 		const NodeData = getNodeData(node)
 
+		const { styleData, boundVariables } = getAllStyleRanges(node)
+
 		const cursorPosition: CurrentCursorType = {
 			projectId,
 			sectionName: sectionData.name,
@@ -165,7 +168,8 @@ export const getCursorPosition = async (node: BaseNode) => {
 			characters: node.characters,
 			autoRename: node.autoRename,
 			data: NodeData,
-			styleData: getAllStyleRanges(node),
+			styleData,
+			boundVariables,
 		}
 
 		return cursorPosition

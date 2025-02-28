@@ -140,6 +140,8 @@ export const onSetLanguageCode = () => {
 			const sectionNode = result.find((node) => node.type === 'SECTION')
 			if (sectionNode) {
 				await changeLocalizationCode(sectionNode, languageCode)
+			} else {
+				// 섹션 밖에 있는 경우 어떻게 처리할 지
 			}
 		}
 	})

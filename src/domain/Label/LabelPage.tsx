@@ -54,7 +54,11 @@ const isTemporary = (data: LocalizationKey | null) => {
  */
 export const enforcePrefix = (input: string, sectionName: string): string => {
 	const sectionPrefix = sectionNameParser(sectionName) ?? ''
-	const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
+	const finalPrefix = sectionPrefix
+	// const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
+	if (finalPrefix === '') {
+		return input
+	}
 
 	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input
 }
@@ -67,13 +71,6 @@ function LabelPage() {
 	const [search, setSearch] = useState('')
 	const [aliasHover, setAliasHover] = useState(false)
 	const [lockHover, setLockHover] = useState(false)
-
-	if (currentPointer && currentPointer.styleData && currentPointer.characters) {
-		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
-		console.log('🚀 ~ LabelPage ~ segments:', segments)
-		const styleGroups = groupSegmentsByStyle(segments)
-		console.log('🚀 ~ LabelPage ~ styleGroups:', styleGroups)
-	}
 
 	useEffect(() => {
 		return () => {

@@ -52,6 +52,7 @@ export type CurrentCursorType = {
 
 	data: NodeData
 	styleData?: ValidAllStyleRangesType
+	boundVariables?: any
 }
 
 // 저장을 어떻게 할까

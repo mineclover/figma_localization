@@ -506,8 +506,12 @@ export const createNormalLocalizationKey = async (
 	if (sectionPrefix != null && sectionPrefix === targetSection) {
 		temp.name = name
 	} else {
-		const finalPrefix = sectionPrefix == null ? 'Default' : sectionPrefix
-		temp.name = [finalPrefix, name].join('_')
+		if (sectionPrefix == null) {
+			temp.name = name
+		} else {
+			const finalPrefix = sectionPrefix == null ? 'Default' : sectionPrefix
+			temp.name = [finalPrefix, name].join('_')
+		}
 	}
 
 	if (alias) {

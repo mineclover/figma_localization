@@ -37,6 +37,7 @@ import {
 import { removeLeadingSymbols } from '@/utils/textTools'
 import LabelSearch, { isBatchSignal } from './LabelSearch'
 import { createStyleSegments, groupSegmentsByStyle } from '../Style/styleModel'
+import { currentSectionSignal } from '../Translate/TranslateModel'
 
 const isTemporary = (data: LocalizationKey | null) => {
 	if (data == null) {
@@ -66,6 +67,7 @@ export const enforcePrefix = (input: string, sectionName: string): string => {
 function LabelPage() {
 	const currentPointer = useSignal(currentPointerSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)
+	const currentSection = useSignal(currentSectionSignal)
 	const isBatch = useSignal(isBatchSignal)
 
 	const [search, setSearch] = useState('')
@@ -82,7 +84,7 @@ function LabelPage() {
 		<div className={styles.container}>
 			<div className={styles.sectionRow}>
 				<IconLayerFrameCoverArt16></IconLayerFrameCoverArt16>
-				<span className={styles.sectionTitle}>{currentPointer?.sectionName ?? ''}</span>
+				<span className={styles.sectionTitle}>{currentSection?.name}</span>
 
 				{currentPointer?.data.localizationKey ? (
 					<button
@@ -191,11 +193,7 @@ function LabelPage() {
 						if (localizationKeyValue?.is_temporary != null) {
 							body.isTemporary = localizationKeyValue.is_temporary
 						}
-						if (currentPointer?.sectionId && currentPointer.sectionId != null) {
-							// DB에 등록된 섹션 아이디랑 현재 상위에 정의된 섹션 아이디가 달라질 수 있음
-							// 그래서 수집함
-							body.sectionId = currentPointer.sectionId.toString()
-						}
+
 						console.log('🚀 ~ LabelPage ~ body:', body)
 						emit(PUT_LOCALIZATION_KEY.REQUEST_KEY, currentPointer?.data.localizationKey, body)
 					}}
@@ -242,7 +240,7 @@ function LabelPage() {
 					onChange={(e) => {
 						const next = {
 							...localizationKeyValue,
-							name: enforcePrefix(e.currentTarget.value, currentPointer?.sectionName ?? ''),
+							name: e.currentTarget.value,
 						} as LocalizationKey
 						localizationKeySignal.value = next
 					}}

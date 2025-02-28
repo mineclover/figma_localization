@@ -13,8 +13,9 @@ import TranslatePage from '@/domain/Translate/TranslatePage'
 import { isBatchSignal } from '@/domain/Label/LabelSearch'
 import { useSignal } from '@/hooks/useSignal'
 import StylePage from '@/domain/Style/StylePage'
+import BatchPage from '@/domain/Batch/BatchPage'
 
-const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate']
+const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch']
 
 function Plugin() {
 	const isBatch = useSignal(isBatchSignal)
@@ -49,6 +50,10 @@ function Plugin() {
 		{
 			children: <TranslatePage />,
 			value: nav[6],
+		},
+		{
+			children: <BatchPage />,
+			value: nav[7],
 		},
 
 		{

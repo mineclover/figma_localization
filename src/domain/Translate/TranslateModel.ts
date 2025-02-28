@@ -16,19 +16,32 @@ import { fetchDB } from '../utils/fetchDB'
 import { textFontLoad } from '@/figmaPluginUtils/text'
 import { FilePathNodeSearch } from '@/figmaPluginUtils'
 
+export type CurrentNode = {
+	id: string
+	name: string
+}
+
 /** 현재 섹션이 선택되었는가 여부 판단 */
-export const currentSectionSignal = signal<string | null>(null)
+export const currentSectionSignal = signal<CurrentNode | null>(null)
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY)
-	return on(CURRENT_SECTION_SELECTED.RESPONSE_KEY, (sectionId: string) => {
-		currentSectionSignal.value = sectionId
+	return on(CURRENT_SECTION_SELECTED.RESPONSE_KEY, (section: CurrentNode) => {
+		currentSectionSignal.value = section
 	})
 }
 
+/**
+ * 선택 기능으로 선택을 제어하려 할 때는 트리거 온오프로 상태 업데이트를 제어하는 방식으로 구성
+ * @param node
+ * @returns
+ */
 export const getCurrentSectionSelected = (node: BaseNode) => {
 	if (node && node.type === 'SECTION') {
-		return node.id
+		return {
+			id: node.id,
+			name: node.name,
+		}
 	}
 
 	if (node) {
@@ -36,7 +49,10 @@ export const getCurrentSectionSelected = (node: BaseNode) => {
 		const sectionNode = result.find((node) => node.type === 'SECTION')
 
 		if (sectionNode) {
-			return sectionNode.id
+			return {
+				id: sectionNode.id,
+				name: sectionNode.name,
+			}
 		}
 	}
 
@@ -44,9 +60,9 @@ export const getCurrentSectionSelected = (node: BaseNode) => {
 }
 export const onCurrentSectionSelected = () => {
 	on(CURRENT_SECTION_SELECTED.REQUEST_KEY, () => {
-		const sectionId = getCurrentSectionSelected(figma.currentPage.selection[0])
-		if (sectionId) {
-			emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId)
+		const section = getCurrentSectionSelected(figma.currentPage.selection[0])
+		if (section) {
+			emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, section)
 		}
 	})
 }

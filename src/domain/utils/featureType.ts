@@ -23,10 +23,10 @@ export type OriginalLocalizeId = string
 
 /**  */
 export type NodeData = {
-	locationKey: LocationKey
 	/** 키 값 등록해놓고 저장은 글로벌 스토어에서 처리 */
 	localizationKey: LocalizationKey
 	originalLocalizeId: OriginalLocalizeId
+	ignore?: boolean
 }
 
 /** 현재 커서 정보 */
@@ -38,11 +38,7 @@ export type CurrentCursorType = {
 	/**
 	 *
 	 */
-	sectionName: string
-	/**
-	 * DB 섹션 아이디
-	 */
-	sectionId: string
+
 	pageName: string
 	pageId: string
 	nodeName: string

@@ -117,8 +117,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 
 		const cursorPosition: CurrentCursorType = {
 			projectId,
-			sectionName: sectionData.name,
-			sectionId: sectionData.section_id,
+
 			pageName: figma.currentPage.name,
 			pageId: figma.currentPage.id,
 			nodeName: removeLeadingSymbols(node.name),

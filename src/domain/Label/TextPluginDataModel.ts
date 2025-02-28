@@ -532,12 +532,10 @@ export const onTargetSetNodeLocation = () => {
 
 		// section은 [sectionName] {기존 제목} 으로 처리 됨
 
-		if (result.data.locationKey === '') {
+		if (result) {
 			await createNormalLocalizationKey(node, {
 				domainId: domainSetting.domainId,
 				name: result.nodeName,
-				sectionId: result.sectionId,
-				sectionName: result.sectionName,
 			})
 		}
 		await getLocalizationKeyData(node, Date.now())
@@ -575,12 +573,10 @@ export const onNodeReload = () => {
 
 /** 플러그인 데이터 조회 */
 export const getNodeData = (node: BaseNode) => {
-	const locationKey = node.getPluginData(NODE_STORE_KEY.LOCATION)
 	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
 	const originalLocalizeId = node.getPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID)
 
 	return {
-		locationKey: locationKey,
 		localizationKey: localizationKey,
 		originalLocalizeId: originalLocalizeId,
 	} as NodeData

@@ -89,6 +89,26 @@ export const onPatternMatchResponse = () => {
 	})
 }
 
+export type GroupOption = {
+	localizationKey: true
+	/** 부모 이름을 그루핑 파라미터로 사용 */
+	parentName: true
+	/** 이름을 그루핑 파라미터로 사용 */
+	name: true
+	/** 텍스트를 그루핑 파라미터로 사용 */
+	text: true
+}
+export type ViewOption = {
+	/** 숨김 대상을 표시 */
+	ignore: boolean
+	/** 숨기지 않은 대상을 표시 */
+	notIgnore: boolean
+	/** 키 값이 있는 대상을 표시 */
+	hasLocalizationKey: boolean
+	/** 키 값이 없는 대상을 표시 */
+	notHasLocalizationKey: boolean
+}
+
 /**
  * SearchNodeData 배열을 받아 id를 제외한 나머지 필드가 동일한 항목끼리 그룹화하여
  * PatternMatchData 배열로 변환합니다
@@ -97,35 +117,58 @@ export const onPatternMatchResponse = () => {
  * @param filterWithLocalizationKey localizationKey가 있는 항목만 포함할지 여부
  * @param includeParentName 키 생성 시 부모 이름을 포함할지 여부
  */
-export const groupByPattern = (
-	dataArr: SearchNodeData[],
-	filterIgnored: boolean = false,
-	filterWithLocalizationKey: boolean = false,
-	includeParentName: boolean = true
-): PatternMatchData[] => {
+export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption, groupOption: GroupOption) => {
 	const groupMap = new Map<string, PatternMatchData>()
 
 	// 옵션에 따라 필터링
 	let filteredData = dataArr
-	if (filterIgnored) {
-		filteredData = filteredData.filter((item) => !item.ignore)
-	}
-	if (filterWithLocalizationKey) {
-		filteredData = filteredData.filter((item) => item.localizationKey !== '')
-	} else {
-		filteredData = filteredData.filter((item) => item.localizationKey === '')
-	}
+	filteredData = filteredData.filter((item) => {
+		// 모든 활성화된 필터 조건을 충족해야 함
+		let shouldInclude = true
 
-	filteredData.forEach((item) => {
-		// id를 제외한 필드를 기준으로 고유 키 생성 (옵션에 따라 parentName 포함 여부 결정)
-		const keyObj: any = {
-			localizationKey: item.localizationKey,
-			text: item.text,
+		// ignore 관련 필터
+		if (viewOption.notIgnore) {
+			shouldInclude = shouldInclude && !item.ignore
+		}
+		if (viewOption.ignore) {
+			shouldInclude = shouldInclude && item.ignore
 		}
 
+		// localizationKey 관련 필터
+		if (viewOption.hasLocalizationKey) {
+			shouldInclude = shouldInclude && item.localizationKey !== ''
+		}
+		if (viewOption.notHasLocalizationKey) {
+			shouldInclude = shouldInclude && item.localizationKey === ''
+		}
+
+		// 필터 조건이 활성화되지 않은 경우 기본적으로 모든 항목 포함
+		const isAnyFilterActive =
+			viewOption.notIgnore || viewOption.ignore || viewOption.hasLocalizationKey || viewOption.notHasLocalizationKey
+		if (!isAnyFilterActive) {
+			return true
+		}
+
+		return shouldInclude
+	})
+
+	const filteredDataLength = filteredData.length
+	filteredData.forEach((item) => {
+		// id를 제외한 필드를 기준으로 고유 키 생성 (옵션에 따라 parentName 포함 여부 결정)
+		const keyObj: any = {}
+
 		// 옵션에 따라 부모 이름 포함 여부 결정
-		if (includeParentName) {
+		if (groupOption.parentName) {
 			keyObj.parentName = item.parentName
+		}
+		if (groupOption.localizationKey) {
+			keyObj.localizationKey = item.localizationKey
+		}
+		if (groupOption.name) {
+			keyObj.name = item.name
+		}
+		if (groupOption.text) {
+			keyObj.text = item.text
 		}
 
 		const key = JSON.stringify(keyObj)
@@ -148,5 +191,8 @@ export const groupByPattern = (
 	})
 
 	// Map 값들을 배열로 변환하여 반환
-	return Array.from(groupMap.values())
+	return {
+		patternMatchData: Array.from(groupMap.values()),
+		filteredDataLength,
+	}
 }

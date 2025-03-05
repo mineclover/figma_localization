@@ -1,13 +1,14 @@
 import { useSignal } from '@/hooks/useSignal'
 import { h } from 'preact'
 import { CurrentNode, currentSectionSignal } from '../Translate/TranslateModel'
-import { useEffect, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
 import {
 	Bold,
 	Button,
 	Code,
 	Container,
 	Dropdown,
+	IconAdjust32,
 	IconButton,
 	IconChevronDown16,
 	IconChevronUp16,
@@ -24,10 +25,12 @@ import { emit } from '@create-figma-plugin/utilities'
 import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY } from '../constant'
 import {
 	groupByPattern,
+	GroupOption,
 	onPatternMatchResponse,
 	PatternMatchData,
 	patternMatchDataSignal,
 	SearchNodeData,
+	ViewOption,
 } from './batchModel'
 import styles from './batch.module.css'
 import { clc } from '@/components/modal/utils'
@@ -78,7 +81,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 				</div>
 				<div className={styles.row}>
 					<Bold className={clc(localizationKey === '' && styles.disabled)}>
-						{localizationKey === '' ? 'NULL' : localizationKey}
+						key: {localizationKey === '' ? 'NULL' : localizationKey}
 					</Bold>
 					<IconButton
 						onClick={() => {
@@ -138,6 +141,18 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 
 type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name'
 
+const optionAlias = {
+	text: '텍스트',
+	localizationKey: '키 값',
+	parentName: '부모 이름',
+	name: '이름',
+	ignore: '숨김 대상',
+	notIgnore: '표시 대상',
+	hasLocalizationKey: '키 값 있음',
+	notHasLocalizationKey: '키 값 없음',
+}
+
+/**
 /**
  * 그루핑 할때는 아이디를 하위 값으로 두고 속성을 위로 올린다
  * 전체 선택, 또는 선택으로 검색 영역 지정
@@ -154,22 +169,48 @@ type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name'
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
 
+	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false)
+	/** 선택 목표 섹션 */
 	const [selectTarget, setSelectTarget] = useState<CurrentNode | null>(null)
 
+	/** 숨김 대상을 포함할 것인가 */
 	const [ignore, setIgnore] = useState<boolean>(false)
-	const [hasLocalizationKey, setHasLocalizationKey] = useState<boolean>(false)
-	const [includeParentName, setIncludeParentName] = useState<boolean>(false)
+
+	const [groupOption, setGroupOption] = useState<GroupOption>({
+		/** 키 값을 그루핑 파라미터로 사용 */
+		localizationKey: true,
+		/** 부모 이름을 그루핑 파라미터로 사용 */
+		parentName: true,
+		/** 이름을 그루핑 파라미터로 사용 */
+		name: true,
+		/** 텍스트를 그루핑 파라미터로 사용 */
+		text: true,
+	})
+	/** 보여줄 옵션 */
+	const [viewOption, setViewOption] = useState<ViewOption>({
+		/** 숨김 대상을 표시 */
+		ignore: false,
+		/** 숨기지 않은 대상을 표시 */
+		notIgnore: true,
+		/** 키 값이 있는 대상을 표시 */
+		hasLocalizationKey: false,
+		/** 키 값이 없는 대상을 표시 */
+		notHasLocalizationKey: true,
+	})
+
+	const [openOption, setOpenOption] = useState<boolean>(false)
 
 	const [searchValue, setSearchValue] = useState<string>('')
-	console.log('🚀 ~ searchValue:', searchValue)
+
 	const [searchOption, setSearchOption] = useState<SearchOption>('text')
-	console.log('🚀 ~ searchOption:', searchOption)
 
 	const patternMatchData = useSignal(patternMatchDataSignal)
 	// console.log('🚀 ~ BatchPage ~ patternMatchData:', patternMatchData)
-	const patternMatchDataGroup = groupByPattern(patternMatchData, ignore, hasLocalizationKey, includeParentName)
-	console.log('🚀 ~ BatchPage ~ patternMatchDataGroup:', patternMatchDataGroup)
+	const { filteredDataLength, patternMatchData: patternMatchDataGroup } = useMemo(
+		() => groupByPattern(patternMatchData, viewOption, groupOption),
+		[patternMatchData, viewOption, groupOption]
+	)
 
 	const matchDataSet = new Set()
 
@@ -190,23 +231,8 @@ function BatchPage() {
 	}, [])
 
 	return (
-		<div className={styles.column}>
+		<div className={styles.miniColumn}>
 			<Stack space="extraSmall">
-				이거 인터페이스를 토글이 아니라 셀렉트 박스 그룹으로 변경하는 게 직관적이여 보임 예상되는 그룹은 0. 검색 인식
-				방식 1. 데이터 포함 여부 , 2. 그루핑 룰 옵션
-				<h1>선택된 값 : {selectTarget?.name}</h1>
-				<Toggle value={selectMode} onClick={() => setSelectMode(!selectMode)}>
-					섹션 선택 활성화 (선택 버튼 클릭 시 선택 영역 지정)
-				</Toggle>
-				<Toggle value={ignore} onClick={() => setIgnore(!ignore)}>
-					무시 대상 검색에 포함 시킬 지 여부 * 완전 제거 옵션임
-				</Toggle>
-				<Toggle value={hasLocalizationKey} onClick={() => setHasLocalizationKey(!hasLocalizationKey)}>
-					키 값 있는 값만 검색 or 반대 * 검색 영영 지정임
-				</Toggle>
-				<Toggle value={includeParentName} onClick={() => setIncludeParentName(!includeParentName)}>
-					그루핑 분류 기준에 부모 이름 포함할 것인가 * 그루핑 기준 지정임
-				</Toggle>
 				<div className={styles.row}>
 					<IconToggleButton
 						value={selectMode}
@@ -248,8 +274,46 @@ function BatchPage() {
 						placeholder="Search..."
 						value={searchValue}
 					/>
+					<IconToggleButton
+						value={openOption}
+						onClick={() => {
+							setOpenOption(!openOption)
+						}}
+					>
+						<IconAdjust32></IconAdjust32>
+					</IconToggleButton>
 				</div>
+				{openOption && (
+					<div className={styles.rowLeft}>
+						<div className={styles.miniColumn}>
+							<Bold>그루핑 기준</Bold>
+							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
+								const value = groupOption[key]
+								return (
+									<Toggle value={value} onClick={() => setGroupOption((prev) => ({ ...prev, [key]: !value }))}>
+										{key}
+									</Toggle>
+								)
+							})}
+						</div>
+						<div className={styles.miniColumn}>
+							<Bold>보여줄 옵션</Bold>
+							{(Object.keys(viewOption) as Array<keyof ViewOption>).map((key) => {
+								const value = viewOption[key]
+								return (
+									<Toggle value={value} onClick={() => setViewOption((prev) => ({ ...prev, [key]: !value }))}>
+										{optionAlias[key]}
+									</Toggle>
+								)
+							})}
+						</div>
+					</div>
+				)}
 			</Stack>
+			<Text>
+				Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
+			</Text>
+
 			<div className={styles.column}>
 				{patternMatchDataGroup
 					.filter((item) => {
@@ -261,7 +325,6 @@ function BatchPage() {
 					})
 					.sort((a, b) => a.text.localeCompare(b.text))
 					.map((item) => {
-						console.log('🚀 ~ .map ~ item:', item)
 						return <SearchResult {...item} />
 					})}
 			</div>

@@ -35,29 +35,51 @@ export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
 export const patternMatchDataSignal = signal<SearchNodeData[]>([])
 
 export const onPatternMatch = () => {
-	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID: string) => {
+	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
 		// 일단 선택된 섹션 관리
 		figma.skipInvisibleInstanceChildren = true
-		const selection = await figma.getNodeByIdAsync(targetID)
 
-		if (selection == null || selection.type !== 'SECTION') {
-			return
+		if (targetID) {
+			const selection = await figma.getNodeByIdAsync(targetID)
+
+			if (selection == null || selection.type !== 'SECTION') {
+				return
+			}
+			const nodeArr = selection.findAllWithCriteria({
+				types: ['TEXT'],
+			})
+			const dataArr = nodeArr.map((node) => {
+				return {
+					id: node.id,
+					name: node.name,
+					ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
+					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
+					text: node.characters,
+					parentName: node.parent?.name ?? '',
+				} as SearchNodeData
+			})
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr)
+		} else {
+			const selection = figma.currentPage
+
+			if (selection == null || selection.type !== 'PAGE') {
+				return
+			}
+			const nodeArr = selection.findAllWithCriteria({
+				types: ['TEXT'],
+			})
+			const dataArr = nodeArr.map((node) => {
+				return {
+					id: node.id,
+					name: node.name,
+					ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
+					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
+					text: node.characters,
+					parentName: node.parent?.name ?? '',
+				} as SearchNodeData
+			})
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr)
 		}
-
-		const nodeArr = selection.findAllWithCriteria({
-			types: ['TEXT'],
-		})
-		const dataArr = nodeArr.map((node) => {
-			return {
-				id: node.id,
-				name: node.name,
-				ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
-				localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
-				text: node.characters,
-				parentName: node.parent?.name ?? '',
-			} as SearchNodeData
-		})
-		emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr)
 	})
 }
 
@@ -70,30 +92,55 @@ export const onPatternMatchResponse = () => {
 /**
  * SearchNodeData 배열을 받아 id를 제외한 나머지 필드가 동일한 항목끼리 그룹화하여
  * PatternMatchData 배열로 변환합니다
+ * @param dataArr 검색 노드 데이터 배열
+ * @param filterIgnored ignore가 true인 항목을 제외할지 여부
+ * @param filterWithLocalizationKey localizationKey가 있는 항목만 포함할지 여부
+ * @param includeParentName 키 생성 시 부모 이름을 포함할지 여부
  */
-export const groupByPattern = (dataArr: SearchNodeData[]): PatternMatchData[] => {
+export const groupByPattern = (
+	dataArr: SearchNodeData[],
+	filterIgnored: boolean = false,
+	filterWithLocalizationKey: boolean = false,
+	includeParentName: boolean = true
+): PatternMatchData[] => {
 	const groupMap = new Map<string, PatternMatchData>()
 
-	dataArr.forEach((item) => {
-		// id를 제외한 필드를 기준으로 고유 키 생성
-		const key = JSON.stringify({
-			name: item.name,
-			ignore: item.ignore,
+	// 옵션에 따라 필터링
+	let filteredData = dataArr
+	if (filterIgnored) {
+		filteredData = filteredData.filter((item) => !item.ignore)
+	}
+	if (filterWithLocalizationKey) {
+		filteredData = filteredData.filter((item) => item.localizationKey !== '')
+	} else {
+		filteredData = filteredData.filter((item) => item.localizationKey === '')
+	}
+
+	filteredData.forEach((item) => {
+		// id를 제외한 필드를 기준으로 고유 키 생성 (옵션에 따라 parentName 포함 여부 결정)
+		const keyObj: any = {
 			localizationKey: item.localizationKey,
 			text: item.text,
-			parentName: item.parentName,
-		})
+		}
+
+		// 옵션에 따라 부모 이름 포함 여부 결정
+		if (includeParentName) {
+			keyObj.parentName = item.parentName
+		}
+
+		const key = JSON.stringify(keyObj)
 
 		if (!groupMap.has(key)) {
 			// 새 그룹 생성
-			groupMap.set(key, {
+			const newGroup: PatternMatchData = {
 				name: item.name,
 				ignore: item.ignore,
 				localizationKey: item.localizationKey,
 				text: item.text,
 				parentName: item.parentName,
 				ids: [item.id],
-			})
+			}
+			groupMap.set(key, newGroup)
 		} else {
 			// 기존 그룹에 id 추가
 			groupMap.get(key)!.ids.push(item.id)

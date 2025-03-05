@@ -1,7 +1,7 @@
 import { on, once, showUI } from '@create-figma-plugin/utilities'
 import { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
 
-import { nodeZoom_Adapter } from '@/figmaPluginUtils/utilAdapter'
+import { nodeZoom_Adapter, pageNodeZoom_Adapter } from '@/figmaPluginUtils/utilAdapter'
 import {
 	onGetDomainSetting,
 	onGetLanguageCodes,
@@ -45,6 +45,7 @@ export default function () {
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()
+	pageNodeZoom_Adapter()
 	onCurrentSectionSelected()
 
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )

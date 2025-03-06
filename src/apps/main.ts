@@ -19,7 +19,7 @@ import {
 	onUpdateNodeStoreKey,
 } from '@/domain/Label/TextPluginDataModel'
 import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel'
-import { onPatternMatch } from '@/domain/Batch/batchModel'
+import { onPatternMatch, onSetNodeLocalizationKeyBatch } from '@/domain/Batch/batchModel'
 
 export default function () {
 	// 세팅
@@ -42,6 +42,7 @@ export default function () {
 	onUpdateNodeStoreKey()
 	onSetLanguageCode()
 	onPatternMatch()
+	onSetNodeLocalizationKeyBatch()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

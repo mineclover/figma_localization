@@ -13,6 +13,7 @@ import {
 	IconButton,
 	IconChevronDown16,
 	IconChevronUp16,
+	IconCross32,
 	IconSwap32,
 	IconTarget16,
 	IconToggleButton,
@@ -25,7 +26,7 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
-import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY } from '../constant'
+import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY, SET_NODE_LOCALIZATION_KEY_BATCH } from '../constant'
 import {
 	groupByPattern,
 	GroupOption,
@@ -64,7 +65,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 	const [isExtended, setIsExtended] = useState<boolean>(false)
 
 	const selectIds = useSignal(selectIdsSignal)
-
+	const hasAnyId = ids.some((id) => selectIds.includes(id))
 	return (
 		<div className={styles.rowContainer}>
 			<div className={styles.column}>
@@ -75,7 +76,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 						onClick={() => {
 							setIsExtended(true)
 							// ids 리스트 중 하나라도 현재 선택된 리스트에 있는지 확인
-							const hasAnyId = ids.some((id) => selectIds.includes(id))
+
 							if (hasAnyId) {
 								// 하나라도 있으면 해당 ids 리스트의 모든 항목 제거
 								selectIdsSignal.value = selectIds.filter((id) => !ids.includes(id))
@@ -85,7 +86,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							}
 						}}
 					>
-						{ids.length.toString()}
+						{hasAnyId ? <IconCross32 /> : ids.length.toString()}
 					</IconButton>
 				</div>
 				<div className={styles.row}>
@@ -172,6 +173,7 @@ const optionAlias = {
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
 	const selectIds = useSignal(selectIdsSignal)
+	console.log('🚀 ~ selectIds:', selectIds)
 	const domainSetting = useSignal(domainSettingSignal)
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
@@ -212,6 +214,7 @@ function BatchPage() {
 	const [searchOption, setSearchOption] = useState<SearchOption>('text')
 
 	const patternMatchData = useSignal(patternMatchDataSignal)
+
 	// console.log('🚀 ~ BatchPage ~ patternMatchData:', patternMatchData)
 	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption)
 
@@ -233,11 +236,8 @@ function BatchPage() {
 		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
 	})
 
-	const matchDataSet = new Set()
-
-	patternMatchDataGroup.forEach((item) => {
-		matchDataSet.add(item.text)
-	})
+	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id))
+	console.log('🚀 ~ missingLink:', missingLink)
 
 	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>()
 	console.log('🚀 ~ hasMessage:', hasMessage)
@@ -261,6 +261,7 @@ function BatchPage() {
 		if (section && selectMode) {
 			setSelectTarget(section)
 			setSelectMode(false)
+			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, section.id)
 		}
 	}, [section])
 	useEffect(() => {
@@ -280,6 +281,37 @@ function BatchPage() {
 			<VerticalSpace space="extraSmall" />
 			<div className={styles.column}>
 				<Text>변경 대상 : {selectIds.length} 개</Text>
+				{missingLink.length > 0 && (
+					<div className={styles.miniColumn}>
+						<Bold>섹션 외 대상</Bold>
+						{missingLink.map((item) => {
+							const selected = selectIds.includes(item)
+
+							return (
+								<Button
+									danger
+									{...selectStyle(selected)}
+									onClick={() => {
+										pageNodeZoomAction(item)
+									}}
+									onContextMenu={(e) => {
+										e.preventDefault() // 기본 우클릭 메뉴 방지
+										// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
+										if (selectIds.includes(item)) {
+											// 제거하고
+											selectIdsSignal.value = selectIds.filter((id) => id !== item)
+										} else {
+											selectIdsSignal.value = [...selectIds, item]
+										}
+									}}
+								>
+									{item}
+								</Button>
+							)
+						})}
+					</div>
+				)}
+
 				<div className={styles.row}>
 					<Bold>Key : </Bold>
 					<Textbox
@@ -288,8 +320,8 @@ function BatchPage() {
 						onChange={(e) => setLocalizationKey(e.currentTarget.value)}
 					></Textbox>
 					<Button
-						onClick={() => {
-							fetchData('/localization/keys', {
+						onClick={async () => {
+							const result = await fetchData('/localization/keys', {
 								method: 'POST',
 								headers: {
 									'Content-Type': 'application/json',
@@ -300,6 +332,14 @@ function BatchPage() {
 									isTemporary: true,
 								}),
 							})
+
+							if (result.data) {
+								emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
+									domainId: result.data.domain_id,
+									keyId: result.data.key_id,
+									ids: selectIds,
+								})
+							}
 						}}
 					>
 						추가
@@ -347,12 +387,32 @@ function BatchPage() {
 					>
 						<IconTarget16 />
 					</IconToggleButton>
-					<Text align="left" className={styles.width}>
+					<button
+						className={styles.textButton}
+						onClick={() => {
+							if (selectTarget?.id) {
+								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id })
+							}
+						}}
+					>
 						{selectTarget?.name ?? '섹션 선택되지 않음'}
-					</Text>
+					</button>
 					<IconButton
 						// disabled={selectTarget == null
-						onClick={() => emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id!)}
+
+						onClick={() => {
+							setSelectTarget(null)
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY)
+						}}
+					>
+						<IconCross32 />
+					</IconButton>
+					<IconButton
+						// disabled={selectTarget == null
+
+						onClick={() => {
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
+						}}
 					>
 						<IconSwap32 />
 					</IconButton>
@@ -360,7 +420,7 @@ function BatchPage() {
 				{openOption && (
 					<div className={styles.rowLeft}>
 						<div className={styles.miniColumn}>
-							<Bold>그루핑 기준</Bold>
+							<Bold>그룹 기준</Bold>
 							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
 								const value = groupOption[key]
 								return (

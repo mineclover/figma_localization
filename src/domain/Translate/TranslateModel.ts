@@ -84,6 +84,7 @@ export const searchTranslationCode = async (key: string, code: string) => {
 	return data
 }
 
+/** 영역 내에 있는 모든 텍스트 노드의 로컬라이제이션 키를 찾아서 변경 */
 export const changeLocalizationCode = async (sectionNode: SectionNode, code: string) => {
 	//인스턴스도 탐색해서 수정하기 위함
 	figma.skipInvisibleInstanceChildren = false

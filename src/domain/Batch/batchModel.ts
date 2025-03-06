@@ -16,8 +16,16 @@
  */
 
 import { emit, on } from '@create-figma-plugin/utilities'
-import { GET_PATTERN_MATCH_KEY, NODE_STORE_KEY } from '../constant'
+import { GET_PATTERN_MATCH_KEY, NODE_STORE_KEY, SET_NODE_LOCALIZATION_KEY_BATCH } from '../constant'
 import { signal } from '@preact/signals-core'
+import {
+	addTranslation,
+	allRefresh,
+	processTextNodeLocalization,
+	reloadOriginalLocalizationName,
+	setNodeData,
+} from '../Label/TextPluginDataModel'
+import { notify } from '@/figmaPluginUtils'
 
 export type SearchNodeData = {
 	id: string
@@ -126,28 +134,28 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 		// 모든 활성화된 필터 조건을 충족해야 함
 		let shouldInclude = true
 
-		// ignore 관련 필터
-		if (viewOption.notIgnore) {
-			shouldInclude = shouldInclude && !item.ignore
-		}
-		if (viewOption.ignore) {
-			shouldInclude = shouldInclude && item.ignore
+		// ignore 관련 필터 (각 옵션 내부는 OR 관계)
+		let ignoreFilterPassed = true
+		if (viewOption.notIgnore || viewOption.ignore) {
+			ignoreFilterPassed = (viewOption.notIgnore && !item.ignore) || (viewOption.ignore && item.ignore)
+			shouldInclude = shouldInclude && ignoreFilterPassed
 		}
 
-		// localizationKey 관련 필터
-		if (viewOption.hasLocalizationKey) {
-			shouldInclude = shouldInclude && item.localizationKey !== ''
-		}
-		if (viewOption.notHasLocalizationKey) {
-			shouldInclude = shouldInclude && item.localizationKey === ''
+		// localizationKey 관련 필터 (각 옵션 내부는 OR 관계)
+		let localizationKeyFilterPassed = true
+		if (viewOption.hasLocalizationKey || viewOption.notHasLocalizationKey) {
+			localizationKeyFilterPassed =
+				(viewOption.hasLocalizationKey && item.localizationKey !== '') ||
+				(viewOption.notHasLocalizationKey && item.localizationKey === '')
+			shouldInclude = shouldInclude && localizationKeyFilterPassed
 		}
 
 		// 필터 조건이 활성화되지 않은 경우 기본적으로 모든 항목 포함
-		const isAnyFilterActive =
-			viewOption.notIgnore || viewOption.ignore || viewOption.hasLocalizationKey || viewOption.notHasLocalizationKey
-		if (!isAnyFilterActive) {
-			return true
-		}
+		// const isAnyFilterActive =
+		// 	viewOption.notIgnore || viewOption.ignore || viewOption.hasLocalizationKey || viewOption.notHasLocalizationKey
+		// if (!isAnyFilterActive) {
+		// 	return true
+		// }
 
 		return shouldInclude
 	})
@@ -195,4 +203,46 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 		patternMatchData: Array.from(groupMap.values()),
 		filteredDataLength,
 	}
+}
+
+/** 기준 설정이 약간 모호한 부분 */
+export const onSetNodeLocalizationKeyBatch = () => {
+	on(
+		SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
+		async (data: { domainId: string; keyId: string; name: string; ids: string[] }) => {
+			if (data.ids.length === 0) {
+				return
+			}
+			// originalLocalizeId 조회 또는 등록
+			// searchTranslationCode
+			const xNode = await figma.getNodeByIdAsync(data.ids[0])
+
+			if (xNode == null || xNode.type !== 'TEXT') {
+				return
+			}
+			setNodeData(xNode, {
+				domainId: data.domainId,
+				localizationKey: data.keyId,
+			})
+
+			const result = await addTranslation(xNode)
+			if (result == null) {
+				notify('Failed to add translation', 'error')
+				return
+			}
+
+			for (const id of data.ids) {
+				const node = await figma.getNodeByIdAsync(id)
+				if (node) {
+					setNodeData(node, {
+						domainId: data.domainId,
+						localizationKey: data.keyId,
+						originalLocalizeId: result.localization_id.toString(),
+					})
+				}
+			}
+
+			await reloadOriginalLocalizationName(xNode)
+		}
+	)
 }

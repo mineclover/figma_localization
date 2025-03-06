@@ -107,3 +107,15 @@
 .flexShrink {
 	flex-shrink: 0;
 }
+
+.textButton {
+	flex-grow: 1;
+	text-align: left;
+	padding: 4px 8px;
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-active);
+	}
+}

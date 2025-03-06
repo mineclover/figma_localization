@@ -109,7 +109,7 @@ function LabelPage() {
 									locationKey: '',
 									localizationKey: '',
 									originalLocalizeId: '',
-									domainId: domainSetting?.domainId ?? 0,
+									domainId: domainSetting?.domainId ?? '',
 								} as CurrentCursorType['data'],
 							} as CurrentCursorType
 							localizationKeySignal.value = null
@@ -130,7 +130,7 @@ function LabelPage() {
 									locationKey: '',
 									localizationKey: '',
 									originalLocalizeId: '',
-									domainId: domainSetting?.domainId ?? 0,
+									domainId: domainSetting?.domainId ?? '',
 								} as CurrentCursorType['data'],
 							} as CurrentCursorType
 							localizationKeySignal.value = null

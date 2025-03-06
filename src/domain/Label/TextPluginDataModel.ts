@@ -448,6 +448,7 @@ export const addTranslation = async (node: TextNode) => {
 
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString())
+		return data
 	} else {
 		notify('Failed to set location', 'error')
 	}
@@ -489,6 +490,25 @@ export const createNormalLocalizationKey = async (
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString())
 	} else {
 		notify('Failed to set localization key', 'error')
+	}
+}
+
+/** 1. 노드 데이터 설정 */
+export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
+	if (data.domainId) {
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString())
+	}
+
+	if (data.localizationKey) {
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString())
+	}
+
+	if (data.originalLocalizeId) {
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.originalLocalizeId.toString())
+	}
+
+	if (data.ignore) {
+		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString())
 	}
 }
 

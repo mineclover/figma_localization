@@ -1,5 +1,5 @@
 import { on } from '@create-figma-plugin/utilities'
-import { NodeZoomHandler, PageNodeZoomHandler } from './types'
+import { NodeZoomHandler, PageNodeZoomHandler, PageSelectIdsHandler } from './types'
 
 /** 특정 값으로 노드 줌 */
 export const nodeZoom_Adapter = () => {
@@ -32,6 +32,19 @@ export const pageNodeZoom_Adapter = () => {
 			// 노드로 화면 줌
 			figma.currentPage.selection = [node]
 			figma.viewport.scrollAndZoomIntoView([node])
+		}
+	})
+}
+
+/** 특정 값으로 노드 줌 */
+export const pageSelectIds_Adapter = () => {
+	on<PageSelectIdsHandler>('PAGE_SELECT_IDS', async ({ ids }) => {
+		const nodes = figma.currentPage.findAll((node) => ids.includes(node.id))
+
+		if (nodes) {
+			// 노드로 화면 줌
+			figma.currentPage.selection = nodes
+			figma.viewport.scrollAndZoomIntoView(nodes)
 		}
 	})
 }

@@ -161,6 +161,8 @@ export const onSetNodeResetKey = () => {
 		if (!node || node.type !== 'TEXT') {
 			return
 		}
+
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '')
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '')
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, '')
 		node.setPluginData(NODE_STORE_KEY.LOCATION, '')
@@ -458,25 +460,13 @@ export const createNormalLocalizationKey = async (
 	node: BaseNode,
 	{ domainId, alias, name, sectionId, sectionName }: LocalizationKeyProps
 ) => {
-	const sectionPrefix = sectionNameParser(sectionName ?? '')
-	const targetSection = sectionNameParser(name)
 	const temp = {
 		domainId: domainId,
-
+		name: name,
 		isTemporary: true,
 		sectionId: sectionId,
 	} as LocalizationKeyProps
 	// 섹션이 비지 않았고, 섹션이 같으면
-	if (sectionPrefix != null && sectionPrefix === targetSection) {
-		temp.name = name
-	} else {
-		if (sectionPrefix == null) {
-			temp.name = name
-		} else {
-			const finalPrefix = sectionPrefix == null ? 'Default' : sectionPrefix
-			temp.name = [finalPrefix, name].join('_')
-		}
-	}
 
 	if (alias) {
 		temp.alias = alias
@@ -495,9 +485,10 @@ export const createNormalLocalizationKey = async (
 	const data = (await result.json()) as LocalizationKeyDTO
 
 	if (result.status === 200) {
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString())
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString())
 	} else {
-		notify('Failed to set location', 'error')
+		notify('Failed to set localization key', 'error')
 	}
 }
 
@@ -645,7 +636,14 @@ export const onUpdateNodeStoreKey = () => {
 		if (!node || node.type !== 'TEXT') {
 			return
 		}
-		console.log('🚀 ~ on ~ key:', key)
+
+		const domainSetting = getDomainSetting()
+		if (!domainSetting) {
+			return
+		}
+
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, domainSetting.domainId.toString())
+
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString())
 
 		const translations = await getTargetTranslations(key.toString())

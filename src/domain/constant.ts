@@ -58,6 +58,7 @@ export const NODE_STORE_KEY = {
 	/** 섹션 용 */
 	SECTION: 'NODE_SECTION',
 	IGNORE: 'NODE_IGNORE',
+	DOMAIN_ID: 'NODE_DOMAIN_ID',
 }
 
 export const SET_NODE_LOCATION = {

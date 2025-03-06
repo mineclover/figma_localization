@@ -36,6 +36,9 @@ import styles from './batch.module.css'
 import { clc } from '@/components/modal/utils'
 import { signal } from '@preact/signals-core'
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
+import { clientFetchDBCurry } from '../utils/fetchDB'
+import { domainSettingSignal } from '../Setting/SettingModel'
+import { useFetch } from '@/hooks/useFetch'
 
 const selectIdsSignal = signal<string[]>([])
 
@@ -96,14 +99,8 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 				<button
 					className={styles.button}
 					onClick={() => {
-						const hasAnyId = ids.some((id) => selectIds.includes(id))
-						if (hasAnyId) {
-							// 하나라도 있으면 해당 ids 리스트의 모든 항목 제거
-							selectIdsSignal.value = selectIds.filter((id) => !ids.includes(id))
-						} else {
-							// 하나도 없으면 모든 항목 추가
-							selectIdsSignal.value = [...selectIds, ...ids]
-						}
+						selectIdsSignal.value = ids
+						emit('PAGE_SELECT_IDS', { ids })
 					}}
 				>
 					{parentName} / {name}
@@ -168,14 +165,14 @@ const optionAlias = {
  */
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
-
+	const selectIds = useSignal(selectIdsSignal)
+	const domainSetting = useSignal(domainSettingSignal)
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false)
 	/** 선택 목표 섹션 */
 	const [selectTarget, setSelectTarget] = useState<CurrentNode | null>(null)
-
 	/** 숨김 대상을 포함할 것인가 */
-	const [ignore, setIgnore] = useState<boolean>(false)
+	const [allView, setAllView] = useState<boolean>(false)
 
 	const [groupOption, setGroupOption] = useState<GroupOption>({
 		/** 키 값을 그루핑 파라미터로 사용 */
@@ -199,6 +196,8 @@ function BatchPage() {
 		notHasLocalizationKey: true,
 	})
 
+	const [localizationKey, setLocalizationKey] = useState<string>('')
+
 	const [openOption, setOpenOption] = useState<boolean>(false)
 
 	const [searchValue, setSearchValue] = useState<string>('')
@@ -218,6 +217,8 @@ function BatchPage() {
 		matchDataSet.add(item.text)
 	})
 
+	const { data, loading, error, fetchData } = useFetch()
+
 	// const textList = Array.from(matchDataSet.values()).sort()
 
 	useEffect(() => {
@@ -230,8 +231,38 @@ function BatchPage() {
 		onPatternMatchResponse()
 	}, [])
 
+	if (domainSetting?.domainId == null) {
+		return <div>도메인 설정이 없습니다.</div>
+	}
+
 	return (
 		<div className={styles.miniColumn}>
+			{data && <div>{JSON.stringify(data)}</div>}
+			{loading && <div>로딩중</div>}
+			{error && <div>에러 {JSON.stringify(error)}</div>}
+			<div className={styles.column}>
+				<Button>숨김 * 숨긴 걸 어떻게 다시 보여주게 할 것인가에 대한 문제가 있음</Button>
+				<Button>업데이트 * 중복 검사 api 에서 지원됨</Button>
+				대상 판별은 아래에서 판별함
+				<Textbox value={localizationKey} onChange={(e) => setLocalizationKey(e.currentTarget.value)}></Textbox>
+				<Button
+					onClick={() => {
+						fetchData('/localization/keys', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({
+								domainId: domainSetting.domainId,
+								name: localizationKey,
+								isTemporary: true,
+							}),
+						})
+					}}
+				>
+					테스트
+				</Button>
+			</div>
 			<Stack space="extraSmall">
 				<div className={styles.row}>
 					<IconToggleButton
@@ -310,13 +341,28 @@ function BatchPage() {
 					</div>
 				)}
 			</Stack>
-			<Text>
-				Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
-			</Text>
+			<div className={styles.row}>
+				<Toggle value={allView} onClick={() => setAllView(!allView)}>
+					<Text>{allView ? '전체 보는 중' : '선택한 것만 보는 중'}</Text>
+				</Toggle>
+				<Text>
+					Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
+				</Text>
+			</div>
 
 			<div className={styles.column}>
 				{patternMatchDataGroup
 					.filter((item) => {
+						{
+							/* 검색이 선택 보기 상태면 선택한 아이디를 제공 */
+						}
+						if (!allView) {
+							if (item.ids.some((id) => selectIds.includes(id))) {
+								return true
+							} else {
+								return false
+							}
+						}
 						if (searchValue === '') {
 							return true
 						}

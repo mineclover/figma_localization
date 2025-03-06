@@ -24,24 +24,24 @@ export const useFetch = <T>() => {
 			if (!response.ok) {
 				const result = await response.json()
 				console.log('🚀 ~ Error result:', result)
-				throw new Error(`HTTP error! status: ${response.status}`)
+				if (result.message) {
+					setState(() => ({
+						data: null,
+						error: result,
+						loading: false,
+					}))
+				} else {
+					throw new Error(`HTTP error! status: ${response.status}`)
+				}
+			} else {
+				const result = await response.json()
+				setState(() => ({
+					data: result,
+					error: null,
+					loading: false,
+				}))
 			}
-
-			const result = await response.json()
-
-			setState((prev) => ({
-				...prev,
-				data: result,
-				loading: false,
-			}))
-
-			return result
 		} catch (error) {
-			setState((prev) => ({
-				...prev,
-				error: error as Error,
-				loading: false,
-			}))
 			throw error
 		}
 	}

@@ -5,7 +5,10 @@ import { paths } from 'types/i18n'
 interface FetchState<T> {
 	data: T | null
 	loading: boolean
-	error: Error | null
+	error: {
+		message: string
+		details: string
+	} | null
 }
 
 export const useFetch = <T>() => {
@@ -14,24 +17,45 @@ export const useFetch = <T>() => {
 		loading: false,
 		error: null,
 	})
+	/** 메세지 이벤트 발행 */
+	const [hasMessage, setHasMessage] = useState<boolean>(false)
 
 	const fetchData = async <V extends keyof paths>(url: V, options?: RequestInit) => {
-		try {
-			setState((prev) => ({ ...prev, loading: true, error: null }))
+		setHasMessage(true)
 
+		setState((prev) => ({ ...prev, loading: true, error: null }))
+
+		try {
 			const response = await fetch(baseURL + url, options)
 
 			if (!response.ok) {
-				const result = await response.json()
-				console.log('🚀 ~ Error result:', result)
-				if (result.message) {
+				try {
+					const result = await response.json()
+					if (result.message) {
+						setState(() => ({
+							data: null,
+							error: result,
+							loading: false,
+						}))
+					} else {
+						setState(() => ({
+							data: null,
+							error: {
+								message: `요청 실패: ${response.status} ${response.statusText}`,
+								details: JSON.stringify(result),
+							},
+							loading: false,
+						}))
+					}
+				} catch (parseError) {
 					setState(() => ({
 						data: null,
-						error: result,
+						error: {
+							message: `요청 실패: ${response.status} ${response.statusText}`,
+							details: '응답을 파싱할 수 없습니다.',
+						},
 						loading: false,
 					}))
-				} else {
-					throw new Error(`HTTP error! status: ${response.status}`)
 				}
 			} else {
 				const result = await response.json()
@@ -42,12 +66,36 @@ export const useFetch = <T>() => {
 				}))
 			}
 		} catch (error) {
-			throw error
+			console.log('🚀 ~ fetchData ~ error:', error)
+			try {
+				const errorDetails =
+					typeof error === 'object' ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error)
+
+				setState((prev) => ({
+					...prev,
+					loading: false,
+					error: {
+						message: '오류가 발생했습니다.',
+						details: errorDetails,
+					},
+				}))
+			} catch (stringifyError) {
+				setState((prev) => ({
+					...prev,
+					loading: false,
+					error: {
+						message: '오류가 발생했습니다.',
+						details: '에러 정보를 가져올 수 없습니다.',
+					},
+				}))
+			}
 		}
 	}
 
 	return {
 		...state,
 		fetchData,
+		hasMessage,
+		setHasMessage,
 	}
 }

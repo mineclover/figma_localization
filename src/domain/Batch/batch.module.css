@@ -39,6 +39,9 @@
 	[class^='_searchTextbox'] {
 		flex-grow: 1;
 	}
+	[class^='_textbox'] {
+		flex-grow: 1;
+	}
 }
 
 .rowLeft {
@@ -46,6 +49,13 @@
 	flex-direction: row;
 	gap: 4px;
 }
+.rowCenter {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 4px;
+}
+
 .miniColumn {
 	display: flex;
 	flex-direction: column;

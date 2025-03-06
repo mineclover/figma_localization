@@ -11,6 +11,7 @@ import {
 	IconLockLocked16,
 	Toggle,
 	VerticalSpace,
+	SearchTextbox,
 } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
@@ -23,7 +24,8 @@ import { clc } from '@/components/modal/utils'
 import { UPDATE_NODE_STORE_KEY } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import { modalAlert } from '@/components/alert'
-import { signal } from '@preact/signals-core'
+import { computed, signal } from '@preact/signals-core'
+import { keyConventionRegex } from '@/utils/textTools'
 
 export const NullDisableText = ({
 	className,
@@ -90,25 +92,41 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 	)
 }
 
-/** search bar */
-function LabelSearch() {
+export const SearchArea = ({
+	search,
+	setSearch,
+	data,
+}: {
+	search: string
+	setSearch: (search: string) => void
+	data: LocalizationKeyDTO[]
+}) => {
+	return (
+		<Fragment>
+			<VerticalSpace space="extraSmall"></VerticalSpace>
+			<SearchTextbox
+				key={'searchTextbox'}
+				placeholder="Search..."
+				value={search}
+				onChange={(e) => {
+					setSearch(e.currentTarget.value)
+					// setSearch(keyConventionRegex(e.currentTarget.value))
+				}}
+			></SearchTextbox>
+			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
+		</Fragment>
+	)
+}
+
+export const useSearch = () => {
 	const [search, setSearch] = useState('')
 	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
-
-	const isBatch = useSignal(isBatchSignal)
-
-	const isTravel = useSignal(isTravelSignal)
-
 	const domainSetting = useSignal(domainSettingSignal)
-	const currentPointer = useSignal(currentPointerSignal)
 	const selectedKey = useSignal(selectedKeySignal)
 
-	useEffect(() => {
-		if (isBatch && selectedKey && currentPointer) {
-			console.log('🚀 ~ useEffect ~ currentPointer:', currentPointer)
-			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
-		}
-	}, [currentPointer?.nodeId])
+	const selectedKeyData = computed(() => {
+		return data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'))
+	})
 
 	useEffect(() => {
 		console.log('🚀 ~ useEffect ~ loading:', loading)
@@ -136,23 +154,41 @@ function LabelSearch() {
 		}
 	}, [search])
 
+	return { search, setSearch, selectedKeyData, data, loading, error, fetchData }
+}
+
+/** search bar */
+function LabelSearch() {
+	const { data, search, setSearch } = useSearch()
+
+	const isBatch = useSignal(isBatchSignal)
+
+	const isTravel = useSignal(isTravelSignal)
+
+	const currentPointer = useSignal(currentPointerSignal)
+	const selectedKey = useSignal(selectedKeySignal)
+
+	// 즉시 적용 기능
+	useEffect(() => {
+		if (isBatch && selectedKey && currentPointer) {
+			console.log('🚀 ~ useEffect ~ currentPointer:', currentPointer)
+			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
+		}
+	}, [currentPointer?.nodeId])
+
 	return (
 		<Fragment>
-			<div>
-				{/* <Toggle onChange={() => setIsTravel(!isTravel)} value={isTravel}>
-					<Text>유사 패턴 탐색 (등록 시 유사 패턴 일괄 적용)</Text>
-				</Toggle> */}
+			{/* <Toggle onChange={() => setIsTravel(!isTravel)} value={isTravel}>
+			<Text>유사 패턴 탐색 (등록 시 유사 패턴 일괄 적용)</Text>
+		</Toggle> */}
+			<VerticalSpace space="extraSmall"></VerticalSpace>
+
+			<Toggle onChange={() => (isBatchSignal.value = !isBatch)} value={isBatch}>
+				<Text>즉시 적용 (alt + click 추천)</Text>
 				<VerticalSpace space="extraSmall"></VerticalSpace>
-
-				<Toggle onChange={() => (isBatchSignal.value = !isBatch)} value={isBatch}>
-					<Text>즉시 적용 (alt + click 추천)</Text>
-					<VerticalSpace space="extraSmall"></VerticalSpace>
-					<Text>검색 창에서 선택된 상태로 피그마 텍스트 클릭 시 반영</Text>
-				</Toggle>
-			</div>
-
-			<Textbox placeholder="search" value={search} onChange={(e) => setSearch(e.currentTarget.value)}></Textbox>
-			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
+				<Text>검색 창에서 선택된 상태로 피그마 텍스트 클릭 시 반영</Text>
+			</Toggle>
+			<SearchArea search={search} setSearch={setSearch} data={data ?? []} />
 		</Fragment>
 	)
 }

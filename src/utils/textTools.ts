@@ -86,3 +86,7 @@ export const removeLeadingSymbols = (text: string) => {
 	// 정규식을 사용하여 문자열 시작 부분의 # 또는 @ 문자를 모두 제거
 	return text.replace(/^[#@]+/, '')
 }
+
+export const keyConventionRegex = (text: string) => {
+	return text.trim().replace(/[^a-zA-Z0-9_]/g, '')
+}

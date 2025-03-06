@@ -7,11 +7,13 @@ import {
 	Button,
 	Code,
 	Container,
+	Divider,
 	Dropdown,
 	IconAdjust32,
 	IconButton,
 	IconChevronDown16,
 	IconChevronUp16,
+	IconSwap32,
 	IconTarget16,
 	IconToggleButton,
 	Muted,
@@ -20,6 +22,7 @@ import {
 	Text,
 	Textbox,
 	Toggle,
+	VerticalSpace,
 } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
 import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY } from '../constant'
@@ -39,6 +42,9 @@ import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
 import { clientFetchDBCurry } from '../utils/fetchDB'
 import { domainSettingSignal } from '../Setting/SettingModel'
 import { useFetch } from '@/hooks/useFetch'
+import { modalAlert } from '@/components/alert'
+import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
+import { useSearch } from '../Label/LabelSearch'
 
 const selectIdsSignal = signal<string[]>([])
 
@@ -167,12 +173,13 @@ function BatchPage() {
 	const section = useSignal(currentSectionSignal)
 	const selectIds = useSignal(selectIdsSignal)
 	const domainSetting = useSignal(domainSettingSignal)
+
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false)
 	/** 선택 목표 섹션 */
 	const [selectTarget, setSelectTarget] = useState<CurrentNode | null>(null)
 	/** 숨김 대상을 포함할 것인가 */
-	const [allView, setAllView] = useState<boolean>(false)
+	const [allView, setAllView] = useState<boolean>(true)
 
 	const [groupOption, setGroupOption] = useState<GroupOption>({
 		/** 키 값을 그루핑 파라미터로 사용 */
@@ -206,10 +213,25 @@ function BatchPage() {
 
 	const patternMatchData = useSignal(patternMatchDataSignal)
 	// console.log('🚀 ~ BatchPage ~ patternMatchData:', patternMatchData)
-	const { filteredDataLength, patternMatchData: patternMatchDataGroup } = useMemo(
-		() => groupByPattern(patternMatchData, viewOption, groupOption),
-		[patternMatchData, viewOption, groupOption]
-	)
+	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption)
+
+	const patternMatchDataGroup = dataTemp.filter((item) => {
+		{
+			/* 검색이 선택 보기 상태면 선택한 아이디를 제공 */
+		}
+		if (!allView) {
+			if (item.ids.some((id) => selectIds.includes(id))) {
+				return true
+			} else {
+				return false
+			}
+		}
+		if (searchValue === '') {
+			return true
+		}
+
+		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
+	})
 
 	const matchDataSet = new Set()
 
@@ -217,9 +239,23 @@ function BatchPage() {
 		matchDataSet.add(item.text)
 	})
 
-	const { data, loading, error, fetchData } = useFetch()
+	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>()
+	console.log('🚀 ~ hasMessage:', hasMessage)
 
 	// const textList = Array.from(matchDataSet.values()).sort()
+
+	useEffect(() => {
+		if (hasMessage && loading === false) {
+			console.log('🚀 ~ useEffect ~ data:', data)
+			console.log('🚀 ~ useEffect ~ error:', error)
+			if (data) {
+				modalAlert('"' + data.name + '" 으로 추가 완료')
+			} else if (error) {
+				modalAlert(error.details)
+			}
+			setHasMessage(false)
+		}
+	}, [hasMessage, loading])
 
 	useEffect(() => {
 		if (section && selectMode) {
@@ -239,51 +275,39 @@ function BatchPage() {
 		<div className={styles.miniColumn}>
 			{data && <div>{JSON.stringify(data)}</div>}
 			{loading && <div>로딩중</div>}
+
 			{error && <div>에러 {JSON.stringify(error)}</div>}
+			<VerticalSpace space="extraSmall" />
 			<div className={styles.column}>
-				<Button>숨김 * 숨긴 걸 어떻게 다시 보여주게 할 것인가에 대한 문제가 있음</Button>
-				<Button>업데이트 * 중복 검사 api 에서 지원됨</Button>
-				대상 판별은 아래에서 판별함
-				<Textbox value={localizationKey} onChange={(e) => setLocalizationKey(e.currentTarget.value)}></Textbox>
-				<Button
-					onClick={() => {
-						fetchData('/localization/keys', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-							},
-							body: JSON.stringify({
-								domainId: domainSetting.domainId,
-								name: localizationKey,
-								isTemporary: true,
-							}),
-						})
-					}}
-				>
-					테스트
-				</Button>
-			</div>
-			<Stack space="extraSmall">
+				<Text>변경 대상 : {selectIds.length} 개</Text>
 				<div className={styles.row}>
-					<IconToggleButton
-						value={selectMode}
+					<Bold>Key : </Bold>
+					<Textbox
+						placeholder="새로운 키 값 입력"
+						value={localizationKey}
+						onChange={(e) => setLocalizationKey(e.currentTarget.value)}
+					></Textbox>
+					<Button
 						onClick={() => {
-							setSelectMode(true)
+							fetchData('/localization/keys', {
+								method: 'POST',
+								headers: {
+									'Content-Type': 'application/json',
+								},
+								body: JSON.stringify({
+									domainId: domainSetting.domainId,
+									name: localizationKey,
+									isTemporary: true,
+								}),
+							})
 						}}
 					>
-						<IconTarget16 />
-					</IconToggleButton>
-					<Text align="left" className={styles.width}>
-						{selectTarget?.name ?? '섹션 선택되지 않음'}
-					</Text>
-					<Button
-						className={styles.noWrap}
-						// disabled={selectTarget == null
-						onClick={() => emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id!)}
-					>
-						{selectTarget == null ? '전체' : '섹션'} 영역에서 불러오기
+						추가
 					</Button>
 				</div>
+			</div>
+			<Divider />
+			<Stack space="extraSmall">
 				<div className={styles.row}>
 					<Dropdown
 						onChange={(e) => {
@@ -314,6 +338,25 @@ function BatchPage() {
 						<IconAdjust32></IconAdjust32>
 					</IconToggleButton>
 				</div>
+				<div className={styles.row}>
+					<IconToggleButton
+						value={selectMode}
+						onClick={() => {
+							setSelectMode(true)
+						}}
+					>
+						<IconTarget16 />
+					</IconToggleButton>
+					<Text align="left" className={styles.width}>
+						{selectTarget?.name ?? '섹션 선택되지 않음'}
+					</Text>
+					<IconButton
+						// disabled={selectTarget == null
+						onClick={() => emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id!)}
+					>
+						<IconSwap32 />
+					</IconButton>
+				</div>
 				{openOption && (
 					<div className={styles.rowLeft}>
 						<div className={styles.miniColumn}>
@@ -340,35 +383,21 @@ function BatchPage() {
 						</div>
 					</div>
 				)}
+				<Divider />
 			</Stack>
 			<div className={styles.row}>
-				<Toggle value={allView} onClick={() => setAllView(!allView)}>
-					<Text>{allView ? '전체 보는 중' : '선택한 것만 보는 중'}</Text>
-				</Toggle>
+				<div className={styles.rowCenter}>
+					<Toggle value={allView} onClick={() => setAllView(!allView)}>
+						<Text>{allView ? '전체 텍스트' : '선택한 텍스트'}</Text>
+					</Toggle>
+				</div>
 				<Text>
-					Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
+					View Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
 				</Text>
 			</div>
 
 			<div className={styles.column}>
 				{patternMatchDataGroup
-					.filter((item) => {
-						{
-							/* 검색이 선택 보기 상태면 선택한 아이디를 제공 */
-						}
-						if (!allView) {
-							if (item.ids.some((id) => selectIds.includes(id))) {
-								return true
-							} else {
-								return false
-							}
-						}
-						if (searchValue === '') {
-							return true
-						}
-
-						return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
-					})
 					.sort((a, b) => a.text.localeCompare(b.text))
 					.map((item) => {
 						return <SearchResult {...item} />

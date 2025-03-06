@@ -38,6 +38,7 @@ import { removeLeadingSymbols } from '@/utils/textTools'
 import LabelSearch, { isBatchSignal } from './LabelSearch'
 import { createStyleSegments, groupSegmentsByStyle } from '../Style/styleModel'
 import { currentSectionSignal } from '../Translate/TranslateModel'
+import { domainSettingSignal } from '../Setting/SettingModel'
 
 const isTemporary = (data: LocalizationKey | null) => {
 	if (data == null) {
@@ -69,6 +70,7 @@ function LabelPage() {
 	const localizationKeyValue = useSignal(localizationKeySignal)
 	const currentSection = useSignal(currentSectionSignal)
 	const isBatch = useSignal(isBatchSignal)
+	const domainSetting = useSignal(domainSettingSignal)
 
 	const [search, setSearch] = useState('')
 	const [aliasHover, setAliasHover] = useState(false)
@@ -107,6 +109,7 @@ function LabelPage() {
 									locationKey: '',
 									localizationKey: '',
 									originalLocalizeId: '',
+									domainId: domainSetting?.domainId ?? 0,
 								} as CurrentCursorType['data'],
 							} as CurrentCursorType
 							localizationKeySignal.value = null
@@ -127,6 +130,7 @@ function LabelPage() {
 									locationKey: '',
 									localizationKey: '',
 									originalLocalizeId: '',
+									domainId: domainSetting?.domainId ?? 0,
 								} as CurrentCursorType['data'],
 							} as CurrentCursorType
 							localizationKeySignal.value = null

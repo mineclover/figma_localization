@@ -24,7 +24,7 @@ export type OriginalLocalizeId = string
 /**  */
 export type NodeData = {
 	/** 키 값 등록해놓고 저장은 글로벌 스토어에서 처리 */
-	domainId: number
+	domainId: string
 	localizationKey: LocalizationKey
 	originalLocalizeId: OriginalLocalizeId
 	ignore?: boolean

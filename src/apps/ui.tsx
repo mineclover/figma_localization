@@ -39,10 +39,10 @@ function Plugin() {
 	}
 
 	const options: Array<TabsOption> = [
-		{
-			children: <LabelPage />,
-			value: nav[0],
-		},
+		// {
+		// 	children: <LabelPage />,
+		// 	value: nav[0],
+		// },
 		{
 			children: <StylePage />,
 			value: nav[5],

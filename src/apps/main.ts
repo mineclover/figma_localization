@@ -16,10 +16,15 @@ import {
 	onPutLocalizationKey,
 	onSetNodeResetKey,
 	onTargetSetNodeLocation,
-	onUpdateNodeStoreKey,
+	onUpdateNodeStoreBatchKey,
 } from '@/domain/Label/TextPluginDataModel'
 import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel'
-import { onPatternMatch, onSetNodeLocalizationKeyBatch } from '@/domain/Batch/batchModel'
+import {
+	onPatternMatch,
+	onSetNodeIgnore,
+	onSetNodeLocalizationKeyBatch,
+	onUpdateNodeLocalizationKeyBatch,
+} from '@/domain/Batch/batchModel'
 
 export default function () {
 	// 세팅
@@ -39,10 +44,13 @@ export default function () {
 	onGetKeyTranslations()
 	onGetLocalizationKeyData()
 	onPutLocalizationKey()
-	onUpdateNodeStoreKey()
+
 	onSetLanguageCode()
 	onPatternMatch()
 	onSetNodeLocalizationKeyBatch()
+	onUpdateNodeStoreBatchKey()
+	onUpdateNodeLocalizationKeyBatch()
+	onSetNodeIgnore()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

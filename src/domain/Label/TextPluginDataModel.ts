@@ -65,6 +65,7 @@ export type LocalizationKeyDTO = {
 	key_id: number
 	domain_id: number
 	name: string
+	origin_id?: number
 	origin_value?: string
 	alias?: string
 	parent_key_id?: number
@@ -82,6 +83,7 @@ export type LocalizationKey = {
 	key_id: number
 	domain_id: number
 	name: string
+	origin_id?: number
 	origin_value?: string
 	alias?: string
 	parent_key_id?: number
@@ -495,19 +497,19 @@ export const createNormalLocalizationKey = async (
 
 /** 1. 노드 데이터 설정 */
 export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
-	if (data.domainId) {
+	if (data.domainId != null) {
 		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString())
 	}
 
-	if (data.localizationKey) {
+	if (data.localizationKey != null) {
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString())
 	}
 
-	if (data.originalLocalizeId) {
+	if (data.originalLocalizeId != null) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.originalLocalizeId.toString())
 	}
 
-	if (data.ignore) {
+	if (data.ignore != null) {
 		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString())
 	}
 }
@@ -650,7 +652,7 @@ export const putLocalizationKey = async (localizationKey: string, body: PutLocal
 	return data
 }
 
-export const onUpdateNodeStoreKey = () => {
+export const onUpdateNodeStoreBatchKey = () => {
 	on(UPDATE_NODE_STORE_KEY.REQUEST_KEY, async (key: number) => {
 		const node = figma.currentPage.selection[0]
 		if (!node || node.type !== 'TEXT') {

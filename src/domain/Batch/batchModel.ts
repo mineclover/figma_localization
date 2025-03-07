@@ -16,7 +16,13 @@
  */
 
 import { emit, on } from '@create-figma-plugin/utilities'
-import { GET_PATTERN_MATCH_KEY, NODE_STORE_KEY, SET_NODE_LOCALIZATION_KEY_BATCH } from '../constant'
+import {
+	GET_PATTERN_MATCH_KEY,
+	NODE_STORE_KEY,
+	SET_NODE_IGNORE,
+	SET_NODE_LOCALIZATION_KEY_BATCH,
+	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
+} from '../constant'
 import { signal } from '@preact/signals-core'
 import {
 	addTranslation,
@@ -207,29 +213,51 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 
 /** 기준 설정이 약간 모호한 부분 */
 export const onSetNodeLocalizationKeyBatch = () => {
+	on(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, async (data: { domainId: string; keyId: string; ids: string[] }) => {
+		if (data.ids.length === 0) {
+			return
+		}
+		// originalLocalizeId 조회 또는 등록
+		// searchTranslationCode
+		const xNode = await figma.getNodeByIdAsync(data.ids[0])
+
+		if (xNode == null || xNode.type !== 'TEXT') {
+			return
+		}
+		setNodeData(xNode, {
+			domainId: data.domainId,
+			localizationKey: data.keyId,
+		})
+
+		const result = await addTranslation(xNode)
+		if (result == null) {
+			notify('Failed to add translation', 'error')
+			return
+		}
+
+		for (const id of data.ids) {
+			const node = await figma.getNodeByIdAsync(id)
+			if (node) {
+				setNodeData(node, {
+					domainId: data.domainId,
+					localizationKey: data.keyId,
+					originalLocalizeId: result.localization_id.toString(),
+				})
+			}
+		}
+
+		await reloadOriginalLocalizationName(xNode)
+	})
+}
+
+export const onUpdateNodeLocalizationKeyBatch = () => {
 	on(
-		SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
-		async (data: { domainId: string; keyId: string; name: string; ids: string[] }) => {
+		UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
+		async (data: { domainId: string; keyId: string; originId: number; ids: string[] }) => {
 			if (data.ids.length === 0) {
 				return
 			}
-			// originalLocalizeId 조회 또는 등록
-			// searchTranslationCode
-			const xNode = await figma.getNodeByIdAsync(data.ids[0])
-
-			if (xNode == null || xNode.type !== 'TEXT') {
-				return
-			}
-			setNodeData(xNode, {
-				domainId: data.domainId,
-				localizationKey: data.keyId,
-			})
-
-			const result = await addTranslation(xNode)
-			if (result == null) {
-				notify('Failed to add translation', 'error')
-				return
-			}
+			// originalLocalizeId 조회
 
 			for (const id of data.ids) {
 				const node = await figma.getNodeByIdAsync(id)
@@ -237,12 +265,39 @@ export const onSetNodeLocalizationKeyBatch = () => {
 					setNodeData(node, {
 						domainId: data.domainId,
 						localizationKey: data.keyId,
-						originalLocalizeId: result.localization_id.toString(),
+						originalLocalizeId: data.originId.toString(),
 					})
 				}
 			}
 
-			await reloadOriginalLocalizationName(xNode)
+			const node = await figma.getNodeByIdAsync(data.ids[0])
+			if (node) {
+				await reloadOriginalLocalizationName(node)
+			}
 		}
 	)
+}
+
+export const onSetNodeIgnore = () => {
+	on(SET_NODE_IGNORE.REQUEST_KEY, async (data: { ignore: boolean; ids: string[] }) => {
+		if (data.ids.length === 0) {
+			return
+		}
+		// originalLocalizeId 조회
+
+		console.log('🚀 ~ on ~  ignore: boolean; ids: string[]:', data)
+
+		for (const id of data.ids) {
+			const node = await figma.getNodeByIdAsync(id)
+			if (node) {
+				setNodeData(node, {
+					ignore: data.ignore,
+				})
+			}
+		}
+		const node = await figma.getNodeByIdAsync(data.ids[0])
+		if (node) {
+			await reloadOriginalLocalizationName(node)
+		}
+	})
 }

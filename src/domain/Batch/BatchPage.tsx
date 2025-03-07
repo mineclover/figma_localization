@@ -17,6 +17,8 @@ import {
 	IconSwap32,
 	IconTarget16,
 	IconToggleButton,
+	IconVisibilityHidden16,
+	IconVisibilityVisible16,
 	Muted,
 	SearchTextbox,
 	Stack,
@@ -28,7 +30,13 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
-import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY, SET_NODE_LOCALIZATION_KEY_BATCH } from '../constant'
+import {
+	GET_LOCALIZATION_KEY_VALUE,
+	GET_PATTERN_MATCH_KEY,
+	SET_NODE_IGNORE,
+	SET_NODE_LOCALIZATION_KEY_BATCH,
+	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
+} from '../constant'
 import {
 	groupByPattern,
 	GroupOption,
@@ -49,6 +57,7 @@ import { modalAlert } from '@/components/alert'
 import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
 import { SearchArea, selectedKeySignal, useSearch } from '../Label/LabelSearch'
 import { NonNullableComponentTypeExtract } from 'types/utilType'
+import { keyConventionRegex } from '@/utils/textTools'
 
 const selectIdsSignal = signal<string[]>([])
 
@@ -65,15 +74,29 @@ const selectStyle = (selected: boolean) => {
 }
 
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
+	console.log('🚀 ~ SearchResult ~ ignore, name,:', ignore, name, ids)
 	const [isExtended, setIsExtended] = useState<boolean>(false)
-
+	const selectTarget = useSignal(selectTargetSignal)
 	const selectIds = useSignal(selectIdsSignal)
 	const hasAnyId = ids.some((id) => selectIds.includes(id))
 	return (
-		<div className={styles.rowContainer}>
+		<div className={styles.container}>
 			<div className={styles.column}>
 				<div className={styles.row}>
-					<Code>text: {text}</Code>
+					<IconButton
+						onClick={() => {
+							emit(SET_NODE_IGNORE.REQUEST_KEY, {
+								ignore: !ignore,
+								ids: ids,
+							})
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
+						}}
+					>
+						{ignore ? <IconVisibilityHidden16 /> : <IconVisibilityVisible16 />}
+					</IconButton>
+					<Text align="left" className={styles.width}>
+						<Code>text: {text}</Code>
+					</Text>
 
 					<IconButton
 						onClick={() => {
@@ -169,8 +192,7 @@ const SearchSection = ({
 	setOpenOption,
 	selectMode,
 	setSelectMode,
-	selectTarget,
-	setSelectTarget,
+
 	groupOption,
 	setGroupOption,
 	viewOption,
@@ -188,8 +210,7 @@ const SearchSection = ({
 	setOpenOption: Dispatch<StateUpdater<boolean>>
 	selectMode: boolean
 	setSelectMode: Dispatch<StateUpdater<boolean>>
-	selectTarget: CurrentNode | null
-	setSelectTarget: Dispatch<StateUpdater<CurrentNode | null>>
+
 	groupOption: GroupOption
 	setGroupOption: Dispatch<StateUpdater<GroupOption>>
 	viewOption: ViewOption
@@ -199,6 +220,11 @@ const SearchSection = ({
 	patternMatchDataGroup: PatternMatchData[]
 	filteredDataLength: number
 }) => {
+	const selectTarget = useSignal(selectTargetSignal)
+	const setSelectTarget = (target: CurrentNode | null) => {
+		selectTargetSignal.value = target
+	}
+
 	return (
 		<Fragment>
 			<Stack space="extraSmall">
@@ -295,6 +321,7 @@ const SearchSection = ({
 				)}
 				<Divider />
 			</Stack>
+			<VerticalSpace space="extraSmall" />
 			<div className={styles.row}>
 				<div className={styles.rowCenter}>
 					<Toggle value={allView} onClick={() => setAllView(!allView)}>
@@ -305,7 +332,7 @@ const SearchSection = ({
 					그룹 보기: {patternMatchDataGroup.length} / 전체: {filteredDataLength}
 				</Text>
 			</div>
-
+			<VerticalSpace space="extraSmall" />
 			<div className={styles.column}>
 				{patternMatchDataGroup
 					.sort((a, b) => a.text.localeCompare(b.text))
@@ -317,7 +344,8 @@ const SearchSection = ({
 	)
 }
 
-/**
+const selectTargetSignal = signal<CurrentNode | null>(null)
+
 /**
  * 그루핑 할때는 아이디를 하위 값으로 두고 속성을 위로 올린다
  * 전체 선택, 또는 선택으로 검색 영역 지정
@@ -342,7 +370,11 @@ function BatchPage() {
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false)
 	/** 선택 목표 섹션 */
-	const [selectTarget, setSelectTarget] = useState<CurrentNode | null>(null)
+
+	const setSelectTarget = (target: CurrentNode | null) => {
+		selectTargetSignal.value = target
+	}
+
 	/** 숨김 대상을 포함할 것인가 */
 	const [allView, setAllView] = useState<boolean>(true)
 
@@ -404,6 +436,7 @@ function BatchPage() {
 
 		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
 	})
+	console.log('🚀 ~ patternMatchDataGroup ~ patternMatchDataGroup:', patternMatchDataGroup)
 
 	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id))
 	console.log('🚀 ~ missingLink:', missingLink)
@@ -434,8 +467,6 @@ function BatchPage() {
 					setOpenOption={setOpenOption}
 					selectMode={selectMode}
 					setSelectMode={setSelectMode}
-					selectTarget={selectTarget}
-					setSelectTarget={setSelectTarget}
 					groupOption={groupOption}
 					setGroupOption={setGroupOption}
 					viewOption={viewOption}
@@ -484,91 +515,103 @@ function BatchPage() {
 
 	return (
 		<div className={styles.miniColumn}>
-			{data && <div>{JSON.stringify(data)}</div>}
-			{loading && <div>로딩중</div>}
-
-			{error && <div>에러 {JSON.stringify(error)}</div>}
-			<VerticalSpace space="extraSmall" />
-			<div className={styles.rowContainer}>
-				<Text>변경 대상 : {selectIds.length} 개</Text>
-				{missingLink.length > 0 && (
-					<div className={styles.miniColumn}>
-						<Bold>섹션 외 대상</Bold>
-						{missingLink.map((item) => {
-							const selected = selectIds.includes(item)
-
-							return (
-								<Button
-									danger
-									{...selectStyle(selected)}
-									onClick={() => {
-										pageNodeZoomAction(item)
-									}}
-									onContextMenu={(e) => {
-										e.preventDefault() // 기본 우클릭 메뉴 방지
-										// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
-										if (selectIds.includes(item)) {
-											// 제거하고
-											selectIdsSignal.value = selectIds.filter((id) => id !== item)
-										} else {
-											selectIdsSignal.value = [...selectIds, item]
-										}
-									}}
-								>
-									{item}
-								</Button>
-							)
-						})}
+			<div className={styles.top}>
+				<VerticalSpace space="extraSmall" />
+				<div className={styles.container}>
+					<div className={styles.rowContainer}>
+						<Text>변경 대상 : {selectIds.length} 개</Text>
 					</div>
-				)}
 
-				<div className={styles.row}>
-					<Bold>Key : </Bold>
-					<Textbox
-						disabled={hasSelectedKey}
-						placeholder="새로운 키 값 입력"
-						value={hasSelectedKey ? selectedKeyData?.name : localizationKey}
-						onChange={(e) => setLocalizationKey(e.currentTarget.value)}
-					></Textbox>
-					<IconButton
-						onClick={() => {
-							setSearch('')
-							selectedKeySignal.value = null
-							setLocalizationKey('')
-						}}
-					>
-						<IconCross32 />
-					</IconButton>
-					<Button
-						onClick={async () => {
-							const result = await fetchData('/localization/keys', {
-								method: 'POST',
-								headers: {
-									'Content-Type': 'application/json',
-								},
-								body: JSON.stringify({
-									domainId: domainSetting.domainId,
-									name: localizationKey,
-									isTemporary: true,
-								}),
-							})
+					{missingLink.length > 0 && (
+						<div className={styles.miniColumn}>
+							<Bold>섹션 외 대상</Bold>
+							{missingLink.map((item) => {
+								const selected = selectIds.includes(item)
 
-							if (result.data) {
-								emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
-									domainId: result.data.domain_id,
-									keyId: result.data.key_id,
-									ids: selectIds,
-								})
-							}
-						}}
-						secondary
-					>
-						추가
-						{/* {hasSelectedKey ?   '변경' : '추가'} */}
-					</Button>
+								return (
+									<Button
+										danger
+										{...selectStyle(selected)}
+										onClick={() => {
+											pageNodeZoomAction(item)
+										}}
+										onContextMenu={(e) => {
+											e.preventDefault() // 기본 우클릭 메뉴 방지
+											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
+											if (selectIds.includes(item)) {
+												// 제거하고
+												selectIdsSignal.value = selectIds.filter((id) => id !== item)
+											} else {
+												selectIdsSignal.value = [...selectIds, item]
+											}
+										}}
+									>
+										{item}
+									</Button>
+								)
+							})}
+						</div>
+					)}
+
+					<div className={styles.row}>
+						<Bold>Key : </Bold>
+						<Textbox
+							disabled={hasSelectedKey}
+							placeholder="새로운 키 값 입력"
+							value={hasSelectedKey ? selectedKeyData?.name : localizationKey}
+							onChange={(e) => setLocalizationKey(keyConventionRegex(e.currentTarget.value))}
+						></Textbox>
+						<IconButton
+							onClick={() => {
+								setSearch('')
+								selectedKeySignal.value = null
+								setLocalizationKey('')
+							}}
+						>
+							<IconCross32 />
+						</IconButton>
+						<Button
+							onClick={async () => {
+								if (hasSelectedKey) {
+									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
+										domainId: selectedKeyData?.domain_id,
+										keyId: selectedKeyData?.key_id,
+
+										originId: selectedKeyData?.origin_id,
+										ids: selectIds,
+									})
+								} else {
+									const result = await fetchData('/localization/keys', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json',
+										},
+										body: JSON.stringify({
+											domainId: domainSetting.domainId,
+											name: localizationKey,
+											isTemporary: true,
+										}),
+									})
+
+									if (result.data) {
+										emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
+											domainId: result.data.domain_id,
+											keyId: result.data.key_id,
+											ids: selectIds,
+										})
+									}
+								}
+							}}
+							secondary
+						>
+							{hasSelectedKey ? '변경' : '추가'}
+							{/* {hasSelectedKey ?   '변경' : '추가'} */}
+						</Button>
+					</div>
 				</div>
+				<Divider />
 			</div>
-			<Divider />
+
 			<Tabs options={options} value={tabValue} onChange={handleChange} />
 		</div>
 	)

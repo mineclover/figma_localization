@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+	'/system/status': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 데이터베이스 및 서버 상태 조회 */
+		get: operations['GetSystemStatus']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/system/sqlite-stats': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** SQLite 성능 및 상태 모니터링 (sqlite3_status, sqlite3_db_status 등에 상응) */
+		get: operations['GetSQLiteStats']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/system/health': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 간단한 헬스 체크 엔드포인트 */
+		get: operations['HealthCheck']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
 	'/sections': {
 		parameters: {
 			query?: never
@@ -283,6 +334,40 @@ export interface paths {
 		patch?: never
 		trace?: never
 	}
+	'/localization/keys/{id}/translation-matrix': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 키 ID를 기반으로 모든 언어별 번역 매트릭스 조회 */
+		get: operations['GetTranslationMatrixByKey']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/keys/domain-matrix-flat': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** CSV 형식과 유사한 도메인 번역 매트릭스 조회 */
+		get: operations['GetDomainTranslationMatrixFlat']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
 	'/localization/translations': {
 		parameters: {
 			query?: never
@@ -349,6 +434,40 @@ export interface paths {
 		 * @description 번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~
 		 */
 		delete: operations['DeleteTranslation']
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/translations/key/{keyId}/translations': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		get?: never
+		/** 단일 키에 대한 여러 언어 번역 동시 업데이트 */
+		put: operations['UpdateKeyTranslations']
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/translations/domain/bulk-update': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		get?: never
+		put?: never
+		/** 도메인 전체 번역 일괄 업데이트 (최적화 버전) */
+		post: operations['BulkUpdateTranslations']
+		delete?: never
 		options?: never
 		head?: never
 		patch?: never
@@ -609,6 +728,213 @@ export interface paths {
 		patch?: never
 		trace?: never
 	}
+	'/audit-logs': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 감사 로그 목록 조회 (필터링 가능) */
+		get: operations['GetAuditLogs']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/table/{tableName}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 테이블의 감사 로그 조회 */
+		get: operations['GetAuditLogsByTable']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/record/{tableName}/{recordId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 레코드의 감사 로그 조회 */
+		get: operations['GetAuditLogsByRecord']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/user/{userId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 사용자의 감사 로그 조회 */
+		get: operations['GetAuditLogsByUser']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/key-name-changes': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 로컬라이제이션 키 이름 변경 내역 조회 */
+		get: operations['GetKeyNameChanges']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/period': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 기간 내 감사 로그 조회 */
+		get: operations['GetAuditLogsByPeriod']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-creations': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 번역 생성 이력 조회 */
+		get: operations['GetTranslationCreations']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-changes': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 번역 변경 이력 조회 */
+		get: operations['GetTranslationChanges']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-creations/key/{keyId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 키의 번역 생성 이력 조회 */
+		get: operations['GetTranslationCreationsByKey']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-changes/key/{keyId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 키의 번역 변경 이력 조회 */
+		get: operations['GetTranslationChangesByKey']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-changes/localization/{localizationId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 특정 번역 항목의 변경 이력 조회 */
+		get: operations['GetTranslationChangesByLocalization']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/audit-logs/translation-history': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/**
+		 * 번역 변경 및 생성 이력 조회 (레거시 - 새 엔드포인트 사용 권장)
+		 * @deprecated
+		 */
+		get: operations['GetTranslationHistory']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -748,6 +1074,7 @@ export interface components {
 			keyId: string
 			language: string
 			translation: string
+			userId?: string
 		}
 		FigmaLocation: {
 			/** Format: double */
@@ -816,6 +1143,20 @@ export interface components {
 			password_hash: string
 			newUsername: string
 		}
+		AuditLog: {
+			/** Format: double */
+			log_id: number
+			table_name: string
+			/** Format: double */
+			record_id: number
+			action: string
+			old_values: unknown
+			new_values: unknown
+			/** Format: double */
+			user_id: number | null
+			user_name?: string | null
+			created_at: string
+		}
 	}
 	responses: never
 	parameters: never
@@ -825,6 +1166,69 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+	GetSystemStatus: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetSQLiteStats: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	HealthCheck: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						timestamp: string
+						status: string
+					}
+				}
+			}
+		}
+	}
 	GetSections: {
 		parameters: {
 			query?: never
@@ -1346,6 +1750,50 @@ export interface operations {
 			}
 		}
 	}
+	GetTranslationMatrixByKey: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				id: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetDomainTranslationMatrixFlat: {
+		parameters: {
+			query?: never
+			header: {
+				'X-Domain-Id': string
+			}
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
 	GetTranslations: {
 		parameters: {
 			query?: never
@@ -1452,6 +1900,72 @@ export interface operations {
 					[name: string]: unknown
 				}
 				content?: never
+			}
+		}
+	}
+	UpdateKeyTranslations: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				keyId: string
+			}
+			cookie?: never
+		}
+		requestBody: {
+			content: {
+				'application/json': {
+					userId: string
+					translations: {
+						[key: string]: string
+					}
+				}
+			}
+		}
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	BulkUpdateTranslations: {
+		parameters: {
+			query?: never
+			header: {
+				'X-Domain-Id': string
+			}
+			path?: never
+			cookie?: never
+		}
+		requestBody: {
+			content: {
+				'application/json': {
+					userId: string
+					rows: ({
+						name: string
+						/** Format: double */
+						key_id: number
+					} & {
+						[key: string]: (string | number) | null
+					})[]
+				}
+			}
+		}
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
 			}
 		}
 	}
@@ -1937,6 +2451,353 @@ export interface operations {
 				}
 				content: {
 					'application/json': components['schemas']['UserResponse']
+				}
+			}
+		}
+	}
+	GetAuditLogs: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				tableName?: string
+				action?: string
+				startDate?: string
+				endDate?: string
+				userId?: number
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: components['schemas']['AuditLog'][]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetAuditLogsByTable: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+			}
+			header?: never
+			path: {
+				tableName: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: components['schemas']['AuditLog'][]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetAuditLogsByRecord: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				tableName: string
+				recordId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': components['schemas']['AuditLog'][]
+				}
+			}
+		}
+	}
+	GetAuditLogsByUser: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+			}
+			header?: never
+			path: {
+				userId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: components['schemas']['AuditLog'][]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetKeyNameChanges: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: components['schemas']['AuditLog'][]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetAuditLogsByPeriod: {
+		parameters: {
+			query: {
+				startDate: string
+				endDate: string
+				limit?: number
+				offset?: number
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: components['schemas']['AuditLog'][]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationCreations: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				keyId?: string
+				localizationId?: string
+				languageCode?: string
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: unknown[]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationChanges: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				keyId?: string
+				localizationId?: string
+				languageCode?: string
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: unknown[]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationCreationsByKey: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				languageCode?: string
+			}
+			header?: never
+			path: {
+				keyId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: unknown[]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationChangesByKey: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				languageCode?: string
+			}
+			header?: never
+			path: {
+				keyId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: unknown[]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationChangesByLocalization: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+			}
+			header?: never
+			path: {
+				localizationId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						logs: unknown[]
+						/** Format: double */
+						total: number
+					}
+				}
+			}
+		}
+	}
+	GetTranslationHistory: {
+		parameters: {
+			query?: {
+				limit?: number
+				offset?: number
+				keyId?: string
+				localizationId?: string
+				languageCode?: string
+				includeCreation?: boolean
+			}
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': {
+						message: string
+					}
 				}
 			}
 		}

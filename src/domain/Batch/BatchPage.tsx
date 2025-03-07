@@ -1,7 +1,7 @@
 import { useSignal } from '@/hooks/useSignal'
-import { h } from 'preact'
+import { Fragment, h } from 'preact'
 import { CurrentNode, currentSectionSignal } from '../Translate/TranslateModel'
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useState } from 'preact/hooks'
 import {
 	Bold,
 	Button,
@@ -20,6 +20,8 @@ import {
 	Muted,
 	SearchTextbox,
 	Stack,
+	Tabs,
+	TabsOption,
 	Text,
 	Textbox,
 	Toggle,
@@ -45,7 +47,8 @@ import { domainSettingSignal } from '../Setting/SettingModel'
 import { useFetch } from '@/hooks/useFetch'
 import { modalAlert } from '@/components/alert'
 import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
-import { useSearch } from '../Label/LabelSearch'
+import { SearchArea, useSearch } from '../Label/LabelSearch'
+import { NonNullableComponentTypeExtract } from 'types/utilType'
 
 const selectIdsSignal = signal<string[]>([])
 
@@ -156,6 +159,164 @@ const optionAlias = {
 	notHasLocalizationKey: '키 값 없음',
 }
 
+// SearchSection 컴포넌트를 별도로 분리
+const SearchSection = ({
+	searchOption,
+	setSearchOption,
+	searchValue,
+	setSearchValue,
+	openOption,
+	setOpenOption,
+	selectMode,
+	setSelectMode,
+	selectTarget,
+	setSelectTarget,
+	groupOption,
+	setGroupOption,
+	viewOption,
+	setViewOption,
+	allView,
+	setAllView,
+	patternMatchDataGroup,
+	filteredDataLength,
+}: {
+	searchOption: SearchOption
+	setSearchOption: Dispatch<StateUpdater<SearchOption>>
+	searchValue: string
+	setSearchValue: Dispatch<StateUpdater<string>>
+	openOption: boolean
+	setOpenOption: Dispatch<StateUpdater<boolean>>
+	selectMode: boolean
+	setSelectMode: Dispatch<StateUpdater<boolean>>
+	selectTarget: CurrentNode | null
+	setSelectTarget: Dispatch<StateUpdater<CurrentNode | null>>
+	groupOption: GroupOption
+	setGroupOption: Dispatch<StateUpdater<GroupOption>>
+	viewOption: ViewOption
+	setViewOption: Dispatch<StateUpdater<ViewOption>>
+	allView: boolean
+	setAllView: Dispatch<StateUpdater<boolean>>
+	patternMatchDataGroup: PatternMatchData[]
+	filteredDataLength: number
+}) => {
+	return (
+		<Fragment>
+			<Stack space="extraSmall">
+				<div className={styles.row}>
+					<Dropdown
+						onChange={(e) => {
+							setSearchOption(e.currentTarget.value as SearchOption)
+						}}
+						options={[
+							{ text: 'text', value: 'text' },
+							{ text: 'key', value: 'localizationKey' },
+							{ text: 'parent', value: 'parentName' },
+							{ text: 'name', value: 'name' },
+						]}
+						value={searchOption}
+					/>
+
+					<SearchTextbox
+						onInput={(e) => {
+							setSearchValue(e.currentTarget.value)
+						}}
+						placeholder="검색..."
+						value={searchValue}
+					/>
+					<IconToggleButton
+						value={openOption}
+						onClick={() => {
+							setOpenOption(!openOption)
+						}}
+					>
+						<IconAdjust32></IconAdjust32>
+					</IconToggleButton>
+				</div>
+				<div className={styles.row}>
+					<IconToggleButton
+						value={selectMode}
+						onClick={() => {
+							setSelectMode(true)
+						}}
+					>
+						<IconTarget16 />
+					</IconToggleButton>
+					<button
+						className={styles.textButton}
+						onClick={() => {
+							if (selectTarget?.id) {
+								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id })
+							}
+						}}
+					>
+						{selectTarget?.name ?? '섹션 선택되지 않음'}
+					</button>
+					<IconButton
+						onClick={() => {
+							setSelectTarget(null)
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY)
+						}}
+					>
+						<IconCross32 />
+					</IconButton>
+					<IconButton
+						onClick={() => {
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
+						}}
+					>
+						<IconSwap32 />
+					</IconButton>
+				</div>
+				{openOption && (
+					<div className={styles.rowLeft}>
+						<div className={styles.miniColumn}>
+							<Bold>그룹 기준</Bold>
+							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
+								const value = groupOption[key]
+								return (
+									<Toggle value={value} onClick={() => setGroupOption((prev) => ({ ...prev, [key]: !value }))}>
+										{key}
+									</Toggle>
+								)
+							})}
+						</div>
+						<div className={styles.miniColumn}>
+							<Bold>보여줄 옵션</Bold>
+							{(Object.keys(viewOption) as Array<keyof ViewOption>).map((key) => {
+								const value = viewOption[key]
+								return (
+									<Toggle value={value} onClick={() => setViewOption((prev) => ({ ...prev, [key]: !value }))}>
+										{optionAlias[key]}
+									</Toggle>
+								)
+							})}
+						</div>
+					</div>
+				)}
+				<Divider />
+			</Stack>
+			<div className={styles.row}>
+				<div className={styles.rowCenter}>
+					<Toggle value={allView} onClick={() => setAllView(!allView)}>
+						<Text>{allView ? '전체 텍스트' : '선택한 텍스트'}</Text>
+					</Toggle>
+				</div>
+				<Text>
+					그룹 보기: {patternMatchDataGroup.length} / 전체: {filteredDataLength}
+				</Text>
+			</div>
+
+			<div className={styles.column}>
+				{patternMatchDataGroup
+					.sort((a, b) => a.text.localeCompare(b.text))
+					.map((item) => {
+						return <SearchResult {...item} />
+					})}
+			</div>
+		</Fragment>
+	)
+}
+
 /**
 /**
  * 그루핑 할때는 아이디를 하위 값으로 두고 속성을 위로 올린다
@@ -173,7 +334,6 @@ const optionAlias = {
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
 	const selectIds = useSignal(selectIdsSignal)
-	console.log('🚀 ~ selectIds:', selectIds)
 	const domainSetting = useSignal(domainSettingSignal)
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
@@ -183,6 +343,7 @@ function BatchPage() {
 	/** 숨김 대상을 포함할 것인가 */
 	const [allView, setAllView] = useState<boolean>(true)
 
+	/** 그루핑 옵션 */
 	const [groupOption, setGroupOption] = useState<GroupOption>({
 		/** 키 값을 그루핑 파라미터로 사용 */
 		localizationKey: true,
@@ -205,14 +366,19 @@ function BatchPage() {
 		notHasLocalizationKey: true,
 	})
 
+	/** 입력한 키 값 */
 	const [localizationKey, setLocalizationKey] = useState<string>('')
 
+	/** 옵션 열기 */
 	const [openOption, setOpenOption] = useState<boolean>(false)
 
+	/** 검색 값 */
 	const [searchValue, setSearchValue] = useState<string>('')
 
+	/** 검색 옵션 */
 	const [searchOption, setSearchOption] = useState<SearchOption>('text')
 
+	/** 피그마 텍스트 스캔 데이터 */
 	const patternMatchData = useSignal(patternMatchDataSignal)
 
 	// console.log('🚀 ~ BatchPage ~ patternMatchData:', patternMatchData)
@@ -243,6 +409,47 @@ function BatchPage() {
 	console.log('🚀 ~ hasMessage:', hasMessage)
 
 	// const textList = Array.from(matchDataSet.values()).sort()
+	const { data: searchResult, search, setSearch } = useSearch()
+	const [tabValue, setTabValue] = useState<string>('Scan')
+	const nav = ['Scan', 'Search']
+	function handleChange(
+		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
+		event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]
+	) {
+		const newValue = event.currentTarget.value
+		setTabValue(newValue)
+	}
+	const options: Array<TabsOption> = [
+		{
+			children: (
+				<SearchSection
+					searchOption={searchOption}
+					setSearchOption={setSearchOption}
+					searchValue={searchValue}
+					setSearchValue={setSearchValue}
+					openOption={openOption}
+					setOpenOption={setOpenOption}
+					selectMode={selectMode}
+					setSelectMode={setSelectMode}
+					selectTarget={selectTarget}
+					setSelectTarget={setSelectTarget}
+					groupOption={groupOption}
+					setGroupOption={setGroupOption}
+					viewOption={viewOption}
+					setViewOption={setViewOption}
+					allView={allView}
+					setAllView={setAllView}
+					patternMatchDataGroup={patternMatchDataGroup}
+					filteredDataLength={filteredDataLength}
+				/>
+			),
+			value: nav[0],
+		},
+		{
+			children: <SearchArea search={search} setSearch={setSearch} data={searchResult ?? []} />,
+			value: nav[1],
+		},
+	] as const
 
 	useEffect(() => {
 		if (hasMessage && loading === false) {
@@ -347,122 +554,7 @@ function BatchPage() {
 				</div>
 			</div>
 			<Divider />
-			<Stack space="extraSmall">
-				<div className={styles.row}>
-					<Dropdown
-						onChange={(e) => {
-							setSearchOption(e.currentTarget.value as SearchOption)
-						}}
-						options={[
-							{ text: 'text', value: 'text' },
-							{ text: 'key', value: 'localizationKey' },
-							{ text: 'parent', value: 'parentName' },
-							{ text: 'name', value: 'name' },
-						]}
-						value={searchOption}
-					/>
-
-					<SearchTextbox
-						onInput={(e) => {
-							setSearchValue(e.currentTarget.value)
-						}}
-						placeholder="Search..."
-						value={searchValue}
-					/>
-					<IconToggleButton
-						value={openOption}
-						onClick={() => {
-							setOpenOption(!openOption)
-						}}
-					>
-						<IconAdjust32></IconAdjust32>
-					</IconToggleButton>
-				</div>
-				<div className={styles.row}>
-					<IconToggleButton
-						value={selectMode}
-						onClick={() => {
-							setSelectMode(true)
-						}}
-					>
-						<IconTarget16 />
-					</IconToggleButton>
-					<button
-						className={styles.textButton}
-						onClick={() => {
-							if (selectTarget?.id) {
-								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id })
-							}
-						}}
-					>
-						{selectTarget?.name ?? '섹션 선택되지 않음'}
-					</button>
-					<IconButton
-						// disabled={selectTarget == null
-
-						onClick={() => {
-							setSelectTarget(null)
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY)
-						}}
-					>
-						<IconCross32 />
-					</IconButton>
-					<IconButton
-						// disabled={selectTarget == null
-
-						onClick={() => {
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
-						}}
-					>
-						<IconSwap32 />
-					</IconButton>
-				</div>
-				{openOption && (
-					<div className={styles.rowLeft}>
-						<div className={styles.miniColumn}>
-							<Bold>그룹 기준</Bold>
-							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
-								const value = groupOption[key]
-								return (
-									<Toggle value={value} onClick={() => setGroupOption((prev) => ({ ...prev, [key]: !value }))}>
-										{key}
-									</Toggle>
-								)
-							})}
-						</div>
-						<div className={styles.miniColumn}>
-							<Bold>보여줄 옵션</Bold>
-							{(Object.keys(viewOption) as Array<keyof ViewOption>).map((key) => {
-								const value = viewOption[key]
-								return (
-									<Toggle value={value} onClick={() => setViewOption((prev) => ({ ...prev, [key]: !value }))}>
-										{optionAlias[key]}
-									</Toggle>
-								)
-							})}
-						</div>
-					</div>
-				)}
-				<Divider />
-			</Stack>
-			<div className={styles.row}>
-				<div className={styles.rowCenter}>
-					<Toggle value={allView} onClick={() => setAllView(!allView)}>
-						<Text>{allView ? '전체 텍스트' : '선택한 텍스트'}</Text>
-					</Toggle>
-				</div>
-				<Text>
-					View Group: {patternMatchDataGroup.length} / Total: {filteredDataLength}
-				</Text>
-			</div>
-
-			<div className={styles.column}>
-				{patternMatchDataGroup
-					.sort((a, b) => a.text.localeCompare(b.text))
-					.map((item) => {
-						return <SearchResult {...item} />
-					})}
-			</div>
+			<Tabs options={options} value={tabValue} onChange={handleChange} />
 		</div>
 	)
 }

@@ -12,6 +12,8 @@ import {
 	Toggle,
 	VerticalSpace,
 	SearchTextbox,
+	Code,
+	Bold,
 } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
@@ -34,7 +36,7 @@ export const NullDisableText = ({
 }: {
 	className?: string
 	placeholder?: string
-	children?: string
+	children?: React.ReactNode
 }) => {
 	return (
 		<span className={clc(className, children == null && styles.textDisabled)}>
@@ -55,7 +57,6 @@ const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
 
 const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, origin_value }: LocalizationKeyDTO) => {
 	const [isOpen, setIsOpen] = useState(false)
-	const [isNameOpen, setIsNameOpen] = useState(true)
 
 	return (
 		<div
@@ -67,26 +68,26 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 			onClick={() => (selectedKeySignal.value = key_id.toString())}
 		>
 			<div className={styles.searchResultTop}>
-				<IconButton onClick={() => setIsNameOpen(!isNameOpen)}>{nameOrAliasIcon(isNameOpen, is_temporary)}</IconButton>
-				{!isNameOpen ? (
-					<NullDisableText className={styles.searchResultAlias} placeholder="별칭 없음" children={alias} />
-				) : (
-					<NullDisableText className={styles.searchResultName} placeholder="이름 없음" children={name} />
-				)}
-				<NullDisableText className={styles.searchSectionTagBox} placeholder="섹션 없음" children={section_name} />
+				<NullDisableText className={styles.searchResultName} placeholder="원본 값 없음">
+					<Code>text : {origin_value ?? ''}</Code>
+				</NullDisableText>
+				{<IconButton>{is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />}</IconButton>}
+
+				{/* <NullDisableText className={styles.searchSectionTagBox} placeholder="섹션 없음" children={section_name} /> */}
 			</div>
 			<div className={styles.searchResultBottom}>
+				<NullDisableText className={styles.searchResultName} placeholder="이름 없음">
+					<Bold>key : {name}</Bold>
+				</NullDisableText>
 				<IconButton onClick={() => setIsOpen(!isOpen)}>
 					{isOpen ? <IconChevronUp16 /> : <IconChevronDown16 />}
 				</IconButton>
-				<NullDisableText className={styles.searchResultName} placeholder="원본 값 없음" children={origin_value} />
-
-				<IconButton
+				{/* <IconButton
 					// className={styles.searchResultSubmitButton}
 					onClick={() => emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, key_id)}
 				>
 					<IconPlus24></IconPlus24>
-				</IconButton>
+				</IconButton> */}
 			</div>
 		</div>
 	)
@@ -113,6 +114,7 @@ export const SearchArea = ({
 					// setSearch(keyConventionRegex(e.currentTarget.value))
 				}}
 			></SearchTextbox>
+			<VerticalSpace space="extraSmall"></VerticalSpace>
 			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
 		</Fragment>
 	)

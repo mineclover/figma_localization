@@ -34,7 +34,7 @@ import { clientFetchDBCurry } from '../utils/fetchDB'
 import { NullDisableText } from '../Label/LabelSearch'
 import { clc } from '@/components/modal/utils'
 import styles from '../Label/LabelPage.module.css'
-import { createStyleSegments, groupSegmentsByStyle } from './styleModel'
+import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle } from './styleModel'
 
 // 있든 없든 수정 가능하게 구성
 
@@ -53,13 +53,10 @@ const StylePage = () => {
 
 	if (currentPointer && currentPointer.styleData && currentPointer.characters && currentPointer.boundVariables) {
 		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
-
-		const styleGroups = groupSegmentsByStyle(segments)
-
 		const boundVariables = createStyleSegments(currentPointer.characters, currentPointer.boundVariables)
-		const boundVariablesGroups = groupSegmentsByStyle(boundVariables)
-		console.log('🚀 ~ StylePage ~ segments:', segments, boundVariables)
-		console.log('🚀 ~ StylePage ~ styleGroups:', styleGroups, boundVariablesGroups)
+
+		const allStyleGroups = groupAllSegmentsByStyle(currentPointer.characters, segments, boundVariables)
+		console.log('🚀 ~ StylePage ~ allStyleGroups:', allStyleGroups)
 
 		return (
 			<div>
@@ -73,8 +70,8 @@ const StylePage = () => {
 					<br /> - 이 경우 defaultStyle 을 base로 group 별로 스타일을 정의할 수 있다
 				</Text>
 
-				{JSON.stringify(styleGroups)}
-				{styleGroups.styleGroups.map((item) => {
+				{JSON.stringify(allStyleGroups)}
+				{allStyleGroups.styleGroups.map((item) => {
 					return <div>{JSON.stringify(item)}</div>
 				})}
 			</div>

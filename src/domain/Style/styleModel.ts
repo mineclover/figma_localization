@@ -1,4 +1,9 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
+import { createStableStyleKey } from '@/utils/keyJson'
+
+const range = (start: number, end: number) => {
+	return Array.from({ length: end - start }, (_, i) => start + i)
+}
 
 export interface StyleSegment {
 	start: number
@@ -111,6 +116,59 @@ const styleClean = (styles: Record<string, any>) => {
 }
 
 /**
+ * Converts an array of positions into ranges of consecutive numbers
+ * and returns objects with start, end, and corresponding text segments
+ *
+ * @param {number[]} positions - Array of position indices
+ * @param {string} text - Text to be split according to positions
+ * @returns {Array<{start: number, end: number, text: string}>} Array of range objects with text
+ */
+function processPositionsAndText(positions: number[], text: string) {
+	// Step 1: Sort positions to ensure proper order
+	positions.sort((a, b) => a - b)
+
+	// Step 2: Group positions into consecutive ranges
+	const ranges = []
+	let rangeStart = positions[0]
+	let prev = positions[0]
+
+	// Find ranges of consecutive positions
+	for (let i = 1; i < positions.length; i++) {
+		if (positions[i] !== prev + 1) {
+			// Gap found, end the current range and start a new one
+			ranges.push({ start: rangeStart, end: prev })
+			rangeStart = positions[i]
+		}
+		prev = positions[i]
+	}
+
+	// Add the last range
+	ranges.push({ start: rangeStart, end: prev })
+
+	// Step 3: Process each range to get corresponding text segment
+	const result = []
+
+	for (const range of ranges) {
+		// Calculate start and end indices for text slicing
+		// This assumes positions correspond to characters in the text
+		const textStart = range.start
+		const textEnd = range.end + 1 // +1 because end is inclusive in range but exclusive in slice
+
+		// Get text segment for this range
+		const textSegment = text.substring(textStart, textEnd)
+
+		// Add to result
+		result.push({
+			start: range.start,
+			end: textEnd,
+			text: textSegment,
+		})
+	}
+
+	return result
+}
+
+/**
  * 스타일과 Ranges 를 분리해서 정리함
  * 이전 세그멘테이션은 중복 스타일이여도 허용했다면 스타일 집군으로 range를 모아서 중복 스타일을 제거함
  * @param segmentsResult
@@ -127,8 +185,7 @@ export const groupSegmentsByStyle = (
 	segments.forEach((segment) => {
 		// 스타일을 JSON 문자열로 변환하여 키로 사용
 		styleClean(segment.style)
-		const styleKey = JSON.stringify(segment.style)
-		console.log('🚀 ~ segments.forEach ~ styleKey:', styleKey)
+		const styleKey = createStableStyleKey(segment.style)
 
 		if (!styleMap.has(styleKey)) {
 			styleMap.set(styleKey, {
@@ -164,4 +221,87 @@ export const groupSegmentsByStyle = (
 	// }
 
 	return { styleGroups, defaultStyle }
+}
+
+export interface StylePosition {
+	style: Record<string, any>
+	position: number[]
+}
+
+/**
+ * 스타일과 Ranges 를 분리해서 정리함
+ * 이전 세그멘테이션은 중복 스타일이여도 허용했다면 스타일 집군으로 range를 모아서 중복 스타일을 제거함
+ * @param segmentsResult
+ * @returns
+ */
+export const groupAllSegmentsByStyle = (
+	characters: string,
+	segmentsResult: StyleSegmentsResult,
+	boundVariablesResult: StyleSegmentsResult
+): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any> } => {
+	const { segments, defaultStyle } = segmentsResult
+	const { segments: boundVariablesSegments, defaultStyle: boundVariablesDefaultStyle } = boundVariablesResult
+
+	const allDefaultStyle = { ...defaultStyle, boundVariables: boundVariablesDefaultStyle }
+
+	// 공간 매핑
+	const positionMap = new Map<number, Record<string, any>>()
+
+	segments.forEach((segment) => {
+		const { start, end, style } = segment
+
+		for (let i = start; i < end; i++) {
+			styleClean(style)
+			positionMap.set(i, style)
+		}
+	})
+
+	boundVariablesSegments.forEach((segment) => {
+		const { start, end, style } = segment
+		styleClean(style)
+		for (let i = start; i < end; i++) {
+			const currentStyle = positionMap.get(i)
+
+			if (currentStyle) {
+				positionMap.set(i, { ...currentStyle, boundVariables: style })
+			} else {
+				positionMap.set(i, { boundVariables: style })
+			}
+			// 바인드 변수는 기본 스타일이 없으면 생략.. 하는 로직은 제거
+			// if (Object.keys(style).length !== 0) {
+
+			// }
+		}
+	})
+
+	// 스타일 기준으로 그룹화하기 위한 맵
+	const styleMap = new Map<string, StylePosition>()
+
+	for (const pointer of range(0, positionMap.size)) {
+		const style = positionMap.get(pointer)
+
+		if (style) {
+			const styleKey = createStableStyleKey(style)
+
+			if (!styleMap.has(styleKey)) {
+				styleMap.set(styleKey, {
+					style: style,
+					position: [],
+				})
+			}
+			styleMap.get(styleKey)!.position.push(pointer)
+		}
+	}
+
+	// 맵에서 배열로 변환
+	const styleGroups = Array.from(styleMap.values())
+
+	const result = styleGroups.map((group) => {
+		return {
+			style: group.style,
+			ranges: processPositionsAndText(group.position, characters),
+		}
+	})
+
+	return { styleGroups: result, defaultStyle: allDefaultStyle }
 }

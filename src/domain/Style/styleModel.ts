@@ -12,6 +12,14 @@ export interface StyleSegmentsResult {
 	segments: StyleSegment[]
 }
 
+/**
+ * 텍스트 문자열과 스타일 데이터를 받아 스타일 세그먼트를 생성합니다.
+ * defaultStyle 도 여기서 출력함
+ * 스타일 키 : range value
+ * @param characters 텍스트 문자열
+ * @param styleData 스타일 데이터
+ * @returns 스타일 세그먼트 결과
+ */
 export const createStyleSegments = (characters: string, styleData: ValidAllStyleRangesType): StyleSegmentsResult => {
 	// 1. 모든 범위의 시작점과 끝점 수집
 	const points = new Set<number>([0, characters.length])
@@ -86,6 +94,28 @@ export interface StyleGroup {
 	ranges: { start: number; end: number; text: string }[]
 }
 
+const styleClean = (styles: Record<string, any>) => {
+	const styleKeys = Object.keys(styles)
+
+	for (const key of styleKeys) {
+		const value = styles[key]
+
+		if (value == null) {
+			delete styles[key]
+		} else if (value === '') {
+			delete styles[key]
+		} else if (typeof value === 'object' && Object.keys(value).length === 0) {
+			delete styles[key]
+		}
+	}
+}
+
+/**
+ * 스타일과 Ranges 를 분리해서 정리함
+ * 이전 세그멘테이션은 중복 스타일이여도 허용했다면 스타일 집군으로 range를 모아서 중복 스타일을 제거함
+ * @param segmentsResult
+ * @returns
+ */
 export const groupSegmentsByStyle = (
 	segmentsResult: StyleSegmentsResult
 ): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any> } => {
@@ -96,6 +126,7 @@ export const groupSegmentsByStyle = (
 
 	segments.forEach((segment) => {
 		// 스타일을 JSON 문자열로 변환하여 키로 사용
+		styleClean(segment.style)
 		const styleKey = JSON.stringify(segment.style)
 		console.log('🚀 ~ segments.forEach ~ styleKey:', styleKey)
 

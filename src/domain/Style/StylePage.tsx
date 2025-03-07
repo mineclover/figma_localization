@@ -53,14 +53,27 @@ const StylePage = () => {
 
 	if (currentPointer && currentPointer.styleData && currentPointer.characters && currentPointer.boundVariables) {
 		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
+
 		const styleGroups = groupSegmentsByStyle(segments)
 
 		const boundVariables = createStyleSegments(currentPointer.characters, currentPointer.boundVariables)
 		const boundVariablesGroups = groupSegmentsByStyle(boundVariables)
+		console.log('🚀 ~ StylePage ~ segments:', segments, boundVariables)
 		console.log('🚀 ~ StylePage ~ styleGroups:', styleGroups, boundVariablesGroups)
 
 		return (
 			<div>
+				<Text>
+					1. Group 의 갯수가 1개면 단일 스타일을 가지고 있는 것이다
+					<br />- 이 경우 group 0 에서 전체 길이와 텍스트를 얻을 수 있다
+				</Text>
+
+				<Text>
+					1. Group 의 갯수가 2개 이상일 경우 복합 스타일을 가지고 있는 것이다
+					<br /> - 이 경우 defaultStyle 을 base로 group 별로 스타일을 정의할 수 있다
+				</Text>
+
+				{JSON.stringify(styleGroups)}
 				{styleGroups.styleGroups.map((item) => {
 					return <div>{JSON.stringify(item)}</div>
 				})}

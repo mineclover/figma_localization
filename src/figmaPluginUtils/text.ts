@@ -432,6 +432,10 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),
 
+		// 나중에는 분리해서 스타일 호출 순서를 지정하고 관리해야하는데 일단 지금은 range를 유효하게 뽑는게 중요하므로 생략함
+		fillStyleId: getFillStyleIdRanges(textNode),
+		textStyleId: getTextStyleIdRanges(textNode),
+
 		//
 	}
 

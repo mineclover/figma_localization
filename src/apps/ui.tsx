@@ -44,16 +44,16 @@ function Plugin() {
 		// 	value: nav[0],
 		// },
 		{
+			children: <BatchPage />,
+			value: nav[0],
+		},
+		{
 			children: <StylePage />,
 			value: nav[5],
 		},
 		{
 			children: <TranslatePage />,
 			value: nav[6],
-		},
-		{
-			children: <BatchPage />,
-			value: nav[7],
 		},
 
 		{

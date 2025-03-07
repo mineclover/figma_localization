@@ -71,9 +71,11 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 				<NullDisableText className={styles.searchResultName} placeholder="원본 값 없음">
 					<Code>text : {origin_value ?? ''}</Code>
 				</NullDisableText>
-				{<IconButton>{is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />}</IconButton>}
+				{/* {<IconButton>{is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />}</IconButton>} */}
 
-				{/* <NullDisableText className={styles.searchSectionTagBox} placeholder="섹션 없음" children={section_name} /> */}
+				<NullDisableText className={styles.searchSectionTagBox} placeholder="key">
+					<Code>#{key_id}</Code>
+				</NullDisableText>
 			</div>
 			<div className={styles.searchResultBottom}>
 				<NullDisableText className={styles.searchResultName} placeholder="이름 없음">
@@ -126,9 +128,7 @@ export const useSearch = () => {
 	const domainSetting = useSignal(domainSettingSignal)
 	const selectedKey = useSignal(selectedKeySignal)
 
-	const selectedKeyData = computed(() => {
-		return data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'))
-	})
+	const selectedKeyData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'))
 
 	useEffect(() => {
 		console.log('🚀 ~ useEffect ~ loading:', loading)

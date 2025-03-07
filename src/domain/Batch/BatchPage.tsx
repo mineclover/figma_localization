@@ -47,7 +47,7 @@ import { domainSettingSignal } from '../Setting/SettingModel'
 import { useFetch } from '@/hooks/useFetch'
 import { modalAlert } from '@/components/alert'
 import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
-import { SearchArea, useSearch } from '../Label/LabelSearch'
+import { SearchArea, selectedKeySignal, useSearch } from '../Label/LabelSearch'
 import { NonNullableComponentTypeExtract } from 'types/utilType'
 
 const selectIdsSignal = signal<string[]>([])
@@ -335,6 +335,9 @@ function BatchPage() {
 	const section = useSignal(currentSectionSignal)
 	const selectIds = useSignal(selectIdsSignal)
 	const domainSetting = useSignal(domainSettingSignal)
+	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch()
+	console.log('🚀 ~ BatchPage ~ selectedKeyData:', selectedKeyData)
+	const hasSelectedKey = typeof selectedKeyData === 'object'
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false)
@@ -409,7 +412,7 @@ function BatchPage() {
 	console.log('🚀 ~ hasMessage:', hasMessage)
 
 	// const textList = Array.from(matchDataSet.values()).sort()
-	const { data: searchResult, search, setSearch } = useSearch()
+
 	const [tabValue, setTabValue] = useState<string>('Scan')
 	const nav = ['Scan', 'Search']
 	function handleChange(
@@ -486,7 +489,7 @@ function BatchPage() {
 
 			{error && <div>에러 {JSON.stringify(error)}</div>}
 			<VerticalSpace space="extraSmall" />
-			<div className={styles.column}>
+			<div className={styles.rowContainer}>
 				<Text>변경 대상 : {selectIds.length} 개</Text>
 				{missingLink.length > 0 && (
 					<div className={styles.miniColumn}>
@@ -522,10 +525,20 @@ function BatchPage() {
 				<div className={styles.row}>
 					<Bold>Key : </Bold>
 					<Textbox
+						disabled={hasSelectedKey}
 						placeholder="새로운 키 값 입력"
-						value={localizationKey}
+						value={hasSelectedKey ? selectedKeyData?.name : localizationKey}
 						onChange={(e) => setLocalizationKey(e.currentTarget.value)}
 					></Textbox>
+					<IconButton
+						onClick={() => {
+							setSearch('')
+							selectedKeySignal.value = null
+							setLocalizationKey('')
+						}}
+					>
+						<IconCross32 />
+					</IconButton>
 					<Button
 						onClick={async () => {
 							const result = await fetchData('/localization/keys', {
@@ -548,8 +561,10 @@ function BatchPage() {
 								})
 							}
 						}}
+						secondary
 					>
 						추가
+						{/* {hasSelectedKey ?   '변경' : '추가'} */}
 					</Button>
 				</div>
 			</div>

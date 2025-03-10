@@ -25,6 +25,7 @@ import {
 	onSetNodeLocalizationKeyBatch,
 	onUpdateNodeLocalizationKeyBatch,
 } from '@/domain/Batch/batchModel'
+import { onSetStyle } from '@/domain/Style/styleModel'
 
 export default function () {
 	// 세팅
@@ -51,6 +52,7 @@ export default function () {
 	onUpdateNodeStoreBatchKey()
 	onUpdateNodeLocalizationKeyBatch()
 	onSetNodeIgnore()
+	onSetStyle()
 	// 유틸
 	onNodeSelectionChange()
 	nodeZoom_Adapter()

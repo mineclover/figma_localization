@@ -21,10 +21,14 @@ import { fetchDB } from '../utils/fetchDB'
 import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel'
 import { getFigmaRootStore } from '../utils/getStore'
 import { ERROR_CODE } from '../errorCode'
-import { textFontLoad } from '@/figmaPluginUtils/text'
+import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text'
 import { signal } from '@preact/signals-core'
 import { components } from 'types/i18n'
 import { enforcePrefix } from './LabelPage'
+import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel'
+
+import { generateXmlString, ParseTextBlock, StyleSync } from '../Style/StylePage'
+import { createStableStyleKey } from '@/utils/keyJson'
 
 export type LocationDTO = {
 	created_at: string
@@ -231,7 +235,7 @@ export const localizationTranslationMapping = (dto: LocalizationTranslationDTO):
 
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
 	/** 임시 값이면 @ 붙이고 아니면 # 붙임 */
-	const prefix = keyData.is_temporary ? '@' : '#'
+	const prefix = keyData.is_temporary ? '❎' : '✅'
 	const name = prefix + keyData.name
 
 	return name
@@ -426,8 +430,51 @@ export const addTranslation = async (node: TextNode) => {
 	const nodeData = getNodeData(node)
 
 	if (nodeData.localizationKey === '') {
+		notify('Failed to get localization key', 'error')
 		return
 	}
+
+	const { styleData, boundVariables } = getAllStyleRanges(node)
+
+	const segments = createStyleSegments(node.characters, styleData)
+	const boundVariables2 = createStyleSegments(node.characters, boundVariables)
+	const allStyleGroups = groupAllSegmentsByStyle(node.characters, segments, boundVariables2)
+	const exportStyleGroups = allStyleGroups.exportStyleGroups
+	console.log('🚀 ~ addTranslation ~ exportStyleGroups:', exportStyleGroups)
+
+	const styleStore: Record<string, StyleSync> = {}
+
+	for (const style of exportStyleGroups) {
+		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
+		const temp = await fetchDB('/resources', {
+			method: 'POST',
+			body: JSON.stringify({
+				styleValue: JSON.stringify(style.style),
+				hashValue: style.hashId,
+			}),
+		})
+		if (!temp) {
+			return
+		}
+		const responseResult = await temp.json()
+		if (responseResult) {
+			const newId = responseResult.resource_id.toString()
+			const newAlias = responseResult.alias
+			const newName = responseResult.style_name
+			const store = {
+				hashId: style.hashId,
+				name: newName,
+				id: newId,
+				alias: newAlias,
+				style: style.style,
+				ranges: style.ranges,
+			}
+			styleStore[style.hashId] = store
+		}
+	}
+
+	const xmlString = generateXmlString(Object.values(styleStore), 'id')
+	console.log('🚀 ~ addTranslation ~ xmlString:', xmlString)
 
 	const result = await fetchDB('/localization/translations', {
 		method: 'PUT',
@@ -435,18 +482,35 @@ export const addTranslation = async (node: TextNode) => {
 			{
 				keyId: nodeData.localizationKey,
 				language: 'origin',
-				translation: node.characters,
+				translation: xmlString,
 			},
 			null,
 			2
 		),
 	})
 
+	for (const style of Object.values(styleStore)) {
+		const result = await fetchDB('/resources', {
+			method: 'POST',
+			body: JSON.stringify({
+				resourceId: style.id,
+				keyId: nodeData.localizationKey,
+			}),
+		})
+		if (!result) {
+			notify('Failed to set resource mapping ' + style.id, 'error')
+			continue
+		}
+		const data = (await result.json()) as LocalizationTranslationDTO
+		console.log('🚀 ~ addTranslation ~ data:', data)
+	}
+
 	if (!result) {
 		return
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO
+	console.log('🚀 ~ addTranslation ~ data:', data)
 
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString())

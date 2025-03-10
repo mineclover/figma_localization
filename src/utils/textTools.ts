@@ -1,3 +1,5 @@
+import { StyleHashSegment, StyleSync } from '@/domain/Style/StylePage'
+
 export const safeNumberConversion = (input: string) => {
 	// 입력이 문자열이 아니면 그대로 반환
 	if (typeof input !== 'string') {
@@ -84,11 +86,44 @@ export const generateRandomText2 = () => {
  */
 export const removeLeadingSymbols = (text: string) => {
 	// 정규식을 사용하여 문자열 시작 부분의 # 또는 @ 문자를 모두 제거
-	return text.replace(/^[#@]+/, '')
+	return text.replace(/^[#@❎✅]+/, '')
 }
 
 export const keyConventionRegex = (text: string) => {
 	const trimmed = text.trim().replace(/[^a-zA-Z0-9_]/g, '')
 	// 첫 글자가 숫자인 경우 '_'를 앞에 추가
 	return /^\d/.test(trimmed) ? '_' + trimmed : trimmed
+}
+
+export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
+	console.log('🚀 ~ generateXmlString ~ styles:', styles)
+	// 모든 스타일 정보를 위치별로 정렬
+	const allRanges: Array<StyleHashSegment> = []
+
+	styles.forEach((style) => {
+		if (style.ranges) {
+			style.ranges.forEach((range) => {
+				// 시작 태그 정보
+				allRanges.push({
+					id: style.id ?? '',
+					name: style.name ?? '',
+					total: range.end + range.start,
+					text: range.text,
+					hashId: style.hashId,
+					styles: style.style,
+				})
+			})
+		}
+	})
+
+	// 위치에 따라 정렬 (시작 위치가 같으면 닫는 태그가 먼저 오도록)
+	allRanges.sort((a, b) => {
+		return a.total - b.total
+	})
+
+	return allRanges
+		.map((item) => {
+			return `<${item[tag]}>${item.text}</${item[tag]}>`
+		})
+		.join('')
 }

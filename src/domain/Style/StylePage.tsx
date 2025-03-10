@@ -24,7 +24,14 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui'
 
-import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
+import {
+	CHANGE_LANGUAGE_CODE,
+	GET_PROJECT_ID,
+	RELOAD_NODE,
+	SET_LANGUAGE_CODES,
+	SET_PROJECT_ID,
+	SET_STYLE,
+} from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import {
 	currentPointerSignal,
@@ -48,7 +55,7 @@ import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle, Sty
 import { computed, signal } from '@preact/signals-core'
 import { createStableStyleKey } from '@/utils/keyJson'
 import { deepEqual } from '@/utils/data'
-import { XMLParser, XMLBuilder } from 'fast-xml-parser'
+import { XMLParser } from 'fast-xml-parser'
 import prettier from 'prettier'
 
 // 있든 없든 수정 가능하게 구성
@@ -59,7 +66,7 @@ export type StyleSync = {
 	id?: string
 } & StyleGroup
 
-export type StyleSegment = {
+export type StyleHashSegment = {
 	total: number
 	text: string
 
@@ -115,7 +122,7 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 			const newName = data.style_name
 
 			const store = { hashId, name: newName, id: newId, alias: newAlias, style, ranges }
-			console.log('🚀 ~ useEffect ~ store:', data, loading, error, store)
+
 			styleSignal.value = {
 				...styleSignal.value,
 
@@ -125,7 +132,6 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 	}, [data])
 
 	useEffect(() => {
-		console.log('🚀 ~ StyleItem ~ style:', hashId)
 		fetchData('/resources', {
 			method: 'POST',
 			headers: {
@@ -150,10 +156,10 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 		</div>
 	)
 }
-const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
+export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 	console.log('🚀 ~ generateXmlString ~ styles:', styles)
 	// 모든 스타일 정보를 위치별로 정렬
-	const allRanges: Array<StyleSegment> = []
+	const allRanges: Array<StyleHashSegment> = []
 
 	styles.forEach((style) => {
 		if (style.ranges) {
@@ -183,7 +189,7 @@ const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 		.join('')
 }
 
-type ParseTextBlock = {
+export type ParseTextBlock = {
 	[key: string]: {
 		'#text': string
 	}[]
@@ -226,11 +232,8 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 					return false
 				},
 			})
-
 			const parsedObj = parser.parse(`<root>${xml}</root>`)
-
 			const parsedDataArr = parsedObj[0].root as ParseTextBlock[]
-
 			/** 텍스트 출력 */
 			// const removeTag = parsedDataArr.map((item) => {
 			// 	const key = Object.keys(item)[0]
@@ -241,7 +244,6 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 			// 		[key]: value['#text'],
 			// 	}
 			// })
-
 			setParsedData(parsedDataArr)
 			console.log('🚀 ~ useEffect ~ parsedObj:', parsedObj)
 		} catch (error) {
@@ -290,7 +292,7 @@ const StylePage = () => {
 
 	useEffect(() => {
 		styleSignal.value = {}
-	}, [currentPointer?.characters])
+	}, [currentPointer])
 
 	if (currentPointer && currentPointer.styleData && currentPointer.characters && currentPointer.boundVariables) {
 		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
@@ -318,6 +320,13 @@ const StylePage = () => {
 				</Text>
 
 				<StyleXml text={currentPointer.characters} styleInfo={allStyleGroups.exportStyleGroups} />
+				<Button
+					onClick={() => {
+						emit(SET_STYLE.REQUEST_KEY)
+					}}
+				>
+					aasf
+				</Button>
 			</div>
 		)
 	}

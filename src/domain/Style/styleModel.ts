@@ -1,6 +1,11 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson'
 import { StyleSync } from './StylePage'
+import { SET_STYLE } from '../constant'
+import { on } from '@create-figma-plugin/utilities'
+import { notify } from '@/figmaPluginUtils'
+import { setNodeData, addTranslation, reloadOriginalLocalizationName } from '../Label/TextPluginDataModel'
+import { getDomainSetting } from '../Setting/SettingModel'
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i)
@@ -323,4 +328,41 @@ export const groupAllSegmentsByStyle = (
 	})
 
 	return { styleGroups: result, defaultStyle: allDefaultStyle, exportStyleGroups }
+}
+
+/**
+ * 일단 로컬라이제이션 키가 있다는 것을 전재로 함
+ *
+ */
+export const onSetStyle = () => {
+	on(SET_STYLE.REQUEST_KEY, async () => {
+		const xNode = figma.currentPage.selection[0]
+		const domainSetting = getDomainSetting()
+
+		if (domainSetting == null) {
+			notify('Failed to get domain id', 'error')
+			return
+		}
+
+		if (xNode == null) {
+			notify('Failed to get node', 'error')
+			return
+		}
+		// originalLocalizeId 조회 또는 등록
+		// searchTranslationCode
+		if (xNode.type !== 'TEXT') {
+			notify('Failed to get node', 'error')
+			return
+		}
+		// setNodeData(xNode, {
+		// 	domainId: domainSetting.domainId.toString(),
+		// })
+		const result = await addTranslation(xNode)
+		if (result == null) {
+			// notify('Failed to add translation', 'error')
+			return
+		}
+
+		await reloadOriginalLocalizationName(xNode)
+	})
 }

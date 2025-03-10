@@ -26,6 +26,11 @@
 .containerDisabled {
 	opacity: 0.5;
 }
+
+.containerSelected {
+	background-color: var(--figma-color-bg-selected);
+}
+
 .column {
 	display: flex;
 	flex-direction: column;

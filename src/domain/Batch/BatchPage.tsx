@@ -58,6 +58,7 @@ import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
 import { SearchArea, selectedKeySignal, useSearch } from '../Label/LabelSearch'
 import { NonNullableComponentTypeExtract } from 'types/utilType'
 import { keyConventionRegex } from '@/utils/textTools'
+import { currentPointerSignal } from '../Label/LabelModel'
 
 const selectIdsSignal = signal<string[]>([])
 
@@ -77,10 +78,11 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 	console.log('🚀 ~ SearchResult ~ ignore, name,:', ignore, name, ids)
 	const [isExtended, setIsExtended] = useState<boolean>(false)
 	const selectTarget = useSignal(selectTargetSignal)
+
 	const selectIds = useSignal(selectIdsSignal)
 	const hasAnyId = ids.some((id) => selectIds.includes(id))
 	return (
-		<div className={styles.container}>
+		<div className={clc(styles.container, hasAnyId && styles.containerSelected)}>
 			<div className={styles.column}>
 				<div className={styles.row}>
 					<IconButton
@@ -361,8 +363,15 @@ const selectTargetSignal = signal<CurrentNode | null>(null)
  */
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
+	console.log('🚀 ~ BatchPage ~ section:', section)
 	const selectIds = useSignal(selectIdsSignal)
+	console.log('🚀 ~ BatchPage ~ selectIds:', selectIds)
 	const domainSetting = useSignal(domainSettingSignal)
+	console.log('🚀 ~ BatchPage ~ domainSetting:', domainSetting)
+
+	const currentPointer = useSignal(currentPointerSignal)
+	console.log('🚀 ~ BatchPage ~ currentPointer:', currentPointer)
+
 	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch()
 	console.log('🚀 ~ BatchPage ~ selectedKeyData:', selectedKeyData)
 	const hasSelectedKey = typeof selectedKeyData === 'object'
@@ -573,6 +582,7 @@ function BatchPage() {
 						<Button
 							onClick={async () => {
 								if (hasSelectedKey) {
+									// 변경할 키가 있으면 바로 일괄 변경 로직
 									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
 										domainId: selectedKeyData?.domain_id,
 										keyId: selectedKeyData?.key_id,
@@ -581,6 +591,7 @@ function BatchPage() {
 										ids: selectIds,
 									})
 								} else {
+									// 변경할 키가 없으면 추가하고
 									const result = await fetchData('/localization/keys', {
 										method: 'POST',
 										headers: {

@@ -220,7 +220,6 @@ export const onSetNodeLocalizationKeyBatch = () => {
 		// originalLocalizeId 조회 또는 등록
 		// searchTranslationCode
 		const xNode = await figma.getNodeByIdAsync(data.ids[0])
-
 		if (xNode == null || xNode.type !== 'TEXT') {
 			return
 		}
@@ -228,13 +227,11 @@ export const onSetNodeLocalizationKeyBatch = () => {
 			domainId: data.domainId,
 			localizationKey: data.keyId,
 		})
-
 		const result = await addTranslation(xNode)
-		if (result == null) {
+		if (result == null || result.localization_id == null) {
 			notify('Failed to add translation', 'error')
 			return
 		}
-
 		for (const id of data.ids) {
 			const node = await figma.getNodeByIdAsync(id)
 			if (node) {
@@ -245,7 +242,6 @@ export const onSetNodeLocalizationKeyBatch = () => {
 				})
 			}
 		}
-
 		await reloadOriginalLocalizationName(xNode)
 	})
 }

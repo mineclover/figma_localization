@@ -27,7 +27,7 @@ import { components } from 'types/i18n'
 import { enforcePrefix } from './LabelPage'
 import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel'
 
-import { generateXmlString, ParseTextBlock, StyleSync } from '../Style/StylePage'
+import { generateXmlString, StyleSync } from '../Style/StylePage'
 import { createStableStyleKey } from '@/utils/keyJson'
 
 export type LocationDTO = {
@@ -73,6 +73,8 @@ export type LocalizationKeyDTO = {
 	origin_value?: string
 	alias?: string
 	parent_key_id?: number
+	parent_name?: string
+	parent_origin_value?: string
 	is_variable: number
 	is_temporary: number
 	section_id?: number
@@ -252,10 +254,10 @@ const requestCache = new Map<string, CacheItem<any>>()
 /**
  * 로컬라이제이션 키를 기준으로 이름 리로드
  */
-export const getLocalizationKeyData = async (node: BaseNode, now: number) => {
+export const getLocalizationKeyData = async (node: BaseNode, now: number): Promise<LocalizationKeyDTO | null> => {
 	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
 	if (localizationKey === '') {
-		return
+		return null
 	}
 
 	const apiPath = '/localization/keys/id/' + localizationKey
@@ -276,7 +278,7 @@ export const getLocalizationKeyData = async (node: BaseNode, now: number) => {
 	})
 
 	if (!result || result.status === 500) {
-		return
+		return null
 	}
 	const data = (await result.json()) as LocalizationKeyDTO
 
@@ -290,7 +292,7 @@ export const getLocalizationKeyData = async (node: BaseNode, now: number) => {
 		console.log('캐싱 갱신 됨')
 		return data
 	}
-	return
+	return null
 }
 
 /** 번역 키 기반 단일 값 조회 */
@@ -490,7 +492,7 @@ export const addTranslation = async (node: TextNode) => {
 	})
 
 	for (const style of Object.values(styleStore)) {
-		const result = await fetchDB('/resources', {
+		const result = await fetchDB('/resources/mapping', {
 			method: 'POST',
 			body: JSON.stringify({
 				resourceId: style.id,

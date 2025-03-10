@@ -249,7 +249,7 @@ export const onSetNodeLocalizationKeyBatch = () => {
 export const onUpdateNodeLocalizationKeyBatch = () => {
 	on(
 		UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
-		async (data: { domainId: string; keyId: string; originId: number; ids: string[] }) => {
+		async (data: { domainId?: string; keyId: string; originId?: string; ids: string[] }) => {
 			if (data.ids.length === 0) {
 				return
 			}
@@ -261,7 +261,7 @@ export const onUpdateNodeLocalizationKeyBatch = () => {
 					setNodeData(node, {
 						domainId: data.domainId,
 						localizationKey: data.keyId,
-						originalLocalizeId: data.originId.toString(),
+						originalLocalizeId: data.originId,
 					})
 				}
 			}

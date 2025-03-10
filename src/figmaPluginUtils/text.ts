@@ -415,6 +415,33 @@ export type ValidAllStyleRangesType = {
 
 // 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
 
+export const setAllStyleRanges = ({
+	textNode,
+	styleData,
+	boundVariables,
+}: {
+	textNode: TextNode
+	styleData: ValidAllStyleRangesType
+	boundVariables: any
+}) => {
+	textNode.setRangeTextDecoration
+	const functionMap = {
+		fontSize: textNode.setRangeFontSize,
+		fontName: textNode.setRangeFontName,
+		lineHeight: textNode.setRangeLineHeight,
+		letterSpacing: textNode.setRangeLetterSpacing,
+		textDecoration: textNode.setRangeTextDecoration,
+		textCase: textNode.setRangeTextCase,
+
+		// fontWeight: textNode.setRangeFontWeight,
+
+		fills: textNode.setRangeFills,
+		textStyleId: textNode.setRangeTextStyleId,
+		fillStyleId: textNode.setRangeFillStyleId,
+		boundVariables: textNode.setRangeBoundVariable,
+	}
+}
+
 export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyleRangesType; boundVariables: any } {
 	const boundVariables = getBoundVariablesRanges(textNode)
 
@@ -427,7 +454,8 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 		textDecoration: getTextDecorationRanges(textNode),
 		textCase: getTextCaseRanges(textNode),
 
-		fontWeight: getFontWeightRanges(textNode),
+		// 설정 할 때 필요 없음 이유는 weight 값으로 스타일이 적용되지 않기 때문 스타일은 fontName으로 적용 됨
+		// fontWeight: getFontWeightRanges(textNode),
 		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),

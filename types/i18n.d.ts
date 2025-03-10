@@ -333,6 +333,23 @@ export interface paths {
 		patch?: never
 		trace?: never
 	}
+	'/resources/by-key/{keyId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 로컬라이제이션 키 ID로 연결된 리소스 조회 */
+		get: operations['GetResourcesByKeyId']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
 	'/localization/keys/all': {
 		parameters: {
 			query?: never
@@ -1877,6 +1894,28 @@ export interface operations {
 				}
 			}
 		}
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetResourcesByKeyId: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				keyId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
 		responses: {
 			/** @description Ok */
 			200: {

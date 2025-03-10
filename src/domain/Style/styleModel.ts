@@ -1,11 +1,18 @@
-import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
+import { textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson'
-import { StyleSync } from './StylePage'
-import { SET_STYLE } from '../constant'
+import { ResourceDTO, StyleSync } from './StylePage'
+import { DOWNLOAD_STYLE, SET_STYLE } from '../constant'
 import { on } from '@create-figma-plugin/utilities'
 import { notify } from '@/figmaPluginUtils'
-import { setNodeData, addTranslation, reloadOriginalLocalizationName } from '../Label/TextPluginDataModel'
+import {
+	setNodeData,
+	addTranslation,
+	reloadOriginalLocalizationName,
+	getLocalizationKeyData,
+} from '../Label/TextPluginDataModel'
 import { getDomainSetting } from '../Setting/SettingModel'
+import { fetchDB } from '../utils/fetchDB'
+import { parseTextBlock, parseXML } from '@/utils/xml'
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i)
@@ -332,8 +339,93 @@ export const groupAllSegmentsByStyle = (
 
 /**
  * 일단 로컬라이제이션 키가 있다는 것을 전재로 함
- *
+ * Test
  */
+export const onDownloadStyle = () => {
+	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
+	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey }: { localizationKey: string }) => {
+		const xNode = figma.currentPage.selection[0]
+		const domainSetting = getDomainSetting()
+
+		if (domainSetting == null) {
+			notify('Failed to get domain id', 'error')
+			return
+		}
+
+		if (xNode == null) {
+			notify('Failed to get node', 'error')
+			return
+		}
+		// originalLocalizeId 조회 또는 등록
+		// searchTranslationCode
+		if (xNode.type !== 'TEXT') {
+			notify('Failed to get node', 'error')
+			return
+		}
+
+		// /** 클라에서 받는 로컬라이제이션 키 없을 때 */
+		const result = await getLocalizationKeyData(xNode, Date.now())
+		console.log('🚀 ~ on ~ result:', result)
+		if (result == null) {
+			notify('Failed to get localization key data', 'error')
+			return
+		}
+		const originText = result.origin_value
+		// 키 아이디 82
+		const parsedData = parseXML(originText ?? '')
+		console.log('🚀 ~ on ~ parsedData:', parsedData)
+
+		const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
+			method: 'GET',
+		})
+
+		if (result2 == null) {
+			notify('Failed to get resource by key', 'error')
+			return
+		}
+
+		const data = (await result2.json()) as ResourceDTO[]
+		console.log('🚀 ~ on ~ data:', data)
+
+		const resourceMap = new Map<string, ResourceDTO>()
+		for (const item of data) {
+			resourceMap.set(item.resource_id.toString(), {
+				...item,
+				style_value: JSON.parse(item.style_value),
+			})
+		}
+
+		const fullText = parsedData
+			.map((item) => {
+				return parseTextBlock(item)
+			})
+			.join('')
+		await textFontLoad(xNode)
+		xNode.characters = fullText
+
+		let start = 0
+		let end = 0
+
+		for (const item of parsedData) {
+			console.log('🚀 ~ on ~ item:', item)
+			const key = Object.keys(item)[0]
+			const target = item[key]
+			const value = target[0]['#text'] as string
+			const length = value.length
+			end = start + length
+			const resource = resourceMap.get(key)
+
+			if (resource == null) {
+				notify('Failed to get resource 맞지 않으면 추가 호출해서 처리하는 로직 추가해야함', 'error')
+				return
+			}
+			const styleValue = resource.style_value
+
+			console.log('🚀 ~ on ~ value:', value)
+		}
+	})
+}
+
 export const onSetStyle = () => {
 	on(SET_STYLE.REQUEST_KEY, async () => {
 		const xNode = figma.currentPage.selection[0]

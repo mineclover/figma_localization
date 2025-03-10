@@ -26,6 +26,7 @@ import {
 
 import {
 	CHANGE_LANGUAGE_CODE,
+	DOWNLOAD_STYLE,
 	GET_PROJECT_ID,
 	RELOAD_NODE,
 	SET_LANGUAGE_CODES,
@@ -57,6 +58,7 @@ import { createStableStyleKey } from '@/utils/keyJson'
 import { deepEqual } from '@/utils/data'
 import { XMLParser } from 'fast-xml-parser'
 import prettier from 'prettier'
+import { ParseTextBlock, parseXML } from '@/utils/xml'
 
 // 있든 없든 수정 가능하게 구성
 
@@ -189,19 +191,6 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 		.join('')
 }
 
-export type ParseTextBlock = {
-	[key: string]: {
-		'#text': string
-	}[]
-}
-
-const parseTextBlock = (block: ParseTextBlock) => {
-	const key = Object.keys(block)[0]
-	const target = block[key]
-	const value = target[0]
-	return value['#text']
-}
-
 export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSync[] }) => {
 	const [xml, setXml] = useState<string>('')
 	/**
@@ -223,17 +212,8 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 	useEffect(() => {
 		try {
 			// XML 파싱
-			const parser = new XMLParser({
-				ignoreAttributes: false,
-				trimValues: false,
-				preserveOrder: true,
-				isArray: (name, jpath, isLeafNode, isAttribute) => {
-					// 배열로 처리하고 싶은 요소들을 지정
-					return false
-				},
-			})
-			const parsedObj = parser.parse(`<root>${xml}</root>`)
-			const parsedDataArr = parsedObj[0].root as ParseTextBlock[]
+
+			const parsedDataArr = parseXML(xml)
 			/** 텍스트 출력 */
 			// const removeTag = parsedDataArr.map((item) => {
 			// 	const key = Object.keys(item)[0]
@@ -245,7 +225,6 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 			// 	}
 			// })
 			setParsedData(parsedDataArr)
-			console.log('🚀 ~ useEffect ~ parsedObj:', parsedObj)
 		} catch (error) {
 			console.error('XML 처리 중 오류:', error)
 		}
@@ -301,6 +280,22 @@ const StylePage = () => {
 
 		return (
 			<div>
+				<Button
+					onClick={() => {
+						emit(DOWNLOAD_STYLE.REQUEST_KEY, {
+							localizationKey: currentPointer.data.localizationKey,
+						})
+					}}
+				>
+					키 있는 상태에서 origin 스타일 받는 테스트
+				</Button>
+				<Button
+					onClick={() => {
+						emit(SET_STYLE.REQUEST_KEY)
+					}}
+				>
+					키 있는 상태에서 추가 테스트
+				</Button>
 				<Toggle
 					value={styleTagMode === 'id'}
 					onChange={() => {

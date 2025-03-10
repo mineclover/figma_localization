@@ -1,5 +1,6 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
-import { createStableStyleKey } from '@/utils/keyJson'
+import { createStableStyleKey, sha256Hash } from '@/utils/keyJson'
+import { StyleSync } from './StylePage'
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i)
@@ -113,6 +114,8 @@ const styleClean = (styles: Record<string, any>) => {
 			delete styles[key]
 		}
 	}
+
+	return styles
 }
 
 /**
@@ -238,11 +241,11 @@ export const groupAllSegmentsByStyle = (
 	characters: string,
 	segmentsResult: StyleSegmentsResult,
 	boundVariablesResult: StyleSegmentsResult
-): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any> } => {
+): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any>; exportStyleGroups: StyleSync[] } => {
 	const { segments, defaultStyle } = segmentsResult
 	const { segments: boundVariablesSegments, defaultStyle: boundVariablesDefaultStyle } = boundVariablesResult
 
-	const allDefaultStyle = { ...defaultStyle, boundVariables: boundVariablesDefaultStyle }
+	const allDefaultStyle = { ...defaultStyle, boundVariables: styleClean(boundVariablesDefaultStyle) }
 
 	// 공간 매핑
 	const positionMap = new Map<number, Record<string, any>>()
@@ -282,7 +285,6 @@ export const groupAllSegmentsByStyle = (
 
 		if (style) {
 			const styleKey = createStableStyleKey(style)
-
 			if (!styleMap.has(styleKey)) {
 				styleMap.set(styleKey, {
 					style: style,
@@ -303,5 +305,22 @@ export const groupAllSegmentsByStyle = (
 		}
 	})
 
-	return { styleGroups: result, defaultStyle: allDefaultStyle }
+	const exportStyleGroups = styleGroups.map((group) => {
+		const allStyle = {
+			...allDefaultStyle,
+			...group.style,
+			boundVariables: { ...allDefaultStyle.boundVariables, ...group.style.boundVariables },
+		}
+		const jsonString = createStableStyleKey(allStyle)
+		// 생성 비용이 높은데 매번 처리하는 것에 대해 좀 더 최적화 필요
+		const hashId = sha256Hash(jsonString)
+
+		return {
+			style: allStyle,
+			ranges: processPositionsAndText(group.position, characters),
+			hashId,
+		}
+	})
+
+	return { styleGroups: result, defaultStyle: allDefaultStyle, exportStyleGroups }
 }

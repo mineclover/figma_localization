@@ -88,5 +88,7 @@ export const removeLeadingSymbols = (text: string) => {
 }
 
 export const keyConventionRegex = (text: string) => {
-	return text.trim().replace(/[^a-zA-Z0-9_]/g, '')
+	const trimmed = text.trim().replace(/[^a-zA-Z0-9_]/g, '')
+	// 첫 글자가 숫자인 경우 '_'를 앞에 추가
+	return /^\d/.test(trimmed) ? '_' + trimmed : trimmed
 }

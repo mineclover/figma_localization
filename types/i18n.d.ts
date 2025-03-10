@@ -150,8 +150,10 @@ export interface paths {
 			path?: never
 			cookie?: never
 		}
+		/** 리소스 목록 조회 */
 		get: operations['GetResources']
 		put?: never
+		/** 리소스 생성 */
 		post: operations['CreateResource']
 		delete?: never
 		options?: never
@@ -166,9 +168,12 @@ export interface paths {
 			path?: never
 			cookie?: never
 		}
+		/** 특정 리소스 상세 조회 */
 		get: operations['GetResource']
+		/** 리소스 수정 */
 		put: operations['UpdateResource']
 		post?: never
+		/** 리소스 삭제 */
 		delete: operations['DeleteResource']
 		options?: never
 		head?: never
@@ -182,9 +187,146 @@ export interface paths {
 			path?: never
 			cookie?: never
 		}
+		/** 리소스와 연결된 키 목록 조회 */
 		get: operations['GetKeysByResource']
 		put?: never
 		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/hash/{hashValue}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 해시값으로 리소스 조회 */
+		get: operations['GetResourceByHash']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/name/{styleName}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 스타일 이름으로 리소스 조회 */
+		get: operations['GetResourceByName']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/hash/{hashValue}/exists': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 해시값으로 리소스 존재 여부 확인 */
+		get: operations['ResourceExistsByHash']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/mapping': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		get?: never
+		put?: never
+		/** 스타일-번역 키 매핑 생성 */
+		post: operations['CreateResourceKeyMapping']
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/mapping/{keyId}/{resourceId}': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		get?: never
+		put?: never
+		post?: never
+		/** 스타일-번역 키 매핑 삭제 */
+		delete: operations['DeleteResourceKeyMapping']
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/duplicates': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 중복된 해시값을 가진 스타일 리소스 목록 조회 */
+		get: operations['GetDuplicateResources']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/usage-stats': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 스타일 사용 통계 조회 */
+		get: operations['GetResourceUsageStats']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/resources/connect-to-key': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		get?: never
+		put?: never
+		/** 로컬라이제이션 키에 리소스 연결 (기존 매핑 제거 후 새 매핑 생성) */
+		post: operations['ConnectResourceToKey']
 		delete?: never
 		options?: never
 		head?: never
@@ -267,6 +409,7 @@ export interface paths {
 			path?: never
 			cookie?: never
 		}
+		/** ID로 키 조회 */
 		get: operations['GetKeyById']
 		put?: never
 		post?: never
@@ -284,14 +427,27 @@ export interface paths {
 			cookie?: never
 		}
 		get?: never
-		/** 변수나 스타일에 대한 키 수정 */
+		/** 키 수정 */
 		put: operations['UpdateKey']
 		post?: never
-		/**
-		 * 키 삭제
-		 * @description 하위 키 삭제 같이 해야 함
-		 */
-		delete: operations['DeleteKey']
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/keys/domain-matrix-flat': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** CSV 형식과 유사한 도메인 번역 매트릭스 조회 */
+		get: operations['GetDomainTranslationMatrixFlat']
+		put?: never
+		post?: never
+		delete?: never
 		options?: never
 		head?: never
 		patch?: never
@@ -351,15 +507,32 @@ export interface paths {
 		patch?: never
 		trace?: never
 	}
-	'/localization/keys/domain-matrix-flat': {
+	'/localization/keys/parent/{parentId}/children': {
 		parameters: {
 			query?: never
 			header?: never
 			path?: never
 			cookie?: never
 		}
-		/** CSV 형식과 유사한 도메인 번역 매트릭스 조회 */
-		get: operations['GetDomainTranslationMatrixFlat']
+		/** 특정 부모 키에 속한 하위 키 목록 조회 */
+		get: operations['GetChildKeysByParentId']
+		put?: never
+		post?: never
+		delete?: never
+		options?: never
+		head?: never
+		patch?: never
+		trace?: never
+	}
+	'/localization/keys/with-children': {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		/** 자식 키를 가진 변수 키 목록 조회 */
+		get: operations['GetKeysWithChildren']
 		put?: never
 		post?: never
 		delete?: never
@@ -982,12 +1155,13 @@ export interface components {
 			translated_languages: string[]
 		}
 		CreateResourceDTO: {
-			name: string
-			type: string
+			styleValue: string
+			hashValue: string
 		}
 		UpdateResourceDTO: {
-			name?: string
-			type?: string
+			styleName?: string
+			alias?: string
+			isDeleted?: boolean
 		}
 		LocalizationKeyDetail: {
 			/** Format: double */
@@ -1524,6 +1698,197 @@ export interface operations {
 			}
 		}
 	}
+	GetResourceByHash: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				hashValue: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetResourceByName: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				styleName: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	ResourceExistsByHash: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				hashValue: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	CreateResourceKeyMapping: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody: {
+			content: {
+				'application/json': {
+					resourceId: string
+					keyId: string
+				}
+			}
+		}
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	DeleteResourceKeyMapping: {
+		parameters: {
+			query?: never
+			header?: never
+			path: {
+				keyId: string
+				resourceId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetDuplicateResources: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	GetResourceUsageStats: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
+	ConnectResourceToKey: {
+		parameters: {
+			query?: never
+			header?: never
+			path?: never
+			cookie?: never
+		}
+		requestBody: {
+			content: {
+				'application/json': {
+					resourceInfo: {
+						resource?: {
+							alias?: string
+							hashValue: string
+							styleValue: string
+							styleName: string
+						}
+						resourceId?: string
+					}
+					keyId: string
+				}
+			}
+		}
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': unknown
+				}
+			}
+		}
+	}
 	GetKeys: {
 		parameters: {
 			query?: never
@@ -1686,23 +2051,25 @@ export interface operations {
 			}
 		}
 	}
-	DeleteKey: {
+	GetDomainTranslationMatrixFlat: {
 		parameters: {
 			query?: never
-			header?: never
-			path: {
-				id: string
+			header: {
+				'X-Domain-Id': string
 			}
+			path?: never
 			cookie?: never
 		}
 		requestBody?: never
 		responses: {
-			/** @description No content */
-			204: {
+			/** @description Ok */
+			200: {
 				headers: {
 					[name: string]: unknown
 				}
-				content?: never
+				content: {
+					'application/json': unknown
+				}
 			}
 		}
 	}
@@ -1772,11 +2139,33 @@ export interface operations {
 			}
 		}
 	}
-	GetDomainTranslationMatrixFlat: {
+	GetChildKeysByParentId: {
 		parameters: {
 			query?: never
-			header: {
-				'X-Domain-Id': string
+			header?: never
+			path: {
+				parentId: string
+			}
+			cookie?: never
+		}
+		requestBody?: never
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown
+				}
+				content: {
+					'application/json': components['schemas']['LocalizationKeyDetail']
+				}
+			}
+		}
+	}
+	GetKeysWithChildren: {
+		parameters: {
+			query?: never
+			header?: {
+				'X-Domain-Id'?: string
 			}
 			path?: never
 			cookie?: never

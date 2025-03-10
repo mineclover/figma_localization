@@ -59,3 +59,49 @@ function figmaBtoa(base: string) {
 function figmaAtob(base: string) {
 	return uint8ArrayToString([...figma.base64Decode(base)])
 }
+
+/**
+ * 두 객체의 내용이 동일한지 깊게 비교하는 함수
+ * @param {any} obj1 - 첫 번째 비교할 객체
+ * @param {any} obj2 - 두 번째 비교할 객체
+ * @returns {boolean} - 두 객체가 동일하면 true, 아니면 false
+ */
+export function deepEqual(obj1: any, obj2: any) {
+	// 기본 타입이거나 null인 경우 직접 비교
+	if (obj1 === obj2) return true
+
+	// 둘 중 하나만 null이거나 undefined인 경우
+	if (obj1 == null || obj2 == null) return false
+
+	// 타입이 다른 경우
+	if (typeof obj1 !== typeof obj2) return false
+
+	// 배열인 경우
+	if (Array.isArray(obj1) && Array.isArray(obj2)) {
+		if (obj1.length !== obj2.length) return false
+
+		for (let i = 0; i < obj1.length; i++) {
+			if (!deepEqual(obj1[i], obj2[i])) return false
+		}
+
+		return true
+	}
+
+	// 일반 객체인 경우
+	if (typeof obj1 === 'object' && typeof obj2 === 'object') {
+		const keys1 = Object.keys(obj1)
+		const keys2 = Object.keys(obj2)
+
+		if (keys1.length !== keys2.length) return false
+
+		for (const key of keys1) {
+			if (!keys2.includes(key)) return false
+			if (!deepEqual(obj1[key], obj2[key])) return false
+		}
+
+		return true
+	}
+
+	// 그 외의 경우 (함수, 날짜 등)
+	return String(obj1) === String(obj2)
+}

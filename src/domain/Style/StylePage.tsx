@@ -12,7 +12,17 @@ import {
 } from '../Setting/SettingModel'
 
 import { useSignal } from '@/hooks/useSignal'
-import { Bold, Button, Container, Stack, Text, Textbox, TextboxMultiline, VerticalSpace } from '@create-figma-plugin/ui'
+import {
+	Bold,
+	Button,
+	Container,
+	Stack,
+	Text,
+	Textbox,
+	TextboxMultiline,
+	Toggle,
+	VerticalSpace,
+} from '@create-figma-plugin/ui'
 
 import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
@@ -38,6 +48,8 @@ import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle, Sty
 import { computed, signal } from '@preact/signals-core'
 import { createStableStyleKey } from '@/utils/keyJson'
 import { deepEqual } from '@/utils/data'
+import { XMLParser, XMLBuilder } from 'fast-xml-parser'
+import prettier from 'prettier'
 
 // 있든 없든 수정 가능하게 구성
 
@@ -90,10 +102,10 @@ const parseSame = (style: string, serverStyle: string) => {
 export type StyleStore = Record<string, StyleSync>
 
 export const styleSignal = signal<StyleStore>({})
+export const styleTagModeSignal = signal<'name' | 'id'>('id')
 
 const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 	const { data, loading, error, fetchData } = useFetch<ResourceDTO>()
-	const styleStore = useSignal(styleSignal)
 
 	useEffect(() => {
 		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
@@ -103,6 +115,7 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 			const newName = data.style_name
 
 			const store = { hashId, name: newName, id: newId, alias: newAlias, style, ranges }
+			console.log('🚀 ~ useEffect ~ store:', data, loading, error, store)
 			styleSignal.value = {
 				...styleSignal.value,
 
@@ -127,8 +140,6 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 
 	const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '')
 
-	console.log('🚀 ~ StyleItem ~ isSame:', hashId, isSame, style, data?.style_value)
-
 	return (
 		<div className={styles.container} style={{ border: '1px solid red' }}>
 			<Text>{hashId}</Text>
@@ -139,7 +150,7 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 		</div>
 	)
 }
-const generateXmlString = (styles: StyleSync[]) => {
+const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 	console.log('🚀 ~ generateXmlString ~ styles:', styles)
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleSegment> = []
@@ -167,58 +178,119 @@ const generateXmlString = (styles: StyleSync[]) => {
 
 	return allRanges
 		.map((item) => {
-			return `<${item.name}>${item.text}</${item.name}>`
+			return `<${item[tag]}>${item.text}</${item[tag]}>`
 		})
 		.join('')
 }
 
+type ParseTextBlock = {
+	[key: string]: {
+		'#text': string
+	}[]
+}
+
+const parseTextBlock = (block: ParseTextBlock) => {
+	const key = Object.keys(block)[0]
+	const target = block[key]
+	const value = target[0]
+	return value['#text']
+}
+
 export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSync[] }) => {
 	const [xml, setXml] = useState<string>('')
-	const styleStore = useSignal(styleSignal)
-	useEffect(() => {
-		setXml(text)
-	}, [text])
+	/**
+	 * {
+	 * 11: {
+	 * 		#text: 'string'
+	 * 	}
+	 * ...
+	 * }[]
+	 */
+	const [parsedData, setParsedData] = useState<ParseTextBlock[]>([])
 
+	const styleStore = useSignal(styleSignal)
+	const styleTagMode = useSignal(styleTagModeSignal)
 	const styleValues = computed(() => {
 		return Object.values(styleStore)
 	})
 
 	useEffect(() => {
-		// XML 형식의 문자열 생성 함수
+		try {
+			// XML 파싱
+			const parser = new XMLParser({
+				ignoreAttributes: false,
+				trimValues: false,
+				preserveOrder: true,
+				isArray: (name, jpath, isLeafNode, isAttribute) => {
+					// 배열로 처리하고 싶은 요소들을 지정
+					return false
+				},
+			})
 
-		console.log('🚀 ~ useEffect ~ styleStore:', styleStore)
+			const parsedObj = parser.parse(`<root>${xml}</root>`)
+
+			const parsedDataArr = parsedObj[0].root as ParseTextBlock[]
+
+			/** 텍스트 출력 */
+			// const removeTag = parsedDataArr.map((item) => {
+			// 	const key = Object.keys(item)[0]
+			// 	const target = item[key]
+			// 	const value = target[0]
+			// 	// 이걸 하면 순서가 깨짐
+			// 	return {
+			// 		[key]: value['#text'],
+			// 	}
+			// })
+
+			setParsedData(parsedDataArr)
+			console.log('🚀 ~ useEffect ~ parsedObj:', parsedObj)
+		} catch (error) {
+			console.error('XML 처리 중 오류:', error)
+		}
+	}, [xml])
+
+	useEffect(() => {
+		// XML 형식의 문자열 생성 함수
 
 		// 함수 실행하여 XML 생성
 		if (text && styleValues.value.length > 0) {
-			const xmlString = generateXmlString(styleValues.value)
-			console.log('🚀 ~ StyleXml ~ xmlString:', xmlString)
+			const xmlString = generateXmlString(styleValues.value, styleTagMode)
+
 			setXml(xmlString)
 		}
-	}, [styleStore, text, styleValues])
-
+	}, [text, styleValues.value, styleTagMode])
 	return (
 		<div>
 			<VerticalSpace space="small" />
-			<Text>{xml}</Text>
+			<Text>원본 XML:</Text>
+			<TextboxMultiline value={xml} placeholder="XML 출력" />
+
+			<VerticalSpace space="small" />
+			<Text>파싱된 데이터:</Text>
+			<Text>{parsedData ? JSON.stringify(parsedData, null, 2) : '데이터 없음'}</Text>
+
 			<VerticalSpace space="small" />
 			{styleInfo.map((item) => {
-				return <StyleItem {...item} />
+				return <StyleItem key={item.hashId} {...item} />
 			})}
 		</div>
 	)
 }
 
 const StylePage = () => {
-	const { data, loading, error, fetchData } = useFetch<LocalizationTranslationDTO[]>()
-
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal)
 	const currentPointer = useSignal(currentPointerSignal)
+	const styleTagMode = useSignal(styleTagModeSignal)
 	console.log('🚀 ~ TranslatePage ~ currentPointer:', currentPointer)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)
 	const targetArray = ['origin', ...languageCodes]
+
+	useEffect(() => {
+		styleSignal.value = {}
+	}, [currentPointer?.characters])
 
 	if (currentPointer && currentPointer.styleData && currentPointer.characters && currentPointer.boundVariables) {
 		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData)
@@ -227,6 +299,14 @@ const StylePage = () => {
 
 		return (
 			<div>
+				<Toggle
+					value={styleTagMode === 'id'}
+					onChange={() => {
+						styleTagModeSignal.value = styleTagMode === 'id' ? 'name' : 'id'
+					}}
+				>
+					name, id 태그 선택
+				</Toggle>
 				<Text>
 					1. Group 의 갯수가 1개면 단일 스타일을 가지고 있는 것이다
 					<br />- 이 경우 group 0 에서 전체 길이와 텍스트를 얻을 수 있다

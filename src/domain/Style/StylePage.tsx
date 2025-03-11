@@ -30,8 +30,10 @@ import {
 	GET_PROJECT_ID,
 	RELOAD_NODE,
 	SET_LANGUAGE_CODES,
+	SET_NODE_LOCALIZATION_KEY_BATCH,
 	SET_PROJECT_ID,
 	SET_STYLE,
+	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
 } from '../constant'
 import { emit } from '@create-figma-plugin/utilities'
 import {
@@ -93,6 +95,16 @@ export type ResourceDTO = {
 	resource_id: number
 	style_name: string
 	style_value: string
+	hash_value: string
+	alias?: string
+	is_deleted: number
+	created_at: string
+	updated_at: string
+}
+export type ParsedResourceDTO = {
+	resource_id: number
+	style_name: string
+	style_value: Record<string, any>
 	hash_value: string
 	alias?: string
 	is_deleted: number
@@ -269,6 +281,8 @@ const StylePage = () => {
 	const localizationKeyValue = useSignal(localizationKeySignal)
 	const targetArray = ['origin', ...languageCodes]
 
+	const clientFetchDB = clientFetchDBCurry(2)
+
 	useEffect(() => {
 		styleSignal.value = {}
 	}, [currentPointer])
@@ -280,6 +294,38 @@ const StylePage = () => {
 
 		return (
 			<div>
+				<Text>키 : {currentPointer.data.localizationKey}</Text>
+				<Button
+					onClick={async () => {
+						// 변경할 키가 없으면 추가하고
+						const randomId = Math.random().toString(36).substring(2, 15)
+						const result = await clientFetchDB('/localization/keys', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({
+								domainId: 2,
+								name: randomId,
+								isTemporary: true,
+							}),
+						})
+
+						const resultData = await result.json()
+
+						if (resultData) {
+							console.log('🚀 ~ onClick={ ~ resultData:', resultData)
+							emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
+								domainId: resultData.domain_id,
+								keyId: resultData.key_id,
+								ids: [currentPointer.nodeId],
+							})
+						}
+					}}
+					secondary
+				>
+					추가
+				</Button>
 				<Button
 					onClick={() => {
 						emit(DOWNLOAD_STYLE.REQUEST_KEY, {

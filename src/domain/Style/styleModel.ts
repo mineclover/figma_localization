@@ -1,6 +1,6 @@
-import { textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
+import { setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson'
-import { ResourceDTO, StyleSync } from './StylePage'
+import { ParsedResourceDTO, ResourceDTO, StyleSync } from './StylePage'
 import { DOWNLOAD_STYLE, SET_STYLE } from '../constant'
 import { on } from '@create-figma-plugin/utilities'
 import { notify } from '@/figmaPluginUtils'
@@ -345,6 +345,7 @@ export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
 	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey }: { localizationKey: string }) => {
 		const xNode = figma.currentPage.selection[0]
+		const xNodeId = xNode.id
 		const domainSetting = getDomainSetting()
 
 		if (domainSetting == null) {
@@ -374,7 +375,7 @@ export const onDownloadStyle = () => {
 		// 키 아이디 82
 		const parsedData = parseXML(originText ?? '')
 		console.log('🚀 ~ on ~ parsedData:', parsedData)
-
+		console.log('🚀 ~ result2 ~ localizationKey:', localizationKey)
 		const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 			method: 'GET',
 		})
@@ -387,8 +388,9 @@ export const onDownloadStyle = () => {
 		const data = (await result2.json()) as ResourceDTO[]
 		console.log('🚀 ~ on ~ data:', data)
 
-		const resourceMap = new Map<string, ResourceDTO>()
+		const resourceMap = new Map<string, ParsedResourceDTO>()
 		for (const item of data) {
+			console.log('🚀 ~ on ~ resourceMap item:', item)
 			resourceMap.set(item.resource_id.toString(), {
 				...item,
 				style_value: JSON.parse(item.style_value),
@@ -405,23 +407,52 @@ export const onDownloadStyle = () => {
 
 		let start = 0
 		let end = 0
-
+		console.log('🚀 ~ on ~ resourceMap:', resourceMap)
+		console.log('🚀 ~ on ~ parsedData:', parsedData)
 		for (const item of parsedData) {
 			console.log('🚀 ~ on ~ item:', item)
+
 			const key = Object.keys(item)[0]
 			const target = item[key]
 			const value = target[0]['#text'] as string
 			const length = value.length
 			end = start + length
-			const resource = resourceMap.get(key)
+
+			let resource = resourceMap.get(key)
 
 			if (resource == null) {
-				notify('Failed to get resource 맞지 않으면 추가 호출해서 처리하는 로직 추가해야함', 'error')
+				const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
+					method: 'GET',
+				})
+				if (onlineStyle == null) {
+					notify('Failed to get resource by key', 'error')
+					return
+				}
+				const onlineData = (await onlineStyle.json()) as ResourceDTO
+				const styleValue = JSON.parse(onlineData.style_value)
+				resourceMap.set(key, {
+					...onlineData,
+					style_value: JSON.parse(styleValue.style_value),
+				})
+				resource = resourceMap.get(key)
+			}
+			const styleValue = resource?.style_value
+
+			if (styleValue == null) {
+				notify('Failed to get resource by key', 'error')
 				return
 			}
-			const styleValue = resource.style_value
-
-			console.log('🚀 ~ on ~ value:', value)
+			await setAllStyleRanges({
+				textNode: xNode,
+				xNodeId,
+				styleData: styleValue,
+				boundVariables: {},
+				range: {
+					start,
+					end,
+				},
+			})
+			start = end
 		}
 	})
 }

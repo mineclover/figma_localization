@@ -1,3 +1,5 @@
+import { ResourceDTO } from '@/domain/Style/StylePage'
+
 // 스타일 객체 타입 정의
 interface StyleRange<T> {
 	start: number
@@ -415,30 +417,94 @@ export type ValidAllStyleRangesType = {
 
 // 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
 
-export const setAllStyleRanges = ({
+// const workQueue = [
+// 	'fontSize',
+// 	'fontName',
+// 	'lineHeight',
+// 	'letterSpacing',
+// 	'textDecoration',
+// 	'textCase',
+// 	'hyperlink',
+// 	'fills',
+// 	'textStyleId',
+// 	'fillStyleId',
+// 	'boundVariables',
+// ]
+
+export const setAllStyleRanges = async ({
 	textNode,
 	styleData,
 	boundVariables,
+	range,
+	xNodeId,
 }: {
+	xNodeId: string
 	textNode: TextNode
-	styleData: ValidAllStyleRangesType
+	styleData: Record<string, any>
 	boundVariables: any
+	range: {
+		start: number
+		end: number
+	}
 }) => {
-	textNode.setRangeTextDecoration
+	console.log('🚀 ~ textNode,styleData,boundVariables,range,:', textNode, styleData, boundVariables, range)
+
+	// const functionMapSample = {
+	// 	fontSize: textNode.setRangeFontSize,
+	// 	fontName: textNode.setRangeFontName,
+	// 	lineHeight: textNode.setRangeLineHeight,
+	// 	letterSpacing: textNode.setRangeLetterSpacing,
+	// 	textDecoration: textNode.setRangeTextDecoration,
+	// 	textCase: textNode.setRangeTextCase,
+	// 	// fontWeight: textNode.setRangeFontWeight,
+	// 	hyperlink: textNode.setRangeHyperlink,
+	// 	fills: textNode.setRangeFills,
+	// 	// openTypeFeatures: textNode.openTypeFeatures,
+	// 	textStyleId: textNode.setRangeTextStyleIdAsync,
+	// 	fillStyleId: textNode.setRangeFillStyleIdAsync,
+	// }
 	const functionMap = {
-		fontSize: textNode.setRangeFontSize,
-		fontName: textNode.setRangeFontName,
-		lineHeight: textNode.setRangeLineHeight,
-		letterSpacing: textNode.setRangeLetterSpacing,
-		textDecoration: textNode.setRangeTextDecoration,
-		textCase: textNode.setRangeTextCase,
+		fontName: 'setRangeFontName',
+		fontSize: 'setRangeFontSize',
+		lineHeight: 'setRangeLineHeight',
+		letterSpacing: 'setRangeLetterSpacing',
+		textDecoration: 'setRangeTextDecoration',
+		textCase: 'setRangeTextCase',
+		// fontWeight: "setRangeFontWeight",
+		hyperlink: 'setRangeHyperlink',
+		fills: 'setRangeFills',
+		// openTypeFeatures: "openTypeFeatures",
+		textStyleId: 'setRangeTextStyleIdAsync',
+		fillStyleId: 'setRangeFillStyleIdAsync',
+	} as const
+	// textNode.setRangeBoundVariable,
+	for (const key of Object.keys(functionMap)) {
+		const style = styleData[key as keyof ResourceDTO]
+		if (style == null) {
+			continue
+		}
+		if (key === 'fontName') {
+			await figma.loadFontAsync(style as FontName)
+		}
 
-		// fontWeight: textNode.setRangeFontWeight,
-
-		fills: textNode.setRangeFills,
-		textStyleId: textNode.setRangeTextStyleId,
-		fillStyleId: textNode.setRangeFillStyleId,
-		boundVariables: textNode.setRangeBoundVariable,
+		try {
+			const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function
+			if (setRange) {
+				console.log('🚀 ~ range.start, range.end, style:', key, range.start, range.end, style)
+				textNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never)
+			}
+		} catch (error) {
+			console.log('🚀 ~ error:', error, textNode)
+			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode
+			if (targetNode) {
+				console.log('🚀 ~ targetNode:', targetNode)
+				const setRange = targetNode[functionMap[key as keyof typeof functionMap]] as Function
+				if (setRange) {
+					console.log('🚀 ~ 2차 시도 range.start, range.end, style:', key, range.start, range.end, style)
+					targetNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never)
+				}
+			}
+		}
 	}
 }
 
@@ -448,7 +514,6 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 	const styleData: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
 		fontName: getFontNameRanges(textNode),
-
 		lineHeight: getLineHeightRanges(textNode),
 		letterSpacing: getLetterSpacingRanges(textNode),
 		textDecoration: getTextDecorationRanges(textNode),
@@ -456,9 +521,9 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 
 		// 설정 할 때 필요 없음 이유는 weight 값으로 스타일이 적용되지 않기 때문 스타일은 fontName으로 적용 됨
 		// fontWeight: getFontWeightRanges(textNode),
-		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),
+		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
 
 		// 나중에는 분리해서 스타일 호출 순서를 지정하고 관리해야하는데 일단 지금은 range를 유효하게 뽑는게 중요하므로 생략함
 		fillStyleId: getFillStyleIdRanges(textNode),
@@ -471,7 +536,7 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 		fillStyleId: getFillStyleIdRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
 	}
-	textNode.id
+
 	for (const key in styleData) {
 		if (styleData[key as keyof AllStyleRanges] == null) {
 			delete styleData[key as keyof AllStyleRanges]

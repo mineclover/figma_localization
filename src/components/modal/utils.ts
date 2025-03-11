@@ -1,36 +1,36 @@
-import { JSXInternal } from 'preact/src/jsx'
+import { JSXInternal } from 'preact/src/jsx';
 
 /** DOM 요소의 크기 얻기 */
 export function getElementRect(element: HTMLElement) {
-	const rect = element.getBoundingClientRect()
+	const rect = element.getBoundingClientRect();
 	return {
 		width: rect.width >> 0,
 		height: rect.height >> 0,
 		/** viewport 기준 위치 */
 		x: rect.left >> 0,
 		y: rect.top >> 0,
-	}
+	};
 }
 /** 현재 뷰포트 크기 얻기 */
 export function getViewportSize() {
 	return {
 		width: (window.innerWidth || document.documentElement.clientWidth) >> 0,
 		height: (window.innerHeight || document.documentElement.clientHeight) >> 0,
-	}
+	};
 }
 
 type RectStyle = {
-	position: 'absolute'
-	left: number
-	top: number
-	width: number
-	height: number
-}
+	position: 'absolute';
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+};
 
-export type Axis = 'left' | 'right' | 'top' | 'bottom'
+export type Axis = 'left' | 'right' | 'top' | 'bottom';
 
 export function rectToStyle(element: HTMLElement): RectStyle {
-	const rect = getElementRect(element)
+	const rect = getElementRect(element);
 
 	return {
 		position: 'absolute',
@@ -38,12 +38,12 @@ export function rectToStyle(element: HTMLElement): RectStyle {
 		top: rect.y,
 		width: rect.width,
 		height: rect.height,
-	}
+	};
 }
 
 /** axis default : bottom */
 export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Axis): RectStyle {
-	const rect = rectToStyle(element)
+	const rect = rectToStyle(element);
 
 	if (axis === 'left') {
 		return {
@@ -52,7 +52,7 @@ export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Ax
 			top: rect.top,
 			width: rect.width,
 			height: rect.height,
-		}
+		};
 	}
 
 	if (axis === 'right') {
@@ -62,7 +62,7 @@ export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Ax
 			top: rect.top,
 			width: rect.width,
 			height: rect.height,
-		}
+		};
 	}
 
 	if (axis === 'top') {
@@ -72,7 +72,7 @@ export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Ax
 			top: rect.top - rect.height - offset,
 			width: rect.width,
 			height: rect.height,
-		}
+		};
 	}
 
 	if (axis === 'bottom')
@@ -82,7 +82,7 @@ export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Ax
 			top: rect.top + rect.height + offset,
 			width: rect.width,
 			height: rect.height,
-		}
+		};
 	// default : bottom
 	return {
 		position: 'absolute',
@@ -90,26 +90,26 @@ export function rectToStyleOffset(element: HTMLElement, offset: number, axis: Ax
 		top: rect.top + rect.height + offset,
 		width: rect.width,
 		height: rect.height,
-	}
+	};
 }
 
-const xAxis = ['left', 'right']
-const yAxis = ['top', 'bottom']
+const xAxis = ['left', 'right'];
+const yAxis = ['top', 'bottom'];
 
 const objectKeyClear = (keys: string[], target: Record<string, any>) => {
 	for (const key of keys) {
-		delete target[key]
+		delete target[key];
 	}
-}
+};
 
 /** axis default : 해당 축 데이터 지우고 다시 주입 */
 export function rectToViewportStyleOffset(before: RectStyle, offset: number, align: Axis) {
-	if (xAxis.includes(align)) objectKeyClear(xAxis, before)
-	if (yAxis.includes(align)) objectKeyClear(yAxis, before)
+	if (xAxis.includes(align)) objectKeyClear(xAxis, before);
+	if (yAxis.includes(align)) objectKeyClear(yAxis, before);
 	return {
 		...before,
 		[align]: offset,
-	}
+	};
 }
 
 export type DiagonalAxis =
@@ -120,25 +120,25 @@ export type DiagonalAxis =
 	| 'bottomLeft'
 	| 'bottomRight'
 	| 'leftTop'
-	| 'leftBottom'
+	| 'leftBottom';
 
 export const diagonalAxisToAxis = (axis: DiagonalAxis): Axis => {
-	if (axis.startsWith('top')) return 'top'
-	if (axis.startsWith('bottom')) return 'bottom'
-	if (axis.startsWith('left')) return 'left'
-	if (axis.startsWith('right')) return 'right'
-	return 'bottom'
-}
+	if (axis.startsWith('top')) return 'top';
+	if (axis.startsWith('bottom')) return 'bottom';
+	if (axis.startsWith('left')) return 'left';
+	if (axis.startsWith('right')) return 'right';
+	return 'bottom';
+};
 
-export type BaseProps = JSXInternal.IntrinsicElements
+export type BaseProps = JSXInternal.IntrinsicElements;
 
-export type NullableString = string | boolean | undefined
+export type NullableString = string | boolean | undefined;
 
 export const clc = (...classNames: NullableString[]) => {
-	const result = classNames.filter((text): text is string => typeof text === 'string')
+	const result = classNames.filter((text): text is string => typeof text === 'string');
 
 	if (result.length === 0) {
-		return undefined
+		return undefined;
 	}
-	return result.map((txt) => txt.trim()).join(' ')
-}
+	return result.map((txt) => txt.trim()).join(' ');
+};

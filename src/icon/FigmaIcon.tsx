@@ -1,5 +1,5 @@
-import { h } from 'preact'
-import styles from './icon.module.css'
+import { h } from 'preact';
+import styles from './icon.module.css';
 
 const FigmaIcon = ({ size = 24, color = '#5F6368', ...props }) => {
 	return (
@@ -24,7 +24,7 @@ const FigmaIcon = ({ size = 24, color = '#5F6368', ...props }) => {
 				/>
 			</svg>
 		</div>
-	)
-}
+	);
+};
 
-export default FigmaIcon
+export default FigmaIcon;

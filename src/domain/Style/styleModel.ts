@@ -1,33 +1,33 @@
-import { setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text'
-import { createStableStyleKey, sha256Hash } from '@/utils/keyJson'
-import { ParsedResourceDTO, ResourceDTO, StyleSync } from './StylePage'
-import { DOWNLOAD_STYLE, SET_STYLE } from '../constant'
-import { on } from '@create-figma-plugin/utilities'
-import { notify } from '@/figmaPluginUtils'
+import { setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
+import { createStableStyleKey, sha256Hash } from '@/utils/keyJson';
+import { ParsedResourceDTO, ResourceDTO, StyleSync } from './StylePage';
+import { DOWNLOAD_STYLE, SET_STYLE } from '../constant';
+import { on } from '@create-figma-plugin/utilities';
+import { notify } from '@/figmaPluginUtils';
 import {
 	setNodeData,
 	addTranslation,
 	reloadOriginalLocalizationName,
 	getLocalizationKeyData,
-} from '../Label/TextPluginDataModel'
-import { getDomainSetting } from '../Setting/SettingModel'
-import { fetchDB } from '../utils/fetchDB'
-import { parseTextBlock, parseXML } from '@/utils/xml'
+} from '../Label/TextPluginDataModel';
+import { getDomainSetting } from '../Setting/SettingModel';
+import { fetchDB } from '../utils/fetchDB';
+import { parseTextBlock, parseXML } from '@/utils/xml';
 
 const range = (start: number, end: number) => {
-	return Array.from({ length: end - start }, (_, i) => start + i)
-}
+	return Array.from({ length: end - start }, (_, i) => start + i);
+};
 
 export interface StyleSegment {
-	start: number
-	end: number
-	text: string
-	style: Record<string, any>
+	start: number;
+	end: number;
+	text: string;
+	style: Record<string, any>;
 }
 
 export interface StyleSegmentsResult {
-	defaultStyle: Record<string, any>
-	segments: StyleSegment[]
+	defaultStyle: Record<string, any>;
+	segments: StyleSegment[];
 }
 
 /**
@@ -40,57 +40,57 @@ export interface StyleSegmentsResult {
  */
 export const createStyleSegments = (characters: string, styleData: ValidAllStyleRangesType): StyleSegmentsResult => {
 	// 1. 모든 범위의 시작점과 끝점 수집
-	const points = new Set<number>([0, characters.length])
+	const points = new Set<number>([0, characters.length]);
 
 	// 모든 스타일 속성의 범위를 순회하며 경계점 수집
 	Object.values(styleData).forEach((ranges) => {
 		if (ranges) {
 			ranges.forEach((range) => {
-				points.add(range.start)
-				points.add(range.end)
-			})
+				points.add(range.start);
+				points.add(range.end);
+			});
 		}
-	})
+	});
 
 	// 2. 정렬된 배열로 변환
-	const sortedPoints = Array.from(points).sort((a, b) => a - b)
+	const sortedPoints = Array.from(points).sort((a, b) => a - b);
 
 	// 3. 기본 스타일 결정 (범위가 1개인 스타일 속성)
-	const defaultStyle: Record<string, any> = {}
+	const defaultStyle: Record<string, any> = {};
 
 	Object.entries(styleData).forEach(([key, ranges]) => {
 		if (ranges && ranges.length === 1 && ranges[0].start === 0 && ranges[0].end === characters.length) {
-			defaultStyle[key] = ranges[0].value
+			defaultStyle[key] = ranges[0].value;
 		}
-	})
+	});
 
 	// 4. 각 구간의 스타일 결정 및 세그먼트 생성
-	const segments: StyleSegment[] = []
+	const segments: StyleSegment[] = [];
 
 	for (let i = 0; i < sortedPoints.length - 1; i++) {
-		const start = sortedPoints[i]
-		const end = sortedPoints[i + 1]
+		const start = sortedPoints[i];
+		const end = sortedPoints[i + 1];
 
 		// 현재 구간의 스타일 계산 (기본 스타일 제외)
-		const segmentStyle: Record<string, any> = {}
+		const segmentStyle: Record<string, any> = {};
 
 		Object.entries(styleData).forEach(([key, ranges]) => {
 			// 기본 스타일에 이미 포함된 속성은 제외
-			if (defaultStyle[key] !== undefined) return
+			if (defaultStyle[key] !== undefined) return;
 
 			if (ranges) {
 				for (const range of ranges) {
 					// 범위가 현재 구간을 포함하는지 확인
 					if (range.start <= start && range.end >= end) {
-						segmentStyle[key] = range.value
-						break
+						segmentStyle[key] = range.value;
+						break;
 					}
 				}
 			}
-		})
+		});
 
 		// 구간의 텍스트 가져오기
-		const segmentText = characters.substring(start, end)
+		const segmentText = characters.substring(start, end);
 
 		// 세그먼트 객체 추가
 		segments.push({
@@ -98,37 +98,37 @@ export const createStyleSegments = (characters: string, styleData: ValidAllStyle
 			end,
 			text: segmentText,
 			style: segmentStyle,
-		})
+		});
 	}
 
 	return {
 		defaultStyle,
 		segments,
-	}
-}
+	};
+};
 
 export interface StyleGroup {
-	style: Record<string, any>
-	ranges: { start: number; end: number; text: string }[]
+	style: Record<string, any>;
+	ranges: { start: number; end: number; text: string }[];
 }
 
 const styleClean = (styles: Record<string, any>) => {
-	const styleKeys = Object.keys(styles)
+	const styleKeys = Object.keys(styles);
 
 	for (const key of styleKeys) {
-		const value = styles[key]
+		const value = styles[key];
 
 		if (value == null) {
-			delete styles[key]
+			delete styles[key];
 		} else if (value === '') {
-			delete styles[key]
+			delete styles[key];
 		} else if (typeof value === 'object' && Object.keys(value).length === 0) {
-			delete styles[key]
+			delete styles[key];
 		}
 	}
 
-	return styles
-}
+	return styles;
+};
 
 /**
  * Converts an array of positions into ranges of consecutive numbers
@@ -140,47 +140,47 @@ const styleClean = (styles: Record<string, any>) => {
  */
 function processPositionsAndText(positions: number[], text: string) {
 	// Step 1: Sort positions to ensure proper order
-	positions.sort((a, b) => a - b)
+	positions.sort((a, b) => a - b);
 
 	// Step 2: Group positions into consecutive ranges
-	const ranges = []
-	let rangeStart = positions[0]
-	let prev = positions[0]
+	const ranges = [];
+	let rangeStart = positions[0];
+	let prev = positions[0];
 
 	// Find ranges of consecutive positions
 	for (let i = 1; i < positions.length; i++) {
 		if (positions[i] !== prev + 1) {
 			// Gap found, end the current range and start a new one
-			ranges.push({ start: rangeStart, end: prev })
-			rangeStart = positions[i]
+			ranges.push({ start: rangeStart, end: prev });
+			rangeStart = positions[i];
 		}
-		prev = positions[i]
+		prev = positions[i];
 	}
 
 	// Add the last range
-	ranges.push({ start: rangeStart, end: prev })
+	ranges.push({ start: rangeStart, end: prev });
 
 	// Step 3: Process each range to get corresponding text segment
-	const result = []
+	const result = [];
 
 	for (const range of ranges) {
 		// Calculate start and end indices for text slicing
 		// This assumes positions correspond to characters in the text
-		const textStart = range.start
-		const textEnd = range.end + 1 // +1 because end is inclusive in range but exclusive in slice
+		const textStart = range.start;
+		const textEnd = range.end + 1; // +1 because end is inclusive in range but exclusive in slice
 
 		// Get text segment for this range
-		const textSegment = text.substring(textStart, textEnd)
+		const textSegment = text.substring(textStart, textEnd);
 
 		// Add to result
 		result.push({
 			start: range.start,
 			end: textEnd,
 			text: textSegment,
-		})
+		});
 	}
 
-	return result
+	return result;
 }
 
 /**
@@ -192,21 +192,21 @@ function processPositionsAndText(positions: number[], text: string) {
 export const groupSegmentsByStyle = (
 	segmentsResult: StyleSegmentsResult
 ): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any> } => {
-	const { segments, defaultStyle } = segmentsResult
+	const { segments, defaultStyle } = segmentsResult;
 
 	// 스타일 기준으로 그룹화하기 위한 맵
-	const styleMap = new Map<string, StyleGroup>()
+	const styleMap = new Map<string, StyleGroup>();
 
 	segments.forEach((segment) => {
 		// 스타일을 JSON 문자열로 변환하여 키로 사용
-		styleClean(segment.style)
-		const styleKey = createStableStyleKey(segment.style)
+		styleClean(segment.style);
+		const styleKey = createStableStyleKey(segment.style);
 
 		if (!styleMap.has(styleKey)) {
 			styleMap.set(styleKey, {
 				style: segment.style,
 				ranges: [],
-			})
+			});
 		}
 
 		// 해당 스타일 그룹에 현재 세그먼트의 범위 추가
@@ -214,11 +214,11 @@ export const groupSegmentsByStyle = (
 			start: segment.start,
 			end: segment.end,
 			text: segment.text,
-		})
-	})
+		});
+	});
 
 	// 맵에서 배열로 변환
-	const styleGroups = Array.from(styleMap.values())
+	const styleGroups = Array.from(styleMap.values());
 
 	// // 기본 스타일이 있는 경우 별도 그룹으로 추가
 	// if (Object.keys(defaultStyle).length > 0) {
@@ -235,12 +235,12 @@ export const groupSegmentsByStyle = (
 	// 	})
 	// }
 
-	return { styleGroups, defaultStyle }
-}
+	return { styleGroups, defaultStyle };
+};
 
 export interface StylePosition {
-	style: Record<string, any>
-	position: number[]
+	style: Record<string, any>;
+	position: number[];
 }
 
 /**
@@ -254,88 +254,88 @@ export const groupAllSegmentsByStyle = (
 	segmentsResult: StyleSegmentsResult,
 	boundVariablesResult: StyleSegmentsResult
 ): { styleGroups: StyleGroup[]; defaultStyle: Record<string, any>; exportStyleGroups: StyleSync[] } => {
-	const { segments, defaultStyle } = segmentsResult
-	const { segments: boundVariablesSegments, defaultStyle: boundVariablesDefaultStyle } = boundVariablesResult
+	const { segments, defaultStyle } = segmentsResult;
+	const { segments: boundVariablesSegments, defaultStyle: boundVariablesDefaultStyle } = boundVariablesResult;
 
-	const allDefaultStyle = { ...defaultStyle, boundVariables: styleClean(boundVariablesDefaultStyle) }
+	const allDefaultStyle = { ...defaultStyle, boundVariables: styleClean(boundVariablesDefaultStyle) };
 
 	// 공간 매핑
-	const positionMap = new Map<number, Record<string, any>>()
+	const positionMap = new Map<number, Record<string, any>>();
 
 	segments.forEach((segment) => {
-		const { start, end, style } = segment
+		const { start, end, style } = segment;
 
 		for (let i = start; i < end; i++) {
-			styleClean(style)
-			positionMap.set(i, style)
+			styleClean(style);
+			positionMap.set(i, style);
 		}
-	})
+	});
 
 	boundVariablesSegments.forEach((segment) => {
-		const { start, end, style } = segment
-		styleClean(style)
+		const { start, end, style } = segment;
+		styleClean(style);
 		for (let i = start; i < end; i++) {
-			const currentStyle = positionMap.get(i)
+			const currentStyle = positionMap.get(i);
 
 			if (currentStyle) {
-				positionMap.set(i, { ...currentStyle, boundVariables: style })
+				positionMap.set(i, { ...currentStyle, boundVariables: style });
 			} else {
-				positionMap.set(i, { boundVariables: style })
+				positionMap.set(i, { boundVariables: style });
 			}
 			// 바인드 변수는 기본 스타일이 없으면 생략.. 하는 로직은 제거
 			// if (Object.keys(style).length !== 0) {
 
 			// }
 		}
-	})
+	});
 
 	// 스타일 기준으로 그룹화하기 위한 맵
-	const styleMap = new Map<string, StylePosition>()
+	const styleMap = new Map<string, StylePosition>();
 
 	for (const pointer of range(0, positionMap.size)) {
-		const style = positionMap.get(pointer)
+		const style = positionMap.get(pointer);
 
 		if (style) {
-			const styleKey = createStableStyleKey(style)
+			const styleKey = createStableStyleKey(style);
 			if (!styleMap.has(styleKey)) {
 				styleMap.set(styleKey, {
 					style: style,
 					position: [],
-				})
+				});
 			}
-			styleMap.get(styleKey)!.position.push(pointer)
+			styleMap.get(styleKey)!.position.push(pointer);
 		}
 	}
 
 	// 맵에서 배열로 변환
-	const styleGroups = Array.from(styleMap.values())
+	const styleGroups = Array.from(styleMap.values());
 
 	const result = styleGroups.map((group) => {
 		return {
 			style: group.style,
 			ranges: processPositionsAndText(group.position, characters),
-		}
-	})
+		};
+	});
 
 	const exportStyleGroups = styleGroups.map((group) => {
 		const allStyle = {
 			...allDefaultStyle,
 			...group.style,
 			boundVariables: { ...allDefaultStyle.boundVariables, ...group.style.boundVariables },
-		}
-		const jsonString = createStableStyleKey(allStyle)
+		};
+		const jsonString = createStableStyleKey(allStyle);
 		// 생성 비용이 높은데 매번 처리하는 것에 대해 좀 더 최적화 필요
-		const hashId = sha256Hash(jsonString)
+		const hashId = sha256Hash(jsonString);
 
 		return {
 			style: allStyle,
 			ranges: processPositionsAndText(group.position, characters),
 			hashId,
-		}
-	})
+		};
+	});
 
-	return { styleGroups: result, defaultStyle: allDefaultStyle, exportStyleGroups }
-}
+	return { styleGroups: result, defaultStyle: allDefaultStyle, exportStyleGroups };
+};
 
 /**
  * 일단 로컬라이제이션 키가 있다는 것을 전재로 함
@@ -344,96 +344,96 @@ export const groupAllSegmentsByStyle = (
 export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
 	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey }: { localizationKey: string }) => {
-		const xNode = figma.currentPage.selection[0]
-		const xNodeId = xNode.id
-		const domainSetting = getDomainSetting()
+		const xNode = figma.currentPage.selection[0];
+		const xNodeId = xNode.id;
+		const domainSetting = getDomainSetting();
 
 		if (domainSetting == null) {
-			notify('Failed to get domain id', 'error')
-			return
+			notify('Failed to get domain id', 'error');
+			return;
 		}
 
 		if (xNode == null) {
-			notify('Failed to get node', 'error')
-			return
+			notify('Failed to get node', 'error');
+			return;
 		}
 		// originalLocalizeId 조회 또는 등록
 		// searchTranslationCode
 		if (xNode.type !== 'TEXT') {
-			notify('Failed to get node', 'error')
-			return
+			notify('Failed to get node', 'error');
+			return;
 		}
 
 		// /** 클라에서 받는 로컬라이제이션 키 없을 때 */
-		const result = await getLocalizationKeyData(xNode, Date.now())
+		const result = await getLocalizationKeyData(xNode, Date.now());
 
 		if (result == null) {
-			notify('Failed to get localization key data', 'error')
-			return
+			notify('Failed to get localization key data', 'error');
+			return;
 		}
-		const originText = result.origin_value
+		const originText = result.origin_value;
 		// 키 아이디 82
-		const parsedData = parseXML(originText ?? '')
+		const parsedData = parseXML(originText ?? '');
 		const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 			method: 'GET',
-		})
+		});
 
 		if (result2 == null) {
-			notify('Failed to get resource by key', 'error')
-			return
+			notify('Failed to get resource by key', 'error');
+			return;
 		}
 
-		const data = (await result2.json()) as ResourceDTO[]
+		const data = (await result2.json()) as ResourceDTO[];
 
-		const resourceMap = new Map<string, ParsedResourceDTO>()
+		const resourceMap = new Map<string, ParsedResourceDTO>();
 		for (const item of data) {
 			resourceMap.set(item.resource_id.toString(), {
 				...item,
 				style_value: JSON.parse(item.style_value),
-			})
+			});
 		}
 
 		const fullText = parsedData
 			.map((item) => {
-				return parseTextBlock(item)
+				return parseTextBlock(item);
 			})
-			.join('')
-		await textFontLoad(xNode)
-		xNode.characters = fullText
+			.join('');
+		await textFontLoad(xNode);
+		xNode.characters = fullText;
 
-		let start = 0
-		let end = 0
+		let start = 0;
+		let end = 0;
 
 		for (const item of parsedData) {
-			const key = Object.keys(item)[0]
-			const target = item[key]
-			const value = target[0]['#text'] as string
-			const length = value.length
-			end = start + length
+			const key = Object.keys(item)[0];
+			const target = item[key];
+			const value = target[0]['#text'] as string;
+			const length = value.length;
+			end = start + length;
 
-			let resource = resourceMap.get(key)
+			let resource = resourceMap.get(key);
 
 			if (resource == null) {
 				const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
 					method: 'GET',
-				})
+				});
 				if (onlineStyle == null) {
-					notify('Failed to get resource by key', 'error')
-					return
+					notify('Failed to get resource by key', 'error');
+					return;
 				}
-				const onlineData = (await onlineStyle.json()) as ResourceDTO
-				const styleValue = JSON.parse(onlineData.style_value)
+				const onlineData = (await onlineStyle.json()) as ResourceDTO;
+				const styleValue = JSON.parse(onlineData.style_value);
 				resourceMap.set(key, {
 					...onlineData,
 					style_value: JSON.parse(styleValue.style_value),
-				})
-				resource = resourceMap.get(key)
+				});
+				resource = resourceMap.get(key);
 			}
-			const styleValue = resource?.style_value
+			const styleValue = resource?.style_value;
 
 			if (styleValue == null) {
-				notify('Failed to get resource by key', 'error')
-				return
+				notify('Failed to get resource by key', 'error');
+				return;
 			}
 			await setAllStyleRanges({
 				textNode: xNode,
@@ -444,41 +444,41 @@ export const onDownloadStyle = () => {
 					start,
 					end,
 				},
-			})
-			start = end
+			});
+			start = end;
 		}
-	})
-}
+	});
+};
 
 export const onSetStyle = () => {
 	on(SET_STYLE.REQUEST_KEY, async () => {
-		const xNode = figma.currentPage.selection[0]
-		const domainSetting = getDomainSetting()
+		const xNode = figma.currentPage.selection[0];
+		const domainSetting = getDomainSetting();
 
 		if (domainSetting == null) {
-			notify('Failed to get domain id', 'error')
-			return
+			notify('Failed to get domain id', 'error');
+			return;
 		}
 
 		if (xNode == null) {
-			notify('Failed to get node', 'error')
-			return
+			notify('Failed to get node', 'error');
+			return;
 		}
 		// originalLocalizeId 조회 또는 등록
 		// searchTranslationCode
 		if (xNode.type !== 'TEXT') {
-			notify('Failed to get node', 'error')
-			return
+			notify('Failed to get node', 'error');
+			return;
 		}
 		// setNodeData(xNode, {
 		// 	domainId: domainSetting.domainId.toString(),
 		// })
-		const result = await addTranslation(xNode)
+		const result = await addTranslation(xNode);
 		if (result == null) {
 			// notify('Failed to add translation', 'error')
-			return
+			return;
 		}
 
-		await reloadOriginalLocalizationName(xNode)
-	})
-}
+		await reloadOriginalLocalizationName(xNode);
+	});
+};

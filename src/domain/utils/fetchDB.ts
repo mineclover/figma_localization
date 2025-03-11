@@ -1,14 +1,14 @@
-import { baseURL } from '@/domain/constant'
+import { baseURL } from '@/domain/constant';
 
-import { paths } from 'types/i18n'
-import { getDomainSetting } from '../Setting/SettingModel'
+import { paths } from 'types/i18n';
+import { getDomainSetting } from '../Setting/SettingModel';
 
 export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) => {
-	const domainSetting = getDomainSetting()
+	const domainSetting = getDomainSetting();
 
 	if (!domainSetting) {
-		figma.notify('도메인 설정이 없습니다.')
-		return
+		figma.notify('도메인 설정이 없습니다.');
+		return;
 	}
 
 	return fetch(baseURL + url, {
@@ -17,8 +17,8 @@ export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) =>
 			'Content-Type': 'application/json',
 			'X-Domain-Id': domainSetting.domainId.toString(),
 		},
-	})
-}
+	});
+};
 
 export const clientFetchDBCurry =
 	(domainId: number) =>
@@ -29,5 +29,5 @@ export const clientFetchDBCurry =
 				'Content-Type': 'application/json',
 				'X-Domain-Id': domainId.toString(),
 			},
-		})
-	}
+		});
+	};

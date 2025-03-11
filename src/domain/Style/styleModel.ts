@@ -366,7 +366,7 @@ export const onDownloadStyle = () => {
 
 		// /** 클라에서 받는 로컬라이제이션 키 없을 때 */
 		const result = await getLocalizationKeyData(xNode, Date.now())
-		console.log('🚀 ~ on ~ result:', result)
+
 		if (result == null) {
 			notify('Failed to get localization key data', 'error')
 			return
@@ -374,8 +374,6 @@ export const onDownloadStyle = () => {
 		const originText = result.origin_value
 		// 키 아이디 82
 		const parsedData = parseXML(originText ?? '')
-		console.log('🚀 ~ on ~ parsedData:', parsedData)
-		console.log('🚀 ~ result2 ~ localizationKey:', localizationKey)
 		const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 			method: 'GET',
 		})
@@ -386,11 +384,9 @@ export const onDownloadStyle = () => {
 		}
 
 		const data = (await result2.json()) as ResourceDTO[]
-		console.log('🚀 ~ on ~ data:', data)
 
 		const resourceMap = new Map<string, ParsedResourceDTO>()
 		for (const item of data) {
-			console.log('🚀 ~ on ~ resourceMap item:', item)
 			resourceMap.set(item.resource_id.toString(), {
 				...item,
 				style_value: JSON.parse(item.style_value),
@@ -407,11 +403,8 @@ export const onDownloadStyle = () => {
 
 		let start = 0
 		let end = 0
-		console.log('🚀 ~ on ~ resourceMap:', resourceMap)
-		console.log('🚀 ~ on ~ parsedData:', parsedData)
-		for (const item of parsedData) {
-			console.log('🚀 ~ on ~ item:', item)
 
+		for (const item of parsedData) {
 			const key = Object.keys(item)[0]
 			const target = item[key]
 			const value = target[0]['#text'] as string

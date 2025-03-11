@@ -22,7 +22,6 @@ function SettingPage() {
 	const { data, loading, error, fetchData } = useFetch<components['schemas']['Domain'][]>()
 
 	const projectId = useSignal(projectIdSignal)
-	console.log('🚀 ~ SettingPage ~ projectId:', projectId)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const languageCodes = useSignal(languageCodesSignal)

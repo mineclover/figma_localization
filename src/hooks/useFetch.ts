@@ -71,7 +71,6 @@ export const useFetch = <T>() => {
 				setState(() => lastState)
 			}
 		} catch (error) {
-			console.log('🚀 ~ fetchData ~ error:', error)
 			try {
 				const errorDetails =
 					typeof error === 'object' ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error)

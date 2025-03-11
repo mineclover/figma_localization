@@ -281,8 +281,6 @@ export const onSetNodeIgnore = () => {
 		}
 		// originalLocalizeId 조회
 
-		console.log('🚀 ~ on ~  ignore: boolean; ids: string[]:', data)
-
 		for (const id of data.ids) {
 			const node = await figma.getNodeByIdAsync(id)
 			if (node) {

@@ -198,7 +198,6 @@ function LabelPage() {
 							body.isTemporary = localizationKeyValue.is_temporary
 						}
 
-						console.log('🚀 ~ LabelPage ~ body:', body)
 						emit(PUT_LOCALIZATION_KEY.REQUEST_KEY, currentPointer?.data.localizationKey, body)
 					}}
 				>

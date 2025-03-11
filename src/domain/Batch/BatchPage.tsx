@@ -75,7 +75,6 @@ const selectStyle = (selected: boolean) => {
 }
 
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
-	console.log('🚀 ~ SearchResult ~ ignore, name,:', ignore, name, ids)
 	const [isExtended, setIsExtended] = useState<boolean>(false)
 	const selectTarget = useSignal(selectTargetSignal)
 
@@ -363,17 +362,15 @@ const selectTargetSignal = signal<CurrentNode | null>(null)
  */
 function BatchPage() {
 	const section = useSignal(currentSectionSignal)
-	console.log('🚀 ~ BatchPage ~ section:', section)
+
 	const selectIds = useSignal(selectIdsSignal)
-	console.log('🚀 ~ BatchPage ~ selectIds:', selectIds)
+
 	const domainSetting = useSignal(domainSettingSignal)
-	console.log('🚀 ~ BatchPage ~ domainSetting:', domainSetting)
 
 	const currentPointer = useSignal(currentPointerSignal)
-	console.log('🚀 ~ BatchPage ~ currentPointer:', currentPointer)
 
 	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch()
-	console.log('🚀 ~ BatchPage ~ selectedKeyData:', selectedKeyData)
+
 	const hasSelectedKey = typeof selectedKeyData === 'object'
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
@@ -425,7 +422,6 @@ function BatchPage() {
 	/** 피그마 텍스트 스캔 데이터 */
 	const patternMatchData = useSignal(patternMatchDataSignal)
 
-	// console.log('🚀 ~ BatchPage ~ patternMatchData:', patternMatchData)
 	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption)
 
 	const patternMatchDataGroup = dataTemp.filter((item) => {
@@ -445,13 +441,10 @@ function BatchPage() {
 
 		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
 	})
-	console.log('🚀 ~ patternMatchDataGroup ~ patternMatchDataGroup:', patternMatchDataGroup)
 
 	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id))
-	console.log('🚀 ~ missingLink:', missingLink)
 
 	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>()
-	console.log('🚀 ~ hasMessage:', hasMessage)
 
 	// const textList = Array.from(matchDataSet.values()).sort()
 
@@ -496,8 +489,6 @@ function BatchPage() {
 
 	useEffect(() => {
 		if (hasMessage && loading === false) {
-			console.log('🚀 ~ useEffect ~ data:', data)
-			console.log('🚀 ~ useEffect ~ error:', error)
 			if (data) {
 				modalAlert('"' + data.name + '" 으로 추가 완료')
 			} else if (error) {

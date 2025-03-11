@@ -132,8 +132,6 @@ export const changeLocalizationCode = async (sectionNode: SectionNode, code: str
 		const a = await searchTranslationCode(key, code)
 
 		if (a) {
-			console.log('🚀 ~ changeLocalizationCode ~ a:', a)
-
 			for (const node of targetNode) {
 				await textFontLoad(node)
 				node.characters = a.text

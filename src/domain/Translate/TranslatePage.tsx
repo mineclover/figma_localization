@@ -102,7 +102,6 @@ const TranslatePage = () => {
 	const { data, loading, error, fetchData } = useFetch<LocalizationTranslationDTO[]>()
 
 	const [translations, setTranslations] = useState<Record<string, LocalizationTranslation>>({})
-	console.log('🚀 ~ TranslatePage ~ translations:', translations)
 
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal)

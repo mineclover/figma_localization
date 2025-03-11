@@ -106,7 +106,6 @@ export type LocalizationKey = {
 export const localizationKeySignal = signal<LocalizationKey | null>(null)
 
 export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey => {
-	console.log('🚀 ~ localizationKeyMapping ~ dto:', dto)
 	return {
 		key_id: dto.key_id,
 		domain_id: dto.domain_id,
@@ -442,7 +441,6 @@ export const addTranslation = async (node: TextNode) => {
 	const boundVariables2 = createStyleSegments(node.characters, boundVariables)
 	const allStyleGroups = groupAllSegmentsByStyle(node.characters, segments, boundVariables2)
 	const exportStyleGroups = allStyleGroups.exportStyleGroups
-	console.log('🚀 ~ addTranslation ~ exportStyleGroups:', exportStyleGroups)
 
 	const styleStore: Record<string, StyleSync> = {}
 
@@ -476,7 +474,6 @@ export const addTranslation = async (node: TextNode) => {
 	}
 
 	const xmlString = generateXmlString(Object.values(styleStore), 'id')
-	console.log('🚀 ~ addTranslation ~ xmlString:', xmlString)
 
 	const result = await fetchDB('/localization/translations', {
 		method: 'PUT',
@@ -504,7 +501,6 @@ export const addTranslation = async (node: TextNode) => {
 			continue
 		}
 		const data = (await result.json()) as LocalizationTranslationDTO
-		console.log('🚀 ~ addTranslation ~ data:', data)
 	}
 
 	if (!result) {
@@ -512,7 +508,6 @@ export const addTranslation = async (node: TextNode) => {
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO
-	console.log('🚀 ~ addTranslation ~ data:', data)
 
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString())
@@ -738,7 +733,6 @@ export const onUpdateNodeStoreBatchKey = () => {
 		if (!translations || translations.length === 0) {
 			return
 		}
-		console.log('🚀 ~ on ~ translations:', translations)
 
 		const translation = translations[0]
 		if (!translation) {

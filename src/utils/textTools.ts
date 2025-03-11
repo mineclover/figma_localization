@@ -96,7 +96,6 @@ export const keyConventionRegex = (text: string) => {
 }
 
 export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
-	console.log('🚀 ~ generateXmlString ~ styles:', styles)
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleHashSegment> = []
 

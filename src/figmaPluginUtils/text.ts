@@ -34,16 +34,13 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 
 	while (start < length) {
 		const initialStyle = getRangeMethod.call(textNode, start, end)
-		console.log('🚀 ~ initialStyle:', initialStyle)
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
-			// console.log('🚀 ~ 탐색:', start, end)
 			const currentStyle = getRangeMethod.call(textNode, start, end)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
 			if (currentStyle === figma.mixed) {
-				// console.log('🚀 ~ 종료  :', start, end, currentStyle)
 				end = end - 1
 				break
 			}
@@ -85,12 +82,10 @@ function getBoundVariableStyleRanges<T>(
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
-			// console.log('🚀 ~ 탐색:', start, end)
 			const currentStyle = getRangeMethod.call(textNode, start, end, field)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
 			if (currentStyle == figma.mixed) {
-				// console.log('🚀 ~ 종료  :', start, end, currentStyle)
 				end = end - 1
 				break
 			}
@@ -337,7 +332,7 @@ const targetVariableBindableFields = [
 
 function getBoundVariablesRanges(textNode: TextNode): any {
 	const keys = Object.keys(textNode.boundVariables as Record<string, string>)
-	console.log('🚀 ~ getBoundVariablesRanges ~ keys:', keys)
+
 	const values = {} as Record<
 		string,
 		ValidStyleRange<{
@@ -447,8 +442,6 @@ export const setAllStyleRanges = async ({
 		end: number
 	}
 }) => {
-	console.log('🚀 ~ textNode,styleData,boundVariables,range,:', textNode, styleData, boundVariables, range)
-
 	// const functionMapSample = {
 	// 	fontSize: textNode.setRangeFontSize,
 	// 	fontName: textNode.setRangeFontName,
@@ -490,17 +483,13 @@ export const setAllStyleRanges = async ({
 		try {
 			const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function
 			if (setRange) {
-				console.log('🚀 ~ range.start, range.end, style:', key, range.start, range.end, style)
 				textNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never)
 			}
 		} catch (error) {
-			console.log('🚀 ~ error:', error, textNode)
 			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode
 			if (targetNode) {
-				console.log('🚀 ~ targetNode:', targetNode)
 				const setRange = targetNode[functionMap[key as keyof typeof functionMap]] as Function
 				if (setRange) {
-					console.log('🚀 ~ 2차 시도 range.start, range.end, style:', key, range.start, range.end, style)
 					targetNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never)
 				}
 			}
@@ -528,8 +517,6 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 		// 나중에는 분리해서 스타일 호출 순서를 지정하고 관리해야하는데 일단 지금은 range를 유효하게 뽑는게 중요하므로 생략함
 		fillStyleId: getFillStyleIdRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
-
-		//
 	}
 
 	const styleIds = {

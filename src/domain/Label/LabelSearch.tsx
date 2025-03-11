@@ -131,12 +131,11 @@ export const useSearch = () => {
 	const selectedKeyData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'))
 
 	useEffect(() => {
-		console.log('🚀 ~ useEffect ~ loading:', loading)
 		if (loading) {
 			return
 		}
 		const domainId = domainSetting?.domainId
-		console.log('🚀 ~ useEffect ~ domainId:', domainId)
+
 		if (!domainId) {
 			return
 		}
@@ -173,7 +172,6 @@ function LabelSearch() {
 	// 즉시 적용 기능
 	useEffect(() => {
 		if (isBatch && selectedKey && currentPointer) {
-			console.log('🚀 ~ useEffect ~ currentPointer:', currentPointer)
 			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
 		}
 	}, [currentPointer?.nodeId])

@@ -171,7 +171,6 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 	)
 }
 export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
-	console.log('🚀 ~ generateXmlString ~ styles:', styles)
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleHashSegment> = []
 
@@ -246,7 +245,8 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 		// XML 형식의 문자열 생성 함수
 
 		// 함수 실행하여 XML 생성
-		if (text && styleValues.value.length > 0) {
+
+		if (typeof text === 'string' && styleValues.value.length > 0) {
 			const xmlString = generateXmlString(styleValues.value, styleTagMode)
 
 			setXml(xmlString)
@@ -275,7 +275,6 @@ const StylePage = () => {
 	const languageCodes = useSignal(languageCodesSignal)
 	const currentPointer = useSignal(currentPointerSignal)
 	const styleTagMode = useSignal(styleTagModeSignal)
-	console.log('🚀 ~ TranslatePage ~ currentPointer:', currentPointer)
 
 	const domainSetting = useSignal(domainSettingSignal)
 	const localizationKeyValue = useSignal(localizationKeySignal)
@@ -314,7 +313,6 @@ const StylePage = () => {
 						const resultData = await result.json()
 
 						if (resultData) {
-							console.log('🚀 ~ onClick={ ~ resultData:', resultData)
 							emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
 								domainId: resultData.domain_id,
 								keyId: resultData.key_id,

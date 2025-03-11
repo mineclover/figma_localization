@@ -1,78 +1,78 @@
-import { on, once, showUI } from '@create-figma-plugin/utilities'
-import { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
+import { on, once, showUI } from '@create-figma-plugin/utilities';
+import { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types';
 
-import { nodeZoom_Adapter, pageNodeZoom_Adapter, pageSelectIds_Adapter } from '@/figmaPluginUtils/utilAdapter'
+import { nodeZoom_Adapter, pageNodeZoom_Adapter, pageSelectIds_Adapter } from '@/figmaPluginUtils/utilAdapter';
 import {
 	onGetDomainSetting,
 	onGetLanguageCodes,
 	onSetDomainSetting,
 	onSetLanguageCodes,
-} from '@/domain/Setting/SettingModel'
-import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel'
+} from '@/domain/Setting/SettingModel';
+import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel';
+import { onGetLocalizationKeyData } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
 import {
-	onGetKeyTranslations,
-	onGetLocalizationKeyData,
 	onNodeReload,
 	onPutLocalizationKey,
 	onSetNodeResetKey,
 	onTargetSetNodeLocation,
 	onUpdateNodeStoreBatchKey,
-} from '@/domain/Label/TextPluginDataModel'
-import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel'
+} from '@/domain/Label/TextPluginDataModel';
+import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel';
 import {
 	onPatternMatch,
 	onSetNodeIgnore,
 	onSetNodeLocalizationKeyBatch,
 	onUpdateNodeLocalizationKeyBatch,
-} from '@/domain/Batch/batchModel'
-import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel'
+} from '@/domain/Batch/batchModel';
+import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel';
+import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 
 export default function () {
 	// 세팅
-	onSetProjectId()
-	onGetProjectId()
+	onSetProjectId();
+	onGetProjectId();
 
-	onGetDomainSetting()
-	onSetDomainSetting()
-	onGetLanguageCodes()
-	onSetLanguageCodes()
-	onGetCursorPosition()
+	onGetDomainSetting();
+	onSetDomainSetting();
+	onGetLanguageCodes();
+	onSetLanguageCodes();
+	onGetCursorPosition();
 	// 플러그인 데이터 세팅
 
-	onTargetSetNodeLocation()
-	onNodeReload()
-	onSetNodeResetKey()
-	onGetKeyTranslations()
-	onGetLocalizationKeyData()
-	onPutLocalizationKey()
+	onTargetSetNodeLocation();
+	onNodeReload();
+	onSetNodeResetKey();
+	onGetKeyTranslations();
+	onGetLocalizationKeyData();
+	onPutLocalizationKey();
 
-	onSetLanguageCode()
-	onPatternMatch()
-	onSetNodeLocalizationKeyBatch()
-	onUpdateNodeStoreBatchKey()
-	onUpdateNodeLocalizationKeyBatch()
-	onSetNodeIgnore()
-	onSetStyle()
-	onDownloadStyle()
+	onSetLanguageCode();
+	onPatternMatch();
+	onSetNodeLocalizationKeyBatch();
+	onUpdateNodeStoreBatchKey();
+	onUpdateNodeLocalizationKeyBatch();
+	onSetNodeIgnore();
+	onSetStyle();
+	onDownloadStyle();
 	// 유틸
-	onNodeSelectionChange()
-	nodeZoom_Adapter()
-	pageNodeZoom_Adapter()
-	pageSelectIds_Adapter()
-	onCurrentSectionSelected()
+	onNodeSelectionChange();
+	nodeZoom_Adapter();
+	pageNodeZoom_Adapter();
+	pageSelectIds_Adapter();
+	onCurrentSectionSelected();
 
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
-		const { width, height } = windowSize
-		figma.ui.resize(width, height)
-	})
+		const { width, height } = windowSize;
+		figma.ui.resize(width, height);
+	});
 
 	once<CloseHandler>('CLOSE', function () {
-		figma.closePlugin()
-	})
+		figma.closePlugin();
+	});
 	showUI({
 		height: 500,
 		width: 330,
-	})
+	});
 }

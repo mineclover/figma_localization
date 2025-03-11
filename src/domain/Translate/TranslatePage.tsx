@@ -1,39 +1,41 @@
-import { modalAlert } from '@/components/alert'
-import { addLayer } from '@/components/modal/Modal'
-import { useFetch } from '@/hooks/useFetch'
-import { ComponentChildren, Fragment, h } from 'preact'
-import { useEffect, useMemo, useState } from 'preact/hooks'
-import { components } from 'types/i18n'
-import {
-	domainSettingSignal,
-	languageCodesSignal,
-	onGetDomainSettingResponse,
-	onGetLanguageCodesResponse,
-} from '../Setting/SettingModel'
+import { modalAlert } from '@/components/alert';
+import { addLayer } from '@/components/modal/Modal';
+import { useFetch } from '@/hooks/useFetch';
+import { ComponentChildren, Fragment, h } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
+import { components } from 'types/i18n';
+import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from '../Setting/SettingModel';
+import { languageCodesSignal } from '@/model/signal';
+import { domainSettingSignal } from '@/model/signal';
 
-import { useSignal } from '@/hooks/useSignal'
-import { Bold, Button, Container, Stack, Text, Textbox, TextboxMultiline, VerticalSpace } from '@create-figma-plugin/ui'
+import { useSignal } from '@/hooks/useSignal';
+import {
+	Bold,
+	Button,
+	Container,
+	Stack,
+	Text,
+	Textbox,
+	TextboxMultiline,
+	VerticalSpace,
+} from '@create-figma-plugin/ui';
 
-import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant'
-import { emit } from '@create-figma-plugin/utilities'
+import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant';
+import { emit } from '@create-figma-plugin/utilities';
+import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
+import { projectIdSignal } from '@/model/signal';
+import { currentPointerSignal } from '@/model/signal';
 import {
-	currentPointerSignal,
-	onGetCursorPositionResponse,
-	onSetProjectIdResponse,
-	projectIdSignal,
-} from '../Label/LabelModel'
-import {
-	localizationKeySignal,
 	LocalizationTranslation,
 	LocalizationTranslationDTO,
 	localizationTranslationMapping,
-	onGetLocalizationKeyResponse,
-} from '../Label/TextPluginDataModel'
-import styles from './translate.module.css'
-import { clientFetchDBCurry } from '../utils/fetchDB'
-import { NullDisableText } from '../Label/LabelSearch'
-import { clc } from '@/components/modal/utils'
-import { currentSectionSignal } from './TranslateModel'
+} from '../Label/TextPluginDataModel';
+import styles from './translate.module.css';
+import { clientFetchDBCurry } from '../utils/fetchDB';
+import { NullDisableText } from '../Label/LabelSearch';
+import { clc } from '@/components/modal/utils';
+import { currentSectionSignal } from '@/model/signal';
+import { localizationKeySignal } from '@/model/signal';
 // 있든 없든 수정 가능하게 구성
 
 const TranslateItem = ({
@@ -47,19 +49,19 @@ const TranslateItem = ({
 	updateAction,
 	selectedId,
 }: LocalizationTranslation & {
-	domainId: number
-	updateAction: () => Promise<any> | undefined
-	selectedId: string | undefined
+	domainId: number;
+	updateAction: () => Promise<any> | undefined;
+	selectedId: string | undefined;
 }) => {
-	const [translation, setTranslation] = useState(text)
+	const [translation, setTranslation] = useState(text);
 
 	useEffect(() => {
-		setTranslation(text)
-	}, [text])
+		setTranslation(text);
+	}, [text]);
 
-	const clientFetchDB = clientFetchDBCurry(domainId)
+	const clientFetchDB = clientFetchDBCurry(domainId);
 
-	const isSelect = localization_id != null && selectedId === localization_id.toString()
+	const isSelect = localization_id != null && selectedId === localization_id.toString();
 
 	return (
 		<div className={clc(styles.translateItem, isSelect && styles.translateBorder)}>
@@ -72,8 +74,8 @@ const TranslateItem = ({
 				value={translation}
 				rows={2}
 				onChange={(e) => {
-					const nextText = e.currentTarget.value.replace(/\n/g, '<br/>')
-					setTranslation(nextText)
+					const nextText = e.currentTarget.value.replace(/\n/g, '<br/>');
+					setTranslation(nextText);
 				}}
 			/>
 			<button
@@ -86,69 +88,69 @@ const TranslateItem = ({
 							language: language_code,
 							translation: translation,
 						}),
-					})
-					emit(RELOAD_NODE.REQUEST_KEY)
-					updateAction()
+					});
+					emit(RELOAD_NODE.REQUEST_KEY);
+					updateAction();
 				}}
 			>
 				<Text className={styles.smallText}>no. {version ?? 'NaN'}</Text>
 				<Bold>Save</Bold>
 			</button>
 		</div>
-	)
-}
+	);
+};
 
 const TranslatePage = () => {
-	const { data, loading, error, fetchData } = useFetch<LocalizationTranslationDTO[]>()
+	const { data, loading, error, fetchData } = useFetch<LocalizationTranslationDTO[]>();
 
-	const [translations, setTranslations] = useState<Record<string, LocalizationTranslation>>({})
+	const [translations, setTranslations] = useState<Record<string, LocalizationTranslation>>({});
 
 	/** 도메인에 설정된 리스트 */
-	const languageCodes = useSignal(languageCodesSignal)
+	const languageCodes = useSignal(languageCodesSignal);
 
-	const currentPointer = useSignal(currentPointerSignal)
-	const currentSection = useSignal(currentSectionSignal)
+	const currentPointer = useSignal(currentPointerSignal);
+	const currentSection = useSignal(currentSectionSignal);
 
-	const domainSetting = useSignal(domainSettingSignal)
-	const localizationKeyValue = useSignal(localizationKeySignal)
-	const targetArray = ['origin', ...languageCodes]
+	const domainSetting = useSignal(domainSettingSignal);
+	const localizationKeyValue = useSignal(localizationKeySignal);
+	const targetArray = ['origin', ...languageCodes];
 
 	const updateAction = () => {
-		const keyId = localizationKeyValue?.key_id
+		const keyId = localizationKeyValue?.key_id;
 		if (!keyId) {
-			return
+			return;
 		}
 		return fetchData(('/localization/keys/' + keyId + '/translations') as '/localization/keys/{id}/translations', {
 			method: 'GET',
-		})
-	}
+		});
+	};
 
 	useEffect(() => {
 		if (!data) {
-			return
+			return;
 		}
 
-		const newTranslations = {} as Record<string, LocalizationTranslation>
+		const newTranslations = {} as Record<string, LocalizationTranslation>;
 
 		data.forEach((item) => {
 			if (targetArray.includes(item.language_code)) {
-				const data = localizationTranslationMapping(item)
-				newTranslations[item.language_code] = data
+				const data = localizationTranslationMapping(item);
+				newTranslations[item.language_code] = data;
 			}
-		})
+		});
 
-		setTranslations(newTranslations)
-	}, [data])
+		setTranslations(newTranslations);
+	}, [data]);
 
 	useEffect(() => {
 		if (localizationKeyValue?.key_id == null) {
-			return
+			return;
 		}
-		updateAction()
-	}, [localizationKeyValue?.key_id])
+		updateAction();
+	}, [localizationKeyValue?.key_id]);
 
 	if (domainSetting == null) {
-		return <Bold>도메인 설정이 없습니다</Bold>
+		return <Bold>도메인 설정이 없습니다</Bold>;
 	}
 
 	if (localizationKeyValue?.key_id == null && currentSection != null) {
@@ -158,18 +160,18 @@ const TranslatePage = () => {
 					return (
 						<Button
 							onClick={() => {
-								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item)
+								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item);
 							}}
 						>
 							{item}
 						</Button>
-					)
+					);
 				})}
 			</div>
-		)
+		);
 	}
 	if (localizationKeyValue?.key_id == null) {
-		return <Bold>선택된 대상이 없습니다</Bold>
+		return <Bold>선택된 대상이 없습니다</Bold>;
 	}
 
 	return (
@@ -179,12 +181,12 @@ const TranslatePage = () => {
 					return (
 						<Button
 							onClick={() => {
-								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item)
+								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item);
 							}}
 						>
 							{item}
 						</Button>
-					)
+					);
 				})}
 			</div>
 			<VerticalSpace space="extraSmall" />
@@ -207,10 +209,10 @@ const TranslatePage = () => {
 							updateAction={updateAction}
 							selectedId={currentPointer?.data.originalLocalizeId}
 						/>
-					)
+					);
 				})}
 			</div>
 		</div>
-	)
-}
-export default TranslatePage
+	);
+};
+export default TranslatePage;

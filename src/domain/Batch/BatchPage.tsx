@@ -1,7 +1,8 @@
-import { useSignal } from '@/hooks/useSignal'
-import { Fragment, h } from 'preact'
-import { CurrentNode, currentSectionSignal } from '../Translate/TranslateModel'
-import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useState } from 'preact/hooks'
+import { useSignal } from '@/hooks/useSignal';
+import { Fragment, h } from 'preact';
+import { CurrentNode } from '../Translate/TranslateModel';
+import { currentSectionSignal } from '@/model/signal';
+import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import {
 	Bold,
 	Button,
@@ -28,58 +29,56 @@ import {
 	Textbox,
 	Toggle,
 	VerticalSpace,
-} from '@create-figma-plugin/ui'
-import { emit } from '@create-figma-plugin/utilities'
+} from '@create-figma-plugin/ui';
+import { emit } from '@create-figma-plugin/utilities';
 import {
 	GET_LOCALIZATION_KEY_VALUE,
 	GET_PATTERN_MATCH_KEY,
 	SET_NODE_IGNORE,
 	SET_NODE_LOCALIZATION_KEY_BATCH,
 	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
-} from '../constant'
+} from '../constant';
 import {
 	groupByPattern,
 	GroupOption,
 	onPatternMatchResponse,
 	PatternMatchData,
-	patternMatchDataSignal,
 	SearchNodeData,
 	ViewOption,
-} from './batchModel'
-import styles from './batch.module.css'
-import { clc } from '@/components/modal/utils'
-import { signal } from '@preact/signals-core'
-import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
-import { clientFetchDBCurry } from '../utils/fetchDB'
-import { domainSettingSignal } from '../Setting/SettingModel'
-import { useFetch } from '@/hooks/useFetch'
-import { modalAlert } from '@/components/alert'
-import { LocalizationKeyDTO } from '../Label/TextPluginDataModel'
-import { SearchArea, selectedKeySignal, useSearch } from '../Label/LabelSearch'
-import { NonNullableComponentTypeExtract } from 'types/utilType'
-import { keyConventionRegex } from '@/utils/textTools'
-import { currentPointerSignal } from '../Label/LabelModel'
-
-const selectIdsSignal = signal<string[]>([])
+} from './batchModel';
+import { patternMatchDataSignal, selectIdsSignal, selectTargetSignal } from '@/model/signal';
+import styles from './batch.module.css';
+import { clc } from '@/components/modal/utils';
+import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
+import { clientFetchDBCurry } from '../utils/fetchDB';
+import { domainSettingSignal } from '@/model/signal';
+import { useFetch } from '@/hooks/useFetch';
+import { modalAlert } from '@/components/alert';
+import { LocalizationKeyDTO } from '../Label/TextPluginDataModel';
+import { SearchArea, useSearch } from '../Label/LabelSearch';
+import { selectedKeySignal } from '@/model/signal';
+import { NonNullableComponentTypeExtract } from 'types/utilType';
+import { keyConventionRegex } from '@/utils/textTools';
+import { currentPointerSignal } from '@/model/signal';
 
 const selectStyle = (selected: boolean) => {
 	if (selected) {
 		return {
 			secondary: false,
-		}
+		};
 	}
 
 	return {
 		secondary: true,
-	}
-}
+	};
+};
 
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
-	const [isExtended, setIsExtended] = useState<boolean>(false)
-	const selectTarget = useSignal(selectTargetSignal)
+	const [isExtended, setIsExtended] = useState<boolean>(false);
+	const selectTarget = useSignal(selectTargetSignal);
 
-	const selectIds = useSignal(selectIdsSignal)
-	const hasAnyId = ids.some((id) => selectIds.includes(id))
+	const selectIds = useSignal(selectIdsSignal);
+	const hasAnyId = ids.some((id) => selectIds.includes(id));
 	return (
 		<div className={clc(styles.container, hasAnyId && styles.containerSelected)}>
 			<div className={styles.column}>
@@ -89,8 +88,8 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							emit(SET_NODE_IGNORE.REQUEST_KEY, {
 								ignore: !ignore,
 								ids: ids,
-							})
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
+							});
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
 						}}
 					>
 						{ignore ? <IconVisibilityHidden16 /> : <IconVisibilityVisible16 />}
@@ -101,15 +100,15 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 
 					<IconButton
 						onClick={() => {
-							setIsExtended(true)
+							setIsExtended(true);
 							// ids 리스트 중 하나라도 현재 선택된 리스트에 있는지 확인
 
 							if (hasAnyId) {
 								// 하나라도 있으면 해당 ids 리스트의 모든 항목 제거
-								selectIdsSignal.value = selectIds.filter((id) => !ids.includes(id))
+								selectIdsSignal.value = selectIds.filter((id) => !ids.includes(id));
 							} else {
 								// 하나도 없으면 모든 항목 추가
-								selectIdsSignal.value = [...selectIds, ...ids]
+								selectIdsSignal.value = [...selectIds, ...ids];
 							}
 						}}
 					>
@@ -122,7 +121,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 					</Bold>
 					<IconButton
 						onClick={() => {
-							setIsExtended(!isExtended)
+							setIsExtended(!isExtended);
 						}}
 					>
 						{isExtended ? <IconChevronUp16 /> : <IconChevronDown16 />}
@@ -133,8 +132,8 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 				<button
 					className={styles.button}
 					onClick={() => {
-						selectIdsSignal.value = ids
-						emit('PAGE_SELECT_IDS', { ids })
+						selectIdsSignal.value = ids;
+						emit('PAGE_SELECT_IDS', { ids });
 					}}
 				>
 					{parentName} / {name}
@@ -142,35 +141,35 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 
 				<div className={styles.wrap}>
 					{ids.map((item) => {
-						const selected = selectIds.includes(item)
+						const selected = selectIds.includes(item);
 
 						return (
 							<Button
 								{...selectStyle(selected)}
 								onClick={() => {
-									pageNodeZoomAction(item)
+									pageNodeZoomAction(item);
 								}}
 								onContextMenu={(e) => {
-									e.preventDefault() // 기본 우클릭 메뉴 방지
+									e.preventDefault(); // 기본 우클릭 메뉴 방지
 									// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
 									if (selectIds.includes(item)) {
-										selectIdsSignal.value = selectIds.filter((id) => id !== item)
+										selectIdsSignal.value = selectIds.filter((id) => id !== item);
 									} else {
-										selectIdsSignal.value = [...selectIds, item]
+										selectIdsSignal.value = [...selectIds, item];
 									}
 								}}
 							>
 								{item}
 							</Button>
-						)
+						);
 					})}
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name'
+type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name';
 
 const optionAlias = {
 	text: '텍스트',
@@ -181,7 +180,7 @@ const optionAlias = {
 	notIgnore: '표시 대상',
 	hasLocalizationKey: '키 값 있음',
 	notHasLocalizationKey: '키 값 없음',
-}
+};
 
 // SearchSection 컴포넌트를 별도로 분리
 const SearchSection = ({
@@ -203,28 +202,28 @@ const SearchSection = ({
 	patternMatchDataGroup,
 	filteredDataLength,
 }: {
-	searchOption: SearchOption
-	setSearchOption: Dispatch<StateUpdater<SearchOption>>
-	searchValue: string
-	setSearchValue: Dispatch<StateUpdater<string>>
-	openOption: boolean
-	setOpenOption: Dispatch<StateUpdater<boolean>>
-	selectMode: boolean
-	setSelectMode: Dispatch<StateUpdater<boolean>>
+	searchOption: SearchOption;
+	setSearchOption: Dispatch<StateUpdater<SearchOption>>;
+	searchValue: string;
+	setSearchValue: Dispatch<StateUpdater<string>>;
+	openOption: boolean;
+	setOpenOption: Dispatch<StateUpdater<boolean>>;
+	selectMode: boolean;
+	setSelectMode: Dispatch<StateUpdater<boolean>>;
 
-	groupOption: GroupOption
-	setGroupOption: Dispatch<StateUpdater<GroupOption>>
-	viewOption: ViewOption
-	setViewOption: Dispatch<StateUpdater<ViewOption>>
-	allView: boolean
-	setAllView: Dispatch<StateUpdater<boolean>>
-	patternMatchDataGroup: PatternMatchData[]
-	filteredDataLength: number
+	groupOption: GroupOption;
+	setGroupOption: Dispatch<StateUpdater<GroupOption>>;
+	viewOption: ViewOption;
+	setViewOption: Dispatch<StateUpdater<ViewOption>>;
+	allView: boolean;
+	setAllView: Dispatch<StateUpdater<boolean>>;
+	patternMatchDataGroup: PatternMatchData[];
+	filteredDataLength: number;
 }) => {
-	const selectTarget = useSignal(selectTargetSignal)
+	const selectTarget = useSignal(selectTargetSignal);
 	const setSelectTarget = (target: CurrentNode | null) => {
-		selectTargetSignal.value = target
-	}
+		selectTargetSignal.value = target;
+	};
 
 	return (
 		<Fragment>
@@ -232,7 +231,7 @@ const SearchSection = ({
 				<div className={styles.row}>
 					<Dropdown
 						onChange={(e) => {
-							setSearchOption(e.currentTarget.value as SearchOption)
+							setSearchOption(e.currentTarget.value as SearchOption);
 						}}
 						options={[
 							{ text: 'text', value: 'text' },
@@ -245,7 +244,7 @@ const SearchSection = ({
 
 					<SearchTextbox
 						onInput={(e) => {
-							setSearchValue(e.currentTarget.value)
+							setSearchValue(e.currentTarget.value);
 						}}
 						placeholder="검색..."
 						value={searchValue}
@@ -253,7 +252,7 @@ const SearchSection = ({
 					<IconToggleButton
 						value={openOption}
 						onClick={() => {
-							setOpenOption(!openOption)
+							setOpenOption(!openOption);
 						}}
 					>
 						<IconAdjust32></IconAdjust32>
@@ -263,7 +262,7 @@ const SearchSection = ({
 					<IconToggleButton
 						value={selectMode}
 						onClick={() => {
-							setSelectMode(true)
+							setSelectMode(true);
 						}}
 					>
 						<IconTarget16 />
@@ -272,7 +271,7 @@ const SearchSection = ({
 						className={styles.textButton}
 						onClick={() => {
 							if (selectTarget?.id) {
-								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id })
+								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id });
 							}
 						}}
 					>
@@ -280,15 +279,15 @@ const SearchSection = ({
 					</button>
 					<IconButton
 						onClick={() => {
-							setSelectTarget(null)
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY)
+							setSelectTarget(null);
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 						}}
 					>
 						<IconCross32 />
 					</IconButton>
 					<IconButton
 						onClick={() => {
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id)
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
 						}}
 					>
 						<IconSwap32 />
@@ -299,23 +298,23 @@ const SearchSection = ({
 						<div className={styles.miniColumn}>
 							<Bold>그룹 기준</Bold>
 							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
-								const value = groupOption[key]
+								const value = groupOption[key];
 								return (
 									<Toggle value={value} onClick={() => setGroupOption((prev) => ({ ...prev, [key]: !value }))}>
 										{key}
 									</Toggle>
-								)
+								);
 							})}
 						</div>
 						<div className={styles.miniColumn}>
 							<Bold>보여줄 옵션</Bold>
 							{(Object.keys(viewOption) as Array<keyof ViewOption>).map((key) => {
-								const value = viewOption[key]
+								const value = viewOption[key];
 								return (
 									<Toggle value={value} onClick={() => setViewOption((prev) => ({ ...prev, [key]: !value }))}>
 										{optionAlias[key]}
 									</Toggle>
-								)
+								);
 							})}
 						</div>
 					</div>
@@ -338,14 +337,12 @@ const SearchSection = ({
 				{patternMatchDataGroup
 					.sort((a, b) => a.text.localeCompare(b.text))
 					.map((item) => {
-						return <SearchResult {...item} />
+						return <SearchResult {...item} />;
 					})}
 			</div>
 		</Fragment>
-	)
-}
-
-const selectTargetSignal = signal<CurrentNode | null>(null)
+	);
+};
 
 /**
  * 그루핑 할때는 아이디를 하위 값으로 두고 속성을 위로 올린다
@@ -361,28 +358,28 @@ const selectTargetSignal = signal<CurrentNode | null>(null)
  * 업데이트 > 노드 아이디로 키 추가
  */
 function BatchPage() {
-	const section = useSignal(currentSectionSignal)
+	const section = useSignal(currentSectionSignal);
 
-	const selectIds = useSignal(selectIdsSignal)
+	const selectIds = useSignal(selectIdsSignal);
 
-	const domainSetting = useSignal(domainSettingSignal)
+	const domainSetting = useSignal(domainSettingSignal);
 
-	const currentPointer = useSignal(currentPointerSignal)
+	const currentPointer = useSignal(currentPointerSignal);
 
-	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch()
+	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
 
-	const hasSelectedKey = typeof selectedKeyData === 'object'
+	const hasSelectedKey = typeof selectedKeyData === 'object';
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
-	const [selectMode, setSelectMode] = useState<boolean>(false)
+	const [selectMode, setSelectMode] = useState<boolean>(false);
 	/** 선택 목표 섹션 */
 
 	const setSelectTarget = (target: CurrentNode | null) => {
-		selectTargetSignal.value = target
-	}
+		selectTargetSignal.value = target;
+	};
 
 	/** 숨김 대상을 포함할 것인가 */
-	const [allView, setAllView] = useState<boolean>(true)
+	const [allView, setAllView] = useState<boolean>(true);
 
 	/** 그루핑 옵션 */
 	const [groupOption, setGroupOption] = useState<GroupOption>({
@@ -394,7 +391,7 @@ function BatchPage() {
 		name: true,
 		/** 텍스트를 그루핑 파라미터로 사용 */
 		text: true,
-	})
+	});
 	/** 보여줄 옵션 */
 	const [viewOption, setViewOption] = useState<ViewOption>({
 		/** 숨김 대상을 표시 */
@@ -405,24 +402,24 @@ function BatchPage() {
 		hasLocalizationKey: false,
 		/** 키 값이 없는 대상을 표시 */
 		notHasLocalizationKey: true,
-	})
+	});
 
 	/** 입력한 키 값 */
-	const [localizationKey, setLocalizationKey] = useState<string>('')
+	const [localizationKey, setLocalizationKey] = useState<string>('');
 
 	/** 옵션 열기 */
-	const [openOption, setOpenOption] = useState<boolean>(false)
+	const [openOption, setOpenOption] = useState<boolean>(false);
 
 	/** 검색 값 */
-	const [searchValue, setSearchValue] = useState<string>('')
+	const [searchValue, setSearchValue] = useState<string>('');
 
 	/** 검색 옵션 */
-	const [searchOption, setSearchOption] = useState<SearchOption>('text')
+	const [searchOption, setSearchOption] = useState<SearchOption>('text');
 
 	/** 피그마 텍스트 스캔 데이터 */
-	const patternMatchData = useSignal(patternMatchDataSignal)
+	const patternMatchData = useSignal(patternMatchDataSignal);
 
-	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption)
+	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption);
 
 	const patternMatchDataGroup = dataTemp.filter((item) => {
 		{
@@ -430,32 +427,32 @@ function BatchPage() {
 		}
 		if (!allView) {
 			if (item.ids.some((id) => selectIds.includes(id))) {
-				return true
+				return true;
 			} else {
-				return false
+				return false;
 			}
 		}
 		if (searchValue === '') {
-			return true
+			return true;
 		}
 
-		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
-	})
+		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase());
+	});
 
-	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id))
+	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id));
 
-	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>()
+	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>();
 
 	// const textList = Array.from(matchDataSet.values()).sort()
 
-	const [tabValue, setTabValue] = useState<string>('Scan')
-	const nav = ['Scan', 'Search']
+	const [tabValue, setTabValue] = useState<string>('Scan');
+	const nav = ['Scan', 'Search'];
 	function handleChange(
 		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
 		event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]
 	) {
-		const newValue = event.currentTarget.value
-		setTabValue(newValue)
+		const newValue = event.currentTarget.value;
+		setTabValue(newValue);
 	}
 	const options: Array<TabsOption> = [
 		{
@@ -485,32 +482,32 @@ function BatchPage() {
 			children: <SearchArea search={search} setSearch={setSearch} data={searchResult ?? []} />,
 			value: nav[1],
 		},
-	] as const
+	] as const;
 
 	useEffect(() => {
 		if (hasMessage && loading === false) {
 			if (data) {
-				modalAlert('"' + data.name + '" 으로 추가 완료')
+				modalAlert('"' + data.name + '" 으로 추가 완료');
 			} else if (error) {
-				modalAlert(error.details)
+				modalAlert(error.details);
 			}
-			setHasMessage(false)
+			setHasMessage(false);
 		}
-	}, [hasMessage, loading])
+	}, [hasMessage, loading]);
 
 	useEffect(() => {
 		if (section && selectMode) {
-			setSelectTarget(section)
-			setSelectMode(false)
-			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, section.id)
+			setSelectTarget(section);
+			setSelectMode(false);
+			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, section.id);
 		}
-	}, [section])
+	}, [section]);
 	useEffect(() => {
-		onPatternMatchResponse()
-	}, [])
+		onPatternMatchResponse();
+	}, []);
 
 	if (domainSetting?.domainId == null) {
-		return <div>도메인 설정이 없습니다.</div>
+		return <div>도메인 설정이 없습니다.</div>;
 	}
 
 	return (
@@ -526,29 +523,29 @@ function BatchPage() {
 						<div className={styles.miniColumn}>
 							<Bold>섹션 외 대상</Bold>
 							{missingLink.map((item) => {
-								const selected = selectIds.includes(item)
+								const selected = selectIds.includes(item);
 
 								return (
 									<Button
 										danger
 										{...selectStyle(selected)}
 										onClick={() => {
-											pageNodeZoomAction(item)
+											pageNodeZoomAction(item);
 										}}
 										onContextMenu={(e) => {
-											e.preventDefault() // 기본 우클릭 메뉴 방지
+											e.preventDefault(); // 기본 우클릭 메뉴 방지
 											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
 											if (selectIds.includes(item)) {
 												// 제거하고
-												selectIdsSignal.value = selectIds.filter((id) => id !== item)
+												selectIdsSignal.value = selectIds.filter((id) => id !== item);
 											} else {
-												selectIdsSignal.value = [...selectIds, item]
+												selectIdsSignal.value = [...selectIds, item];
 											}
 										}}
 									>
 										{item}
 									</Button>
-								)
+								);
 							})}
 						</div>
 					)}
@@ -563,9 +560,9 @@ function BatchPage() {
 						></Textbox>
 						<IconButton
 							onClick={() => {
-								setSearch('')
-								selectedKeySignal.value = null
-								setLocalizationKey('')
+								setSearch('');
+								selectedKeySignal.value = null;
+								setLocalizationKey('');
 							}}
 						>
 							<IconCross32 />
@@ -580,7 +577,7 @@ function BatchPage() {
 
 										originId: selectedKeyData?.origin_id,
 										ids: selectIds,
-									})
+									});
 								} else {
 									// 변경할 키가 없으면 추가하고
 									const result = await fetchData('/localization/keys', {
@@ -593,14 +590,14 @@ function BatchPage() {
 											name: localizationKey,
 											isTemporary: true,
 										}),
-									})
+									});
 
 									if (result.data) {
 										emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
 											domainId: result.data.domain_id,
 											keyId: result.data.key_id,
 											ids: selectIds,
-										})
+										});
 									}
 								}
 							}}
@@ -616,6 +613,6 @@ function BatchPage() {
 
 			<Tabs options={options} value={tabValue} onChange={handleChange} />
 		</div>
-	)
+	);
 }
-export default BatchPage
+export default BatchPage;

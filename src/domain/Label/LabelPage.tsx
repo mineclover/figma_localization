@@ -1,7 +1,7 @@
-import { modalAlert } from '@/components/alert'
-import { addLayer } from '@/components/modal/Modal'
-import { ComponentChildren, Fragment, h } from 'preact'
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { modalAlert } from '@/components/alert';
+import { addLayer } from '@/components/modal/Modal';
+import { ComponentChildren, Fragment, h } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import {
 	GET_CURSOR_POSITION,
 	GET_LOCALIZATION_KEY_VALUE,
@@ -9,11 +9,12 @@ import {
 	RELOAD_NODE,
 	SET_NODE_LOCATION,
 	SET_NODE_RESET_KEY,
-} from '../constant'
-import { emit } from '@create-figma-plugin/utilities'
-import { currentPointerSignal, onGetCursorPositionResponse, sectionNameParser } from './LabelModel'
-import { useSignal } from '@/hooks/useSignal'
-import { CurrentCursorType } from '../utils/featureType'
+} from '../constant';
+import { emit } from '@create-figma-plugin/utilities';
+import { onGetCursorPositionResponse, sectionNameParser } from './LabelModel';
+import { currentPointerSignal } from '@/model/signal';
+import { useSignal } from '@/hooks/useSignal';
+import { CurrentCursorType } from '../utils/featureType';
 import {
 	Button,
 	Checkbox,
@@ -25,28 +26,24 @@ import {
 	IconLockLocked16,
 	IconLockUnlocked16,
 	IconStarFilled16,
-} from '@create-figma-plugin/ui'
-import styles from './LabelPage.module.css'
-import {
-	LocalizationKey,
-	localizationKeySignal,
-	onGetLocalizationKeyResponse,
-	onLocalizationKeyTranslationsResponse,
-	PutLocalizationKeyType,
-} from './TextPluginDataModel'
-import { removeLeadingSymbols } from '@/utils/textTools'
-import LabelSearch, { isBatchSignal } from './LabelSearch'
-import { createStyleSegments, groupSegmentsByStyle } from '../Style/styleModel'
-import { currentSectionSignal } from '../Translate/TranslateModel'
-import { domainSettingSignal } from '../Setting/SettingModel'
+} from '@create-figma-plugin/ui';
+import styles from './LabelPage.module.css';
+import { LocalizationKey, PutLocalizationKeyType } from './TextPluginDataModel';
+import { localizationKeySignal } from '@/model/signal';
+import { removeLeadingSymbols } from '@/utils/textTools';
+import LabelSearch from './LabelSearch';
+import { isDirectSignal } from '@/model/signal';
+import { createStyleSegments, groupSegmentsByStyle } from '../Style/styleModel';
+import { currentSectionSignal } from '@/model/signal';
+import { domainSettingSignal } from '@/model/signal';
 
 const isTemporary = (data: LocalizationKey | null) => {
 	if (data == null) {
-		return false
+		return false;
 	}
 
-	return !data.is_temporary
-}
+	return !data.is_temporary;
+};
 
 /**
  * 입력 값에 섹션 명을 붙여준다
@@ -55,32 +52,32 @@ const isTemporary = (data: LocalizationKey | null) => {
  * @returns
  */
 export const enforcePrefix = (input: string, sectionName: string): string => {
-	const sectionPrefix = sectionNameParser(sectionName) ?? ''
-	const finalPrefix = sectionPrefix
+	const sectionPrefix = sectionNameParser(sectionName) ?? '';
+	const finalPrefix = sectionPrefix;
 	// const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
 	if (finalPrefix === '') {
-		return input
+		return input;
 	}
 
-	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input
-}
+	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input;
+};
 
 function LabelPage() {
-	const currentPointer = useSignal(currentPointerSignal)
-	const localizationKeyValue = useSignal(localizationKeySignal)
-	const currentSection = useSignal(currentSectionSignal)
-	const isBatch = useSignal(isBatchSignal)
-	const domainSetting = useSignal(domainSettingSignal)
+	const currentPointer = useSignal(currentPointerSignal);
+	const localizationKeyValue = useSignal(localizationKeySignal);
+	const currentSection = useSignal(currentSectionSignal);
+	const isBatch = useSignal(isDirectSignal);
+	const domainSetting = useSignal(domainSettingSignal);
 
-	const [search, setSearch] = useState('')
-	const [aliasHover, setAliasHover] = useState(false)
-	const [lockHover, setLockHover] = useState(false)
+	const [search, setSearch] = useState('');
+	const [aliasHover, setAliasHover] = useState(false);
+	const [lockHover, setLockHover] = useState(false);
 
 	useEffect(() => {
 		return () => {
-			isBatchSignal.value = false
-		}
-	}, [])
+			isDirectSignal.value = false;
+		};
+	}, []);
 
 	return (
 		<div className={styles.container}>
@@ -92,8 +89,8 @@ function LabelPage() {
 					<button
 						className={styles.dangerButton}
 						onClick={() => {
-							emit(RELOAD_NODE.REQUEST_KEY)
-							emit(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY)
+							emit(RELOAD_NODE.REQUEST_KEY);
+							emit(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY);
 						}}
 					>
 						새로 고침
@@ -102,7 +99,7 @@ function LabelPage() {
 					<button
 						className={styles.dangerButton}
 						onClick={() => {
-							emit(SET_NODE_RESET_KEY.REQUEST_KEY)
+							emit(SET_NODE_RESET_KEY.REQUEST_KEY);
 							currentPointerSignal.value = {
 								...currentPointer,
 								data: {
@@ -111,8 +108,8 @@ function LabelPage() {
 									originalLocalizeId: '',
 									domainId: domainSetting?.domainId ?? '',
 								} as CurrentCursorType['data'],
-							} as CurrentCursorType
-							localizationKeySignal.value = null
+							} as CurrentCursorType;
+							localizationKeySignal.value = null;
 						}}
 					>
 						초기화
@@ -123,7 +120,7 @@ function LabelPage() {
 					<button
 						className={styles.componentButton}
 						onClick={() => {
-							emit(SET_NODE_RESET_KEY.REQUEST_KEY)
+							emit(SET_NODE_RESET_KEY.REQUEST_KEY);
 							currentPointerSignal.value = {
 								...currentPointer,
 								data: {
@@ -132,8 +129,8 @@ function LabelPage() {
 									originalLocalizeId: '',
 									domainId: domainSetting?.domainId ?? '',
 								} as CurrentCursorType['data'],
-							} as CurrentCursorType
-							localizationKeySignal.value = null
+							} as CurrentCursorType;
+							localizationKeySignal.value = null;
 						}}
 					>
 						연결 해제
@@ -142,7 +139,7 @@ function LabelPage() {
 					<button
 						className={styles.brandButton}
 						onClick={() => {
-							emit(SET_NODE_LOCATION.REQUEST_KEY)
+							emit(SET_NODE_LOCATION.REQUEST_KEY);
 						}}
 					>
 						추가
@@ -156,13 +153,13 @@ function LabelPage() {
 						zIndex: 3,
 					}}
 					onBlur={() => {
-						setAliasHover(false)
+						setAliasHover(false);
 					}}
 					onMouseEnter={() => {
-						setAliasHover(true)
+						setAliasHover(true);
 					}}
 					onMouseLeave={() => {
-						setAliasHover(false)
+						setAliasHover(false);
 					}}
 				>
 					<IconStarFilled16 />
@@ -180,25 +177,25 @@ function LabelPage() {
 						const next = {
 							...localizationKeyValue,
 							alias: e.currentTarget.value,
-						} as LocalizationKey
-						localizationKeySignal.value = next
+						} as LocalizationKey;
+						localizationKeySignal.value = next;
 					}}
 				></Textbox>
 				<button
 					className={styles.dangerButton}
 					onClick={() => {
-						const body = {} as PutLocalizationKeyType
+						const body = {} as PutLocalizationKeyType;
 						if (localizationKeyValue?.alias != null) {
-							body.alias = localizationKeyValue.alias
+							body.alias = localizationKeyValue.alias;
 						}
 						if (localizationKeyValue?.name != null) {
-							body.name = localizationKeyValue.name
+							body.name = localizationKeyValue.name;
 						}
 						if (localizationKeyValue?.is_temporary != null) {
-							body.isTemporary = localizationKeyValue.is_temporary
+							body.isTemporary = localizationKeyValue.is_temporary;
 						}
 
-						emit(PUT_LOCALIZATION_KEY.REQUEST_KEY, currentPointer?.data.localizationKey, body)
+						emit(PUT_LOCALIZATION_KEY.REQUEST_KEY, currentPointer?.data.localizationKey, body);
 					}}
 				>
 					저장
@@ -214,17 +211,17 @@ function LabelPage() {
 						const next = {
 							...localizationKeyValue,
 							is_temporary: false,
-						} as LocalizationKey
-						localizationKeySignal.value = next
+						} as LocalizationKey;
+						localizationKeySignal.value = next;
 					}}
 					onBlur={() => {
-						setLockHover(false)
+						setLockHover(false);
 					}}
 					onMouseEnter={() => {
-						setLockHover(true)
+						setLockHover(true);
 					}}
 					onMouseLeave={() => {
-						setLockHover(false)
+						setLockHover(false);
 					}}
 				>
 					{isTemporary(localizationKeyValue) ? <IconLockLocked16 /> : <IconLockUnlocked16 />}
@@ -244,8 +241,8 @@ function LabelPage() {
 						const next = {
 							...localizationKeyValue,
 							name: e.currentTarget.value,
-						} as LocalizationKey
-						localizationKeySignal.value = next
+						} as LocalizationKey;
+						localizationKeySignal.value = next;
 					}}
 				></Textbox>
 			</div>
@@ -255,6 +252,6 @@ function LabelPage() {
 			{/* <div>1. 검색 창을 준다 {'>'} 라벨링 + 번역 키 검색</div> */}
 			<LabelSearch />
 		</div>
-	)
+	);
 }
-export default LabelPage
+export default LabelPage;

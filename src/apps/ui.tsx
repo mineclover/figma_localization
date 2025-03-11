@@ -1,26 +1,26 @@
-import { render, useWindowResize, TabsOption, Tabs, Container } from '@create-figma-plugin/ui'
-import { Fragment, h } from 'preact'
+import { render, useWindowResize, TabsOption, Tabs, Container } from '@create-figma-plugin/ui';
+import { Fragment, h } from 'preact';
 
-import { emit } from '@create-figma-plugin/utilities'
-import { ResizeWindowHandler } from '../figmaPluginUtils/types'
+import { emit } from '@create-figma-plugin/utilities';
+import { ResizeWindowHandler } from '../figmaPluginUtils/types';
 
-import { AppProvider } from '@/domain/Provider'
-import { NonNullableComponentTypeExtract } from 'types/utilType'
-import { useState } from 'preact/hooks'
-import LabelPage from '@/domain/Label/LabelPage'
-import SettingPage from '@/domain/Setting/SettingPage'
-import TranslatePage from '@/domain/Translate/TranslatePage'
-import { isBatchSignal } from '@/domain/Label/LabelSearch'
-import { useSignal } from '@/hooks/useSignal'
-import StylePage from '@/domain/Style/StylePage'
-import BatchPage from '@/domain/Batch/BatchPage'
+import { AppProvider } from '@/domain/Provider';
+import { NonNullableComponentTypeExtract } from 'types/utilType';
+import { useState } from 'preact/hooks';
+import LabelPage from '@/domain/Label/LabelPage';
+import SettingPage from '@/domain/Setting/SettingPage';
+import TranslatePage from '@/domain/Translate/TranslatePage';
+import { isDirectSignal } from '@/model/signal';
+import { useSignal } from '@/hooks/useSignal';
+import StylePage from '@/domain/Style/StylePage';
+import BatchPage from '@/domain/Batch/BatchPage';
 
-const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch']
+const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch'];
 
 function Plugin() {
-	const isBatch = useSignal(isBatchSignal)
+	const isBatch = useSignal(isDirectSignal);
 	function onWindowResize(windowSize: { width: number; height: number }) {
-		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize)
+		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize);
 	}
 	useWindowResize(onWindowResize, {
 		maxHeight: 1080,
@@ -28,14 +28,14 @@ function Plugin() {
 		minHeight: 120,
 		minWidth: 120,
 		resizeBehaviorOnDoubleClick: 'minimize',
-	})
+	});
 
 	function handleChange(
 		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
 		event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]
 	) {
-		const newValue = event.currentTarget.value
-		setValue(newValue)
+		const newValue = event.currentTarget.value;
+		setValue(newValue);
 	}
 
 	const options: Array<TabsOption> = [
@@ -64,8 +64,8 @@ function Plugin() {
 		//   children: <Inspect></Inspect>,
 		//   value: nav[2],
 		// },
-	] as const
-	const [value, setValue] = useState<string>(nav[5])
+	] as const;
+	const [value, setValue] = useState<string>(nav[5]);
 
 	return (
 		<AppProvider>
@@ -78,7 +78,7 @@ function Plugin() {
 				<Tabs options={options} value={value} onChange={handleChange} />
 			</Container>
 		</AppProvider>
-	)
+	);
 }
 
-export default render(Plugin)
+export default render(Plugin);

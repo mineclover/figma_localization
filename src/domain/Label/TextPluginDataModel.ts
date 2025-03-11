@@ -1,5 +1,5 @@
-import { CurrentCursorType, NodeData } from '../utils/featureType'
-import { emit, on } from '@create-figma-plugin/utilities'
+import { CurrentCursorType, NodeData } from '../utils/featureType';
+import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_CURSOR_POSITION,
 	GET_LOCALIZATION_KEY_VALUE,
@@ -13,44 +13,45 @@ import {
 	SET_PROJECT_ID,
 	STORE_KEY,
 	UPDATE_NODE_STORE_KEY,
-} from '../constant'
+} from '../constant';
 
-import { FilePathNodeSearch, notify } from '@/figmaPluginUtils'
-import { getCursorPosition, sectionNameParser } from './LabelModel'
-import { fetchDB } from '../utils/fetchDB'
-import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel'
-import { getFigmaRootStore } from '../utils/getStore'
-import { ERROR_CODE } from '../errorCode'
-import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text'
-import { signal } from '@preact/signals-core'
-import { components } from 'types/i18n'
-import { enforcePrefix } from './LabelPage'
-import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel'
+import { FilePathNodeSearch, notify } from '@/figmaPluginUtils';
+import { getCursorPosition, sectionNameParser } from './LabelModel';
+import { fetchDB } from '../utils/fetchDB';
+import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel';
+import { getFigmaRootStore } from '../utils/getStore';
+import { ERROR_CODE } from '../errorCode';
+import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
+import { signal } from '@preact/signals-core';
+import { components } from 'types/i18n';
+import { enforcePrefix } from './LabelPage';
+import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel';
 
-import { generateXmlString, StyleSync } from '../Style/StylePage'
-import { createStableStyleKey } from '@/utils/keyJson'
+import { generateXmlString, StyleSync } from '../Style/StylePage';
+import { createStableStyleKey } from '@/utils/keyJson';
+import { localizationKeySignal } from '@/model/signal';
 
 export type LocationDTO = {
-	created_at: string
-	is_deleted: number
-	is_pinned: number
-	location_id: number
-	node_id: string
-	page_id: string
-	project_id: string
-	updated_at: string
-}
+	created_at: string;
+	is_deleted: number;
+	is_pinned: number;
+	location_id: number;
+	node_id: string;
+	page_id: string;
+	project_id: string;
+	updated_at: string;
+};
 
 export type Location = {
-	location_id: number
-	project_id: string
-	node_id: string
-	page_id: string
-	is_pinned: boolean
-	is_deleted: boolean
-	created_at: string
-	updated_at: string
-}
+	location_id: number;
+	project_id: string;
+	node_id: string;
+	page_id: string;
+	is_pinned: boolean;
+	is_deleted: boolean;
+	created_at: string;
+	updated_at: string;
+};
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -62,48 +63,46 @@ export const locationMapping = (location: LocationDTO): Location => {
 		is_deleted: location.is_deleted === 1,
 		created_at: location.created_at,
 		updated_at: location.updated_at,
-	}
-}
+	};
+};
 
 export type LocalizationKeyDTO = {
-	key_id: number
-	domain_id: number
-	name: string
-	origin_id?: number
-	origin_value?: string
-	alias?: string
-	parent_key_id?: number
-	parent_name?: string
-	parent_origin_value?: string
-	is_variable: number
-	is_temporary: number
-	section_id?: number
-	section_name: string
-	version: number
-	is_deleted: number
-	created_at: string
-	updated_at: string
-}
+	key_id: number;
+	domain_id: number;
+	name: string;
+	origin_id?: number;
+	origin_value?: string;
+	alias?: string;
+	parent_key_id?: number;
+	parent_name?: string;
+	parent_origin_value?: string;
+	is_variable: number;
+	is_temporary: number;
+	section_id?: number;
+	section_name: string;
+	version: number;
+	is_deleted: number;
+	created_at: string;
+	updated_at: string;
+};
 
 export type LocalizationKey = {
-	key_id: number
-	domain_id: number
-	name: string
-	origin_id?: number
-	origin_value?: string
-	alias?: string
-	parent_key_id?: number
-	is_variable: boolean
-	is_temporary: boolean
-	section_id?: number
-	section_name: string
-	version: number
-	is_deleted: boolean
-	created_at: string
-	updated_at: string
-}
-
-export const localizationKeySignal = signal<LocalizationKey | null>(null)
+	key_id: number;
+	domain_id: number;
+	name: string;
+	origin_id?: number;
+	origin_value?: string;
+	alias?: string;
+	parent_key_id?: number;
+	is_variable: boolean;
+	is_temporary: boolean;
+	section_id?: number;
+	section_name: string;
+	version: number;
+	is_deleted: boolean;
+	created_at: string;
+	updated_at: string;
+};
 
 export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey => {
 	return {
@@ -120,31 +119,17 @@ export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey
 		is_deleted: dto.is_deleted === 1,
 		created_at: dto.created_at,
 		updated_at: dto.updated_at,
-	}
-}
+	};
+};
 
-/** 키 데이터 조회 */
-export const onGetLocalizationKeyData = () => {
-	on(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0]
-		const value = await processTextNodeLocalization(node)
-		emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value)
-	})
-}
-export const onGetLocalizationKeyResponse = () => {
-	emit(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY)
-	return on(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, (data) => {
-		localizationKeySignal.value = data
-	})
-}
 /** 키에 소속된 모든 번역 값 조회 */
 export const getNodeTranslations = async (node: BaseNode) => {
-	const nodeData = getNodeData(node)
+	const nodeData = getNodeData(node);
 	if (nodeData.localizationKey === '') {
-		return
+		return;
 	}
-	return await getTargetTranslations(nodeData.localizationKey)
-}
+	return await getTargetTranslations(nodeData.localizationKey);
+};
 
 /**
  * 키에 번역된 언어 검색 , 작업 중
@@ -152,73 +137,66 @@ export const getNodeTranslations = async (node: BaseNode) => {
  */
 export const onGetKeyTranslations = () => {
 	on(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0]
+		const node = figma.currentPage.selection[0];
 		if (!node || node.type !== 'TEXT') {
-			return
+			return;
 		}
 
-		const result = await getNodeTranslations(node)
-	})
-}
+		const result = await getNodeTranslations(node);
+	});
+};
 
 /** 낙관적 업데이트로 반영 */
 export const onSetNodeResetKey = () => {
 	on(SET_NODE_RESET_KEY.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0]
+		const node = figma.currentPage.selection[0];
 		if (!node || node.type !== 'TEXT') {
-			return
+			return;
 		}
 
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '')
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '')
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, '')
-		node.setPluginData(NODE_STORE_KEY.LOCATION, '')
-		node.autoRename = true
-	})
-}
-/** ui , 작업 중 */
-export const onLocalizationKeyTranslationsResponse = () => {
-	emit(GET_TRANSLATION_KEY_VALUE.REQUEST_KEY)
-	return on(GET_TRANSLATION_KEY_VALUE.RESPONSE_KEY, (data) => {
-		localizationKeySignal.value = data
-	})
-}
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '');
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '');
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, '');
+		node.setPluginData(NODE_STORE_KEY.LOCATION, '');
+		node.autoRename = true;
+	});
+};
 
 export type LocalizationKeyProps = {
-	domainId: number
-	name: string
-	alias?: string
-	sectionId?: string
-	parentKeyId?: number
-	isVariable?: boolean
-	isTemporary?: boolean
-	sectionName?: string
-}
+	domainId: number;
+	name: string;
+	alias?: string;
+	sectionId?: string;
+	parentKeyId?: number;
+	isVariable?: boolean;
+	isTemporary?: boolean;
+	sectionName?: string;
+};
 
 // TextPluginDataModel 타입 정의
 export type LocalizationTranslationDTO = {
-	created_at: string
-	is_deleted: number
-	key_id: number
-	language_code: string
-	last_modified_by: null | string
-	localization_id: number
-	text: string
-	updated_at: string
-	version: number
-}
+	created_at: string;
+	is_deleted: number;
+	key_id: number;
+	language_code: string;
+	last_modified_by: null | string;
+	localization_id: number;
+	text: string;
+	updated_at: string;
+	version: number;
+};
 
 export type LocalizationTranslation = {
-	created_at: string
-	is_deleted: boolean
-	key_id: number
-	language_code: string
-	last_modified_by: string | null
-	localization_id: number
-	text: string
-	updated_at: string
-	version: number
-}
+	created_at: string;
+	is_deleted: boolean;
+	key_id: number;
+	language_code: string;
+	last_modified_by: string | null;
+	localization_id: number;
+	text: string;
+	updated_at: string;
+	version: number;
+};
 
 export const localizationTranslationMapping = (dto: LocalizationTranslationDTO): LocalizationTranslation => {
 	return {
@@ -231,82 +209,82 @@ export const localizationTranslationMapping = (dto: LocalizationTranslationDTO):
 		text: dto.text,
 		updated_at: dto.updated_at,
 		version: dto.version,
-	}
-}
+	};
+};
 
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
 	/** 임시 값이면 @ 붙이고 아니면 # 붙임 */
-	const prefix = keyData.is_temporary ? '❎' : '✅'
-	const name = prefix + keyData.name
+	const prefix = keyData.is_temporary ? '❎' : '✅';
+	const name = prefix + keyData.name;
 
-	return name
-}
+	return name;
+};
 
 // 캐시 시스템 구현
 interface CacheItem<T> {
-	timestamp: number
-	data: T
+	timestamp: number;
+	data: T;
 }
 
-const requestCache = new Map<string, CacheItem<any>>()
+const requestCache = new Map<string, CacheItem<any>>();
 
 /**
  * 로컬라이제이션 키를 기준으로 이름 리로드
  */
 export const getLocalizationKeyData = async (node: BaseNode, now: number): Promise<LocalizationKeyDTO | null> => {
-	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
+	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
 	if (localizationKey === '') {
-		return null
+		return null;
 	}
 
-	const apiPath = '/localization/keys/id/' + localizationKey
-	const cacheKey = apiPath
+	const apiPath = '/localization/keys/id/' + localizationKey;
+	const cacheKey = apiPath;
 
-	const cachedItem = requestCache.get(cacheKey)
+	const cachedItem = requestCache.get(cacheKey);
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (0.5초)
 
 	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 1000) {
-		console.log(`캐시된 데이터 반환: ${cacheKey}`)
-		return cachedItem.data
+		console.log(`캐시된 데이터 반환: ${cacheKey}`);
+		return cachedItem.data;
 	}
 
 	// 캐시가 없거나 만료된 경우 새로운 요청 수행
 	const result = await fetchDB(apiPath as '/localization/keys/id/{id}', {
 		method: 'GET',
-	})
+	});
 
 	if (!result || result.status === 500) {
-		return null
+		return null;
 	}
-	const data = (await result.json()) as LocalizationKeyDTO
+	const data = (await result.json()) as LocalizationKeyDTO;
 
 	if (result.status === 200) {
-		node.name = generateLocalizationName(data)
+		node.name = generateLocalizationName(data);
 		// 결과 캐싱
 		requestCache.set(cacheKey, {
 			timestamp: now,
 			data: data,
-		})
-		console.log('캐싱 갱신 됨')
-		return data
+		});
+		console.log('캐싱 갱신 됨');
+		return data;
 	}
-	return null
-}
+	return null;
+};
 
 /** 번역 키 기반 단일 값 조회 */
 export const getTargetLocalizationName = async (id: string) => {
 	const result = await fetchDB(('/localization/translations/id/' + id) as '/localization/translations/id/{id}', {
 		method: 'GET',
-	})
+	});
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO
-	return data.text
-}
+	const data = (await result.json()) as LocalizationTranslationDTO;
+	return data.text;
+};
 
 /** 번역에 대해 수정하거나 업데이트하거나 */
 export const putTargetTranslations = async (id: string, language: string, text: string) => {
@@ -317,16 +295,16 @@ export const putTargetTranslations = async (id: string, language: string, text: 
 			language: language,
 			translation: text,
 		}),
-	})
+	});
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO
+	const data = (await result.json()) as LocalizationTranslationDTO;
 
-	return data
-}
+	return data;
+};
 
 /** 하나만 얻음 */
 export const searchTargetLocalization = async (id: string, language: string) => {
@@ -336,16 +314,16 @@ export const searchTargetLocalization = async (id: string, language: string) => 
 			keyId: id,
 			language: language,
 		}),
-	})
+	});
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO
+	const data = (await result.json()) as LocalizationTranslationDTO;
 
-	return data.text
-}
+	return data.text;
+};
 /** 키 아이디 기반으로 여러개 얻음 */
 export const getTargetTranslations = async (id: string) => {
 	const result = await fetchDB(
@@ -353,37 +331,37 @@ export const getTargetTranslations = async (id: string) => {
 		{
 			method: 'GET',
 		}
-	)
+	);
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO[]
+	const data = (await result.json()) as LocalizationTranslationDTO[];
 
-	return data
-}
+	return data;
+};
 
 /**
  * 오리지널 로컬라이제이션 키를 기준으로 값 일괄 수정
  * allRefresh
  */
 export const reloadOriginalLocalizationName = async (node: BaseNode) => {
-	const nodeData = getNodeData(node)
+	const nodeData = getNodeData(node);
 	if (nodeData.localizationKey === '') {
-		return
+		return;
 	}
-	const localizationKey = nodeData.localizationKey
-	figma.skipInvisibleInstanceChildren = true
+	const localizationKey = nodeData.localizationKey;
+	figma.skipInvisibleInstanceChildren = true;
 
 	const arr = figma.currentPage.findAllWithCriteria({
 		types: ['TEXT'],
 		pluginData: {
 			keys: [NODE_STORE_KEY.LOCALIZATION_KEY],
 		},
-	})
+	});
 
-	const targetOrigin = new Map<string, Set<TextNode>>()
+	const targetOrigin = new Map<string, Set<TextNode>>();
 
 	//  map 말고 foreach 해도 될지도?
 	/**
@@ -392,57 +370,57 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 	const targetTextArr = arr
 
 		.filter((item) => {
-			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
+			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
 			if (localizationKey === currentLocalizationKey) {
-				return true
+				return true;
 			}
-			return false
+			return false;
 		})
 		.map((item) => {
-			const nodeData = getNodeData(item)
+			const nodeData = getNodeData(item);
 			if (nodeData.originalLocalizeId !== '') {
-				let temp = targetOrigin.get(nodeData.originalLocalizeId)
+				let temp = targetOrigin.get(nodeData.originalLocalizeId);
 				if (temp == null) {
-					temp = new Set<TextNode>()
+					temp = new Set<TextNode>();
 				}
 
-				targetOrigin.set(nodeData.originalLocalizeId, temp.add(item))
+				targetOrigin.set(nodeData.originalLocalizeId, temp.add(item));
 			}
 			return {
 				node: item,
 				data: nodeData,
-			}
-		})
+			};
+		});
 
-	const now = Date.now()
+	const now = Date.now();
 	for (const [key, targetNode] of targetOrigin.entries()) {
-		const a = await getTargetLocalizationName(key)
+		const a = await getTargetLocalizationName(key);
 		if (a) {
 			for (const node of targetNode) {
-				getLocalizationKeyData(node, now)
-				await textFontLoad(node)
-				node.characters = a
+				getLocalizationKeyData(node, now);
+				await textFontLoad(node);
+				node.characters = a;
 			}
 		}
 	}
-}
+};
 
 export const addTranslation = async (node: TextNode) => {
-	const nodeData = getNodeData(node)
+	const nodeData = getNodeData(node);
 
 	if (nodeData.localizationKey === '') {
-		notify('Failed to get localization key', 'error')
-		return
+		notify('Failed to get localization key', 'error');
+		return;
 	}
 
-	const { styleData, boundVariables } = getAllStyleRanges(node)
+	const { styleData, boundVariables } = getAllStyleRanges(node);
 
-	const segments = createStyleSegments(node.characters, styleData)
-	const boundVariables2 = createStyleSegments(node.characters, boundVariables)
-	const allStyleGroups = groupAllSegmentsByStyle(node.characters, segments, boundVariables2)
-	const exportStyleGroups = allStyleGroups.exportStyleGroups
+	const segments = createStyleSegments(node.characters, styleData);
+	const boundVariables2 = createStyleSegments(node.characters, boundVariables);
+	const allStyleGroups = groupAllSegmentsByStyle(node.characters, segments, boundVariables2);
+	const exportStyleGroups = allStyleGroups.exportStyleGroups;
 
-	const styleStore: Record<string, StyleSync> = {}
+	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {
 		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
@@ -452,15 +430,15 @@ export const addTranslation = async (node: TextNode) => {
 				styleValue: JSON.stringify(style.style),
 				hashValue: style.hashId,
 			}),
-		})
+		});
 		if (!temp) {
-			return
+			return;
 		}
-		const responseResult = await temp.json()
+		const responseResult = await temp.json();
 		if (responseResult) {
-			const newId = responseResult.resource_id.toString()
-			const newAlias = responseResult.alias
-			const newName = responseResult.style_name
+			const newId = responseResult.resource_id.toString();
+			const newAlias = responseResult.alias;
+			const newName = responseResult.style_name;
 			const store = {
 				hashId: style.hashId,
 				name: newName,
@@ -468,12 +446,12 @@ export const addTranslation = async (node: TextNode) => {
 				alias: newAlias,
 				style: style.style,
 				ranges: style.ranges,
-			}
-			styleStore[style.hashId] = store
+			};
+			styleStore[style.hashId] = store;
 		}
 	}
 
-	const xmlString = generateXmlString(Object.values(styleStore), 'id')
+	const xmlString = generateXmlString(Object.values(styleStore), 'id');
 
 	const result = await fetchDB('/localization/translations', {
 		method: 'PUT',
@@ -486,7 +464,7 @@ export const addTranslation = async (node: TextNode) => {
 			null,
 			2
 		),
-	})
+	});
 
 	for (const style of Object.values(styleStore)) {
 		const result = await fetchDB('/resources/mapping', {
@@ -495,27 +473,27 @@ export const addTranslation = async (node: TextNode) => {
 				resourceId: style.id,
 				keyId: nodeData.localizationKey,
 			}),
-		})
+		});
 		if (!result) {
-			notify('Failed to set resource mapping ' + style.id, 'error')
-			continue
+			notify('Failed to set resource mapping ' + style.id, 'error');
+			continue;
 		}
-		const data = (await result.json()) as LocalizationTranslationDTO
+		const data = (await result.json()) as LocalizationTranslationDTO;
 	}
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO
+	const data = (await result.json()) as LocalizationTranslationDTO;
 
 	if (result.status === 200) {
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString())
-		return data
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
+		return data;
 	} else {
-		notify('Failed to set location', 'error')
+		notify('Failed to set location', 'error');
 	}
-}
+};
 
 /**
  * 일반 localization key 생성
@@ -529,65 +507,65 @@ export const createNormalLocalizationKey = async (
 		name: name,
 		isTemporary: true,
 		sectionId: sectionId,
-	} as LocalizationKeyProps
+	} as LocalizationKeyProps;
 	// 섹션이 비지 않았고, 섹션이 같으면
 
 	if (alias) {
-		temp.alias = alias
+		temp.alias = alias;
 	}
 
 	// targetData
 	const result = await fetchDB('/localization/keys', {
 		method: 'POST',
 		body: JSON.stringify(temp, null, 2),
-	})
+	});
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationKeyDTO
+	const data = (await result.json()) as LocalizationKeyDTO;
 
 	if (result.status === 200) {
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString())
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString())
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString());
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString());
 	} else {
-		notify('Failed to set localization key', 'error')
+		notify('Failed to set localization key', 'error');
 	}
-}
+};
 
 /** 1. 노드 데이터 설정 */
 export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 	if (data.domainId != null) {
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString())
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString());
 	}
 
 	if (data.localizationKey != null) {
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString())
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString());
 	}
 
 	if (data.originalLocalizeId != null) {
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.originalLocalizeId.toString())
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.originalLocalizeId.toString());
 	}
 
 	if (data.ignore != null) {
-		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString())
+		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString());
 	}
-}
+};
 
 /**
  * 로컬라이제이션 텍스트 등록 과정
  * 플러그인 데이터 생성 */
 export const onTargetSetNodeLocation = () => {
 	on(SET_NODE_LOCATION.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0]
+		const node = figma.currentPage.selection[0];
 		if (node.type !== 'TEXT') {
-			return
+			return;
 		}
-		const result = await getCursorPosition(node)
+		const result = await getCursorPosition(node);
 
 		if (!result) {
-			return
+			return;
 		}
 		/**
 		 * result는 이전 값을 가지고 있음 init해도 안바뀜
@@ -598,10 +576,10 @@ export const onTargetSetNodeLocation = () => {
 		// 변경 가능하고 저장 가능하게 임시 값 보여야 함
 		// 섹션 관리 되야 함
 
-		const domainSetting = getDomainSetting()
+		const domainSetting = getDomainSetting();
 
 		if (!domainSetting) {
-			return
+			return;
 		}
 
 		// section은 [sectionName] {기존 제목} 으로 처리 됨
@@ -610,51 +588,55 @@ export const onTargetSetNodeLocation = () => {
 			await createNormalLocalizationKey(node, {
 				domainId: domainSetting.domainId,
 				name: result.nodeName,
-			})
+			});
 		}
-		await getLocalizationKeyData(node, Date.now())
+		await getLocalizationKeyData(node, Date.now());
 
 		// 두번 눌렀을 때 처리 어떻게 할지 정해야 됨
-		await addTranslation(node)
+		await addTranslation(node);
 
 		/** 업데이트 반영 코드 */
-		await allRefresh(node)
-	})
-}
+		await allRefresh(node);
+	});
+};
 
 export const allRefresh = async (node: TextNode) => {
-	const cursorPosition = await getCursorPosition(node)
-	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
-	const value = await processTextNodeLocalization(node)
-	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value)
-}
+	const cursorPosition = await getCursorPosition(node);
+	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
+	const value = await processTextNodeLocalization(node);
+	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value);
+};
 
 /**
  * allRefresh
  */
 export const onNodeReload = () => {
 	on(RELOAD_NODE.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0]
+		const node = figma.currentPage.selection[0];
 		if (!node || node.type !== 'TEXT') {
-			return
+			return;
 		}
 
-		figma.commitUndo()
+		figma.commitUndo();
 
-		await reloadOriginalLocalizationName(node)
-	})
-}
+		await reloadOriginalLocalizationName(node);
+	});
+};
 
 /** 플러그인 데이터 조회 */
-export const getNodeData = (node: BaseNode) => {
-	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
-	const originalLocalizeId = node.getPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID)
+export const getNodeData = (node: BaseNode): NodeData => {
+	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
+	const originalLocalizeId = node.getPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID);
+	const domainId = node.getPluginData(NODE_STORE_KEY.DOMAIN_ID);
+	const ignore = node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true';
 
 	return {
-		localizationKey: localizationKey,
-		originalLocalizeId: originalLocalizeId,
-	} as NodeData
-}
+		localizationKey,
+		originalLocalizeId,
+		domainId: domainId || '',
+		ignore: ignore || false,
+	};
+};
 
 /**
  * TEXT 타입 노드의 지역화 키에 대한 데이터를 처리합니다.
@@ -663,85 +645,85 @@ export const getNodeData = (node: BaseNode) => {
  */
 export const processTextNodeLocalization = async (node: SceneNode) => {
 	if (!node || node.type !== 'TEXT') {
-		return
+		return;
 	}
 
-	const nodeData = getNodeData(node)
+	const nodeData = getNodeData(node);
 	if (nodeData.localizationKey === '') {
-		return
+		return;
 	}
 
-	const result = await getLocalizationKeyData(node, Date.now())
+	const result = await getLocalizationKeyData(node, Date.now());
 	if (!result) {
-		return
+		return;
 	}
 
-	return localizationKeyMapping(result)
-}
+	return localizationKeyMapping(result);
+};
 
-export type PutLocalizationKeyType = components['schemas']['UpdateLocalizationKeyDTO']
+export type PutLocalizationKeyType = components['schemas']['UpdateLocalizationKeyDTO'];
 
 export const onPutLocalizationKey = () => {
 	on(PUT_LOCALIZATION_KEY.REQUEST_KEY, async (localizationKey: string, data: PutLocalizationKeyType) => {
-		const result = await putLocalizationKey(localizationKey, data)
+		const result = await putLocalizationKey(localizationKey, data);
 
 		if (!result) {
-			return
+			return;
 		}
 
 		if (typeof result === 'string') {
-			notify(result, 'error')
-			return
+			notify(result, 'error');
+			return;
 		}
 
 		// emit(PUT_LOCALIZATION_KEY.RESPONSE_KEY, result)
-	})
-}
+	});
+};
 
 export const putLocalizationKey = async (localizationKey: string, body: PutLocalizationKeyType) => {
 	const result = await fetchDB(('/localization/keys/' + localizationKey) as '/localization/keys/{id}', {
 		method: 'PUT',
 		body: JSON.stringify(body, null, 2),
-	})
+	});
 
 	if (!result) {
-		return
+		return;
 	}
 
-	const data = (await result.json()) as LocalizationKeyDTO | string
+	const data = (await result.json()) as LocalizationKeyDTO | string;
 
-	return data
-}
+	return data;
+};
 
 export const onUpdateNodeStoreBatchKey = () => {
 	on(UPDATE_NODE_STORE_KEY.REQUEST_KEY, async (key: number) => {
-		const node = figma.currentPage.selection[0]
+		const node = figma.currentPage.selection[0];
 		if (!node || node.type !== 'TEXT') {
-			return
+			return;
 		}
 
-		const domainSetting = getDomainSetting()
+		const domainSetting = getDomainSetting();
 		if (!domainSetting) {
-			return
+			return;
 		}
 
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, domainSetting.domainId.toString())
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, domainSetting.domainId.toString());
 
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString())
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString());
 
-		const translations = await getTargetTranslations(key.toString())
+		const translations = await getTargetTranslations(key.toString());
 		if (!translations || translations.length === 0) {
-			return
+			return;
 		}
 
-		const translation = translations[0]
+		const translation = translations[0];
 		if (!translation) {
-			return
+			return;
 		}
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, translation.localization_id.toString())
-		await allRefresh(node)
-		figma.commitUndo()
+		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, translation.localization_id.toString());
+		await allRefresh(node);
+		figma.commitUndo();
 
-		await reloadOriginalLocalizationName(node)
-	})
-}
+		await reloadOriginalLocalizationName(node);
+	});
+};

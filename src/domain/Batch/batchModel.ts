@@ -15,53 +15,51 @@
  * 작업 중인 영역의 정보를 기억해야한다는 의미임
  */
 
-import { emit, on } from '@create-figma-plugin/utilities'
+import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_PATTERN_MATCH_KEY,
 	NODE_STORE_KEY,
 	SET_NODE_IGNORE,
 	SET_NODE_LOCALIZATION_KEY_BATCH,
 	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
-} from '../constant'
-import { signal } from '@preact/signals-core'
+} from '../constant';
 import {
 	addTranslation,
 	allRefresh,
 	processTextNodeLocalization,
 	reloadOriginalLocalizationName,
 	setNodeData,
-} from '../Label/TextPluginDataModel'
-import { notify } from '@/figmaPluginUtils'
+} from '../Label/TextPluginDataModel';
+import { notify } from '@/figmaPluginUtils';
+import { patternMatchDataSignal } from '@/model/signal';
 
 export type SearchNodeData = {
-	id: string
-	name: string
-	ignore: boolean
-	localizationKey: string
-	text: string
-	parentName: string
-}
+	id: string;
+	name: string;
+	ignore: boolean;
+	localizationKey: string;
+	text: string;
+	parentName: string;
+};
 
 export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
-	ids: string[]
-}
-
-export const patternMatchDataSignal = signal<SearchNodeData[]>([])
+	ids: string[];
+};
 
 export const onPatternMatch = () => {
 	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
 		// 일단 선택된 섹션 관리
-		figma.skipInvisibleInstanceChildren = true
+		figma.skipInvisibleInstanceChildren = true;
 
 		if (targetID) {
-			const selection = await figma.getNodeByIdAsync(targetID)
+			const selection = await figma.getNodeByIdAsync(targetID);
 
 			if (selection == null || selection.type !== 'SECTION') {
-				return
+				return;
 			}
 			const nodeArr = selection.findAllWithCriteria({
 				types: ['TEXT'],
-			})
+			});
 			const dataArr = nodeArr.map((node) => {
 				return {
 					id: node.id,
@@ -70,18 +68,18 @@ export const onPatternMatch = () => {
 					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
 					text: node.characters,
 					parentName: node.parent?.name ?? '',
-				} as SearchNodeData
-			})
-			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr)
+				} as SearchNodeData;
+			});
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
 		} else {
-			const selection = figma.currentPage
+			const selection = figma.currentPage;
 
 			if (selection == null || selection.type !== 'PAGE') {
-				return
+				return;
 			}
 			const nodeArr = selection.findAllWithCriteria({
 				types: ['TEXT'],
-			})
+			});
 			const dataArr = nodeArr.map((node) => {
 				return {
 					id: node.id,
@@ -90,38 +88,38 @@ export const onPatternMatch = () => {
 					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
 					text: node.characters,
 					parentName: node.parent?.name ?? '',
-				} as SearchNodeData
-			})
-			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr)
+				} as SearchNodeData;
+			});
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
 		}
-	})
-}
+	});
+};
 
 export const onPatternMatchResponse = () => {
 	on(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, (dataArr: SearchNodeData[]) => {
-		patternMatchDataSignal.value = dataArr
-	})
-}
+		patternMatchDataSignal.value = dataArr;
+	});
+};
 
 export type GroupOption = {
-	localizationKey: true
+	localizationKey: true;
 	/** 부모 이름을 그루핑 파라미터로 사용 */
-	parentName: true
+	parentName: true;
 	/** 이름을 그루핑 파라미터로 사용 */
-	name: true
+	name: true;
 	/** 텍스트를 그루핑 파라미터로 사용 */
-	text: true
-}
+	text: true;
+};
 export type ViewOption = {
 	/** 숨김 대상을 표시 */
-	ignore: boolean
+	ignore: boolean;
 	/** 숨기지 않은 대상을 표시 */
-	notIgnore: boolean
+	notIgnore: boolean;
 	/** 키 값이 있는 대상을 표시 */
-	hasLocalizationKey: boolean
+	hasLocalizationKey: boolean;
 	/** 키 값이 없는 대상을 표시 */
-	notHasLocalizationKey: boolean
-}
+	notHasLocalizationKey: boolean;
+};
 
 /**
  * SearchNodeData 배열을 받아 id를 제외한 나머지 필드가 동일한 항목끼리 그룹화하여
@@ -132,28 +130,28 @@ export type ViewOption = {
  * @param includeParentName 키 생성 시 부모 이름을 포함할지 여부
  */
 export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption, groupOption: GroupOption) => {
-	const groupMap = new Map<string, PatternMatchData>()
+	const groupMap = new Map<string, PatternMatchData>();
 
 	// 옵션에 따라 필터링
-	let filteredData = dataArr
+	let filteredData = dataArr;
 	filteredData = filteredData.filter((item) => {
 		// 모든 활성화된 필터 조건을 충족해야 함
-		let shouldInclude = true
+		let shouldInclude = true;
 
 		// ignore 관련 필터 (각 옵션 내부는 OR 관계)
-		let ignoreFilterPassed = true
+		let ignoreFilterPassed = true;
 		if (viewOption.notIgnore || viewOption.ignore) {
-			ignoreFilterPassed = (viewOption.notIgnore && !item.ignore) || (viewOption.ignore && item.ignore)
-			shouldInclude = shouldInclude && ignoreFilterPassed
+			ignoreFilterPassed = (viewOption.notIgnore && !item.ignore) || (viewOption.ignore && item.ignore);
+			shouldInclude = shouldInclude && ignoreFilterPassed;
 		}
 
 		// localizationKey 관련 필터 (각 옵션 내부는 OR 관계)
-		let localizationKeyFilterPassed = true
+		let localizationKeyFilterPassed = true;
 		if (viewOption.hasLocalizationKey || viewOption.notHasLocalizationKey) {
 			localizationKeyFilterPassed =
 				(viewOption.hasLocalizationKey && item.localizationKey !== '') ||
-				(viewOption.notHasLocalizationKey && item.localizationKey === '')
-			shouldInclude = shouldInclude && localizationKeyFilterPassed
+				(viewOption.notHasLocalizationKey && item.localizationKey === '');
+			shouldInclude = shouldInclude && localizationKeyFilterPassed;
 		}
 
 		// 필터 조건이 활성화되지 않은 경우 기본적으로 모든 항목 포함
@@ -163,29 +161,29 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 		// 	return true
 		// }
 
-		return shouldInclude
-	})
+		return shouldInclude;
+	});
 
-	const filteredDataLength = filteredData.length
+	const filteredDataLength = filteredData.length;
 	filteredData.forEach((item) => {
 		// id를 제외한 필드를 기준으로 고유 키 생성 (옵션에 따라 parentName 포함 여부 결정)
-		const keyObj: any = {}
+		const keyObj: any = {};
 
 		// 옵션에 따라 부모 이름 포함 여부 결정
 		if (groupOption.parentName) {
-			keyObj.parentName = item.parentName
+			keyObj.parentName = item.parentName;
 		}
 		if (groupOption.localizationKey) {
-			keyObj.localizationKey = item.localizationKey
+			keyObj.localizationKey = item.localizationKey;
 		}
 		if (groupOption.name) {
-			keyObj.name = item.name
+			keyObj.name = item.name;
 		}
 		if (groupOption.text) {
-			keyObj.text = item.text
+			keyObj.text = item.text;
 		}
 
-		const key = JSON.stringify(keyObj)
+		const key = JSON.stringify(keyObj);
 
 		if (!groupMap.has(key)) {
 			// 새 그룹 생성
@@ -196,102 +194,102 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 				text: item.text,
 				parentName: item.parentName,
 				ids: [item.id],
-			}
-			groupMap.set(key, newGroup)
+			};
+			groupMap.set(key, newGroup);
 		} else {
 			// 기존 그룹에 id 추가
-			groupMap.get(key)!.ids.push(item.id)
+			groupMap.get(key)!.ids.push(item.id);
 		}
-	})
+	});
 
 	// Map 값들을 배열로 변환하여 반환
 	return {
 		patternMatchData: Array.from(groupMap.values()),
 		filteredDataLength,
-	}
-}
+	};
+};
 
 /** 기준 설정이 약간 모호한 부분 */
 export const onSetNodeLocalizationKeyBatch = () => {
 	on(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, async (data: { domainId: string; keyId: string; ids: string[] }) => {
 		if (data.ids.length === 0) {
-			return
+			return;
 		}
 		// originalLocalizeId 조회 또는 등록
 		// searchTranslationCode
-		const xNode = await figma.getNodeByIdAsync(data.ids[0])
+		const xNode = await figma.getNodeByIdAsync(data.ids[0]);
 		if (xNode == null || xNode.type !== 'TEXT') {
-			return
+			return;
 		}
 		setNodeData(xNode, {
 			domainId: data.domainId,
 			localizationKey: data.keyId,
-		})
-		const result = await addTranslation(xNode)
+		});
+		const result = await addTranslation(xNode);
 		if (result == null || result.localization_id == null) {
-			notify('Failed to add translation', 'error')
-			return
+			notify('Failed to add translation', 'error');
+			return;
 		}
 		for (const id of data.ids) {
-			const node = await figma.getNodeByIdAsync(id)
+			const node = await figma.getNodeByIdAsync(id);
 			if (node) {
 				setNodeData(node, {
 					domainId: data.domainId,
 					localizationKey: data.keyId,
 					originalLocalizeId: result.localization_id.toString(),
-				})
+				});
 			}
 		}
-		await reloadOriginalLocalizationName(xNode)
-	})
-}
+		await reloadOriginalLocalizationName(xNode);
+	});
+};
 
 export const onUpdateNodeLocalizationKeyBatch = () => {
 	on(
 		UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
 		async (data: { domainId?: string; keyId: string; originId?: string; ids: string[] }) => {
 			if (data.ids.length === 0) {
-				return
+				return;
 			}
 			// originalLocalizeId 조회
 
 			for (const id of data.ids) {
-				const node = await figma.getNodeByIdAsync(id)
+				const node = await figma.getNodeByIdAsync(id);
 				if (node) {
 					setNodeData(node, {
 						domainId: data.domainId,
 						localizationKey: data.keyId,
 						originalLocalizeId: data.originId,
-					})
+					});
 				}
 			}
 
-			const node = await figma.getNodeByIdAsync(data.ids[0])
+			const node = await figma.getNodeByIdAsync(data.ids[0]);
 			if (node) {
-				await reloadOriginalLocalizationName(node)
+				await reloadOriginalLocalizationName(node);
 			}
 		}
-	)
-}
+	);
+};
 
 export const onSetNodeIgnore = () => {
 	on(SET_NODE_IGNORE.REQUEST_KEY, async (data: { ignore: boolean; ids: string[] }) => {
 		if (data.ids.length === 0) {
-			return
+			return;
 		}
 		// originalLocalizeId 조회
 
 		for (const id of data.ids) {
-			const node = await figma.getNodeByIdAsync(id)
+			const node = await figma.getNodeByIdAsync(id);
 			if (node) {
 				setNodeData(node, {
 					ignore: data.ignore,
-				})
+				});
 			}
 		}
-		const node = await figma.getNodeByIdAsync(data.ids[0])
+		const node = await figma.getNodeByIdAsync(data.ids[0]);
 		if (node) {
-			await reloadOriginalLocalizationName(node)
+			await reloadOriginalLocalizationName(node);
 		}
-	})
-}
+	});
+};

@@ -1,4 +1,4 @@
-import { useFetch } from '@/hooks/useFetch'
+import { useFetch } from '@/hooks/useFetch';
 import {
 	IconButton,
 	Textbox,
@@ -14,49 +14,46 @@ import {
 	SearchTextbox,
 	Code,
 	Bold,
-} from '@create-figma-plugin/ui'
-import { Fragment, h } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
-import { LocalizationKeyDTO } from './TextPluginDataModel'
-import { currentPointerSignal } from './LabelModel'
-import { useSignal } from '@/hooks/useSignal'
-import { domainSettingSignal, onGetDomainSettingResponse } from '../Setting/SettingModel'
-import styles from './LabelPage.module.css'
-import { clc } from '@/components/modal/utils'
-import { UPDATE_NODE_STORE_KEY } from '../constant'
-import { emit } from '@create-figma-plugin/utilities'
-import { modalAlert } from '@/components/alert'
-import { computed, signal } from '@preact/signals-core'
-import { keyConventionRegex } from '@/utils/textTools'
+} from '@create-figma-plugin/ui';
+import { Fragment, h } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
+import { LocalizationKeyDTO } from './TextPluginDataModel';
+import { currentPointerSignal, isDirectSignal, isTravelSignal, selectedKeySignal } from '@/model/signal';
+import { useSignal } from '@/hooks/useSignal';
+import { onGetDomainSettingResponse } from '../Setting/SettingModel';
+import { domainSettingSignal } from '@/model/signal';
+import styles from './LabelPage.module.css';
+import { clc } from '@/components/modal/utils';
+import { UPDATE_NODE_STORE_KEY } from '../constant';
+import { emit } from '@create-figma-plugin/utilities';
+import { modalAlert } from '@/components/alert';
+import { computed } from '@preact/signals-core';
+import { keyConventionRegex } from '@/utils/textTools';
 
 export const NullDisableText = ({
 	className,
 	placeholder,
 	children,
 }: {
-	className?: string
-	placeholder?: string
-	children?: React.ReactNode
+	className?: string;
+	placeholder?: string;
+	children?: React.ReactNode;
 }) => {
 	return (
 		<span className={clc(className, children == null && styles.textDisabled)}>
 			{children == null ? placeholder : children}
 		</span>
-	)
-}
-export const selectedKeySignal = signal<string | null>(null)
-export const isBatchSignal = signal<boolean>(false)
-export const isTravelSignal = signal<boolean>(false)
-
+	);
+};
 const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
 	if (isNameOpen) {
-		return is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />
+		return is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />;
 	}
-	return <IconStar16 />
-}
+	return <IconStar16 />;
+};
 
 const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, origin_value }: LocalizationKeyDTO) => {
-	const [isOpen, setIsOpen] = useState(false)
+	const [isOpen, setIsOpen] = useState(false);
 
 	return (
 		<div
@@ -92,17 +89,17 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 				</IconButton> */}
 			</div>
 		</div>
-	)
-}
+	);
+};
 
 export const SearchArea = ({
 	search,
 	setSearch,
 	data,
 }: {
-	search: string
-	setSearch: (search: string) => void
-	data: LocalizationKeyDTO[]
+	search: string;
+	setSearch: (search: string) => void;
+	data: LocalizationKeyDTO[];
 }) => {
 	return (
 		<Fragment>
@@ -112,35 +109,35 @@ export const SearchArea = ({
 				placeholder="Search..."
 				value={search}
 				onChange={(e) => {
-					setSearch(e.currentTarget.value)
+					setSearch(e.currentTarget.value);
 					// setSearch(keyConventionRegex(e.currentTarget.value))
 				}}
 			></SearchTextbox>
 			<VerticalSpace space="extraSmall"></VerticalSpace>
 			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
 		</Fragment>
-	)
-}
+	);
+};
 
 export const useSearch = () => {
-	const [search, setSearch] = useState('')
-	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
-	const domainSetting = useSignal(domainSettingSignal)
-	const selectedKey = useSignal(selectedKeySignal)
+	const [search, setSearch] = useState('');
+	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>();
+	const domainSetting = useSignal(domainSettingSignal);
+	const selectedKey = useSignal(selectedKeySignal);
 
-	const selectedKeyData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'))
+	const selectedKeyData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'));
 
 	useEffect(() => {
 		if (loading) {
-			return
+			return;
 		}
-		const domainId = domainSetting?.domainId
+		const domainId = domainSetting?.domainId;
 
 		if (!domainId) {
-			return
+			return;
 		}
 		if (search.length === 0) {
-			return
+			return;
 		}
 
 		fetchData(('/localization/keys/name/' + search) as '/localization/keys/name/{name}', {
@@ -149,32 +146,32 @@ export const useSearch = () => {
 				'X-Domain-Id': domainId.toString(),
 				'Content-Type': 'application/json',
 			},
-		})
+		});
 		return () => {
-			selectedKeySignal.value = null
-		}
-	}, [search])
+			selectedKeySignal.value = null;
+		};
+	}, [search]);
 
-	return { search, setSearch, selectedKeyData, data, loading, error, fetchData }
-}
+	return { search, setSearch, selectedKeyData, data, loading, error, fetchData };
+};
 
 /** search bar */
 function LabelSearch() {
-	const { data, search, setSearch } = useSearch()
+	const { data, search, setSearch } = useSearch();
 
-	const isBatch = useSignal(isBatchSignal)
+	const isBatch = useSignal(isDirectSignal);
 
-	const isTravel = useSignal(isTravelSignal)
+	const isTravel = useSignal(isTravelSignal);
 
-	const currentPointer = useSignal(currentPointerSignal)
-	const selectedKey = useSignal(selectedKeySignal)
+	const currentPointer = useSignal(currentPointerSignal);
+	const selectedKey = useSignal(selectedKeySignal);
 
 	// 즉시 적용 기능
 	useEffect(() => {
 		if (isBatch && selectedKey && currentPointer) {
-			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
+			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey);
 		}
-	}, [currentPointer?.nodeId])
+	}, [currentPointer?.nodeId]);
 
 	return (
 		<Fragment>
@@ -183,13 +180,13 @@ function LabelSearch() {
 		</Toggle> */}
 			<VerticalSpace space="extraSmall"></VerticalSpace>
 
-			<Toggle onChange={() => (isBatchSignal.value = !isBatch)} value={isBatch}>
+			<Toggle onChange={() => (isDirectSignal.value = !isBatch)} value={isBatch}>
 				<Text>즉시 적용 (alt + click 추천)</Text>
 				<VerticalSpace space="extraSmall"></VerticalSpace>
 				<Text>검색 창에서 선택된 상태로 피그마 텍스트 클릭 시 반영</Text>
 			</Toggle>
 			<SearchArea search={search} setSearch={setSearch} data={data ?? []} />
 		</Fragment>
-	)
+	);
 }
-export default LabelSearch
+export default LabelSearch;

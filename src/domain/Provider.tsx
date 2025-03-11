@@ -1,10 +1,10 @@
-import { ComponentChildren, Fragment, h } from 'preact'
-import { useLayoutEffect } from 'preact/hooks'
-import ClientModalProvider from '@/components/modal/Modal'
-import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/LabelModel'
-import { onGetLocalizationKeyResponse } from './Label/TextPluginDataModel'
-import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel'
-import { onCurrentSectionSelectedResponse } from './Translate/TranslateModel'
+import { ComponentChildren, Fragment, h } from 'preact';
+import { useLayoutEffect } from 'preact/hooks';
+import ClientModalProvider from '@/components/modal/Modal';
+import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/LabelModel';
+import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
+import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
+import { onCurrentSectionSelectedResponse } from './Translate/TranslateModel';
 
 /**
  * duplex 전용 어댑터
@@ -24,15 +24,15 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onGetCursorPositionResponse(),
 			onSetProjectIdResponse(),
 			onCurrentSectionSelectedResponse(),
-		]
+		];
 
 		return () => {
-			events.forEach((event) => event())
-		}
-	}, [])
+			events.forEach((event) => event());
+		};
+	}, []);
 
-	return <Fragment>{children}</Fragment>
-}
+	return <Fragment>{children}</Fragment>;
+};
 
 /**
  * 최종 provider
@@ -46,5 +46,5 @@ export function AppProvider({ children }: { children: preact.ComponentChildren }
 			{children}
 			<ClientModalProvider></ClientModalProvider>
 		</Duplex_Adapter>
-	)
+	);
 }

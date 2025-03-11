@@ -8,7 +8,8 @@ import {
 	onSetDomainSetting,
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel';
-import { onGetCursorPosition, onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel';
+import { onGetProjectId, onNodeSelectionChange, onSetProjectId } from '@/domain/Label/LabelModel';
+import { onGetCursorPosition } from '@/model/on/GET_CURSOR_POSITION';
 import { onGetLocalizationKeyData } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
 import {
 	onNodeReload,

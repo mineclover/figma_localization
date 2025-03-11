@@ -28,7 +28,8 @@ import {
 	IconStarFilled16,
 } from '@create-figma-plugin/ui';
 import styles from './LabelPage.module.css';
-import { LocalizationKey, PutLocalizationKeyType } from './TextPluginDataModel';
+import { PutLocalizationKeyType } from './TextPluginDataModel';
+import { LocalizationKey } from '@/model/types';
 import { localizationKeySignal } from '@/model/signal';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import LabelSearch from './LabelSearch';

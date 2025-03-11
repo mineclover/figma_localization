@@ -1,57 +1,35 @@
-import { CurrentCursorType, NodeData } from '../utils/featureType';
+import { NodeData } from '../utils/featureType';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_CURSOR_POSITION,
 	GET_LOCALIZATION_KEY_VALUE,
-	GET_PROJECT_ID,
-	GET_TRANSLATION_KEY_VALUE,
 	NODE_STORE_KEY,
 	PUT_LOCALIZATION_KEY,
 	RELOAD_NODE,
 	SET_NODE_LOCATION,
 	SET_NODE_RESET_KEY,
-	SET_PROJECT_ID,
-	STORE_KEY,
 	UPDATE_NODE_STORE_KEY,
 } from '../constant';
 
-import { FilePathNodeSearch, notify } from '@/figmaPluginUtils';
-import { getCursorPosition, sectionNameParser } from './LabelModel';
+import { notify } from '@/figmaPluginUtils';
+import { getCursorPosition } from './LabelModel';
 import { fetchDB } from '../utils/fetchDB';
-import { DomainSettingType, getDomainSetting } from '../Setting/SettingModel';
-import { getFigmaRootStore } from '../utils/getStore';
-import { ERROR_CODE } from '../errorCode';
+import { getDomainSetting } from '../Setting/SettingModel';
 import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
-import { signal } from '@preact/signals-core';
 import { components } from 'types/i18n';
-import { enforcePrefix } from './LabelPage';
 import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel';
 
 import { generateXmlString, StyleSync } from '../Style/StylePage';
-import { createStableStyleKey } from '@/utils/keyJson';
-import { localizationKeySignal } from '@/model/signal';
 
-export type LocationDTO = {
-	created_at: string;
-	is_deleted: number;
-	is_pinned: number;
-	location_id: number;
-	node_id: string;
-	page_id: string;
-	project_id: string;
-	updated_at: string;
-};
-
-export type Location = {
-	location_id: number;
-	project_id: string;
-	node_id: string;
-	page_id: string;
-	is_pinned: boolean;
-	is_deleted: boolean;
-	created_at: string;
-	updated_at: string;
-};
+import {
+	LocationDTO,
+	Location,
+	LocalizationKey,
+	LocalizationKeyDTO,
+	LocalizationKeyProps,
+	LocalizationTranslation,
+	LocalizationTranslationDTO,
+} from '@/model/types';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -64,44 +42,6 @@ export const locationMapping = (location: LocationDTO): Location => {
 		created_at: location.created_at,
 		updated_at: location.updated_at,
 	};
-};
-
-export type LocalizationKeyDTO = {
-	key_id: number;
-	domain_id: number;
-	name: string;
-	origin_id?: number;
-	origin_value?: string;
-	alias?: string;
-	parent_key_id?: number;
-	parent_name?: string;
-	parent_origin_value?: string;
-	is_variable: number;
-	is_temporary: number;
-	section_id?: number;
-	section_name: string;
-	version: number;
-	is_deleted: number;
-	created_at: string;
-	updated_at: string;
-};
-
-export type LocalizationKey = {
-	key_id: number;
-	domain_id: number;
-	name: string;
-	origin_id?: number;
-	origin_value?: string;
-	alias?: string;
-	parent_key_id?: number;
-	is_variable: boolean;
-	is_temporary: boolean;
-	section_id?: number;
-	section_name: string;
-	version: number;
-	is_deleted: boolean;
-	created_at: string;
-	updated_at: string;
 };
 
 export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey => {
@@ -160,42 +100,6 @@ export const onSetNodeResetKey = () => {
 		node.setPluginData(NODE_STORE_KEY.LOCATION, '');
 		node.autoRename = true;
 	});
-};
-
-export type LocalizationKeyProps = {
-	domainId: number;
-	name: string;
-	alias?: string;
-	sectionId?: string;
-	parentKeyId?: number;
-	isVariable?: boolean;
-	isTemporary?: boolean;
-	sectionName?: string;
-};
-
-// TextPluginDataModel 타입 정의
-export type LocalizationTranslationDTO = {
-	created_at: string;
-	is_deleted: number;
-	key_id: number;
-	language_code: string;
-	last_modified_by: null | string;
-	localization_id: number;
-	text: string;
-	updated_at: string;
-	version: number;
-};
-
-export type LocalizationTranslation = {
-	created_at: string;
-	is_deleted: boolean;
-	key_id: number;
-	language_code: string;
-	last_modified_by: string | null;
-	localization_id: number;
-	text: string;
-	updated_at: string;
-	version: number;
 };
 
 export const localizationTranslationMapping = (dto: LocalizationTranslationDTO): LocalizationTranslation => {
@@ -601,8 +505,11 @@ export const onTargetSetNodeLocation = () => {
 };
 
 export const allRefresh = async (node: TextNode) => {
+	// getCursorPosition은 LabelModel.ts에서 가져와 사용
 	const cursorPosition = await getCursorPosition(node);
 	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
+
+	// 이 함수는 이 파일에 있으므로 직접 호출
 	const value = await processTextNodeLocalization(node);
 	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value);
 };

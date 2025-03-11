@@ -17,7 +17,7 @@ import {
 } from '@create-figma-plugin/ui';
 import { Fragment, h } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
-import { LocalizationKeyDTO } from './TextPluginDataModel';
+import { LocalizationKeyDTO } from '@/model/types';
 import { currentPointerSignal, isDirectSignal, isTravelSignal, selectedKeySignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { onGetDomainSettingResponse } from '../Setting/SettingModel';

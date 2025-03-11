@@ -1,5 +1,5 @@
 import { SearchNodeData } from '@/domain/Batch/batchModel';
-import { LocalizationKey } from '@/domain/Label/TextPluginDataModel';
+import { LocalizationKey } from './types';
 import { DomainSettingType } from '@/domain/Setting/SettingModel';
 import { StyleStore } from '@/domain/Style/StylePage';
 import { CurrentNode } from '@/domain/Translate/TranslateModel';

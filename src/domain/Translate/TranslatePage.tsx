@@ -25,11 +25,8 @@ import { emit } from '@create-figma-plugin/utilities';
 import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
 import { projectIdSignal } from '@/model/signal';
 import { currentPointerSignal } from '@/model/signal';
-import {
-	LocalizationTranslation,
-	LocalizationTranslationDTO,
-	localizationTranslationMapping,
-} from '../Label/TextPluginDataModel';
+import { localizationTranslationMapping } from '../Label/TextPluginDataModel';
+import { LocalizationTranslation, LocalizationTranslationDTO } from '@/model/types';
 import styles from './translate.module.css';
 import { clientFetchDBCurry } from '../utils/fetchDB';
 import { NullDisableText } from '../Label/LabelSearch';

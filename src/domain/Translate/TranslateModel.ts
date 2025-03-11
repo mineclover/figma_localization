@@ -10,7 +10,8 @@ import {
 	NODE_STORE_KEY,
 } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
-import { getNodeData, LocalizationTranslationDTO } from '../Label/TextPluginDataModel';
+import { getNodeData } from '../Label/TextPluginDataModel';
+import { LocalizationTranslationDTO } from '@/model/types';
 import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';

@@ -54,7 +54,7 @@ import { clientFetchDBCurry } from '../utils/fetchDB';
 import { domainSettingSignal } from '@/model/signal';
 import { useFetch } from '@/hooks/useFetch';
 import { modalAlert } from '@/components/alert';
-import { LocalizationKeyDTO } from '../Label/TextPluginDataModel';
+import { LocalizationKeyDTO } from '@/model/types';
 import { SearchArea, useSearch } from '../Label/LabelSearch';
 import { selectedKeySignal } from '@/model/signal';
 import { NonNullableComponentTypeExtract } from 'types/utilType';

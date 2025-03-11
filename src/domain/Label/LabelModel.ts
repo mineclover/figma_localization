@@ -1,4 +1,4 @@
-import { CurrentCursorType } from '../utils/featureType';
+import { CurrentCursorType } from '@/model/types';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	CURRENT_SECTION_SELECTED,

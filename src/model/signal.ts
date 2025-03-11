@@ -1,9 +1,8 @@
-import { SearchNodeData } from './types';
+import { SearchNodeData, StyleSync } from './types';
 import { LocalizationKey } from './types';
 import { DomainSettingType } from './types';
-import { StyleStore } from '@/domain/Style/StylePage';
-import { CurrentNode } from '@/domain/Translate/TranslateModel';
-import { CurrentCursorType } from '@/domain/utils/featureType';
+import { CurrentNode } from './types';
+import { CurrentCursorType } from './types';
 import { signal } from '@preact/signals-core';
 
 /**
@@ -51,3 +50,4 @@ export const domainSettingSignal = signal<DomainSettingType | null>(null);
 
 /** 언어 코드 배열 */
 export const languageCodesSignal = signal<string[]>([]);
+export type StyleStore = Record<string, StyleSync>;

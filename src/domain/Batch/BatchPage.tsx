@@ -1,6 +1,6 @@
 import { useSignal } from '@/hooks/useSignal';
 import { Fragment, h } from 'preact';
-import { CurrentNode } from '../Translate/TranslateModel';
+import { CurrentNode } from '@/model/types';
 import { currentSectionSignal } from '@/model/signal';
 import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import {

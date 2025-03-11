@@ -11,16 +11,11 @@ import {
 } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
 import { getNodeData } from '../Label/TextPluginDataModel';
-import { LocalizationTranslationDTO } from '@/model/types';
+import { CurrentNode, LocalizationTranslationDTO } from '@/model/types';
 import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal } from '@/model/signal';
-
-export type CurrentNode = {
-	id: string;
-	name: string;
-};
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);

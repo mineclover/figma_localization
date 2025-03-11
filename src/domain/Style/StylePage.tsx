@@ -59,8 +59,6 @@ const parseSame = (style: string, serverStyle: string) => {
 	return deepEqual(styleValue, styleValue2);
 };
 
-export type StyleStore = Record<string, StyleSync>;
-
 const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 	const { data, loading, error, fetchData } = useFetch<ResourceDTO>();
 

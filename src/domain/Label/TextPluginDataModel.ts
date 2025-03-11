@@ -1,4 +1,4 @@
-import { NodeData } from '../utils/featureType';
+import { NodeData } from '@/model/types';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_CURSOR_POSITION,

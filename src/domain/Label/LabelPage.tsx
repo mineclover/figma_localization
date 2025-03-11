@@ -14,7 +14,7 @@ import { emit } from '@create-figma-plugin/utilities';
 import { onGetCursorPositionResponse, sectionNameParser } from './LabelModel';
 import { currentPointerSignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
-import { CurrentCursorType } from '../utils/featureType';
+import { CurrentCursorType } from '@/model/types';
 import {
 	Button,
 	Checkbox,

@@ -1,3 +1,5 @@
+import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
+
 // 번역 관련 이벤트 타입
 export interface TranslationKeyEventTypes {
 	REQUEST_KEY: string;
@@ -225,3 +227,27 @@ export interface StyleGroup {
 	style: Record<string, any>;
 	ranges: { start: number; end: number; text: string }[];
 }
+export type CurrentNode = {
+	id: string;
+	name: string;
+}; /** 현재 커서 정보 */
+
+export type CurrentCursorType = {
+	/**
+	 * 표시 생략해도 됨
+	 */
+	projectId: string;
+	/**
+	 *
+	 */
+	pageName: string;
+	pageId: string;
+	nodeName: string;
+	nodeId: string;
+	characters: string;
+	autoRename: boolean;
+
+	data: NodeData;
+	styleData?: ValidAllStyleRangesType;
+	boundVariables?: any;
+}; /**  */

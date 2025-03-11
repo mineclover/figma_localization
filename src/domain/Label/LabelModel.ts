@@ -1,22 +1,20 @@
 import { CurrentCursorType } from '@/model/types';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
-	CURRENT_SECTION_SELECTED,
 	GET_CURSOR_POSITION,
-	GET_LOCALIZATION_KEY_VALUE,
 	GET_PROJECT_ID,
+	GET_STYLE_DATA,
 	NODE_STORE_KEY,
 	SET_PROJECT_ID,
 	STORE_KEY,
 } from '../constant';
 
 import { FilePathNodeSearch, notify } from '@/figmaPluginUtils';
-import { getNodeData, processTextNodeLocalization } from './TextPluginDataModel';
+import { getNodeData } from './TextPluginDataModel';
 import { getAllStyleRanges } from '@/figmaPluginUtils/text';
 import { fetchDB } from '../utils/fetchDB';
 import { ERROR_CODE } from '../errorCode';
 import { removeLeadingSymbols } from '@/utils/textTools';
-import { getCurrentSectionSelected } from '../Translate/TranslateModel';
 import { currentPointerSignal, projectIdSignal } from '@/model/signal';
 
 export const getProjectId = () => {
@@ -69,35 +67,25 @@ export const sectionNameParser = (text: string) => {
 	return null;
 };
 
-/**
- * 이 코드가 너무 많은 기능을 갖고 있어서 리펙토링 하게 되면 수정하면 좋을 것 같음
- */
 export const getCursorPosition = async (node: BaseNode) => {
-	const sectionData = {
-		section_id: '',
-		name: 'NULL',
-	};
 	if (node && node.type === 'TEXT') {
-		const result = FilePathNodeSearch(node);
-
 		// 첫번째 섹션
-		const sectionNode = result.find((node) => node.type === 'SECTION');
+		// const result = FilePathNodeSearch(node);
+		// const sectionNode = result.find((node) => node.type === 'SECTION');
 
-		if (sectionNode) {
-			const text = sectionNode.name.trim();
+		// if (sectionNode) {
+		// 	const text = sectionNode.name.trim();
 
-			const sectionName = text;
-			sectionData.name = sectionName;
-			sectionData.section_id = sectionNode.id;
-		}
+		// 	const sectionName = text;
+		// 	sectionData.name = sectionName;
+		// 	sectionData.section_id = sectionNode.id;
+		// }
 
 		const projectId = getProjectId();
 		if (!projectId) {
 			return;
 		}
 		const NodeData = getNodeData(node);
-
-		const { styleData, boundVariables } = getAllStyleRanges(node);
 
 		const cursorPosition: CurrentCursorType = {
 			projectId,
@@ -109,30 +97,10 @@ export const getCursorPosition = async (node: BaseNode) => {
 			characters: node.characters,
 			autoRename: node.autoRename,
 			data: NodeData,
-			styleData,
-			boundVariables,
 		};
 
 		return cursorPosition;
 	}
-};
-
-let tempNode = '';
-
-export const onNodeSelectionChange = () => {
-	figma.on('selectionchange', async () => {
-		const node = figma.currentPage.selection[0];
-		/** 업데이트 반영 코드 */
-		if (node && tempNode !== node.id) {
-			tempNode = node.id;
-			const cursorPosition = await getCursorPosition(node);
-			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
-			const localizationKey = await processTextNodeLocalization(node);
-			emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey);
-		}
-		const sectionId = getCurrentSectionSelected(node);
-		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
-	});
 };
 
 /** Main */

@@ -321,6 +321,7 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	];
 }
 
+/** TODO: 값이 약간 다름.. 체크 해야함.. */
 const targetVariableBindableFields = [
 	'fontFamily',
 	'fontSize',

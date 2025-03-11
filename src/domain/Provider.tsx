@@ -5,6 +5,7 @@ import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/Lab
 import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
 import { onCurrentSectionSelectedResponse } from './Translate/TranslateModel';
+import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 
 /**
  * duplex 전용 어댑터
@@ -24,6 +25,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onGetCursorPositionResponse(),
 			onSetProjectIdResponse(),
 			onCurrentSectionSelectedResponse(),
+			onGetStyleDataResponse(),
 		];
 
 		return () => {

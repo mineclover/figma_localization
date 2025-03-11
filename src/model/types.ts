@@ -248,6 +248,6 @@ export type CurrentCursorType = {
 	autoRename: boolean;
 
 	data: NodeData;
-	styleData?: ValidAllStyleRangesType;
-	boundVariables?: any;
+	// styleData?: ValidAllStyleRangesType;
+	// boundVariables?: any;
 }; /**  */

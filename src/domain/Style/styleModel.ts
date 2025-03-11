@@ -329,7 +329,8 @@ export const groupAllSegmentsByStyle = (
 
 /**
  * 일단 로컬라이제이션 키가 있다는 것을 전재로 함
- * Test
+ * 받아온 키를 통해
+ * 해당 아이디의 스타일을 선택 노드에 적용하는 코드임
  */
 export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
@@ -398,7 +399,7 @@ export const onDownloadStyle = () => {
 			const key = Object.keys(item)[0];
 			const target = item[key];
 			const value = target[0]['#text'] as string;
-			const length = value.length;
+			const length = typeof value === 'string' ? value.length : 0;
 			end = start + length;
 
 			let resource = resourceMap.get(key);

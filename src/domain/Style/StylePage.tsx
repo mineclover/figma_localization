@@ -5,7 +5,7 @@ import { ComponentChildren, Fragment, h } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { components } from 'types/i18n';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from '../Setting/SettingModel';
-import { languageCodesSignal } from '@/model/signal';
+import { languageCodesSignal, styleDataSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 
 import { useSignal } from '@/hooks/useSignal';
@@ -157,7 +157,6 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 	useEffect(() => {
 		try {
 			// XML 파싱
-
 			const parsedDataArr = parseXML(xml);
 			/** 텍스트 출력 */
 			// const removeTag = parsedDataArr.map((item) => {
@@ -177,9 +176,7 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 
 	useEffect(() => {
 		// XML 형식의 문자열 생성 함수
-
 		// 함수 실행하여 XML 생성
-
 		if (typeof text === 'string' && styleValues.value.length > 0) {
 			const xmlString = generateXmlString(styleValues.value, styleTagMode);
 
@@ -209,6 +206,7 @@ const StylePage = () => {
 	const languageCodes = useSignal(languageCodesSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	const styleTagMode = useSignal(styleTagModeSignal);
+	const styleData = useSignal(styleDataSignal);
 
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
@@ -217,12 +215,15 @@ const StylePage = () => {
 	const clientFetchDB = clientFetchDBCurry(2);
 
 	useEffect(() => {
-		styleSignal.value = {};
-	}, [currentPointer]);
+		if (currentPointer) {
+			styleSignal.value = {};
+		}
+	}, [styleData]);
+	console.log('🚀 ~ useEffect ~ styleSignal:', currentPointer, styleData);
 
-	if (currentPointer && currentPointer.styleData && currentPointer.characters && currentPointer.boundVariables) {
-		const segments = createStyleSegments(currentPointer.characters, currentPointer.styleData);
-		const boundVariables = createStyleSegments(currentPointer.characters, currentPointer.boundVariables);
+	if (currentPointer && styleData) {
+		const segments = createStyleSegments(currentPointer.characters, styleData.styleData);
+		const boundVariables = createStyleSegments(currentPointer.characters, styleData.boundVariables);
 		const allStyleGroups = groupAllSegmentsByStyle(currentPointer.characters, segments, boundVariables);
 
 		return (

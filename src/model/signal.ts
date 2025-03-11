@@ -1,3 +1,4 @@
+import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
 import { SearchNodeData, StyleSync } from './types';
 import { LocalizationKey } from './types';
 import { DomainSettingType } from './types';
@@ -51,3 +52,10 @@ export const domainSettingSignal = signal<DomainSettingType | null>(null);
 /** 언어 코드 배열 */
 export const languageCodesSignal = signal<string[]>([]);
 export type StyleStore = Record<string, StyleSync>;
+
+export type StyleData = {
+	styleData: ValidAllStyleRangesType;
+	boundVariables: any;
+};
+
+export const styleDataSignal = signal<StyleData | null>(null);

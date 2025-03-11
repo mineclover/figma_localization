@@ -1,4 +1,4 @@
-import { StyleHashSegment, StyleSync } from '@/domain/Style/StylePage';
+import { StyleHashSegment, StyleSync } from '@/model/types';
 
 export const safeNumberConversion = (input: string) => {
 	// 입력이 문자열이 아니면 그대로 반환

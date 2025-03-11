@@ -19,7 +19,8 @@ import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
 import { components } from 'types/i18n';
 import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel';
 
-import { generateXmlString, StyleSync } from '../Style/StylePage';
+import { generateXmlString } from '../Style/StylePage';
+import { StyleSync } from '@/model/types';
 
 import {
 	LocationDTO,

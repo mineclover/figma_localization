@@ -117,3 +117,111 @@ export type LocalizationTranslation = {
 	updated_at: string;
 	version: number;
 };
+export type SearchNodeData = {
+	id: string;
+	name: string;
+	ignore: boolean;
+	localizationKey: string;
+	text: string;
+	parentName: string;
+};
+
+export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
+	ids: string[];
+};
+export type GroupOption = {
+	localizationKey: true;
+	/** 부모 이름을 그루핑 파라미터로 사용 */
+	parentName: true;
+	/** 이름을 그루핑 파라미터로 사용 */
+	name: true;
+	/** 텍스트를 그루핑 파라미터로 사용 */
+	text: true;
+};
+export type ViewOption = {
+	/** 숨김 대상을 표시 */
+	ignore: boolean;
+	/** 숨기지 않은 대상을 표시 */
+	notIgnore: boolean;
+	/** 키 값이 있는 대상을 표시 */
+	hasLocalizationKey: boolean;
+	/** 키 값이 없는 대상을 표시 */
+	notHasLocalizationKey: boolean;
+}; // inspect 모드에서 figma.fileKey가 없기 때문에 프로젝트 아이디를 STORE_KEY에 추가함
+
+export type SectionDTO = {
+	section_id: number;
+	section_name: string;
+	domain_id: number;
+	doc_link: string;
+	created_at: string;
+	updated_at: string;
+	code?: string;
+};
+export type DomainSettingType = {
+	domainId: number;
+	domain: string;
+}; // 있든 없든 수정 가능하게 구성
+
+export type StyleSync = {
+	hashId: string;
+	name?: string;
+	id?: string;
+} & StyleGroup;
+
+export type StyleHashSegment = {
+	total: number;
+	text: string;
+
+	id?: string;
+	hashId: string;
+	name?: string;
+	styles: Record<string, any>;
+};
+
+export type Resource = {
+	resource_id: number;
+	style_name: string;
+	style_value: string;
+	hash_value: string;
+	alias?: string;
+	is_deleted: boolean;
+	created_at: string;
+	updated_at: string;
+};
+
+export type ResourceDTO = {
+	resource_id: number;
+	style_name: string;
+	style_value: string;
+	hash_value: string;
+	alias?: string;
+	is_deleted: number;
+	created_at: string;
+	updated_at: string;
+};
+export type ParsedResourceDTO = {
+	resource_id: number;
+	style_name: string;
+	style_value: Record<string, any>;
+	hash_value: string;
+	alias?: string;
+	is_deleted: number;
+	created_at: string;
+	updated_at: string;
+};
+export interface StyleSegment {
+	start: number;
+	end: number;
+	text: string;
+	style: Record<string, any>;
+}
+
+export interface StyleSegmentsResult {
+	defaultStyle: Record<string, any>;
+	segments: StyleSegment[];
+}
+export interface StyleGroup {
+	style: Record<string, any>;
+	ranges: { start: number; end: number; text: string }[];
+}

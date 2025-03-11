@@ -1,6 +1,6 @@
-import { SearchNodeData } from '@/domain/Batch/batchModel';
+import { SearchNodeData } from './types';
 import { LocalizationKey } from './types';
-import { DomainSettingType } from '@/domain/Setting/SettingModel';
+import { DomainSettingType } from './types';
 import { StyleStore } from '@/domain/Style/StylePage';
 import { CurrentNode } from '@/domain/Translate/TranslateModel';
 import { CurrentCursorType } from '@/domain/utils/featureType';

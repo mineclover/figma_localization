@@ -2,11 +2,7 @@ import { emit, on } from '@create-figma-plugin/utilities';
 import { SET_DOMAIN_PAIR, GET_DOMAIN_PAIR, STORE_KEY, GET_LANGUAGE_CODES, SET_LANGUAGE_CODES } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
 import { domainSettingSignal, languageCodesSignal } from '@/model/signal';
-
-export type DomainSettingType = {
-	domainId: number;
-	domain: string;
-};
+import { DomainSettingType } from '@/model/types';
 
 export const getDomainSetting = () => {
 	return getFigmaRootStore<DomainSettingType>(STORE_KEY.DOMAIN);

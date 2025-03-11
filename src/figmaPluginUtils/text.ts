@@ -1,4 +1,4 @@
-import { ResourceDTO } from '@/domain/Style/StylePage';
+import { ResourceDTO } from '@/model/types';
 
 // 스타일 객체 타입 정의
 interface StyleRange<T> {

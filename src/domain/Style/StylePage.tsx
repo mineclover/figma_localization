@@ -41,7 +41,7 @@ import { clientFetchDBCurry } from '../utils/fetchDB';
 import { NullDisableText } from '../Label/LabelSearch';
 import { clc } from '@/components/modal/utils';
 import styles from '../Label/LabelPage.module.css';
-import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle, StyleGroup } from './styleModel';
+import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle } from './styleModel';
 import { computed } from '@preact/signals-core';
 import { createStableStyleKey } from '@/utils/keyJson';
 import { deepEqual } from '@/utils/data';
@@ -49,56 +49,7 @@ import { XMLParser } from 'fast-xml-parser';
 import prettier from 'prettier';
 import { ParseTextBlock, parseXML } from '@/utils/xml';
 import { localizationKeySignal } from '@/model/signal';
-
-// 있든 없든 수정 가능하게 구성
-
-export type StyleSync = {
-	hashId: string;
-	name?: string;
-	id?: string;
-} & StyleGroup;
-
-export type StyleHashSegment = {
-	total: number;
-	text: string;
-
-	id?: string;
-	hashId: string;
-	name?: string;
-	styles: Record<string, any>;
-};
-
-export type Resource = {
-	resource_id: number;
-	style_name: string;
-	style_value: string;
-	hash_value: string;
-	alias?: string;
-	is_deleted: boolean;
-	created_at: string;
-	updated_at: string;
-};
-
-export type ResourceDTO = {
-	resource_id: number;
-	style_name: string;
-	style_value: string;
-	hash_value: string;
-	alias?: string;
-	is_deleted: number;
-	created_at: string;
-	updated_at: string;
-};
-export type ParsedResourceDTO = {
-	resource_id: number;
-	style_name: string;
-	style_value: Record<string, any>;
-	hash_value: string;
-	alias?: string;
-	is_deleted: number;
-	created_at: string;
-	updated_at: string;
-};
+import { StyleSync, ResourceDTO, StyleHashSegment } from '@/model/types';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;

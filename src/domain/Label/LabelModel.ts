@@ -19,18 +19,6 @@ import { removeLeadingSymbols } from '@/utils/textTools';
 import { getCurrentSectionSelected } from '../Translate/TranslateModel';
 import { currentPointerSignal, projectIdSignal } from '@/model/signal';
 
-// inspect 모드에서 figma.fileKey가 없기 때문에 프로젝트 아이디를 STORE_KEY에 추가함
-
-export type SectionDTO = {
-	section_id: number;
-	section_name: string;
-	domain_id: number;
-	doc_link: string;
-	created_at: string;
-	updated_at: string;
-	code?: string;
-};
-
 export const getProjectId = () => {
 	const fileKey = figma.fileKey;
 	if (fileKey) {

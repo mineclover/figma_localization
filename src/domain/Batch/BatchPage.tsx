@@ -38,14 +38,9 @@ import {
 	SET_NODE_LOCALIZATION_KEY_BATCH,
 	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
 } from '../constant';
-import {
-	groupByPattern,
-	GroupOption,
-	onPatternMatchResponse,
-	PatternMatchData,
-	SearchNodeData,
-	ViewOption,
-} from './batchModel';
+import { groupByPattern, onPatternMatchResponse } from './batchModel';
+import { GroupOption, ViewOption } from '@/model/types';
+import { PatternMatchData, SearchNodeData } from '@/model/types';
 import { patternMatchDataSignal, selectIdsSignal, selectTargetSignal } from '@/model/signal';
 import styles from './batch.module.css';
 import { clc } from '@/components/modal/utils';

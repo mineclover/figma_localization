@@ -1,6 +1,13 @@
 import { setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson';
-import { ParsedResourceDTO, ResourceDTO, StyleSync } from './StylePage';
+import {
+	ParsedResourceDTO,
+	ResourceDTO,
+	StyleGroup,
+	StyleSegment,
+	StyleSegmentsResult,
+	StyleSync,
+} from '@/model/types';
 import { DOWNLOAD_STYLE, SET_STYLE } from '../constant';
 import { on } from '@create-figma-plugin/utilities';
 import { notify } from '@/figmaPluginUtils';
@@ -17,18 +24,6 @@ import { parseTextBlock, parseXML } from '@/utils/xml';
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i);
 };
-
-export interface StyleSegment {
-	start: number;
-	end: number;
-	text: string;
-	style: Record<string, any>;
-}
-
-export interface StyleSegmentsResult {
-	defaultStyle: Record<string, any>;
-	segments: StyleSegment[];
-}
 
 /**
  * 텍스트 문자열과 스타일 데이터를 받아 스타일 세그먼트를 생성합니다.
@@ -106,11 +101,6 @@ export const createStyleSegments = (characters: string, styleData: ValidAllStyle
 		segments,
 	};
 };
-
-export interface StyleGroup {
-	style: Record<string, any>;
-	ranges: { start: number; end: number; text: string }[];
-}
 
 const styleClean = (styles: Record<string, any>) => {
 	const styleKeys = Object.keys(styles);

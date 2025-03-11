@@ -32,19 +32,7 @@ import {
 } from '../Label/TextPluginDataModel';
 import { notify } from '@/figmaPluginUtils';
 import { patternMatchDataSignal } from '@/model/signal';
-
-export type SearchNodeData = {
-	id: string;
-	name: string;
-	ignore: boolean;
-	localizationKey: string;
-	text: string;
-	parentName: string;
-};
-
-export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
-	ids: string[];
-};
+import { SearchNodeData, PatternMatchData, GroupOption, ViewOption } from '@/model/types';
 
 export const onPatternMatch = () => {
 	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
@@ -99,26 +87,6 @@ export const onPatternMatchResponse = () => {
 	on(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, (dataArr: SearchNodeData[]) => {
 		patternMatchDataSignal.value = dataArr;
 	});
-};
-
-export type GroupOption = {
-	localizationKey: true;
-	/** 부모 이름을 그루핑 파라미터로 사용 */
-	parentName: true;
-	/** 이름을 그루핑 파라미터로 사용 */
-	name: true;
-	/** 텍스트를 그루핑 파라미터로 사용 */
-	text: true;
-};
-export type ViewOption = {
-	/** 숨김 대상을 표시 */
-	ignore: boolean;
-	/** 숨기지 않은 대상을 표시 */
-	notIgnore: boolean;
-	/** 키 값이 있는 대상을 표시 */
-	hasLocalizationKey: boolean;
-	/** 키 값이 없는 대상을 표시 */
-	notHasLocalizationKey: boolean;
 };
 
 /**

@@ -69,8 +69,6 @@ const selectStyle = (selected: boolean) => {
 };
 
 const selectCurrentGroup = (selectTarget: CurrentNode, patternMatchDataGroup: PatternMatchData[]) => {
-	console.log('🚀 ~ selectCurrentGroup ~ patternMatchDataGroup:', patternMatchDataGroup);
-	console.log('🚀 ~ selectCurrentGroup ~ selectTarget:', selectTarget);
 	const currentGroup = patternMatchDataGroup.find((item) => item.ids.includes(selectTarget.id));
 	if (currentGroup) {
 		return currentGroup.ids;
@@ -365,8 +363,6 @@ function BatchPage() {
 	const section = useSignal(currentSectionSignal);
 
 	const selectIds = useSignal(selectIdsSignal);
-	console.log('🚀 ~ BatchPage ~ selectIds:', selectIds);
-
 	const domainSetting = useSignal(domainSettingSignal);
 
 	const selectTarget = useSignal(selectTargetSignal);
@@ -425,9 +421,13 @@ function BatchPage() {
 	/** 피그마 텍스트 스캔 데이터 */
 	const patternMatchData = useSignal(patternMatchDataSignal);
 
-	const { filteredDataLength, patternMatchData: dataTemp } = groupByPattern(patternMatchData, viewOption, groupOption);
+	const { filteredDataLength, patternMatchData: allPatternData } = groupByPattern(
+		patternMatchData,
+		viewOption,
+		groupOption
+	);
 
-	const patternMatchDataGroup = dataTemp.filter((item) => {
+	const patternMatchDataGroup = allPatternData.filter((item) => {
 		{
 			/* 검색이 선택 보기 상태면 선택한 아이디를 제공 */
 		}
@@ -441,7 +441,6 @@ function BatchPage() {
 		if (searchValue === '') {
 			return true;
 		}
-
 		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase());
 	});
 
@@ -525,14 +524,13 @@ function BatchPage() {
 						<Text>변경 대상 : {selectIds.length} 개</Text>
 						<Button
 							onClick={() => {
-								console.log('🚀 ~ BatchPage ~ currentPointer:', currentPointer);
 								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
 								const currentGroup = selectCurrentGroup(
 									{
 										id: currentPointer?.nodeId ?? '',
 										name: currentPointer?.nodeName ?? '',
 									},
-									patternMatchDataGroup
+									allPatternData
 								);
 
 								if (currentGroup) {
@@ -597,8 +595,6 @@ function BatchPage() {
 							onClick={async () => {
 								if (hasSelectedKey) {
 									// 변경할 키가 있으면 바로 일괄 변경 로직
-									console.log('🚀 ~ BatchPage ~ selectedKeyData:', selectedKeyData);
-
 									const isOriginNull = selectedKeyData.origin_value == null || selectedKeyData.origin_value === '';
 
 									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {

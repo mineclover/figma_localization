@@ -252,6 +252,7 @@ export const getTargetTranslations = async (id: string) => {
 
 /**
  * 오리지널 로컬라이제이션 키를 기준으로 값 일괄 수정
+ * TODO: 문제 있는 걸로 보임
  * allRefresh
  */
 export const reloadOriginalLocalizationName = async (node: BaseNode) => {
@@ -286,7 +287,7 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 		})
 		.map((node) => {
 			const nodeData = getNodeData(node);
-			if (nodeData.originalLocalizeId !== '') {
+			if (nodeData.originalLocalizeId != null && nodeData.originalLocalizeId !== '') {
 				let temp = targetOrigin.get(nodeData.originalLocalizeId);
 				if (temp == null) {
 					temp = new Set<TextNode>();
@@ -303,7 +304,7 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 	const now = Date.now();
 	for (const [key, targetNodes] of targetOrigin.entries()) {
 		for (const node of targetNodes) {
-			await TargetNodeStyleUpdate(node, key, now);
+			await TargetNodeStyleUpdate(node, localizationKey, now);
 		}
 	}
 };
@@ -336,6 +337,9 @@ export const addTranslation = async (node: TextNode) => {
 			2
 		),
 	});
+	if (!result) {
+		return;
+	}
 
 	for (const style of styleStoreArray) {
 		const result = await fetchDB('/resources/mapping', {
@@ -351,14 +355,10 @@ export const addTranslation = async (node: TextNode) => {
 		}
 	}
 
-	if (!result) {
-		return;
-	}
-
 	const data = (await result.json()) as LocalizationTranslationDTO;
-
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
+		const nodeData = getNodeData(node);
 		return data;
 	} else {
 		notify('Failed to set location', 'error');

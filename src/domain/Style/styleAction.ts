@@ -31,8 +31,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	// /** 클라에서 받는 로컬라이제이션 키 없을 때 노드의 원본 텍스트 조회 */
 	const originTextResult = await getLocalizationKeyData(localizationKey, date);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ originTextResult:', originTextResult);
-
 	if (originTextResult == null) {
 		notify('Failed to get localization key data', 'error');
 		return;

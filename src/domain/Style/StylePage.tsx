@@ -31,6 +31,7 @@ import {
 	SET_PROJECT_ID,
 	SET_STYLE,
 	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
+	UPDATE_STYLE_DATA,
 } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
@@ -176,7 +177,9 @@ const StylePage = () => {
 
 		return (
 			<div>
-				<Text>키 : {currentPointer.data.localizationKey}</Text>
+				<Text>domainId : {currentPointer.data.domainId}</Text>
+				<Text> localizationKey: {currentPointer.data.localizationKey}</Text>
+				<Text>originalLocalizeId : {currentPointer.data.originalLocalizeId}</Text>
 				<Button
 					onClick={async () => {
 						// 변경할 키가 없으면 추가하고
@@ -221,8 +224,9 @@ const StylePage = () => {
 						emit(SET_STYLE.REQUEST_KEY);
 					}}
 				>
-					키 있는 상태에서 추가 테스트
+					키 있는 상태에서 업데이트
 				</Button>
+
 				<Toggle
 					value={styleTagMode === 'id'}
 					onChange={() => {

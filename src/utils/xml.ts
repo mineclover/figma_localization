@@ -26,6 +26,5 @@ export const parseXML = (xml: string) => {
 	});
 	const parsedObj = parser.parse(`<root>${xml}</root>`);
 	const parsedDataArr = parsedObj[0].root as ParseTextBlock[];
-	console.log('🚀 ~ parseXML ~ parsedDataArr:', parsedDataArr);
 	return parsedDataArr;
 };

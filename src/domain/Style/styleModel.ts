@@ -1,6 +1,7 @@
-import { setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
+import { getAllStyleRanges, setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson';
 import {
+	LocalizationTranslationDTO,
 	ParsedResourceDTO,
 	ResourceDTO,
 	StyleGroup,
@@ -8,7 +9,7 @@ import {
 	StyleSegmentsResult,
 	StyleSync,
 } from '@/model/types';
-import { DOWNLOAD_STYLE, SET_STYLE } from '../constant';
+import { DOWNLOAD_STYLE, NODE_STORE_KEY, SET_STYLE, UPDATE_STYLE_DATA } from '../constant';
 import { on } from '@create-figma-plugin/utilities';
 import { notify } from '@/figmaPluginUtils';
 import {
@@ -17,11 +18,13 @@ import {
 	reloadOriginalLocalizationName,
 	getLocalizationKeyData,
 	generateLocalizationName,
+	getNodeData,
 } from '../Label/TextPluginDataModel';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
-import { TargetNodeStyleUpdate } from './styleAction';
+import { styleToXml, TargetNodeStyleUpdate } from './styleAction';
+import toNumber from 'strnum';
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i);

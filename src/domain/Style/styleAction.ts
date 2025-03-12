@@ -114,12 +114,73 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	}
 };
 
+export const xmlToStyle = async (xml: string, domainId: number | string) => {
+	const parsedData = parseXML(xml);
+	const clientFetchDB = clientFetchDBCurry(domainId);
+	const styleStore: Record<string, StyleSync> = {};
+
+	let start = 0;
+	let end = 0;
+
+	for (const item of parsedData) {
+		console.log('🚀 ~ xmlToStyle ~ item:', item);
+		const key = Object.keys(item)[0];
+		const value = parseTextBlock(item);
+		console.log('🚀 ~ xmlToStyle ~ value:', value);
+		const length = typeof value === 'string' ? value.length : 0;
+		end = start + length;
+		console.log('🚀 ~ xmlToStyle ~ end:', start, end);
+
+		const onlineStyle = await clientFetchDB(('/resources/' + key) as '/resources/{id}', {
+			method: 'GET',
+		});
+		const responseResult = (await onlineStyle.json()) as ResourceDTO;
+		console.log('🚀 ~ xmlToStyle ~ responseResult:', responseResult);
+		if (responseResult) {
+			const newHashId = responseResult.hash_value;
+
+			const before = styleStore[newHashId];
+
+			const ranges = before?.ranges ?? [];
+
+			const newId = responseResult.resource_id.toString();
+			const newAlias = responseResult.alias;
+			const newName = responseResult.style_name;
+			const newStyle = JSON.parse(responseResult.style_value);
+			const newRanges = {
+				start,
+				end,
+				text: value,
+			};
+
+			const store = {
+				hashId: newHashId,
+				name: newName,
+				id: newId,
+				alias: newAlias,
+				style: newStyle,
+				ranges: [...ranges, newRanges],
+			};
+			styleStore[newHashId] = store;
+			start = end;
+		}
+	}
+
+	return { xmlString: xml, styleStoreArray: Object.values(styleStore) };
+
+	// const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
+	// 	method: 'GET',
+	// });
+};
+
 export const styleToXml = async (
 	domainId: number | string,
 	characters: string,
 	styleData: StyleData,
 	mode: 'id' | 'name'
 ) => {
+	console.log('characters 업데이트 시점과 styleData시점이 별개임으로 스플릿이 과도하게 생길 수 있음');
+
 	const clientFetchDB = clientFetchDBCurry(domainId);
 	const segments = createStyleSegments(characters, styleData.styleData);
 	const boundVariables = createStyleSegments(characters, styleData.boundVariables);

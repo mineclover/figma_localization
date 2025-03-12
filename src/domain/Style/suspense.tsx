@@ -65,8 +65,10 @@ export const createResource = <T extends unknown>(
 export const ResourceProvider = <T extends unknown>({
 	fetchFn,
 	children,
+	focusUpdateCount,
 	...props
 }: {
+	focusUpdateCount: number;
 	fetchFn: (args: any) => Promise<T>;
 	children: (resource: { read: () => T }) => ComponentChildren;
 	[key: string]: any;
@@ -76,17 +78,18 @@ export const ResourceProvider = <T extends unknown>({
 
 	// 초기 리소스 생성
 	const [resource, setResource] = useState(() => createResource(fetchFn, props));
+	console.log('🚀 ~ ResourceProvider ~ resource:', { ...props, focusUpdateCount });
 
 	// props가 변경되면 리소스를 재생성
 	useEffect(() => {
 		// props가 변경되었는지 확인
-		if (!shallowEqual(prevPropsRef.current, props)) {
+		if (!shallowEqual({ ...prevPropsRef.current, focusUpdateCount }, { ...props, focusUpdateCount })) {
 			// 새 리소스 생성
 			setResource(createResource(fetchFn, props));
 			// 이전 props 업데이트
 			prevPropsRef.current = { ...props };
 		}
-	}, [fetchFn, props]);
+	}, [fetchFn, props, focusUpdateCount]);
 
 	return children(resource);
 };
@@ -174,7 +177,7 @@ const UserProfile = ({ resource }: { resource: { read: () => UserData } }) => {
 };
 
 // 앱 컴포넌트 예시
-export const App = () => {
+export const App = ({ focusUpdateCount }: { focusUpdateCount: number }) => {
 	const [userId, setUserId] = useState(1);
 
 	return (
@@ -197,7 +200,7 @@ export const App = () => {
 			</div>
 
 			<ErrorBoundary>
-				<ResourceProvider fetchFn={fetchUserData} userId={userId}>
+				<ResourceProvider fetchFn={fetchUserData} userId={userId} focusUpdateCount={focusUpdateCount}>
 					{(resource) => (
 						<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
 							<UserProfile resource={resource} />

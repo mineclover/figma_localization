@@ -43,17 +43,17 @@ import { NullDisableText } from '../Label/LabelSearch';
 import { clc } from '@/components/modal/utils';
 import styles from '../Label/LabelPage.module.css';
 import { groupSegmentsByStyle } from './styleModel';
-import { computed } from '@preact/signals-core';
+import { computed, signal } from '@preact/signals-core';
 import { createStableStyleKey } from '@/utils/keyJson';
 import { deepEqual } from '@/utils/data';
 import { XMLParser } from 'fast-xml-parser';
 import prettier from 'prettier';
-import { ParseTextBlock, parseXML } from '@/utils/xml';
+import { isXmlCheck, parseTextBlock, ParseTextBlock, parseXML } from '@/utils/xml';
 import { localizationKeySignal } from '@/model/signal';
 import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@/model/types';
 import { App, ErrorBoundary, ResourceProvider } from './suspense';
 import { Suspense } from 'preact/compat';
-import { styleToXml } from './styleAction';
+import { styleToXml, xmlToStyle } from './styleAction';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;
@@ -64,8 +64,6 @@ const parseSame = (style: string, serverStyle: string) => {
 };
 
 const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => {
-	console.table({ style, hashId, name, id, ranges, ...props });
-
 	// const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
 
 	return (
@@ -120,28 +118,9 @@ export const StyleXml = ({
 }) => {
 	const { xmlString, styleStoreArray: styleValues } = resource.read();
 
-	/**
-	 * {
-	 * 11: {
-	 * 		#text: 'string'
-	 * 	}
-	 * ...
-	 * }[]
-	 */
-	const [parsedData, setParsedData] = useState<ParseTextBlock[]>([]);
+	console.log('🚀 ~ xmlString:', xmlString);
 
 	const styleTagMode = useSignal(styleTagModeSignal);
-
-	useEffect(() => {
-		try {
-			// XML 파싱
-			const parsedDataArr = parseXML(xmlString);
-
-			setParsedData(parsedDataArr);
-		} catch (error) {
-			console.error('XML 처리 중 오류:', error);
-		}
-	}, [xmlString]);
 
 	return (
 		<div>
@@ -150,8 +129,6 @@ export const StyleXml = ({
 			<TextboxMultiline value={xmlString} placeholder="XML 출력" />
 
 			<VerticalSpace space="small" />
-			<Text>파싱된 데이터:</Text>
-			<Text>{parsedData ? JSON.stringify(parsedData, null, 2) : '데이터 없음'}</Text>
 
 			<VerticalSpace space="small" />
 			{styleValues.map((item) => {
@@ -161,12 +138,15 @@ export const StyleXml = ({
 	);
 };
 
+export const focusUpdateCountSignal = signal(0);
+
 const StylePage = () => {
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);
+	const focusUpdateCount = useSignal(focusUpdateCountSignal);
 
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
@@ -215,6 +195,7 @@ const StylePage = () => {
 						emit(DOWNLOAD_STYLE.REQUEST_KEY, {
 							localizationKey: currentPointer.data.localizationKey,
 						});
+						focusUpdateCountSignal.value = focusUpdateCount + 1;
 					}}
 				>
 					키 있는 상태에서 origin 스타일 받는 테스트
@@ -222,6 +203,7 @@ const StylePage = () => {
 				<Button
 					onClick={() => {
 						emit(SET_STYLE.REQUEST_KEY);
+						focusUpdateCountSignal.value = focusUpdateCount + 1;
 					}}
 				>
 					키 있는 상태에서 업데이트
@@ -249,7 +231,7 @@ const StylePage = () => {
 
 				<ErrorBoundary>
 					<ResourceProvider
-						fetchFn={({
+						fetchFn={async ({
 							domainId,
 							characters,
 							StyleDataArr,
@@ -260,12 +242,17 @@ const StylePage = () => {
 							StyleDataArr: StyleData;
 							mode: 'id' | 'name';
 						}) => {
-							return styleToXml(domainId, characters, StyleDataArr, mode);
+							if (isXmlCheck(characters)) {
+								return xmlToStyle(characters, domainId);
+							} else {
+								return styleToXml(domainId, characters, StyleDataArr, mode);
+							}
 						}}
 						domainId={domainSetting.domainId}
 						characters={currentPointer.characters}
 						StyleDataArr={styleData}
 						mode={styleTagMode}
+						focusUpdateCount={focusUpdateCount}
 					>
 						{(resource) => {
 							return (

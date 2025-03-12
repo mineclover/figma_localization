@@ -16,7 +16,11 @@ export const newGetStyleData = async (nodeId: string) => {
 export const onGetStyleData = () => {
 	on(GET_STYLE_DATA.REQUEST_KEY, async (nodeId?: string) => {
 		if (!nodeId) {
-			nodeId = figma.currentPage.selection[0].id;
+			const node = figma.currentPage.selection[0];
+			if (!node) {
+				return;
+			}
+			nodeId = node.id;
 		}
 
 		const styleData = await newGetStyleData(nodeId);

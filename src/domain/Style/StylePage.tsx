@@ -5,7 +5,7 @@ import { ComponentChildren, Fragment, h } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { components } from 'types/i18n';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from '../Setting/SettingModel';
-import { languageCodesSignal, styleDataSignal } from '@/model/signal';
+import { languageCodesSignal, StyleData, styleDataSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 
 import { useSignal } from '@/hooks/useSignal';
@@ -49,7 +49,9 @@ import { XMLParser } from 'fast-xml-parser';
 import prettier from 'prettier';
 import { ParseTextBlock, parseXML } from '@/utils/xml';
 import { localizationKeySignal } from '@/model/signal';
-import { StyleSync, ResourceDTO, StyleHashSegment } from '@/model/types';
+import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@/model/types';
+import { App, ErrorBoundary, ResourceProvider } from './suspense';
+import { Suspense } from 'preact/compat';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;
@@ -60,20 +62,21 @@ const parseSame = (style: string, serverStyle: string) => {
 };
 
 const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
+	console.log('🚀 ~ StyleItem ~  style, hashId, name, id, ranges :', style, hashId, name, id, ranges);
 	const { data, loading, error, fetchData } = useFetch<ResourceDTO>();
 
 	useEffect(() => {
-		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
+		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류가 심함
 		if (data) {
 			const newId = data.resource_id.toString();
 			const newAlias = data.alias;
 			const newName = data.style_name;
 
 			const store = { hashId, name: newName, id: newId, alias: newAlias, style, ranges };
-
+			// 여기 코드 문제임 분산된 컨텍스트에서 실행되서 오류 발생하고 있음
+			// 인식된 태그랑 식별자도 다름
 			styleSignal.value = {
 				...styleSignal.value,
-
 				[hashId]: store,
 			};
 		}
@@ -105,6 +108,7 @@ const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
 	);
 };
 export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
+	console.log('🚀 ~ generateXmlString ~ styles:', styles);
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleHashSegment> = [];
 
@@ -136,7 +140,27 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 		.join('');
 };
 
-export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSync[] }) => {
+export const StyleXml = ({
+	text,
+	resource,
+	domainId,
+	StyleDataArr,
+}: {
+	text: string;
+	domainId: number;
+	StyleDataArr: StyleData;
+	resource: {
+		read: () => {
+			xmlString: string;
+			styleStoreArray: StyleSync[];
+		};
+	};
+}) => {
+	console.log('🚀 ~ 	text,resource,:', text, resource);
+
+	const { xmlString, styleStoreArray: styleValues } = resource.read();
+
+	console.log('🚀 ~ { xmlString, styleStoreArray: styleValues }:', { xmlString, styleStoreArray: styleValues });
 	const [xml, setXml] = useState<string>('');
 	/**
 	 * {
@@ -148,11 +172,7 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 	 */
 	const [parsedData, setParsedData] = useState<ParseTextBlock[]>([]);
 
-	const styleStore = useSignal(styleSignal);
 	const styleTagMode = useSignal(styleTagModeSignal);
-	const styleValues = computed(() => {
-		return Object.values(styleStore);
-	});
 
 	useEffect(() => {
 		try {
@@ -177,12 +197,12 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 	useEffect(() => {
 		// XML 형식의 문자열 생성 함수
 		// 함수 실행하여 XML 생성
-		if (typeof text === 'string' && styleValues.value.length > 0) {
-			const xmlString = generateXmlString(styleValues.value, styleTagMode);
+		if (typeof text === 'string' && styleValues.length > 0) {
+			const xmlString = generateXmlString(styleValues, styleTagMode);
 
 			setXml(xmlString);
 		}
-	}, [text, styleValues.value, styleTagMode]);
+	}, [text, styleValues, styleTagMode]);
 	return (
 		<div>
 			<VerticalSpace space="small" />
@@ -194,11 +214,59 @@ export const StyleXml = ({ text, styleInfo }: { text: string; styleInfo: StyleSy
 			<Text>{parsedData ? JSON.stringify(parsedData, null, 2) : '데이터 없음'}</Text>
 
 			<VerticalSpace space="small" />
-			{styleInfo.map((item) => {
+			{styleValues.map((item) => {
 				return <StyleItem key={item.hashId} {...item} />;
 			})}
 		</div>
 	);
+};
+
+export const styleToXml = async (domainId: number, characters: string, styleData: StyleData) => {
+	const clientFetchDB = clientFetchDBCurry(domainId);
+	const segments = createStyleSegments(characters, styleData.styleData);
+	const boundVariables = createStyleSegments(characters, styleData.boundVariables);
+	const allStyleGroups = groupAllSegmentsByStyle(characters, segments, boundVariables);
+
+	const exportStyleGroups = allStyleGroups.exportStyleGroups;
+	const styleStore: Record<string, StyleSync> = {};
+
+	for (const style of exportStyleGroups) {
+		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
+		const temp = await clientFetchDB('/resources', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				styleValue: JSON.stringify(style.style),
+				hashValue: style.hashId,
+			}),
+		});
+		if (!temp) {
+			continue;
+		}
+		const responseResult = await temp.json();
+		if (responseResult) {
+			const newId = responseResult.resource_id.toString();
+			const newAlias = responseResult.alias;
+			const newName = responseResult.style_name;
+			const store = {
+				hashId: style.hashId,
+				name: newName,
+				id: newId,
+				alias: newAlias,
+				style: style.style,
+				ranges: style.ranges,
+			};
+			styleStore[style.hashId] = store;
+		}
+	}
+
+	const styleStoreArray = Object.values(styleStore);
+
+	const xmlString = generateXmlString(styleStoreArray, 'id');
+
+	return { xmlString, styleStoreArray };
 };
 
 const StylePage = () => {
@@ -212,19 +280,10 @@ const StylePage = () => {
 	const localizationKeyValue = useSignal(localizationKeySignal);
 	const targetArray = ['origin', ...languageCodes];
 
-	const clientFetchDB = clientFetchDBCurry(2);
-
-	useEffect(() => {
-		if (currentPointer) {
-			styleSignal.value = {};
-		}
-	}, [styleData]);
 	console.log('🚀 ~ useEffect ~ styleSignal:', currentPointer, styleData);
 
-	if (currentPointer && styleData) {
-		const segments = createStyleSegments(currentPointer.characters, styleData.styleData);
-		const boundVariables = createStyleSegments(currentPointer.characters, styleData.boundVariables);
-		const allStyleGroups = groupAllSegmentsByStyle(currentPointer.characters, segments, boundVariables);
+	if (currentPointer && styleData && domainSetting) {
+		const clientFetchDB = clientFetchDBCurry(domainSetting.domainId);
 
 		return (
 			<div>
@@ -292,8 +351,41 @@ const StylePage = () => {
 					1. Group 의 갯수가 2개 이상일 경우 복합 스타일을 가지고 있는 것이다
 					<br /> - 이 경우 defaultStyle 을 base로 group 별로 스타일을 정의할 수 있다
 				</Text>
+				<VerticalSpace space="small" />
+				<Text>{(domainSetting.domainId, currentPointer.characters, styleData)}</Text>
 
-				<StyleXml text={currentPointer.characters} styleInfo={allStyleGroups.exportStyleGroups} />
+				<ErrorBoundary>
+					<ResourceProvider
+						fetchFn={({
+							domainId,
+							characters,
+							StyleDataArr,
+						}: {
+							domainId: number;
+							characters: string;
+							StyleDataArr: StyleData;
+						}) => {
+							return styleToXml(domainId, characters, StyleDataArr);
+						}}
+						domainId={domainSetting.domainId}
+						characters={currentPointer.characters}
+						StyleDataArr={styleData}
+					>
+						{(resource) => {
+							return (
+								<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
+									<StyleXml
+										text={currentPointer.characters}
+										resource={resource}
+										domainId={domainSetting.domainId}
+										StyleDataArr={styleData}
+									/>
+								</Suspense>
+							);
+						}}
+					</ResourceProvider>
+				</ErrorBoundary>
+
 				<Button
 					onClick={() => {
 						emit(SET_STYLE.REQUEST_KEY);

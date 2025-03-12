@@ -141,14 +141,8 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 };
 
 export const StyleXml = ({
-	text,
 	resource,
-	domainId,
-	StyleDataArr,
 }: {
-	text: string;
-	domainId: number;
-	StyleDataArr: StyleData;
 	resource: {
 		read: () => {
 			xmlString: string;
@@ -156,12 +150,8 @@ export const StyleXml = ({
 		};
 	};
 }) => {
-	console.log('🚀 ~ 	text,resource,:', text, resource);
-
 	const { xmlString, styleStoreArray: styleValues } = resource.read();
 
-	console.log('🚀 ~ { xmlString, styleStoreArray: styleValues }:', { xmlString, styleStoreArray: styleValues });
-	const [xml, setXml] = useState<string>('');
 	/**
 	 * {
 	 * 11: {
@@ -177,7 +167,7 @@ export const StyleXml = ({
 	useEffect(() => {
 		try {
 			// XML 파싱
-			const parsedDataArr = parseXML(xml);
+			const parsedDataArr = parseXML(xmlString);
 			/** 텍스트 출력 */
 			// const removeTag = parsedDataArr.map((item) => {
 			// 	const key = Object.keys(item)[0]
@@ -192,22 +182,13 @@ export const StyleXml = ({
 		} catch (error) {
 			console.error('XML 처리 중 오류:', error);
 		}
-	}, [xml]);
+	}, [xmlString]);
 
-	useEffect(() => {
-		// XML 형식의 문자열 생성 함수
-		// 함수 실행하여 XML 생성
-		if (typeof text === 'string' && styleValues.length > 0) {
-			const xmlString = generateXmlString(styleValues, styleTagMode);
-
-			setXml(xmlString);
-		}
-	}, [text, styleValues, styleTagMode]);
 	return (
 		<div>
 			<VerticalSpace space="small" />
 			<Text>원본 XML:</Text>
-			<TextboxMultiline value={xml} placeholder="XML 출력" />
+			<TextboxMultiline value={xmlString} placeholder="XML 출력" />
 
 			<VerticalSpace space="small" />
 			<Text>파싱된 데이터:</Text>
@@ -221,7 +202,7 @@ export const StyleXml = ({
 	);
 };
 
-export const styleToXml = async (domainId: number, characters: string, styleData: StyleData) => {
+export const styleToXml = async (domainId: number, characters: string, styleData: StyleData, mode: 'id' | 'name') => {
 	const clientFetchDB = clientFetchDBCurry(domainId);
 	const segments = createStyleSegments(characters, styleData.styleData);
 	const boundVariables = createStyleSegments(characters, styleData.boundVariables);
@@ -264,7 +245,7 @@ export const styleToXml = async (domainId: number, characters: string, styleData
 
 	const styleStoreArray = Object.values(styleStore);
 
-	const xmlString = generateXmlString(styleStoreArray, 'id');
+	const xmlString = generateXmlString(styleStoreArray, mode);
 
 	return { xmlString, styleStoreArray };
 };
@@ -282,7 +263,7 @@ const StylePage = () => {
 
 	console.log('🚀 ~ useEffect ~ styleSignal:', currentPointer, styleData);
 
-	if (currentPointer && styleData && domainSetting) {
+	if (currentPointer && styleData && domainSetting && domainSetting.domainId) {
 		const clientFetchDB = clientFetchDBCurry(domainSetting.domainId);
 
 		return (
@@ -360,26 +341,24 @@ const StylePage = () => {
 							domainId,
 							characters,
 							StyleDataArr,
+							mode,
 						}: {
 							domainId: number;
 							characters: string;
 							StyleDataArr: StyleData;
+							mode: 'id' | 'name';
 						}) => {
-							return styleToXml(domainId, characters, StyleDataArr);
+							return styleToXml(domainId, characters, StyleDataArr, mode);
 						}}
 						domainId={domainSetting.domainId}
 						characters={currentPointer.characters}
 						StyleDataArr={styleData}
+						mode={styleTagMode}
 					>
 						{(resource) => {
 							return (
 								<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
-									<StyleXml
-										text={currentPointer.characters}
-										resource={resource}
-										domainId={domainSetting.domainId}
-										StyleDataArr={styleData}
-									/>
+									<StyleXml resource={resource} />
 								</Suspense>
 							);
 						}}

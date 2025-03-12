@@ -16,6 +16,7 @@ import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal } from '@/model/signal';
+import { TargetNodeStyleUpdate } from '../Style/styleAction';
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);
@@ -78,7 +79,7 @@ export const searchTranslationCode = async (key: string, code: string) => {
 };
 
 /** 영역 내에 있는 모든 텍스트 노드의 로컬라이제이션 키를 찾아서 변경 */
-export const changeLocalizationCode = async (sectionNode: SectionNode, code: string) => {
+export const changeLocalizationCode = async (sectionNode: SectionNode | PageNode, code: string) => {
 	//인스턴스도 탐색해서 수정하기 위함
 	figma.skipInvisibleInstanceChildren = false;
 
@@ -119,38 +120,36 @@ export const changeLocalizationCode = async (sectionNode: SectionNode, code: str
 		});
 
 	const now = Date.now();
-	for (const [key, targetNode] of targetOrigin.entries()) {
+	for (const [key, targetNodes] of targetOrigin.entries()) {
 		// key , code
 
 		const a = await searchTranslationCode(key, code);
 
 		if (a) {
-			for (const node of targetNode) {
-				await textFontLoad(node);
-				node.characters = a.text;
+			for (const node of targetNodes) {
+				const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
+
+				if (localizationKey) {
+					await TargetNodeStyleUpdate(node, localizationKey, now);
+				}
 			}
 		}
 	}
 };
 
 /** 번역을 위한 언어 코드 설정 */
-export const onSetLanguageCode = () => {
-	on(CHANGE_LANGUAGE_CODE.REQUEST_KEY, async (languageCode: string) => {
-		const node = figma.currentPage.selection[0];
-
+export const onSetLanguageCode = async () => {
+	on(CHANGE_LANGUAGE_CODE.REQUEST_KEY, async (languageCode: string, sectionId?: string) => {
+		let node: SectionNode | PageNode | null = null;
+		if (sectionId) {
+			node = (await figma.getNodeByIdAsync(sectionId)) as SectionNode | null;
+		} else {
+			node = figma.currentPage;
+		}
 		if (node == null) {
 			return;
 		}
-		if (node.type === 'SECTION') {
-			await changeLocalizationCode(node, languageCode);
-		} else if (node) {
-			const result = FilePathNodeSearch(node);
-			const sectionNode = result.find((node) => node.type === 'SECTION');
-			if (sectionNode) {
-				await changeLocalizationCode(sectionNode, languageCode);
-			} else {
-				// 섹션 밖에 있는 경우 어떻게 처리할 지
-			}
-		}
+
+		await changeLocalizationCode(node, languageCode);
 	});
 };

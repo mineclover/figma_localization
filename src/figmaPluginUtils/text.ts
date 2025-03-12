@@ -540,6 +540,7 @@ export const textFontLoad = async (textNode: TextNode) => {
 	if (arr) {
 		for (const item of arr) {
 			const fontName = item.value as FontName;
+
 			await figma.loadFontAsync(fontName);
 		}
 	}

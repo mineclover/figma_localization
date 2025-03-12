@@ -1,4 +1,4 @@
-import { getAllStyleRanges, setAllStyleRanges, textFontLoad, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
+import { getAllStyleRanges, setAllStyleRanges, ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
 import { createStableStyleKey, sha256Hash } from '@/utils/keyJson';
 import {
 	LocalizationTranslationDTO,

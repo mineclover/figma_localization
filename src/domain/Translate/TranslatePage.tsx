@@ -167,18 +167,16 @@ const TranslatePage = () => {
 			</div>
 		);
 	}
-	if (localizationKeyValue?.key_id == null) {
-		return <Bold>선택된 대상이 없습니다</Bold>;
-	}
 
 	return (
 		<div>
 			<div className={styles.translateRow}>
+				<Bold>{currentSection == null ? '페이지' : '섹션'} 에서 언어 변경</Bold>
 				{targetArray.map((item) => {
 					return (
 						<Button
 							onClick={() => {
-								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item);
+								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item, currentSection?.id);
 							}}
 						>
 							{item}
@@ -192,22 +190,23 @@ const TranslatePage = () => {
     <div>3. 위치가 있으면 위치를 준다 {'>'} 해당 키를 검색으로 입력 받게 해서 확장 가능</div> */}
 
 			<div className={styles.container}>
-				<NullDisableText>{localizationKeyValue.name}</NullDisableText>
+				<NullDisableText>{localizationKeyValue?.name}</NullDisableText>
 				<VerticalSpace space="extraSmall" />
 				{/* {JSON.stringify(data)} */}
-				{targetArray.map((item) => {
-					return (
-						<TranslateItem
-							key={item + translations[item]?.localization_id}
-							{...translations[item]}
-							language_code={item}
-							key_id={localizationKeyValue.key_id}
-							domainId={domainSetting.domainId}
-							updateAction={updateAction}
-							selectedId={currentPointer?.data.originalLocalizeId}
-						/>
-					);
-				})}
+				{localizationKeyValue &&
+					targetArray.map((item) => {
+						return (
+							<TranslateItem
+								key={item + translations[item]?.localization_id}
+								{...translations[item]}
+								language_code={item}
+								key_id={localizationKeyValue.key_id}
+								domainId={domainSetting.domainId}
+								updateAction={updateAction}
+								selectedId={currentPointer?.data.originalLocalizeId}
+							/>
+						);
+					})}
 			</div>
 		</div>
 	);

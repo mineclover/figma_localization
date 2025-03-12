@@ -63,8 +63,12 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 			return parseTextBlock(item);
 		})
 		.join('');
-	await textFontLoad(node);
-	node.characters = fullText;
+	try {
+		await textFontLoad(node);
+		node.characters = fullText;
+	} catch (error) {
+		if (typeof error === 'string') figma.notify('폰트 로드 실패 :' + error);
+	}
 
 	let start = 0;
 	let end = 0;

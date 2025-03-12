@@ -41,7 +41,7 @@ import { clientFetchDBCurry } from '../utils/fetchDB';
 import { NullDisableText } from '../Label/LabelSearch';
 import { clc } from '@/components/modal/utils';
 import styles from '../Label/LabelPage.module.css';
-import { createStyleSegments, groupAllSegmentsByStyle, groupSegmentsByStyle } from './styleModel';
+import { groupSegmentsByStyle } from './styleModel';
 import { computed } from '@preact/signals-core';
 import { createStableStyleKey } from '@/utils/keyJson';
 import { deepEqual } from '@/utils/data';
@@ -52,6 +52,7 @@ import { localizationKeySignal } from '@/model/signal';
 import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@/model/types';
 import { App, ErrorBoundary, ResourceProvider } from './suspense';
 import { Suspense } from 'preact/compat';
+import { styleToXml } from './styleAction';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;
@@ -61,54 +62,20 @@ const parseSame = (style: string, serverStyle: string) => {
 	return deepEqual(styleValue, styleValue2);
 };
 
-const StyleItem = ({ style, hashId, name, id, ranges }: StyleSync) => {
-	console.log('🚀 ~ StyleItem ~  style, hashId, name, id, ranges :', style, hashId, name, id, ranges);
-	const { data, loading, error, fetchData } = useFetch<ResourceDTO>();
+const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => {
+	console.table({ style, hashId, name, id, ranges, ...props });
 
-	useEffect(() => {
-		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류가 심함
-		if (data) {
-			const newId = data.resource_id.toString();
-			const newAlias = data.alias;
-			const newName = data.style_name;
-
-			const store = { hashId, name: newName, id: newId, alias: newAlias, style, ranges };
-			// 여기 코드 문제임 분산된 컨텍스트에서 실행되서 오류 발생하고 있음
-			// 인식된 태그랑 식별자도 다름
-			styleSignal.value = {
-				...styleSignal.value,
-				[hashId]: store,
-			};
-		}
-	}, [data]);
-
-	useEffect(() => {
-		fetchData('/resources', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				styleValue: JSON.stringify(style),
-				hashValue: hashId,
-			}),
-		});
-	}, [hashId]);
-
-	const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
+	// const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
 
 	return (
 		<div className={styles.container} style={{ border: '1px solid red' }}>
 			<Text>{hashId}</Text>
-			<Text>name: {data?.style_name}</Text>
-			<Text>id: {data?.resource_id}</Text>
-
-			{isSame ? <Text>동일</Text> : <Text>다름</Text>}
+			<Text>name: {name}</Text>
+			<Text>id: {id}</Text>
 		</div>
 	);
 };
 export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
-	console.log('🚀 ~ generateXmlString ~ styles:', styles);
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleHashSegment> = [];
 
@@ -168,16 +135,7 @@ export const StyleXml = ({
 		try {
 			// XML 파싱
 			const parsedDataArr = parseXML(xmlString);
-			/** 텍스트 출력 */
-			// const removeTag = parsedDataArr.map((item) => {
-			// 	const key = Object.keys(item)[0]
-			// 	const target = item[key]
-			// 	const value = target[0]
-			// 	// 이걸 하면 순서가 깨짐
-			// 	return {
-			// 		[key]: value['#text'],
-			// 	}
-			// })
+
 			setParsedData(parsedDataArr);
 		} catch (error) {
 			console.error('XML 처리 중 오류:', error);
@@ -202,54 +160,6 @@ export const StyleXml = ({
 	);
 };
 
-export const styleToXml = async (domainId: number, characters: string, styleData: StyleData, mode: 'id' | 'name') => {
-	const clientFetchDB = clientFetchDBCurry(domainId);
-	const segments = createStyleSegments(characters, styleData.styleData);
-	const boundVariables = createStyleSegments(characters, styleData.boundVariables);
-	const allStyleGroups = groupAllSegmentsByStyle(characters, segments, boundVariables);
-
-	const exportStyleGroups = allStyleGroups.exportStyleGroups;
-	const styleStore: Record<string, StyleSync> = {};
-
-	for (const style of exportStyleGroups) {
-		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
-		const temp = await clientFetchDB('/resources', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				styleValue: JSON.stringify(style.style),
-				hashValue: style.hashId,
-			}),
-		});
-		if (!temp) {
-			continue;
-		}
-		const responseResult = await temp.json();
-		if (responseResult) {
-			const newId = responseResult.resource_id.toString();
-			const newAlias = responseResult.alias;
-			const newName = responseResult.style_name;
-			const store = {
-				hashId: style.hashId,
-				name: newName,
-				id: newId,
-				alias: newAlias,
-				style: style.style,
-				ranges: style.ranges,
-			};
-			styleStore[style.hashId] = store;
-		}
-	}
-
-	const styleStoreArray = Object.values(styleStore);
-
-	const xmlString = generateXmlString(styleStoreArray, mode);
-
-	return { xmlString, styleStoreArray };
-};
-
 const StylePage = () => {
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
@@ -260,8 +170,6 @@ const StylePage = () => {
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
 	const targetArray = ['origin', ...languageCodes];
-
-	console.log('🚀 ~ useEffect ~ styleSignal:', currentPointer, styleData);
 
 	if (currentPointer && styleData && domainSetting && domainSetting.domainId) {
 		const clientFetchDB = clientFetchDBCurry(domainSetting.domainId);

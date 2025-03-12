@@ -16,10 +16,12 @@ import {
 	addTranslation,
 	reloadOriginalLocalizationName,
 	getLocalizationKeyData,
+	generateLocalizationName,
 } from '../Label/TextPluginDataModel';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
+import { TargetNodeStyleUpdate } from './styleAction';
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i);
@@ -336,7 +338,6 @@ export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
 	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey }: { localizationKey: string }) => {
 		const xNode = figma.currentPage.selection[0];
-		const xNodeId = xNode.id;
 		const domainSetting = getDomainSetting();
 
 		if (domainSetting == null) {
@@ -354,90 +355,7 @@ export const onDownloadStyle = () => {
 			notify('Failed to get node', 'error');
 			return;
 		}
-
-		// /** 클라에서 받는 로컬라이제이션 키 없을 때 */
-		const result = await getLocalizationKeyData(xNode, Date.now());
-
-		if (result == null) {
-			notify('Failed to get localization key data', 'error');
-			return;
-		}
-		const originText = result.origin_value;
-		// 키 아이디 82
-		const parsedData = parseXML(originText ?? '');
-		const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
-			method: 'GET',
-		});
-
-		if (result2 == null) {
-			notify('Failed to get resource by key', 'error');
-			return;
-		}
-
-		const data = (await result2.json()) as ResourceDTO[];
-
-		const resourceMap = new Map<string, ParsedResourceDTO>();
-		for (const item of data) {
-			resourceMap.set(item.resource_id.toString(), {
-				...item,
-				style_value: JSON.parse(item.style_value),
-			});
-		}
-
-		const fullText = parsedData
-			.map((item) => {
-				return parseTextBlock(item);
-			})
-			.join('');
-		await textFontLoad(xNode);
-		xNode.characters = fullText;
-
-		let start = 0;
-		let end = 0;
-
-		for (const item of parsedData) {
-			const key = Object.keys(item)[0];
-			const target = item[key];
-			const value = target[0]['#text'] as string;
-			const length = typeof value === 'string' ? value.length : 0;
-			end = start + length;
-
-			let resource = resourceMap.get(key);
-
-			if (resource == null) {
-				const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
-					method: 'GET',
-				});
-				if (onlineStyle == null) {
-					notify('Failed to get resource by key', 'error');
-					return;
-				}
-				const onlineData = (await onlineStyle.json()) as ResourceDTO;
-				const styleValue = JSON.parse(onlineData.style_value);
-				resourceMap.set(key, {
-					...onlineData,
-					style_value: JSON.parse(styleValue.style_value),
-				});
-				resource = resourceMap.get(key);
-			}
-			const styleValue = resource?.style_value;
-
-			if (styleValue == null) {
-				notify('Failed to get resource by key', 'error');
-				return;
-			}
-			await setAllStyleRanges({
-				textNode: xNode,
-				xNodeId,
-				styleData: styleValue,
-				boundVariables: {},
-				range: {
-					start,
-					end,
-				},
-			});
-			start = end;
-		}
+		await TargetNodeStyleUpdate(xNode, localizationKey, Date.now());
 	});
 };
 
@@ -466,7 +384,6 @@ export const onSetStyle = () => {
 		// })
 		const result = await addTranslation(xNode);
 		if (result == null) {
-			// notify('Failed to add translation', 'error')
 			return;
 		}
 

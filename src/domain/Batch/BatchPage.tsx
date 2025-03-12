@@ -68,6 +68,15 @@ const selectStyle = (selected: boolean) => {
 	};
 };
 
+const selectCurrentGroup = (selectTarget: CurrentNode, patternMatchDataGroup: PatternMatchData[]) => {
+	console.log('🚀 ~ selectCurrentGroup ~ patternMatchDataGroup:', patternMatchDataGroup);
+	console.log('🚀 ~ selectCurrentGroup ~ selectTarget:', selectTarget);
+	const currentGroup = patternMatchDataGroup.find((item) => item.ids.includes(selectTarget.id));
+	if (currentGroup) {
+		return currentGroup.ids;
+	}
+};
+
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
 	const [isExtended, setIsExtended] = useState<boolean>(false);
 	const selectTarget = useSignal(selectTargetSignal);
@@ -356,9 +365,11 @@ function BatchPage() {
 	const section = useSignal(currentSectionSignal);
 
 	const selectIds = useSignal(selectIdsSignal);
+	console.log('🚀 ~ BatchPage ~ selectIds:', selectIds);
 
 	const domainSetting = useSignal(domainSettingSignal);
 
+	const selectTarget = useSignal(selectTargetSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 
 	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
@@ -512,6 +523,26 @@ function BatchPage() {
 				<div className={styles.container}>
 					<div className={styles.rowContainer}>
 						<Text>변경 대상 : {selectIds.length} 개</Text>
+						<Button
+							onClick={() => {
+								console.log('🚀 ~ BatchPage ~ currentPointer:', currentPointer);
+								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+								const currentGroup = selectCurrentGroup(
+									{
+										id: currentPointer?.nodeId ?? '',
+										name: currentPointer?.nodeName ?? '',
+									},
+									patternMatchDataGroup
+								);
+
+								if (currentGroup) {
+									selectIdsSignal.value = currentGroup;
+									emit('PAGE_SELECT_IDS', { ids: currentGroup });
+								}
+							}}
+						>
+							현재 커서 그룹 선택
+						</Button>
 					</div>
 
 					{missingLink.length > 0 && (
@@ -566,11 +597,14 @@ function BatchPage() {
 							onClick={async () => {
 								if (hasSelectedKey) {
 									// 변경할 키가 있으면 바로 일괄 변경 로직
+									console.log('🚀 ~ BatchPage ~ selectedKeyData:', selectedKeyData);
+
+									const isOriginNull = selectedKeyData.origin_value == null || selectedKeyData.origin_value === '';
+
 									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
 										domainId: selectedKeyData?.domain_id,
 										keyId: selectedKeyData?.key_id,
-
-										originId: selectedKeyData?.origin_id,
+										originId: isOriginNull ? null : selectedKeyData?.origin_id,
 										ids: selectIds,
 									});
 								} else {

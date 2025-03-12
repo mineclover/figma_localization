@@ -21,7 +21,7 @@ export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) =>
 };
 
 export const clientFetchDBCurry =
-	(domainId: number) =>
+	(domainId: number | string) =>
 	<V extends keyof paths>(url: V, options?: RequestInit) => {
 		return fetch(baseURL + url, {
 			...options,

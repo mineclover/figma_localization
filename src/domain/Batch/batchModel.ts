@@ -219,7 +219,9 @@ export const onUpdateNodeLocalizationKeyBatch = () => {
 			if (data.ids.length === 0) {
 				return;
 			}
+
 			// originalLocalizeId 조회
+			// const originTextResult = await getLocalizationKeyData(data.keyId, date);
 
 			for (const id of data.ids) {
 				const node = await figma.getNodeByIdAsync(id);

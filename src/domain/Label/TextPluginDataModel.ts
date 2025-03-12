@@ -10,6 +10,7 @@ import {
 	SET_NODE_RESET_KEY,
 	UPDATE_NODE_STORE_KEY,
 } from '../constant';
+import toNumber from 'strnum';
 
 import { notify } from '@/figmaPluginUtils';
 import { getCursorPosition } from './LabelModel';
@@ -31,6 +32,7 @@ import {
 	LocalizationTranslation,
 	LocalizationTranslationDTO,
 } from '@/model/types';
+import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -63,7 +65,7 @@ export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey
 	};
 };
 
-/** 키에 소속된 모든 번역 값 조회 */
+/** 노드에서 키에 소속된 모든 번역 값 조회 */
 export const getNodeTranslations = async (node: BaseNode) => {
 	const nodeData = getNodeData(node);
 	if (nodeData.localizationKey === '') {
@@ -136,8 +138,10 @@ const requestCache = new Map<string, CacheItem<any>>();
 /**
  * 로컬라이제이션 키를 기준으로 이름 리로드
  */
-export const getLocalizationKeyData = async (node: BaseNode, now: number): Promise<LocalizationKeyDTO | null> => {
-	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
+export const getLocalizationKeyData = async (
+	localizationKey: string,
+	now: number
+): Promise<LocalizationKeyDTO | null> => {
 	if (localizationKey === '') {
 		return null;
 	}
@@ -165,7 +169,6 @@ export const getLocalizationKeyData = async (node: BaseNode, now: number): Promi
 	const data = (await result.json()) as LocalizationKeyDTO;
 
 	if (result.status === 200) {
-		node.name = generateLocalizationName(data);
 		// 결과 캐싱
 		requestCache.set(cacheKey, {
 			timestamp: now,
@@ -281,31 +284,26 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 			}
 			return false;
 		})
-		.map((item) => {
-			const nodeData = getNodeData(item);
+		.map((node) => {
+			const nodeData = getNodeData(node);
 			if (nodeData.originalLocalizeId !== '') {
 				let temp = targetOrigin.get(nodeData.originalLocalizeId);
 				if (temp == null) {
 					temp = new Set<TextNode>();
 				}
 
-				targetOrigin.set(nodeData.originalLocalizeId, temp.add(item));
+				targetOrigin.set(nodeData.originalLocalizeId, temp.add(node));
 			}
 			return {
-				node: item,
+				node: node,
 				data: nodeData,
 			};
 		});
 
 	const now = Date.now();
-	for (const [key, targetNode] of targetOrigin.entries()) {
-		const a = await getTargetLocalizationName(key);
-		if (a) {
-			for (const node of targetNode) {
-				getLocalizationKeyData(node, now);
-				await textFontLoad(node);
-				node.characters = a;
-			}
+	for (const [key, targetNodes] of targetOrigin.entries()) {
+		for (const node of targetNodes) {
+			await TargetNodeStyleUpdate(node, key, now);
 		}
 	}
 };
@@ -313,50 +311,18 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 export const addTranslation = async (node: TextNode) => {
 	const nodeData = getNodeData(node);
 
-	if (nodeData.localizationKey === '') {
+	if (nodeData.localizationKey === '' || nodeData.domainId == null) {
 		notify('Failed to get localization key', 'error');
 		return;
 	}
 
-	const { styleData, boundVariables } = getAllStyleRanges(node);
-
-	const segments = createStyleSegments(node.characters, styleData);
-	const boundVariables2 = createStyleSegments(node.characters, boundVariables);
-	const allStyleGroups = groupAllSegmentsByStyle(node.characters, segments, boundVariables2);
-	const exportStyleGroups = allStyleGroups.exportStyleGroups;
-
-	const styleStore: Record<string, StyleSync> = {};
-
-	for (const style of exportStyleGroups) {
-		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
-		const temp = await fetchDB('/resources', {
-			method: 'POST',
-			body: JSON.stringify({
-				styleValue: JSON.stringify(style.style),
-				hashValue: style.hashId,
-			}),
-		});
-		if (!temp) {
-			return;
-		}
-		const responseResult = await temp.json();
-		if (responseResult) {
-			const newId = responseResult.resource_id.toString();
-			const newAlias = responseResult.alias;
-			const newName = responseResult.style_name;
-			const store = {
-				hashId: style.hashId,
-				name: newName,
-				id: newId,
-				alias: newAlias,
-				style: style.style,
-				ranges: style.ranges,
-			};
-			styleStore[style.hashId] = store;
-		}
-	}
-
-	const xmlString = generateXmlString(Object.values(styleStore), 'id');
+	const styleData = getAllStyleRanges(node);
+	const { xmlString, styleStoreArray } = await styleToXml(
+		toNumber(nodeData.domainId),
+		node.characters,
+		styleData,
+		'id'
+	);
 
 	const result = await fetchDB('/localization/translations', {
 		method: 'PUT',
@@ -371,7 +337,7 @@ export const addTranslation = async (node: TextNode) => {
 		),
 	});
 
-	for (const style of Object.values(styleStore)) {
+	for (const style of styleStoreArray) {
 		const result = await fetchDB('/resources/mapping', {
 			method: 'POST',
 			body: JSON.stringify({
@@ -383,7 +349,6 @@ export const addTranslation = async (node: TextNode) => {
 			notify('Failed to set resource mapping ' + style.id, 'error');
 			continue;
 		}
-		const data = (await result.json()) as LocalizationTranslationDTO;
 	}
 
 	if (!result) {
@@ -434,6 +399,7 @@ export const createNormalLocalizationKey = async (
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString());
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString());
+		return data;
 	} else {
 		notify('Failed to set localization key', 'error');
 	}
@@ -471,6 +437,7 @@ export const onTargetSetNodeLocation = () => {
 
 		if (!result) {
 			return;
+			// 실행 될리가 없는 곳이긴 함
 		}
 		/**
 		 * result는 이전 값을 가지고 있음 init해도 안바뀜
@@ -489,13 +456,19 @@ export const onTargetSetNodeLocation = () => {
 
 		// section은 [sectionName] {기존 제목} 으로 처리 됨
 
-		if (result) {
-			await createNormalLocalizationKey(node, {
-				domainId: domainSetting.domainId,
-				name: result.nodeName,
-			});
+		const newKey = await createNormalLocalizationKey(node, {
+			domainId: domainSetting.domainId,
+			name: result.nodeName,
+		});
+		if (!newKey) {
+			return;
 		}
-		await getLocalizationKeyData(node, Date.now());
+
+		const originTextResult = await getLocalizationKeyData(newKey.key_id.toString(), Date.now());
+		if (originTextResult == null) {
+			return;
+		}
+		node.name = generateLocalizationName(originTextResult);
 
 		// 두번 눌렀을 때 처리 어떻게 할지 정해야 됨
 		await addTranslation(node);
@@ -561,7 +534,7 @@ export const processTextNodeLocalization = async (node: SceneNode) => {
 		return;
 	}
 
-	const result = await getLocalizationKeyData(node, Date.now());
+	const result = await getLocalizationKeyData(nodeData.localizationKey, Date.now());
 	if (!result) {
 		return;
 	}

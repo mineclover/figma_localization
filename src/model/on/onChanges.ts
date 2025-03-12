@@ -40,11 +40,18 @@ interface StyleChangeEvent {
  * */
 const textStyleChangeEvent = async (event: NodeChangeEvent) => {
 	const nodes = event.nodeChanges
+		.filter((eventData) => {
+			if (eventData.type === 'PROPERTY_CHANGE') {
+				return eventData.properties.some((eventName) => {
+					return !['x', 'y', 'relativeTransform'].includes(eventName);
+				});
+			}
+		})
 		.map((item) => item.node)
 		.filter((node) => {
 			return node.type === 'TEXT';
 		});
-	console.log(nodes);
+
 	const currentNode = figma.currentPage.selection[0];
 
 	if (!currentNode) {

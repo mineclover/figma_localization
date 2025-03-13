@@ -51,3 +51,18 @@
 	background-color: var(--figma-color-bg);
 	text-align: center;
 }
+
+.buttonContainer {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	border: 1px solid var(--figma-color-border);
+	padding: 4px;
+	[class^='_textbox'] {
+		flex-grow: 1;
+	}
+}
+
+.nowrap {
+	white-space: nowrap;
+}

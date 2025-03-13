@@ -51,13 +51,13 @@ const LanguageCode = ({ languageCode }: { languageCode: string }) => {
 };
 
 function SettingPage() {
-	const { data, loading, error, fetchData } = useFetch<components['schemas']['Domain'][]>();
+	const { data, loading, hasMessage, setHasMessage, error, fetchData } = useFetch<components['schemas']['Domain'][]>();
 
 	const projectId = useSignal(projectIdSignal);
-
 	const domainSetting = useSignal(domainSettingSignal);
-	console.log('🚀 ~ SettingPage ~ domainSetting:', domainSetting);
+
 	const languageCodes = useSignal(languageCodesSignal);
+	const [domainName, setDomainName] = useState('');
 
 	useEffect(() => {
 		if (data && domainSetting) {
@@ -99,6 +99,45 @@ function SettingPage() {
 						select={domainSetting?.domainId === domain.domain_id}
 					/>
 				))}
+				<div className={styles.buttonContainer}>
+					<Text className={styles.nowrap}>새 도메인 추가 : </Text>
+					<Textbox
+						placeholder="도메인 이름"
+						value={domainName}
+						onChange={(e) => setDomainName(e.currentTarget.value)}
+					/>
+					<IconButton
+						onClick={async () => {
+							if (domainName === '') {
+								modalAlert('도메인 이름을 입력해주세요.');
+								return;
+							}
+
+							const clientFetch = clientFetchDBCurry(domainSetting?.domainId!);
+							const result = await clientFetch('/domains', {
+								method: 'POST',
+								body: JSON.stringify({
+									domain: domainName.trim(),
+								}),
+							});
+							if (result.status === 200) {
+								modalAlert('도메인 추가 완료');
+								fetchData('/domains', {
+									method: 'GET',
+								});
+							} else {
+								const error = await result.json();
+								if (error.details.includes('UNIQUE constraint failed')) {
+									modalAlert('이미 존재하는 도메인 이름입니다.');
+								} else {
+									modalAlert(error.details);
+								}
+							}
+						}}
+					>
+						<IconPlus32 />
+					</IconButton>
+				</div>
 			</div>
 			<VerticalSpace space="extraSmall" />
 			<div className={styles.container}>
@@ -148,7 +187,7 @@ function SettingPage() {
 				<div className={styles.domainContainer}>
 					<Bold>Project ID</Bold>
 				</div>
-				<Text>현재 페이지의 Section URL을 복사하여 입력해주세요. (최초 1회)</Text>
+				<Text>Section URL을 복사하여 입력 후 Enter (최초 1회)</Text>
 				<Textbox
 					placeholder={'project Id'}
 					value={projectId}

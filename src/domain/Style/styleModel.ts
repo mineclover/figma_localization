@@ -23,7 +23,7 @@ import {
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
-import { styleToXml, TargetNodeStyleUpdate } from './styleAction';
+import { styleToXml, TargetNodeStyleUpdateOrigin } from './styleAction';
 import toNumber from 'strnum';
 
 const range = (start: number, end: number) => {
@@ -358,7 +358,8 @@ export const onDownloadStyle = () => {
 			notify('Failed to get node', 'error');
 			return;
 		}
-		await TargetNodeStyleUpdate(xNode, localizationKey, Date.now());
+		// 디자인된 버전의 텍스트로 변경
+		await TargetNodeStyleUpdateOrigin(xNode, localizationKey, Date.now());
 	});
 };
 

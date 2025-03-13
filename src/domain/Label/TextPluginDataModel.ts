@@ -32,7 +32,7 @@ import {
 	LocalizationTranslation,
 	LocalizationTranslationDTO,
 } from '@/model/types';
-import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
+import { styleToXml, TargetNodeStyleUpdateOrigin } from '../Style/styleAction';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -305,7 +305,7 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 	const now = Date.now();
 	for (const [key, targetNodes] of targetOrigin.entries()) {
 		for (const node of targetNodes) {
-			await TargetNodeStyleUpdate(node, localizationKey, now);
+			await TargetNodeStyleUpdateOrigin(node, localizationKey, now);
 		}
 	}
 };

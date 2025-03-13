@@ -12,19 +12,23 @@ import { newGetStyleData } from './GET_STYLE_DATA';
 
 export let tempNode = '';
 
+const refreshNode = async (node: SceneNode) => {
+	tempNode = node.id;
+	const cursorPosition = await getCursorPosition(node);
+	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
+	const localizationKey = await processTextNodeLocalization(node);
+	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey);
+	const styleData = await newGetStyleData(node.id);
+	emit(GET_STYLE_DATA.RESPONSE_KEY, styleData);
+};
+
 export const onNodeSelectionChange = () => {
 	figma.on('selectionchange', async () => {
 		const node = figma.currentPage.selection[0];
 		/** 업데이트 반영 코드 */
 		if (node && tempNode !== node.id) {
 			tempNode = node.id;
-			const cursorPosition = await getCursorPosition(node);
-			emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
-			const localizationKey = await processTextNodeLocalization(node);
-			emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey);
-
-			const styleData = await newGetStyleData(node.id);
-			emit(GET_STYLE_DATA.RESPONSE_KEY, styleData);
+			refreshNode(node);
 		}
 		const sectionId = getCurrentSectionSelected(node);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
@@ -64,8 +68,7 @@ const textStyleChangeEvent = async (event: NodeChangeEvent) => {
 	});
 
 	if (isCurrentChangeNode) {
-		const styleData = await newGetStyleData(currentNodeId);
-		emit(GET_STYLE_DATA.RESPONSE_KEY, styleData);
+		refreshNode(currentNode);
 	}
 };
 export const onStyleChange = async () => {

@@ -16,7 +16,7 @@ import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal } from '@/model/signal';
-import { TargetNodeStyleUpdate } from '../Style/styleAction';
+import { TargetNodeStyleUpdate, TargetNodeStyleUpdateOrigin } from '../Style/styleAction';
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);
@@ -97,7 +97,6 @@ export const changeLocalizationCode = async (sectionNode: SectionNode | PageNode
 	 * 현재 로컬라이제이션 키가 같은 노드들을 모아서 처리
 	 */
 	const targetTextArr = arr
-
 		.filter((item) => {
 			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
 			if (currentLocalizationKey) {
@@ -130,7 +129,7 @@ export const changeLocalizationCode = async (sectionNode: SectionNode | PageNode
 				const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
 
 				if (localizationKey) {
-					await TargetNodeStyleUpdate(node, localizationKey, now);
+					await TargetNodeStyleUpdate(node, localizationKey, code, now);
 				}
 			}
 		}

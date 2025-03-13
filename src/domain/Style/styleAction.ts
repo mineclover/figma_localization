@@ -4,7 +4,7 @@ import { ResourceDTO, ParsedResourceDTO, StyleSync } from '@/model/types';
 import { parseXML, parseTextBlock } from '@/utils/xml';
 
 import { DOWNLOAD_STYLE } from '../constant';
-import { getLocalizationKeyData, generateLocalizationName } from '../Label/TextPluginDataModel';
+import { getLocalizationKeyData, generateLocalizationName, getTargetTranslations } from '../Label/TextPluginDataModel';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB } from '../utils/fetchDB';
 import { StyleData } from '@/model/signal';
@@ -19,7 +19,7 @@ import { generateXmlString } from './StylePage';
  * @param date Date.now()
  * @returns
  */
-export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: string, date: number) => {
+export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKey: string, date: number) => {
 	const xNodeId = node.id;
 	const domainSetting = getDomainSetting();
 
@@ -29,7 +29,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		return;
 	}
 
-	// /** 클라에서 받는 로컬라이제이션 키 없을 때 노드의 원본 텍스트 조회 */
+	/** 이름이 없어서 이름 얻는 로직 */
 	const originTextResult = await getLocalizationKeyData(localizationKey, date);
 	if (originTextResult == null) {
 		notify('Failed to get localization key data', 'error');
@@ -75,6 +75,139 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
+		console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ item:', item);
+		if (key == null) {
+			continue;
+		}
+		const target = item[key];
+		const value = target[0]['#text'] as string;
+		const length = typeof value === 'string' ? value.length : 0;
+		end = start + length;
+
+		let resource = resourceMap.get(key);
+
+		if (resource == null) {
+			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
+				method: 'GET',
+			});
+			if (onlineStyle == null) {
+				notify('Failed to get resource by key', 'error');
+				return;
+			}
+			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ onlineStyle:', onlineStyle);
+			const onlineData = (await onlineStyle.json()) as ResourceDTO;
+			const styleValue = JSON.parse(onlineData.style_value);
+			resourceMap.set(key, {
+				...onlineData,
+				style_value: JSON.parse(styleValue.style_value),
+			});
+			resource = resourceMap.get(key);
+		}
+		const styleValue = resource?.style_value;
+
+		if (styleValue == null) {
+			notify('Failed to get resource by key', 'error');
+			return;
+		}
+		await setAllStyleRanges({
+			textNode: node,
+			xNodeId,
+			styleData: styleValue,
+			boundVariables: {},
+			range: {
+				start,
+				end,
+			},
+		});
+		start = end;
+	}
+};
+
+/**
+ * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
+ * 요청은 date 값으로 캐싱함
+ * @param node
+ * @param localizationKey
+ * @param date Date.now()
+ * @returns
+ */
+export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: string, code: string, date: number) => {
+	const xNodeId = node.id;
+	const domainSetting = getDomainSetting();
+
+	// TODO: 내부에 도메인 설정 없을 때 널처리 시키려고 둔거 같은데 확장성이 낮아진다고 봄
+	if (domainSetting == null) {
+		notify('Failed to get domain id', 'error');
+		return;
+	}
+
+	/** 이름이 없어서 이름 얻는 로직 */
+	const originTextResult = await getLocalizationKeyData(localizationKey, date);
+	if (originTextResult == null) {
+		notify('Failed to get localization key data', 'error');
+		return;
+	}
+
+	node.name = generateLocalizationName(originTextResult);
+
+	/** 클라에서 받는 로컬라이제이션 키 없을 때 노드의 원본 텍스트 조회 */
+	const targetTextResult = await getTargetTranslations(localizationKey);
+	if (targetTextResult == null) {
+		notify('Failed to get localization data', 'error');
+		return;
+	}
+
+	const targetText = targetTextResult.find((item) => item.language_code === code);
+	if (targetText == null) {
+		notify('Failed to get localization code data : ' + code, 'error');
+		return;
+	}
+	// 데이터 처리를 이름 얻기 위해서 로컬 키 얻어서 이름을 얻어오냐
+	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
+	// node.name = generateLocalizationName(targetText.text);
+
+	const parsedData = parseXML(targetText.text ?? '');
+	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
+		method: 'GET',
+	});
+
+	if (result2 == null) {
+		notify('Failed to get resource by key', 'error');
+		return;
+	}
+
+	const data = (await result2.json()) as ResourceDTO[];
+
+	const resourceMap = new Map<string, ParsedResourceDTO>();
+	for (const item of data) {
+		resourceMap.set(item.resource_id.toString(), {
+			...item,
+			style_value: JSON.parse(item.style_value),
+		});
+	}
+
+	const fullText = parsedData
+		.map((item) => {
+			return parseTextBlock(item);
+		})
+		.join('');
+	try {
+		await textFontLoad(node);
+		node.characters = fullText;
+	} catch (error) {
+		if (typeof error === 'string') figma.notify('폰트 로드 실패 :' + error);
+	}
+
+	let start = 0;
+	let end = 0;
+
+	for (const item of parsedData) {
+		console.log('🚀 ~ TargetNodeStyleUpdate ~ item:', item);
+		const key = Object.keys(item)[0];
+		if (key == null) {
+			console.log('🚀 ~ TargetNodeStyleUpdate ~ key:', key);
+			continue;
+		}
 		const target = item[key];
 		const value = target[0]['#text'] as string;
 		const length = typeof value === 'string' ? value.length : 0;

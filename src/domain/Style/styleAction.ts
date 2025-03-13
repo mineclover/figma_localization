@@ -45,6 +45,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		return;
 	}
 	node.name = generateLocalizationName(originTextResult);
+	const NULL_TEXT = 'NULL TEXT';
 	/** 클라에서 받는 로컬라이제이션 키로 번역 값들 조회 */
 	const targetTextResult = await getTargetTranslations(localizationKey, date);
 	if (targetTextResult == null) {
@@ -67,9 +68,9 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		(acc, item) => {
 			const name = item.name.toUpperCase();
 			const temp = figma.root.getPluginData(VARIABLE_PREFIX + name) ?? '';
-			const changeName = temp === '' ? '대체' : temp;
+			const changeName = temp === '' ? NULL_TEXT : temp;
 			if (temp === '') {
-				figma.root.setPluginData(VARIABLE_PREFIX + name, 'NULL');
+				figma.root.setPluginData(VARIABLE_PREFIX + name, NULL_TEXT);
 			}
 			acc[item.name] = changeName;
 			return acc;

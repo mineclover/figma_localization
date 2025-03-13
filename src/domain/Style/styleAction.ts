@@ -10,6 +10,7 @@ import { clientFetchDBCurry, fetchDB } from '../utils/fetchDB';
 import { StyleData } from '@/model/signal';
 import { createStyleSegments, groupAllSegmentsByStyle } from './styleModel';
 import { generateXmlString } from './StylePage';
+import { safeJsonParse } from '../utils/getStore';
 
 /**
  * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
@@ -23,9 +24,19 @@ export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKe
 	const xNodeId = node.id;
 	const domainSetting = getDomainSetting();
 
+	console.log(
+		'🚀 ~ TargetNodeStyleUpdateOrigin ~ node: TextNode, localizationKey: string, date: number:',
+		node,
+		localizationKey,
+		date
+	);
 	// TODO: 내부에 도메인 설정 없을 때 널처리 시키려고 둔거 같은데 확장성이 낮아진다고 봄
 	if (domainSetting == null) {
 		notify('Failed to get domain id', 'error');
+		return;
+	}
+	if (localizationKey == null) {
+		console.log('localizationKey is null', node, localizationKey);
 		return;
 	}
 
@@ -54,7 +65,7 @@ export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKe
 	for (const item of data) {
 		resourceMap.set(item.resource_id.toString(), {
 			...item,
-			style_value: JSON.parse(item.style_value),
+			style_value: safeJsonParse<Record<string, any>>(item.style_value) ?? {},
 		});
 	}
 
@@ -85,7 +96,10 @@ export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKe
 		end = start + length;
 
 		let resource = resourceMap.get(key);
-
+		if (key == null || key == '' || key === '#text') {
+			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ key:', item, key, target, localizationKey, node);
+			continue;
+		}
 		if (resource == null) {
 			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
 				method: 'GET',
@@ -96,10 +110,11 @@ export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKe
 			}
 			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ onlineStyle:', onlineStyle);
 			const onlineData = (await onlineStyle.json()) as ResourceDTO;
-			const styleValue = JSON.parse(onlineData.style_value);
+			const styleValue = safeJsonParse<Record<string, any>>(onlineData.style_value) ?? {};
+
 			resourceMap.set(key, {
 				...onlineData,
-				style_value: JSON.parse(styleValue.style_value),
+				style_value: styleValue,
 			});
 			resource = resourceMap.get(key);
 		}
@@ -166,6 +181,9 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
 	// node.name = generateLocalizationName(targetText.text);
 
+	/**
+	 * 등록된 번역 값
+	 */
 	const parsedData = parseXML(targetText.text ?? '');
 	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 		method: 'GET',
@@ -180,9 +198,10 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	const resourceMap = new Map<string, ParsedResourceDTO>();
 	for (const item of data) {
+		const styleValue = safeJsonParse<Record<string, any>>(item.style_value) ?? {};
 		resourceMap.set(item.resource_id.toString(), {
 			...item,
-			style_value: JSON.parse(item.style_value),
+			style_value: styleValue,
 		});
 	}
 
@@ -200,22 +219,26 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	let start = 0;
 	let end = 0;
-
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedData:', parsedData);
 	for (const item of parsedData) {
-		console.log('🚀 ~ TargetNodeStyleUpdate ~ item:', item);
 		const key = Object.keys(item)[0];
 		if (key == null) {
 			console.log('🚀 ~ TargetNodeStyleUpdate ~ key:', key);
 			continue;
 		}
+		// 만약 단일 키일 경우 target 값이 배열이 아니라 문자열로 나온다.
 		const target = item[key];
+		const isSingleText = typeof target === 'string';
+
 		const value = target[0]['#text'] as string;
 		const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
 
 		let resource = resourceMap.get(key);
-
-		if (resource == null) {
+		console.log('🚀 ~ TargetNodeStyleUpdate ~ resource:', resource);
+		if (key == null || key == '' || key === '#text') {
+			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ key:', item, key, target, localizationKey, node);
+		} else if (resource == null) {
 			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
 				method: 'GET',
 			});
@@ -224,30 +247,36 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 				return;
 			}
 			const onlineData = (await onlineStyle.json()) as ResourceDTO;
-			const styleValue = JSON.parse(onlineData.style_value);
+			const styleValue = safeJsonParse<Record<string, any>>(onlineData.style_value) ?? {};
 			resourceMap.set(key, {
 				...onlineData,
-				style_value: JSON.parse(styleValue.style_value),
+				style_value: styleValue,
 			});
 			resource = resourceMap.get(key);
 		}
 		const styleValue = resource?.style_value;
-
-		if (styleValue == null) {
-			notify('Failed to get resource by key', 'error');
+		if (isSingleText) {
+			// 단일 키일 경우 문자열로 처리
+			parsedData.length === 1;
+			node.characters = target as string;
+		} else if (styleValue == null) {
+			// 스타일 값이 없을 경우 오류 처리
+			notify('Failed to get resource by key style_value', 'error');
 			return;
+		} else {
+			console.log('🚀 ~ TargetNodeStyleUpdate ~ styleValue:', styleValue);
+			await setAllStyleRanges({
+				textNode: node,
+				xNodeId,
+				styleData: styleValue,
+				boundVariables: {},
+				range: {
+					start,
+					end,
+				},
+			});
+			start = end;
 		}
-		await setAllStyleRanges({
-			textNode: node,
-			xNodeId,
-			styleData: styleValue,
-			boundVariables: {},
-			range: {
-				start,
-				end,
-			},
-		});
-		start = end;
 	}
 };
 
@@ -283,7 +312,7 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 			const newId = responseResult.resource_id.toString();
 			const newAlias = responseResult.alias;
 			const newName = responseResult.style_name;
-			const newStyle = JSON.parse(responseResult.style_value);
+			const newStyle = safeJsonParse<Record<string, any>>(responseResult.style_value) ?? {};
 			const newRanges = {
 				start,
 				end,

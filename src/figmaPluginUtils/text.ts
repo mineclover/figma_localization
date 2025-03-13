@@ -437,7 +437,7 @@ export const setAllStyleRanges = async ({
 	xNodeId: string;
 	textNode: TextNode;
 	styleData: Record<string, any>;
-	boundVariables: any;
+	boundVariables?: any;
 	range: {
 		start: number;
 		end: number;
@@ -480,7 +480,6 @@ export const setAllStyleRanges = async ({
 		if (key === 'fontName') {
 			await figma.loadFontAsync(style as FontName);
 		}
-
 		try {
 			const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function;
 			if (setRange) {

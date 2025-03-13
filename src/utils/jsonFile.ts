@@ -1,3 +1,4 @@
+import { safeJsonParse } from '@/domain/utils/getStore';
 import { LLog } from './console';
 
 /**
@@ -8,7 +9,7 @@ import { LLog } from './console';
 export function downloadJsonFile(text: string): void {
 	try {
 		// JSON 문자열을 파싱하여 유효성 검사
-		JSON.parse(text);
+		safeJsonParse(text);
 
 		// Blob 객체 생성
 		const blob = new Blob([text], { type: 'application/json' });
@@ -43,7 +44,7 @@ export const JsonToObject = async (files: File[]) => {
 		array.push(text);
 	}
 	const result = array.flatMap((text) => {
-		const json = JSON.parse(text);
+		const json = safeJsonParse(text);
 		return json;
 	});
 	return result;

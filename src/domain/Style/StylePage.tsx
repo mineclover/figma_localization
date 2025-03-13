@@ -54,12 +54,13 @@ import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@
 import { App, ErrorBoundary, ResourceProvider } from './suspense';
 import { Suspense } from 'preact/compat';
 import { styleToXml, xmlToStyle } from './styleAction';
+import { safeJsonParse } from '../utils/getStore';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;
 
-	const styleValue = JSON.parse(style);
-	const styleValue2 = JSON.parse(serverStyle);
+	const styleValue = safeJsonParse(style);
+	const styleValue2 = safeJsonParse(serverStyle);
 	return deepEqual(styleValue, styleValue2);
 };
 

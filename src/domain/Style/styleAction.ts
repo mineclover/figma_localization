@@ -20,132 +20,6 @@ import { safeJsonParse } from '../utils/getStore';
  * @param date Date.now()
  * @returns
  */
-export const TargetNodeStyleUpdateOrigin = async (node: TextNode, localizationKey: string, date: number) => {
-	const xNodeId = node.id;
-	const domainSetting = getDomainSetting();
-
-	console.log(
-		'🚀 ~ TargetNodeStyleUpdateOrigin ~ node: TextNode, localizationKey: string, date: number:',
-		node,
-		localizationKey,
-		date
-	);
-	// TODO: 내부에 도메인 설정 없을 때 널처리 시키려고 둔거 같은데 확장성이 낮아진다고 봄
-	if (domainSetting == null) {
-		notify('Failed to get domain id', 'error');
-		return;
-	}
-	if (localizationKey == null) {
-		console.log('localizationKey is null', node, localizationKey);
-		return;
-	}
-
-	/** 이름이 없어서 이름 얻는 로직 */
-	const originTextResult = await getLocalizationKeyData(localizationKey, date);
-	if (originTextResult == null) {
-		notify('Failed to get localization key data', 'error');
-		return;
-	}
-	const originText = originTextResult.origin_value;
-	node.name = generateLocalizationName(originTextResult);
-	// 키 아이디 82
-	const parsedData = parseXML(originText ?? '');
-	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
-		method: 'GET',
-	});
-
-	if (result2 == null) {
-		notify('Failed to get resource by key', 'error');
-		return;
-	}
-
-	const data = (await result2.json()) as ResourceDTO[];
-
-	const resourceMap = new Map<string, ParsedResourceDTO>();
-	for (const item of data) {
-		resourceMap.set(item.resource_id.toString(), {
-			...item,
-			style_value: safeJsonParse<Record<string, any>>(item.style_value) ?? {},
-		});
-	}
-
-	const fullText = parsedData
-		.map((item) => {
-			return parseTextBlock(item);
-		})
-		.join('');
-	try {
-		await textFontLoad(node);
-		node.characters = fullText;
-	} catch (error) {
-		if (typeof error === 'string') figma.notify('폰트 로드 실패 :' + error);
-	}
-
-	let start = 0;
-	let end = 0;
-
-	for (const item of parsedData) {
-		const key = Object.keys(item)[0];
-		console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ item:', item);
-		if (key == null) {
-			continue;
-		}
-		const target = item[key];
-		const value = target[0]['#text'] as string;
-		const length = typeof value === 'string' ? value.length : 0;
-		end = start + length;
-
-		let resource = resourceMap.get(key);
-		if (key == null || key == '' || key === '#text') {
-			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ key:', item, key, target, localizationKey, node);
-			continue;
-		}
-		if (resource == null) {
-			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
-				method: 'GET',
-			});
-			if (onlineStyle == null) {
-				notify('Failed to get resource by key', 'error');
-				return;
-			}
-			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ onlineStyle:', onlineStyle);
-			const onlineData = (await onlineStyle.json()) as ResourceDTO;
-			const styleValue = safeJsonParse<Record<string, any>>(onlineData.style_value) ?? {};
-
-			resourceMap.set(key, {
-				...onlineData,
-				style_value: styleValue,
-			});
-			resource = resourceMap.get(key);
-		}
-		const styleValue = resource?.style_value;
-
-		if (styleValue == null) {
-			notify('Failed to get resource by key', 'error');
-			return;
-		}
-		await setAllStyleRanges({
-			textNode: node,
-			xNodeId,
-			styleData: styleValue,
-			boundVariables: {},
-			range: {
-				start,
-				end,
-			},
-		});
-		start = end;
-	}
-};
-
-/**
- * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
- * 요청은 date 값으로 캐싱함
- * @param node
- * @param localizationKey
- * @param date Date.now()
- * @returns
- */
 export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: string, code: string, date: number) => {
 	const xNodeId = node.id;
 	const domainSetting = getDomainSetting();
@@ -235,9 +109,8 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		end = start + length;
 
 		let resource = resourceMap.get(key);
-		console.log('🚀 ~ TargetNodeStyleUpdate ~ resource:', resource);
+
 		if (key == null || key == '' || key === '#text') {
-			console.log('🚀 ~ TargetNodeStyleUpdateOrigin ~ key:', item, key, target, localizationKey, node);
 		} else if (resource == null) {
 			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
 				method: 'GET',

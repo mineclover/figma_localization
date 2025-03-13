@@ -23,7 +23,7 @@ import {
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
-import { styleToXml, TargetNodeStyleUpdateOrigin } from './styleAction';
+import { styleToXml, TargetNodeStyleUpdate } from './styleAction';
 import toNumber from 'strnum';
 
 const range = (start: number, end: number) => {
@@ -359,7 +359,7 @@ export const onDownloadStyle = () => {
 			return;
 		}
 		// 디자인된 버전의 텍스트로 변경
-		await TargetNodeStyleUpdateOrigin(xNode, localizationKey, Date.now());
+		await TargetNodeStyleUpdate(xNode, localizationKey, 'origin', Date.now());
 	});
 };
 

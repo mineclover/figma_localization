@@ -150,28 +150,10 @@ const TranslatePage = () => {
 		return <Bold>도메인 설정이 없습니다</Bold>;
 	}
 
-	if (localizationKeyValue?.key_id == null && currentSection != null) {
-		return (
-			<div className={styles.translateRow}>
-				{targetArray.map((item) => {
-					return (
-						<Button
-							onClick={() => {
-								emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item);
-							}}
-						>
-							{item}
-						</Button>
-					);
-				})}
-			</div>
-		);
-	}
-
 	return (
 		<div>
 			<div className={styles.translateRow}>
-				<Bold>{currentSection == null ? '페이지' : '섹션'} 에서 언어 변경</Bold>
+				<Bold>{currentSection == null ? '페이지' : currentSection.name + ' 섹션'} 에서 언어 변경</Bold>
 				{targetArray.map((item) => {
 					return (
 						<Button

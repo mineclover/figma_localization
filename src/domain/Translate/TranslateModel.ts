@@ -16,7 +16,7 @@ import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal } from '@/model/signal';
-import { TargetNodeStyleUpdate, TargetNodeStyleUpdateOrigin } from '../Style/styleAction';
+import { TargetNodeStyleUpdate } from '../Style/styleAction';
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);

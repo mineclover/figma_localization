@@ -85,7 +85,7 @@ export const generateRandomText2 = () => {
  * @returns
  */
 export const removeLeadingSymbols = (text: string) => {
-	// 정규식을 사용하여 문자열 시작 부분의 # 또는 @ 문자를 모두 제거
+	// 정규식을 사용하여 문자열 시작 부분의 # 또는 @ 문자, 등록 식별 심볼을 모두 제거
 	return text.replace(/^[#@❎✅]+/, '');
 };
 
@@ -126,3 +126,102 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 		})
 		.join('');
 };
+
+type LocalizationVariable = {
+	variable: string;
+	content: string;
+	name: string;
+};
+
+/**
+ * 텍스트에서 {.(.*)} 패턴만 찾는 파서
+ * 내부 중괄호를 포함한 전체 내용을 콘텐츠로 취급하고, 정리된 name 필드 추가
+ * @param {string} text - 파싱할 텍스트
+ * @returns {Object} - 파싱 결과 (성공 여부, 값 또는 오류 메시지)
+ */
+export const parseLocalizationVariables = (text: string) => {
+	// 결과를 저장할 배열
+	const results = {} as Record<string, LocalizationVariable>;
+	// 오류 메시지를 저장할 배열
+	const errors = [];
+
+	// 텍스트를 순회하면서 파싱
+	let i = 0;
+
+	while (i < text.length) {
+		// 최상위 레벨의 { 문자를 찾음 (중첩된 중괄호의 시작이 아닌)
+		if (text[i] === '{' && (i === 0 || text[i - 1] !== '{')) {
+			const startIndex = i;
+			let depth = 1; // 중괄호 깊이 추적
+			let j = i + 1;
+
+			// 같은 깊이의 닫는 } 를 찾을 때까지 진행
+			while (j < text.length && depth > 0) {
+				if (text[j] === '{') {
+					depth++;
+				} else if (text[j] === '}') {
+					depth--;
+				}
+				j++;
+			}
+
+			// 중괄호가 제대로 닫혔는지 확인
+			if (depth > 0) {
+				errors.push(`오류: 닫는 중괄호가 없습니다. 위치: ${startIndex}`);
+				i = j;
+				continue;
+			}
+
+			// 외부 중괄호 전체를 변수로 추출
+			const variable = text.substring(startIndex, j);
+			// 중괄호 내부 내용을 콘텐츠로 추출 (내부 중괄호 포함)
+			const content = text.substring(startIndex + 1, j - 1);
+
+			// 내용에서 특수 문자를 제거한 name 필드 생성
+			const name = content.replace(/[{}\s]/g, ''); // 중괄호와 공백 제거
+
+			results[name] = {
+				variable, // 원본 변수 (예: "{a{b}c}")
+				content, // 내부 내용 (예: "a{b}c")
+				name, // 특수 문자가 제거된 버전 (예: "abc")
+			};
+
+			i = j;
+		} else {
+			i++;
+		}
+	}
+
+	return {
+		success: true,
+		variables: results,
+		errors: errors,
+	};
+};
+
+// 템플릿에서 변수를 대체하는 함수
+export const applyLocalization = (template: string, variables: Record<string, string>, useNameField = false) => {
+	let result = template;
+
+	// 템플릿에서 변수 파싱
+	const parseResult = parseLocalizationVariables(template);
+
+	// 각 변수를 대체
+	Object.values(parseResult.variables).forEach((variable) => {
+		// useNameField가 true이면 name 필드를 사용하고, 아니면 content 필드를 사용
+		const variableName = useNameField ? variable.name : variable.content;
+
+		if (variables[variableName] !== undefined) {
+			result = result.replace(variable.variable, variables[variableName]);
+		} else if (useNameField && variables[variable.content] !== undefined) {
+			// name으로 찾지 못했을 경우 content로 한번 더 시도
+			result = result.replace(variable.variable, variables[variable.content]);
+		}
+	});
+
+	return result;
+};
+
+// 로컬라이제이션 적용 테스트
+// console.log("로컬라이제이션 적용 전:", template);
+// console.log("로컬라이제이션 적용 후:", applyLocalization(template, variables));

@@ -233,20 +233,39 @@ export const searchTargetLocalization = async (id: string, language: string) => 
 
 	return data.text;
 };
+
+const localizationKeyTranslationCache = new Map<string, CacheItem<LocalizationTranslationDTO[]>>();
+
 /** 키 아이디 기반으로 여러개 얻음 */
-export const getTargetTranslations = async (id: string) => {
-	const result = await fetchDB(
-		('/localization/keys/' + id + '/translations') as '/localization/keys/{id}/translations',
-		{
-			method: 'GET',
-		}
-	);
+export const getTargetTranslations = async (id: string, date?: number) => {
+	const apiPath = '/localization/keys/' + id + '/translations';
+	const cacheKey = apiPath;
+	const now = date || Date.now();
+
+	const cachedItem = localizationKeyTranslationCache.get(cacheKey);
+
+	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
+	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
+		console.log(`캐시된 번역 데이터 반환: ${cacheKey}`);
+		return cachedItem.data;
+	}
+
+	const result = await fetchDB(apiPath as '/localization/keys/{id}/translations', {
+		method: 'GET',
+	});
 
 	if (!result) {
 		return;
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO[];
+
+	// 결과 캐싱
+	localizationKeyTranslationCache.set(cacheKey, {
+		timestamp: now,
+		data: data,
+	});
+	console.log('번역 데이터 캐싱 갱신 됨');
 
 	return data;
 };

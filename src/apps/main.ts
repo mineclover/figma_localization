@@ -19,7 +19,13 @@ import {
 	onTargetSetNodeLocation,
 	onUpdateNodeStoreBatchKey,
 } from '@/domain/Label/TextPluginDataModel';
-import { onCurrentSectionSelected, onSetLanguageCode } from '@/domain/Translate/TranslateModel';
+import {
+	onClearVariableData,
+	onCurrentSectionSelected,
+	onGetVariableData,
+	onSetLanguageCode,
+	onSetVariableData,
+} from '@/domain/Translate/TranslateModel';
 import {
 	onPatternMatch,
 	onSetNodeIgnore,
@@ -57,7 +63,9 @@ export default function () {
 	onSetNodeIgnore();
 	onSetStyle();
 	onDownloadStyle();
-
+	onGetVariableData();
+	onSetVariableData();
+	onClearVariableData();
 	// 유틸
 	onNodeSelectionChange();
 	nodeZoom_Adapter();

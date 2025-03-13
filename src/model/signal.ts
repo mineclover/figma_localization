@@ -59,3 +59,4 @@ export type StyleData = {
 };
 
 export const styleDataSignal = signal<StyleData | null>(null);
+export const variableDataSignal = signal<Record<string, string>>({});

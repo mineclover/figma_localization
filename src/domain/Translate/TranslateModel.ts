@@ -8,6 +8,10 @@ import {
 	CHANGE_LANGUAGE_CODE,
 	CURRENT_SECTION_SELECTED,
 	NODE_STORE_KEY,
+	GET_VARIABLE_DATA,
+	VARIABLE_PREFIX,
+	SET_VARIABLE_DATA,
+	CLEAR_VARIABLE_DATA,
 } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
 import { getNodeData } from '../Label/TextPluginDataModel';
@@ -15,7 +19,7 @@ import { CurrentNode, LocalizationTranslationDTO } from '@/model/types';
 import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
-import { currentSectionSignal } from '@/model/signal';
+import { currentSectionSignal, variableDataSignal } from '@/model/signal';
 import { TargetNodeStyleUpdate } from '../Style/styleAction';
 
 export const onCurrentSectionSelectedResponse = () => {
@@ -139,16 +143,60 @@ export const changeLocalizationCode = async (sectionNode: SectionNode | PageNode
 /** 번역을 위한 언어 코드 설정 */
 export const onSetLanguageCode = async () => {
 	on(CHANGE_LANGUAGE_CODE.REQUEST_KEY, async (languageCode: string, sectionId?: string) => {
-		let node: SectionNode | PageNode | null = null;
+		let areaNode: SectionNode | PageNode | null = null;
 		if (sectionId) {
-			node = (await figma.getNodeByIdAsync(sectionId)) as SectionNode | null;
+			areaNode = (await figma.getNodeByIdAsync(sectionId)) as SectionNode | null;
 		} else {
-			node = figma.currentPage;
+			areaNode = figma.currentPage;
 		}
-		if (node == null) {
+		if (areaNode == null) {
 			return;
 		}
+		await changeLocalizationCode(areaNode, languageCode);
+		getVariableData();
+	});
+};
 
-		await changeLocalizationCode(node, languageCode);
+/** 변수 데이터 조회 후 전송 */
+export const getVariableData = () => {
+	const data = figma.root.getPluginDataKeys();
+	const variableData = data.filter((item) => item.startsWith(VARIABLE_PREFIX));
+
+	const variableDataMap = {} as Record<string, string>;
+	variableData.map((item) => {
+		const value = figma.root.getPluginData(item);
+		const key = item.replace(VARIABLE_PREFIX, '');
+		variableDataMap[key] = value;
+	});
+
+	emit(GET_VARIABLE_DATA.RESPONSE_KEY, variableDataMap);
+};
+
+export const onGetVariableData = () => {
+	on(GET_VARIABLE_DATA.REQUEST_KEY, getVariableData);
+};
+
+export const onGetVariableDataResponse = () => {
+	emit(GET_VARIABLE_DATA.REQUEST_KEY);
+	return on(GET_VARIABLE_DATA.RESPONSE_KEY, (data: Record<string, string>) => {
+		variableDataSignal.value = data;
+	});
+};
+
+export const onSetVariableData = () => {
+	on(SET_VARIABLE_DATA.REQUEST_KEY, (key: string, value: string) => {
+		figma.root.setPluginData(VARIABLE_PREFIX + key.toUpperCase(), value);
+		getVariableData();
+	});
+};
+
+export const onClearVariableData = () => {
+	on(CLEAR_VARIABLE_DATA.REQUEST_KEY, () => {
+		const data = figma.root.getPluginDataKeys();
+		const variableData = data.filter((item) => item.startsWith(VARIABLE_PREFIX));
+		variableData.map((item) => {
+			figma.root.setPluginData(item, '');
+		});
+		getVariableData();
 	});
 };

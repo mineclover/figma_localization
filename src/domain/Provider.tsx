@@ -4,7 +4,7 @@ import ClientModalProvider from '@/components/modal/Modal';
 import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/LabelModel';
 import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
-import { onCurrentSectionSelectedResponse } from './Translate/TranslateModel';
+import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel';
 import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 
 /**
@@ -26,6 +26,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onSetProjectIdResponse(),
 			onCurrentSectionSelectedResponse(),
 			onGetStyleDataResponse(),
+			onGetVariableDataResponse(),
 		];
 
 		return () => {

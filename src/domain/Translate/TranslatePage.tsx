@@ -5,7 +5,7 @@ import { ComponentChildren, Fragment, h } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { components } from 'types/i18n';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from '../Setting/SettingModel';
-import { languageCodesSignal } from '@/model/signal';
+import { languageCodesSignal, variableDataSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 
 import { useSignal } from '@/hooks/useSignal';
@@ -20,7 +20,15 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui';
 
-import { CHANGE_LANGUAGE_CODE, GET_PROJECT_ID, RELOAD_NODE, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant';
+import {
+	CHANGE_LANGUAGE_CODE,
+	CLEAR_VARIABLE_DATA,
+	GET_PROJECT_ID,
+	GET_VARIABLE_DATA,
+	RELOAD_NODE,
+	SET_LANGUAGE_CODES,
+	SET_PROJECT_ID,
+} from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
 import { projectIdSignal } from '@/model/signal';
@@ -104,12 +112,14 @@ const TranslatePage = () => {
 
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
-
 	const currentPointer = useSignal(currentPointerSignal);
 	const currentSection = useSignal(currentSectionSignal);
-
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
+
+	const variableData = useSignal(variableDataSignal);
+	console.log('🚀 ~ TranslatePage ~ variableData:', variableData);
+
 	const targetArray = ['origin', ...languageCodes];
 
 	const updateAction = () => {
@@ -152,6 +162,20 @@ const TranslatePage = () => {
 
 	return (
 		<div>
+			<Button
+				onClick={() => {
+					emit(GET_VARIABLE_DATA.REQUEST_KEY);
+				}}
+			>
+				새로고침
+			</Button>
+			<Button
+				onClick={() => {
+					emit(CLEAR_VARIABLE_DATA.REQUEST_KEY);
+				}}
+			>
+				변수 초기화
+			</Button>
 			<div className={styles.translateRow}>
 				<Bold>{currentSection == null ? '페이지' : currentSection.name + ' 섹션'} 에서 언어 변경</Bold>
 				{targetArray.map((item) => {
@@ -193,4 +217,5 @@ const TranslatePage = () => {
 		</div>
 	);
 };
+
 export default TranslatePage;

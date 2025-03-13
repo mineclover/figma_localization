@@ -162,7 +162,7 @@ export type SectionDTO = {
 };
 export type DomainSettingType = {
 	domainId: number;
-	domain: string;
+	domainName: string;
 }; // 있든 없든 수정 가능하게 구성
 
 export type StyleSync = {

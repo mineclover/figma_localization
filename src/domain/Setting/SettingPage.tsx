@@ -9,12 +9,46 @@ import { languageCodesSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 import DomainSelect from './DomainSelect';
 import { useSignal } from '@/hooks/useSignal';
-import { Bold, Button, Container, Stack, Text, Textbox, VerticalSpace } from '@create-figma-plugin/ui';
+import {
+	Bold,
+	Button,
+	Container,
+	IconButton,
+	IconCross32,
+	IconPlus32,
+	IconSwap32,
+	Stack,
+	Text,
+	Textbox,
+	VerticalSpace,
+} from '@create-figma-plugin/ui';
 import styles from './domainSelect.module.css';
 import { GET_PROJECT_ID, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 import { onSetProjectIdResponse } from '../Label/LabelModel';
 import { projectIdSignal } from '@/model/signal';
+import { clientFetchDBCurry } from '../utils/fetchDB';
+
+const LanguageCode = ({ languageCode }: { languageCode: string }) => {
+	return (
+		<div className={styles.languageCode}>
+			<input
+				className={styles.languageCodeInput}
+				value={languageCode}
+				maxLength={3}
+				onChange={(e) => {
+					const value = e.currentTarget.value.toLowerCase();
+					languageCodesSignal.value = languageCodesSignal.value.map((temp) => {
+						if (temp === languageCode) {
+							return value;
+						}
+						return temp;
+					});
+				}}
+			/>
+		</div>
+	);
+};
 
 function SettingPage() {
 	const { data, loading, error, fetchData } = useFetch<components['schemas']['Domain'][]>();
@@ -22,6 +56,7 @@ function SettingPage() {
 	const projectId = useSignal(projectIdSignal);
 
 	const domainSetting = useSignal(domainSettingSignal);
+	console.log('🚀 ~ SettingPage ~ domainSetting:', domainSetting);
 	const languageCodes = useSignal(languageCodesSignal);
 
 	useEffect(() => {
@@ -32,7 +67,7 @@ function SettingPage() {
 				emit(SET_LANGUAGE_CODES.REQUEST_KEY, domain.language_codes);
 			}
 		}
-	}, [domainSetting]);
+	}, [data, domainSetting]);
 
 	useEffect(() => {
 		fetchData('/domains', {
@@ -46,15 +81,15 @@ function SettingPage() {
 			<div className={styles.container}>
 				<div className={styles.domainContainer}>
 					<Bold>Domain</Bold>
-					<Button
+					<IconButton
 						onClick={() => {
 							fetchData('/domains', {
 								method: 'GET',
 							});
 						}}
 					>
-						update
-					</Button>
+						<IconSwap32 />
+					</IconButton>
 				</div>
 				{data?.map((domain) => (
 					<DomainSelect
@@ -68,20 +103,44 @@ function SettingPage() {
 			<VerticalSpace space="extraSmall" />
 			<div className={styles.container}>
 				<div className={styles.domainContainer}>
-					<Bold>Language Codes</Bold>
+					<Bold>Language Codes : {domainSetting?.domainName}</Bold>
+					<Button
+						onClick={async () => {
+							const clientFetch = clientFetchDBCurry(domainSetting?.domainId!);
+							console.log('🚀 ~ SettingPage ~ domainSetting:', domainSetting);
+
+							await clientFetch(
+								('/domains/' + domainSetting?.domainName + '/languages') as '/domains/{name}/languages',
+								{
+									method: 'PUT',
+									body: JSON.stringify({
+										languageCodes: languageCodes,
+									}),
+								}
+							);
+							fetchData('/domains', {
+								method: 'GET',
+							});
+						}}
+					>
+						SAVE
+					</Button>
 				</div>
 				<div className={styles.languageCodesContainer}>
-					{languageCodes.map((languageCode, index) => {
-						if (index === 0) {
-							return <span key={index}>{languageCode}</span>;
-						}
-						return (
-							<Fragment key={index}>
-								<span>/</span>
-								<span>{languageCode}</span>
-							</Fragment>
-						);
-					})}
+					{languageCodes
+						.filter((item, index, arr) => {
+							return arr.indexOf(item) === index;
+						})
+						.map((languageCode, index) => (
+							<LanguageCode key={index} languageCode={languageCode} />
+						))}
+					<IconButton
+						onClick={() => {
+							languageCodesSignal.value = [...languageCodesSignal.value, ''];
+						}}
+					>
+						<IconPlus32 />
+					</IconButton>
 				</div>
 			</div>
 			<VerticalSpace space="extraSmall" />

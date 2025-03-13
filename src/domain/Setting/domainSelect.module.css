@@ -34,3 +34,20 @@
 .tag {
 	color: var(--figma-color-text-secondary);
 }
+
+.languageCode {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	/* padding: 2px 2px 2px 8px; */
+	padding: 8px;
+
+	border: 1px solid var(--figma-color-border);
+}
+
+.languageCodeInput {
+	width: 40px;
+	background-color: var(--figma-color-bg);
+	text-align: center;
+}

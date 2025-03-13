@@ -11,6 +11,8 @@ function DomainSelect({ domainId, domainName, select }: { domainId: number; doma
 		<button
 			className={styles.button}
 			onClick={() => {
+				// 도메인 업데이트에 의해 useEffect에서 언어 코드도 업데이트 됨으로
+				// 언어코드 업데이트는 필요 없다 하지만 useEffect를 제거하면 필요해짐
 				emit(SET_DOMAIN_PAIR.REQUEST_KEY, {
 					domainId,
 					domainName,

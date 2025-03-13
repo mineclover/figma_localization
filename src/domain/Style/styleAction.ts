@@ -310,11 +310,16 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	// });
 };
 
-// 전역 캐시 객체 추가
-export const styleResourceCache = new Map<string, StyleSync>();
+// 전역 캐시 객체 추가 - ranges 정보 제외
+interface StyleResourceCacheItem {
+	name: string;
+	id: string;
+	alias?: string;
+	style: any;
+}
 
-// hashId 기준이므로 새로운 값이 생기면 새로운 해시가 생성 됨
-// 수정이 없다는 것을 확정 지을 수 있음
+const styleResourceCache: Record<string, StyleResourceCacheItem> = {};
+
 export const styleToXml = async (
 	domainId: number | string,
 	characters: string,
@@ -333,14 +338,18 @@ export const styleToXml = async (
 
 	for (const style of exportStyleGroups) {
 		// 캐시 확인 - 이미 같은 해시 ID로 요청한 적이 있는지 확인
-		if (styleResourceCache.has(style.hashId)) {
-			const temp = styleResourceCache.get(style.hashId);
-			if (temp) {
-				styleStore[style.hashId] = temp;
-				continue;
-			} else {
-				styleResourceCache.delete(style.hashId);
-			}
+		if (styleResourceCache[style.hashId]) {
+			// 캐시된 값 사용하되, ranges는 현재 계산된 값 사용
+			const cachedData = styleResourceCache[style.hashId];
+			styleStore[style.hashId] = {
+				hashId: style.hashId,
+				name: cachedData.name,
+				id: cachedData.id,
+				alias: cachedData.alias,
+				style: cachedData.style,
+				ranges: style.ranges, // 현재 계산된 ranges 사용
+			};
+			continue;
 		}
 
 		// 캐시에 없는 경우 API 요청 실행
@@ -357,12 +366,22 @@ export const styleToXml = async (
 		if (!temp) {
 			continue;
 		}
-		const responseResult = await temp.json();
+		const responseResult = (await temp.json()) as ResourceDTO;
 		if (responseResult) {
 			const newId = responseResult.resource_id.toString();
 			const newAlias = responseResult.alias;
 			const newName = responseResult.style_name;
-			const store = {
+
+			// 결과를 캐시에 저장 (ranges 제외)
+			styleResourceCache[style.hashId] = {
+				name: newName,
+				id: newId,
+				alias: newAlias,
+				style: style.style,
+			};
+
+			// styleStore에는 모든 데이터 포함
+			styleStore[style.hashId] = {
 				hashId: style.hashId,
 				name: newName,
 				id: newId,
@@ -370,9 +389,6 @@ export const styleToXml = async (
 				style: style.style,
 				ranges: style.ranges,
 			};
-			styleStore[style.hashId] = store;
-			// 결과를 캐시에 저장
-			styleResourceCache.set(style.hashId, store);
 		}
 	}
 

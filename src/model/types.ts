@@ -169,6 +169,7 @@ export type StyleSync = {
 	hashId: string;
 	name?: string;
 	id?: string;
+	alias?: string;
 } & StyleGroup;
 
 export type StyleHashSegment = {

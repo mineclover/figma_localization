@@ -310,6 +310,11 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	// });
 };
 
+// 전역 캐시 객체 추가
+export const styleResourceCache = new Map<string, StyleSync>();
+
+// hashId 기준이므로 새로운 값이 생기면 새로운 해시가 생성 됨
+// 수정이 없다는 것을 확정 지을 수 있음
 export const styleToXml = async (
 	domainId: number | string,
 	characters: string,
@@ -327,7 +332,18 @@ export const styleToXml = async (
 	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {
-		// store 동시 실행 시 컨텍스트가 이전 컨텍스트여서 오류
+		// 캐시 확인 - 이미 같은 해시 ID로 요청한 적이 있는지 확인
+		if (styleResourceCache.has(style.hashId)) {
+			const temp = styleResourceCache.get(style.hashId);
+			if (temp) {
+				styleStore[style.hashId] = temp;
+				continue;
+			} else {
+				styleResourceCache.delete(style.hashId);
+			}
+		}
+
+		// 캐시에 없는 경우 API 요청 실행
 		const temp = await clientFetchDB('/resources', {
 			method: 'POST',
 			headers: {
@@ -355,6 +371,8 @@ export const styleToXml = async (
 				ranges: style.ranges,
 			};
 			styleStore[style.hashId] = store;
+			// 결과를 캐시에 저장
+			styleResourceCache.set(style.hashId, store);
 		}
 	}
 

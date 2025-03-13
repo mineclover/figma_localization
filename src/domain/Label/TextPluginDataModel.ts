@@ -154,7 +154,7 @@ export const getLocalizationKeyData = async (
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (0.5초)
 
-	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 1000) {
+	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
 		console.log(`캐시된 데이터 반환: ${cacheKey}`);
 		return cachedItem.data;
 	}

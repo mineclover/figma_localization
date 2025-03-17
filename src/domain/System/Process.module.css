@@ -5,3 +5,14 @@
 	gap: 4px;
 	padding: 4px;
 }
+
+.row {
+	display: flex;
+	flex-direction: row;
+	gap: 4px;
+	width: 100%;
+}
+.text {
+	flex-shrink: 0;
+	width: 40px;
+}

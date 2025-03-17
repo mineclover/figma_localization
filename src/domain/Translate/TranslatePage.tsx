@@ -14,6 +14,9 @@ import {
 	Button,
 	Container,
 	Divider,
+	IconButton,
+	IconSwap32,
+	IconTrash32,
 	Stack,
 	Text,
 	Textbox,
@@ -192,23 +195,6 @@ const TranslatePage = () => {
 	return (
 		<div>
 			<ProcessBar />
-			<div className={styles.translateItem}>
-				<Button
-					onClick={() => {
-						emit(GET_VARIABLE_DATA.REQUEST_KEY);
-					}}
-				>
-					새로고침
-				</Button>
-				<Button
-					danger
-					onClick={() => {
-						emit(CLEAR_VARIABLE_DATA.REQUEST_KEY);
-					}}
-				>
-					변수 초기화
-				</Button>
-			</div>
 
 			<div className={styles.container}>
 				<Bold>{currentSection == null ? '페이지' : currentSection.name + ' 섹션'} 에서 언어 변경</Bold>
@@ -234,7 +220,24 @@ const TranslatePage = () => {
     <div>2. 번역 가능한 인터페이스를 준다 {'>'} 실시간 번역</div>
     <div>3. 위치가 있으면 위치를 준다 {'>'} 해당 키를 검색으로 입력 받게 해서 확장 가능</div> */}
 			<div className={styles.container}>
-				<Bold>변수 목록</Bold>
+				<div className={styles.translateRow}>
+					<Bold>변수 목록</Bold>
+					<IconButton
+						onClick={() => {
+							emit(GET_VARIABLE_DATA.REQUEST_KEY);
+						}}
+					>
+						<IconSwap32 />
+					</IconButton>
+					<IconButton
+						onClick={() => {
+							emit(CLEAR_VARIABLE_DATA.REQUEST_KEY);
+						}}
+					>
+						<IconTrash32 />
+					</IconButton>
+				</div>
+
 				{Object.entries(variableData).map(([key, value]) => {
 					return <VariableItem key={key} id={key} value={value} />;
 				})}

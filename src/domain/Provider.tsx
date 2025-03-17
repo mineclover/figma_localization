@@ -6,6 +6,7 @@ import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VA
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
 import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel';
 import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
+import { onProcessResponse } from './System/process';
 
 /**
  * duplex 전용 어댑터
@@ -27,6 +28,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onCurrentSectionSelectedResponse(),
 			onGetStyleDataResponse(),
 			onGetVariableDataResponse(),
+			onProcessResponse(),
 		];
 
 		return () => {

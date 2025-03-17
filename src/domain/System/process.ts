@@ -2,7 +2,7 @@ import { signal } from '@preact/signals-core';
 import { GET_PROCESS_PAIR } from '../constant';
 import { emit, on } from '@create-figma-plugin/utilities';
 
-type Process = {
+export type Process = {
 	process_id: string;
 	process_name: string;
 	process_status: number;
@@ -12,7 +12,6 @@ type Process = {
 export const processSignal = signal<Record<string, Process>>({});
 
 export const onProcessResponse = () => {
-	emit(GET_PROCESS_PAIR.REQUEST_KEY, processSignal.value);
 	return on(GET_PROCESS_PAIR.RESPONSE_KEY, (data: Process) => {
 		const { process_id } = data;
 
@@ -32,9 +31,9 @@ const receiveTimer = {} as Record<
 >;
 const completedTimer = {} as Record<string, NodeJS.Timeout>;
 
-const TICK = 500;
+const TICK = 300;
 
-const processReceiver = (data: Process) => {
+export const processReceiver = (data: Process) => {
 	const { process_id, process_status, process_end } = data;
 
 	const now = Date.now();

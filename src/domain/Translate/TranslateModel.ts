@@ -21,6 +21,7 @@ import { textFontLoad } from '@/figmaPluginUtils/text';
 import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal, variableDataSignal } from '@/model/signal';
 import { TargetNodeStyleUpdate } from '../Style/styleAction';
+import { processReceiver } from '../System/process';
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);
@@ -65,7 +66,29 @@ export const onCurrentSectionSelected = () => {
 	});
 };
 
-export const searchTranslationCode = async (key: string, code: string) => {
+// 캐시 아이템 인터페이스 정의 (TextPluginDataModel.ts와 동일한 구조 사용)
+interface CacheItem<T> {
+	timestamp: number;
+	data: T;
+}
+
+// 번역 코드 검색 결과를 위한 캐시 맵
+const translationCodeCache = new Map<string, CacheItem<LocalizationTranslationDTO>>();
+
+// 키와 언어 코드로 번역 데이터 조회해서 1개 받음
+export const searchTranslationCode = async (key: string, code: string, date?: number) => {
+	const apiPath = '/localization/translations/search?keyId=' + key + '&language=' + code;
+	const cacheKey = apiPath;
+	const now = date || Date.now();
+
+	const cachedItem = translationCodeCache.get(cacheKey);
+
+	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
+	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
+		console.log(`캐시된 번역 코드 데이터 반환: ${cacheKey}`);
+		return cachedItem.data;
+	}
+
 	const result = await fetchDB(
 		('/localization/translations/search?keyId=' + key + '&language=' + code) as '/localization/translations/search',
 		{
@@ -78,6 +101,13 @@ export const searchTranslationCode = async (key: string, code: string) => {
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO;
+
+	// 결과 캐싱
+	translationCodeCache.set(cacheKey, {
+		timestamp: now,
+		data: data,
+	});
+	console.log('번역 코드 데이터 캐싱 갱신 됨');
 
 	return data;
 };
@@ -116,25 +146,40 @@ export const changeLocalizationCode = async (sectionNode: SectionNode | PageNode
 				if (temp == null) {
 					temp = new Set<TextNode>();
 				}
-
 				targetOrigin.set(localizationKey, temp.add(item));
 			}
 			return item;
 		});
 
 	const now = Date.now();
+	const id = 'change target : ' + code;
+	let count = 0;
+	processReceiver({
+		process_id: id,
+		process_name: code,
+		process_status: count,
+		process_end: targetTextArr.length,
+	});
+
 	for (const [key, targetNodes] of targetOrigin.entries()) {
 		// key , code
 
-		const a = await searchTranslationCode(key, code);
+		const a = await searchTranslationCode(key, code, now);
 
+		// 번역 텍스트가 없으면 카운트 안됨
 		if (a) {
 			for (const node of targetNodes) {
+				count++;
 				const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
-
 				if (localizationKey) {
 					await TargetNodeStyleUpdate(node, localizationKey, code, now);
 				}
+				processReceiver({
+					process_id: id,
+					process_name: code,
+					process_status: count,
+					process_end: targetTextArr.length,
+				});
 			}
 		}
 	}

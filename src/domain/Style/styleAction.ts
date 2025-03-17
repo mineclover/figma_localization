@@ -12,6 +12,7 @@ import { createStyleSegments, groupAllSegmentsByStyle } from './styleModel';
 import { generateXmlString } from './StylePage';
 import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
+import { searchTranslationCode } from '../Translate/TranslateModel';
 
 const innerTextExtract = (text: any): string => {
 	if (typeof text === 'string') {
@@ -47,18 +48,12 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	node.name = generateLocalizationName(originTextResult);
 	const NULL_TEXT = 'NULL TEXT';
 	/** 클라에서 받는 로컬라이제이션 키로 번역 값들 조회 */
-	const targetTextResult = await getTargetTranslations(localizationKey, date);
-	if (targetTextResult == null) {
+	const targetText = await searchTranslationCode(localizationKey, code, date);
+	if (targetText == null) {
 		notify('Failed to get localization data', 'error');
 		return;
 	}
 
-	/** 클라에서 받는 언어 코드로 번역 값 조회 */
-	const targetText = targetTextResult.find((item) => item.language_code === code);
-	if (targetText == null) {
-		notify('Failed to get localization code data : ' + code, 'error');
-		return;
-	}
 	// 데이터 처리를 이름 얻기 위해서 로컬 키 얻어서 이름을 얻어오냐
 	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
 	// node.name = generateLocalizationName(targetText.text);

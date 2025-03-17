@@ -4,7 +4,7 @@ import styles from './alert.module.css';
 const MODAL_KEY = 'modal';
 let timmer = setTimeout(() => {});
 
-export const modalAlert = (text: string) => {
+export const modalAlert = (text: React.ReactNode) => {
 	addLayer(MODAL_KEY, <div className={styles.box}>{text}</div>);
 	clearTimeout(timmer);
 	timmer = setTimeout(() => {

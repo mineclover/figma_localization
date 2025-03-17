@@ -3,12 +3,17 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { h, Fragment } from 'preact';
 import { Process, processSignal } from './process';
 import styles from './Process.module.css';
-import { Bold, IconButton, IconTrash32 } from '@create-figma-plugin/ui';
+import { Bold, Text, IconLockLocked16, IconLockUnlocked16, IconButton, IconTrash32 } from '@create-figma-plugin/ui';
+
+import { currentPointerSignal } from '@/model/signal';
 
 const ProcessBar = () => {
 	const processStore = useSignal(processSignal);
 
 	const keys = Object.keys(processStore);
+	const currentPointer = useSignal(currentPointerSignal);
+
+	const isPageOpen = currentPointer?.pageLock ?? false;
 
 	// process_id: string;
 	// process_name: string;
@@ -17,7 +22,10 @@ const ProcessBar = () => {
 
 	return (
 		<div className={styles.container}>
-			<Bold>변경 대상의 번역 상태</Bold>
+			<Text> 번역 미리 보기 가능 여부 {isPageOpen ? <IconLockUnlocked16 /> : <IconLockLocked16 />}</Text>
+			<Text>
+				<Bold>변경 대상의 번역 상태</Bold>
+			</Text>
 			{keys.map((key) => {
 				const process = processStore[key];
 				const { process_status, process_name, process_end } = process;

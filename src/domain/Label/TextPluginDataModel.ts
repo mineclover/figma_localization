@@ -332,7 +332,7 @@ export const addTranslation = async (node: TextNode) => {
 	const nodeData = getNodeData(node);
 
 	if (nodeData.localizationKey === '' || nodeData.domainId == null) {
-		notify('Failed to get localization key', 'error');
+		notify('335 Failed to get localization key', 'error');
 		return;
 	}
 
@@ -346,21 +346,19 @@ export const addTranslation = async (node: TextNode) => {
 
 	const result = await fetchDB('/localization/translations', {
 		method: 'PUT',
-		body: JSON.stringify(
-			{
-				keyId: nodeData.localizationKey,
-				language: 'origin',
-				translation: xmlString,
-			},
-			null,
-			2
-		),
+		body: JSON.stringify({
+			keyId: nodeData.localizationKey,
+			language: 'origin',
+			translation: xmlString,
+		}),
 	});
 	if (!result) {
+		console.log('🚀 ~ addTranslation ~ result:', result);
 		return;
 	}
 
 	for (const style of styleStoreArray) {
+		console.log('🚀 ~ addTranslation ~ style:', style);
 		const result = await fetchDB('/resources/mapping', {
 			method: 'POST',
 			body: JSON.stringify({

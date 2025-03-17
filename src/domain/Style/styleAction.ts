@@ -13,6 +13,7 @@ import { generateXmlString } from './StylePage';
 import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
 import { searchTranslationCode } from '../Translate/TranslateModel';
+import { getPageLockOpen } from '../System/lock';
 
 const innerTextExtract = (text: any): string => {
 	if (typeof text === 'string') {
@@ -38,19 +39,27 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		notify('Failed to get domain id', 'error');
 		return;
 	}
+	const pageLock = getPageLockOpen();
+	console.log('🚀 잠금체크', pageLock);
+	if (pageLock === true) {
+		notify('Page is locked', 'ok', 1000);
+		return;
+	}
 
 	/** 이름이 없어서 이름 얻는 로직 */
 	const originTextResult = await getLocalizationKeyData(localizationKey, date);
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ originTextResult:', originTextResult);
 	if (originTextResult == null) {
-		notify('Failed to get localization key data', 'error');
+		notify('52 Failed to get localization key data', 'error');
 		return;
 	}
 	node.name = generateLocalizationName(originTextResult);
 	const NULL_TEXT = 'NULL TEXT';
 	/** 클라에서 받는 로컬라이제이션 키로 번역 값들 조회 */
 	const targetText = await searchTranslationCode(localizationKey, code, date);
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ targetText:', targetText);
 	if (targetText == null) {
-		notify('Failed to get localization data', 'error');
+		notify('60 Failed to get localization data', 'error');
 		return;
 	}
 
@@ -285,6 +294,7 @@ export const styleToXml = async (
 				hashValue: style.hashId,
 			}),
 		});
+		console.log('🚀 ~ style temp:', temp);
 		if (!temp) {
 			continue;
 		}

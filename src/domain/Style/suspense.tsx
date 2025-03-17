@@ -81,7 +81,6 @@ export const ResourceProvider = <T extends unknown>({
 
 	// props가 변경되면 리소스를 재생성
 	useEffect(() => {
-		console.log('🚀 ~ ResourceProvider ~ focusUpdateCount:', focusUpdateCount);
 		// props가 변경되었는지 확인
 		if (!shallowEqual({ ...prevPropsRef.current }, { ...props, focusUpdateCount })) {
 			// 새 리소스 생성

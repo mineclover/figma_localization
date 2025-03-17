@@ -391,6 +391,10 @@ export const onSetStyle = () => {
 			return;
 		}
 
-		await reloadOriginalLocalizationName(xNode);
+		// 업로드는 업데이트 안해도 되지 않나 해서 뺌
+		// 한 개 업데이트
+		// await TargetNodeStyleUpdate(xNode, result.key_id.toString(), 'origin', Date.now());
+		// 같은 키 업데이트
+		// await reloadOriginalLocalizationName(xNode);
 	});
 };

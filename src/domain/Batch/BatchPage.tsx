@@ -17,6 +17,7 @@ import {
 	IconCross32,
 	IconSwap32,
 	IconTarget16,
+	IconTarget32,
 	IconToggleButton,
 	IconVisibilityHidden16,
 	IconVisibilityVisible16,
@@ -401,7 +402,8 @@ function BatchPage() {
 		/** 숨기지 않은 대상을 표시 */
 		notIgnore: true,
 		/** 키 값이 있는 대상을 표시 */
-		hasLocalizationKey: false,
+		hasLocalizationKey: true,
+		// hasLocalizationKey: false,
 		/** 키 값이 없는 대상을 표시 */
 		notHasLocalizationKey: true,
 	});
@@ -518,62 +520,7 @@ function BatchPage() {
 	return (
 		<div className={styles.miniColumn}>
 			<div className={styles.top}>
-				<VerticalSpace space="extraSmall" />
 				<div className={styles.container}>
-					<div className={styles.rowContainer}>
-						<Text>변경 대상 : {selectIds.length} 개</Text>
-						<Button
-							onClick={() => {
-								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
-								const currentGroup = selectCurrentGroup(
-									{
-										id: currentPointer?.nodeId ?? '',
-										name: currentPointer?.nodeName ?? '',
-									},
-									allPatternData
-								);
-
-								if (currentGroup) {
-									selectIdsSignal.value = currentGroup;
-									emit('PAGE_SELECT_IDS', { ids: currentGroup });
-								}
-							}}
-						>
-							현재 커서 그룹 선택
-						</Button>
-					</div>
-
-					{missingLink.length > 0 && (
-						<div className={styles.miniColumn}>
-							<Bold>섹션 외 대상</Bold>
-							{missingLink.map((item) => {
-								const selected = selectIds.includes(item);
-
-								return (
-									<Button
-										danger
-										{...selectStyle(selected)}
-										onClick={() => {
-											pageNodeZoomAction(item);
-										}}
-										onContextMenu={(e) => {
-											e.preventDefault(); // 기본 우클릭 메뉴 방지
-											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
-											if (selectIds.includes(item)) {
-												// 제거하고
-												selectIdsSignal.value = selectIds.filter((id) => id !== item);
-											} else {
-												selectIdsSignal.value = [...selectIds, item];
-											}
-										}}
-									>
-										{item}
-									</Button>
-								);
-							})}
-						</div>
-					)}
-
 					<div className={styles.row}>
 						<Bold>Key : </Bold>
 						<Textbox
@@ -632,6 +579,71 @@ function BatchPage() {
 							{/* {hasSelectedKey ?   '변경' : '추가'} */}
 						</Button>
 					</div>
+					<div className={styles.rowContainer}>
+						<Text>변경 대상 : {selectIds.length} 개</Text>
+						<Button
+							onClick={() => {
+								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+								const currentGroup = selectCurrentGroup(
+									{
+										id: currentPointer?.nodeId ?? '',
+										name: currentPointer?.nodeName ?? '',
+									},
+									allPatternData
+								);
+
+								if (currentGroup) {
+									selectIdsSignal.value = currentGroup;
+									emit('PAGE_SELECT_IDS', { ids: currentGroup });
+								}
+							}}
+						>
+							패턴 다중 선택
+						</Button>
+						<label className={styles.label}>
+							<Text>대표 노드 {currentPointer?.nodeId}</Text>
+							<IconButton
+								onClick={() => {
+									if (currentPointer?.nodeId) {
+										pageNodeZoomAction(currentPointer.nodeId);
+									}
+								}}
+							>
+								<IconTarget32></IconTarget32>
+							</IconButton>
+						</label>
+					</div>
+
+					{missingLink.length > 0 && (
+						<div className={styles.miniColumn}>
+							<Bold>섹션 외 대상</Bold>
+							{missingLink.map((item) => {
+								const selected = selectIds.includes(item);
+
+								return (
+									<Button
+										danger
+										{...selectStyle(selected)}
+										onClick={() => {
+											pageNodeZoomAction(item);
+										}}
+										onContextMenu={(e) => {
+											e.preventDefault(); // 기본 우클릭 메뉴 방지
+											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
+											if (selectIds.includes(item)) {
+												// 제거하고
+												selectIdsSignal.value = selectIds.filter((id) => id !== item);
+											} else {
+												selectIdsSignal.value = [...selectIds, item];
+											}
+										}}
+									>
+										{item}
+									</Button>
+								);
+							})}
+						</div>
+					)}
 				</div>
 				<Divider />
 			</div>

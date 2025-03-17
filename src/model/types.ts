@@ -247,8 +247,8 @@ export type CurrentCursorType = {
 	nodeId: string;
 	characters: string;
 	autoRename: boolean;
-
 	data: NodeData;
+	pageLock: boolean;
 	// styleData?: ValidAllStyleRangesType;
 	// boundVariables?: any;
 }; /**  */

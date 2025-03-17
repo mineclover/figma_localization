@@ -35,6 +35,7 @@ import {
 import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel';
 import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
+import { onSetPageLockOpen } from '@/domain/System/lock';
 
 export default function () {
 	// 세팅
@@ -66,6 +67,8 @@ export default function () {
 	onGetVariableData();
 	onSetVariableData();
 	onClearVariableData();
+
+	onSetPageLockOpen();
 	// 유틸
 	onNodeSelectionChange();
 	nodeZoom_Adapter();

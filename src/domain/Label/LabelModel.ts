@@ -5,6 +5,7 @@ import {
 	GET_PROJECT_ID,
 	GET_STYLE_DATA,
 	NODE_STORE_KEY,
+	PAGE_LOCK_KEY,
 	SET_PROJECT_ID,
 	STORE_KEY,
 } from '../constant';
@@ -86,6 +87,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 			return;
 		}
 		const NodeData = getNodeData(node);
+		const pageLock = figma.currentPage.getPluginData(PAGE_LOCK_KEY) === 'true';
 
 		const cursorPosition: CurrentCursorType = {
 			projectId,
@@ -97,6 +99,7 @@ export const getCursorPosition = async (node: BaseNode) => {
 			characters: node.characters,
 			autoRename: node.autoRename,
 			data: NodeData,
+			pageLock: pageLock,
 		};
 
 		return cursorPosition;

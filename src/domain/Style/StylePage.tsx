@@ -19,7 +19,7 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui';
 
-import { DOWNLOAD_STYLE, SET_STYLE } from '../constant';
+import { DOWNLOAD_STYLE, SET_PAGE_LOCK_OPEN, SET_STYLE } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 
 import { styleTagModeSignal } from '@/model/signal';
@@ -146,11 +146,27 @@ export const StyleXml = ({
 
 	const styleTagMode = useSignal(styleTagModeSignal);
 
+	const currentPointer = useSignal(currentPointerSignal);
+
 	return (
 		<div>
 			<VerticalSpace space="small" />
-			<Text>원본 XML:</Text>
+			<Text>{currentPointer?.data.localizationKey}: 피그마 저장 결과 미리보기:</Text>
+			<VerticalSpace space="small" />
 			<TextboxMultiline value={xmlString} placeholder="XML 출력" />
+			<VerticalSpace space="small" />
+			<Toggle
+				value={styleTagMode === 'id'}
+				onChange={() => {
+					styleTagModeSignal.value = styleTagMode === 'id' ? 'name' : 'id';
+				}}
+			>
+				<Text>
+					아이디 표시
+					<Muted> *off 시 이름 표시</Muted>
+				</Text>
+			</Toggle>
+
 			<VerticalSpace space="small" />
 
 			{styleValues.map((item) => {
@@ -169,16 +185,16 @@ const StylePage = () => {
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);
 	const focusUpdateCount = useSignal(focusUpdateCountSignal);
-
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
+
+	const pageLock = currentPointer?.pageLock ?? false;
+
 	const targetArray = ['origin', ...languageCodes];
 	const isStyle = currentPointer && currentPointer.data.originalLocalizeId !== '';
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
 
 	if (currentPointer && styleData && domainSetting && domainSetting.domainId) {
-		const clientFetchDB = clientFetchDBCurry(domainSetting.domainId);
-
 		return (
 			<div>
 				{/* <Button
@@ -211,7 +227,17 @@ const StylePage = () => {
 				>
 					랜덤으로 이름 추가
 				</Button> */}
+				<VerticalSpace space="extraSmall" />
+				<Toggle
+					value={currentPointer?.pageLock ?? false}
+					onChange={(e) => {
+						emit(SET_PAGE_LOCK_OPEN.REQUEST_KEY, e.currentTarget.checked);
+					}}
+				>
+					<Text>페이지 잠금</Text>
+				</Toggle>
 
+				<VerticalSpace space="small" />
 				{isStyle && isKeySetting ? (
 					<Button
 						onClick={() => {
@@ -234,26 +260,13 @@ const StylePage = () => {
 							emit(SET_STYLE.REQUEST_KEY);
 						}}
 					>
-						Update
+						Upload
 					</Button>
 				) : (
 					<div className={styles.padding}>
 						<Bold>로컬라이제이션 키 없음</Bold>
 					</div>
 				)}
-				<VerticalSpace space="small" />
-
-				<Toggle
-					value={styleTagMode === 'id'}
-					onChange={() => {
-						styleTagModeSignal.value = styleTagMode === 'id' ? 'name' : 'id';
-					}}
-				>
-					<Text>
-						아이디 표시
-						<Muted> *off 시 이름 표시</Muted>
-					</Text>
-				</Toggle>
 
 				<VerticalSpace space="small" />
 				<Text>{(domainSetting.domainId, currentPointer.characters, styleData)}</Text>

@@ -47,6 +47,7 @@ import { clc } from '@/components/modal/utils';
 import { currentSectionSignal } from '@/model/signal';
 import { localizationKeySignal } from '@/model/signal';
 import ProcessBar from '../System/ProcessBar';
+
 // 있든 없든 수정 가능하게 구성
 
 const TranslateItem = ({
@@ -150,8 +151,8 @@ const TranslatePage = () => {
 	const localizationKeyValue = useSignal(localizationKeySignal);
 
 	const variableData = useSignal(variableDataSignal);
-
 	const targetArray = ['origin', ...languageCodes];
+	const pageLock = currentPointer?.pageLock ?? false;
 
 	const updateAction = () => {
 		const keyId = localizationKeyValue?.key_id;
@@ -203,6 +204,14 @@ const TranslatePage = () => {
 						return (
 							<Button
 								onClick={() => {
+									if (pageLock) {
+										modalAlert(
+											<Text>
+												페이지가 잠겨있습니다<br></br>
+												번역 여부 확인만 진행합니다
+											</Text>
+										);
+									}
 									emit(CHANGE_LANGUAGE_CODE.REQUEST_KEY, item, currentSection?.id);
 								}}
 							>

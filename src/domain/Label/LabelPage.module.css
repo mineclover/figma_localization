@@ -190,6 +190,7 @@
 	height: 24px;
 	padding: 4px 8px;
 	background-color: var(--figma-color-bg);
+	border: 1px solid var(--figma-color-border);
 	&:hover {
 		background-color: var(--figma-color-bg-hover);
 	}
@@ -211,3 +212,45 @@
 }
 
 /* #endregion */
+
+.styleContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	padding: 8px 8px;
+	gap: 8px;
+	border: 1px solid transparent;
+	background-color: var(--figma-color-bg);
+	& > div {
+		flex-grow: 1;
+	}
+	&:hover {
+		/* border: 1px solid var(--figma-color-bg-brand-tertiary); */
+		background-color: var(--figma-color-bg-brand-tertiary);
+	}
+}
+
+.rowContainer {
+	display: flex;
+	flex-direction: row;
+
+	gap: 4px;
+
+	[class^='_textbox'] {
+		flex-grow: 1;
+	}
+	[class^='_bold'] {
+		flex-grow: 1;
+	}
+}
+
+.buttonOverride {
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.padding {
+	padding: 8px;
+}

@@ -1,10 +1,7 @@
 import { modalAlert } from '@/components/alert';
-import { addLayer } from '@/components/modal/Modal';
-import { useFetch } from '@/hooks/useFetch';
-import { ComponentChildren, Fragment, h } from 'preact';
-import { useEffect, useMemo, useState } from 'preact/hooks';
-import { components } from 'types/i18n';
-import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from '../Setting/SettingModel';
+
+import { h } from 'preact';
+import { useState } from 'preact/hooks';
 import { languageCodesSignal, StyleData, styleDataSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 
@@ -13,6 +10,7 @@ import {
 	Bold,
 	Button,
 	Container,
+	Muted,
 	Stack,
 	Text,
 	Textbox,
@@ -21,40 +19,28 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui';
 
-import {
-	CHANGE_LANGUAGE_CODE,
-	DOWNLOAD_STYLE,
-	GET_PROJECT_ID,
-	RELOAD_NODE,
-	SET_LANGUAGE_CODES,
-	SET_NODE_LOCALIZATION_KEY_BATCH,
-	SET_PROJECT_ID,
-	SET_STYLE,
-	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
-	UPDATE_STYLE_DATA,
-} from '../constant';
+import { DOWNLOAD_STYLE, SET_STYLE } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
-import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
-import { projectIdSignal, styleSignal, styleTagModeSignal } from '@/model/signal';
+
+import { styleTagModeSignal } from '@/model/signal';
 import { currentPointerSignal } from '@/model/signal';
 
 import { clientFetchDBCurry } from '../utils/fetchDB';
-import { NullDisableText } from '../Label/LabelSearch';
-import { clc } from '@/components/modal/utils';
+
 import styles from '../Label/LabelPage.module.css';
-import { groupSegmentsByStyle } from './styleModel';
-import { computed, signal } from '@preact/signals-core';
-import { createStableStyleKey } from '@/utils/keyJson';
+
+import { signal } from '@preact/signals-core';
+
 import { deepEqual } from '@/utils/data';
-import { XMLParser } from 'fast-xml-parser';
-import prettier from 'prettier';
-import { isXmlCheck, parseTextBlock, ParseTextBlock, parseXML } from '@/utils/xml';
+
+import { isXmlCheck } from '@/utils/xml';
 import { localizationKeySignal } from '@/model/signal';
-import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@/model/types';
-import { App, ErrorBoundary, ResourceProvider } from './suspense';
+import { StyleSync, StyleHashSegment } from '@/model/types';
+import { ErrorBoundary, ResourceProvider } from './suspense';
 import { Suspense } from 'preact/compat';
 import { styleResourceCache, styleToXml, xmlToStyle } from './styleAction';
 import { safeJsonParse } from '../utils/getStore';
+import { clc } from '@/components/modal/utils';
 
 const parseSame = (style: string, serverStyle: string) => {
 	if (!style || !serverStyle) return false;
@@ -72,39 +58,43 @@ const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => 
 	const [styleValue, setStyleValue] = useState<string>(name ?? '');
 
 	return (
-		<div className={styles.container} style={{ border: '1px solid red' }}>
-			<Text>{hashId}</Text>
-			<Text>name: {name}</Text>
-			<Text>id: {id}</Text>
-			<Textbox
-				value={styleValue}
-				placeholder="style name here..."
-				onChange={(e) => setStyleValue(e.currentTarget.value)}
-			/>
-			<button
-				onClick={async () => {
-					const fetchDB = clientFetchDBCurry(domainSetting.domainId);
-					const result = await fetchDB(('/resources/' + id) as '/resources/{id}', {
-						method: 'PUT',
-						body: JSON.stringify({
-							styleName: styleValue,
-						}),
-					});
-					const resultData = await result.json();
+		<div className={styles.styleContainer}>
+			<Text>
+				name : {name} / id: {id}
+			</Text>
 
-					delete styleResourceCache[hashId];
-					if (resultData) {
-						modalAlert('수정 완료');
-						setTimeout(() => {
-							focusUpdateCountSignal.value = focusUpdateCountSignal.value + 1;
-						}, 300);
-					} else {
-						modalAlert('수정 실패');
-					}
-				}}
-			>
-				save
-			</button>
+			<div className={styles.rowContainer}>
+				<Textbox
+					value={styleValue}
+					placeholder="style name here..."
+					onChange={(e) => setStyleValue(e.currentTarget.value)}
+				/>
+				<button
+					className={clc(styles.normalButton, styles.buttonOverride)}
+					onClick={async () => {
+						const fetchDB = clientFetchDBCurry(domainSetting.domainId);
+						const result = await fetchDB(('/resources/' + id) as '/resources/{id}', {
+							method: 'PUT',
+							body: JSON.stringify({
+								styleName: styleValue,
+							}),
+						});
+						const resultData = await result.json();
+
+						delete styleResourceCache[hashId];
+						if (resultData) {
+							modalAlert('수정 완료');
+							setTimeout(() => {
+								focusUpdateCountSignal.value = focusUpdateCountSignal.value + 1;
+							}, 300);
+						} else {
+							modalAlert('수정 실패');
+						}
+					}}
+				>
+					save
+				</button>
+			</div>
 		</div>
 	);
 };
@@ -161,10 +151,8 @@ export const StyleXml = ({
 			<VerticalSpace space="small" />
 			<Text>원본 XML:</Text>
 			<TextboxMultiline value={xmlString} placeholder="XML 출력" />
-
 			<VerticalSpace space="small" />
 
-			<VerticalSpace space="small" />
 			{styleValues.map((item) => {
 				return <StyleItem key={item.hashId + item.name} {...item} />;
 			})}
@@ -224,7 +212,7 @@ const StylePage = () => {
 					랜덤으로 이름 추가
 				</Button> */}
 
-				{isStyle && isKeySetting && (
+				{isStyle && isKeySetting ? (
 					<Button
 						onClick={() => {
 							emit(DOWNLOAD_STYLE.REQUEST_KEY, {
@@ -235,8 +223,12 @@ const StylePage = () => {
 					>
 						Download
 					</Button>
+				) : (
+					<div className={styles.padding}>
+						<Bold>스타일 키 없음</Bold>
+					</div>
 				)}
-				{isKeySetting && (
+				{isKeySetting ? (
 					<Button
 						onClick={() => {
 							emit(SET_STYLE.REQUEST_KEY);
@@ -244,7 +236,12 @@ const StylePage = () => {
 					>
 						Update
 					</Button>
+				) : (
+					<div className={styles.padding}>
+						<Bold>로컬라이제이션 키 없음</Bold>
+					</div>
 				)}
+				<VerticalSpace space="small" />
 
 				<Toggle
 					value={styleTagMode === 'id'}
@@ -252,7 +249,10 @@ const StylePage = () => {
 						styleTagModeSignal.value = styleTagMode === 'id' ? 'name' : 'id';
 					}}
 				>
-					name, id 태그 선택
+					<Text>
+						아이디 표시
+						<Muted> *off 시 이름 표시</Muted>
+					</Text>
 				</Toggle>
 
 				<VerticalSpace space="small" />

@@ -430,14 +430,14 @@ export type ValidAllStyleRangesType = {
 export const setAllStyleRanges = async ({
 	textNode,
 	styleData,
-	boundVariables,
+
 	range,
 	xNodeId,
 }: {
 	xNodeId: string;
 	textNode: TextNode;
 	styleData: Record<string, any>;
-	boundVariables?: any;
+
 	range: {
 		start: number;
 		end: number;
@@ -457,6 +457,9 @@ export const setAllStyleRanges = async ({
 	// 	textStyleId: textNode.setRangeTextStyleIdAsync,
 	// 	fillStyleId: textNode.setRangeFillStyleIdAsync,
 	// }
+
+	const { boundVariables, ...styles } = styleData;
+
 	const functionMap = {
 		fontName: 'setRangeFontName',
 		fontSize: 'setRangeFontSize',
@@ -473,7 +476,7 @@ export const setAllStyleRanges = async ({
 	} as const;
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(functionMap)) {
-		const style = styleData[key as keyof ResourceDTO];
+		const style = styles[key as keyof ResourceDTO];
 		if (style == null) {
 			continue;
 		}
@@ -493,6 +496,25 @@ export const setAllStyleRanges = async ({
 					targetNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never);
 				}
 			}
+		}
+	}
+
+	const boundVariablesMap = {
+		fontFamily: 'fontFamily',
+		fontSize: 'fontSize',
+		fontStyle: 'fontStyle',
+		fontWeight: 'fontWeight',
+		letterSpacing: 'letterSpacing',
+		lineHeight: 'lineHeight',
+		paragraphSpacing: 'paragraphSpacing',
+		paragraphIndent: 'paragraphIndent',
+	} as const;
+
+	for (const field of Object.keys(boundVariablesMap)) {
+		const value = boundVariables[field as keyof typeof boundVariables];
+		if (value) {
+			console.log('🚀 ~  boundVariablesMap value:', field, value);
+			textNode.setRangeBoundVariable(range.start, range.end, field as VariableBindableTextField, value as never);
 		}
 	}
 };

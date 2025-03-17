@@ -163,7 +163,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 				textNode: node,
 				xNodeId,
 				styleData: styleValue,
-				boundVariables: {},
+
 				range: {
 					start,
 					end,

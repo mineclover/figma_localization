@@ -53,7 +53,7 @@ import { localizationKeySignal } from '@/model/signal';
 import { StyleSync, ResourceDTO, StyleHashSegment, StyleSegmentsResult } from '@/model/types';
 import { App, ErrorBoundary, ResourceProvider } from './suspense';
 import { Suspense } from 'preact/compat';
-import { styleToXml, xmlToStyle } from './styleAction';
+import { styleResourceCache, styleToXml, xmlToStyle } from './styleAction';
 import { safeJsonParse } from '../utils/getStore';
 
 const parseSame = (style: string, serverStyle: string) => {
@@ -67,11 +67,44 @@ const parseSame = (style: string, serverStyle: string) => {
 const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => {
 	// const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
 
+	// 상위 노드에서 처리하므로 NotNull
+	const domainSetting = useSignal(domainSettingSignal)!;
+	const [styleValue, setStyleValue] = useState<string>(name ?? '');
+
 	return (
 		<div className={styles.container} style={{ border: '1px solid red' }}>
 			<Text>{hashId}</Text>
 			<Text>name: {name}</Text>
 			<Text>id: {id}</Text>
+			<Textbox
+				value={styleValue}
+				placeholder="style name here..."
+				onChange={(e) => setStyleValue(e.currentTarget.value)}
+			/>
+			<button
+				onClick={async () => {
+					const fetchDB = clientFetchDBCurry(domainSetting.domainId);
+					const result = await fetchDB(('/resources/' + id) as '/resources/{id}', {
+						method: 'PUT',
+						body: JSON.stringify({
+							styleName: styleValue,
+						}),
+					});
+					const resultData = await result.json();
+
+					delete styleResourceCache[hashId];
+					if (resultData) {
+						modalAlert('수정 완료');
+						setTimeout(() => {
+							focusUpdateCountSignal.value = focusUpdateCountSignal.value + 1;
+						}, 300);
+					} else {
+						modalAlert('수정 실패');
+					}
+				}}
+			>
+				save
+			</button>
 		</div>
 	);
 };
@@ -109,6 +142,7 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 
 export const StyleXml = ({
 	resource,
+	focusUpdateCount,
 }: {
 	resource: {
 		read: () => {
@@ -116,10 +150,9 @@ export const StyleXml = ({
 			styleStoreArray: StyleSync[];
 		};
 	};
+	focusUpdateCount: number;
 }) => {
 	const { xmlString, styleStoreArray: styleValues } = resource.read();
-
-	console.log('🚀 ~ xmlString:', xmlString);
 
 	const styleTagMode = useSignal(styleTagModeSignal);
 
@@ -133,7 +166,7 @@ export const StyleXml = ({
 
 			<VerticalSpace space="small" />
 			{styleValues.map((item) => {
-				return <StyleItem key={item.hashId} {...item} />;
+				return <StyleItem key={item.hashId + item.name} {...item} />;
 			})}
 		</div>
 	);
@@ -152,16 +185,15 @@ const StylePage = () => {
 	const domainSetting = useSignal(domainSettingSignal);
 	const localizationKeyValue = useSignal(localizationKeySignal);
 	const targetArray = ['origin', ...languageCodes];
+	const isStyle = currentPointer && currentPointer.data.originalLocalizeId !== '';
+	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
 
 	if (currentPointer && styleData && domainSetting && domainSetting.domainId) {
 		const clientFetchDB = clientFetchDBCurry(domainSetting.domainId);
 
 		return (
 			<div>
-				<Text>domainId : {currentPointer.data.domainId}</Text>
-				<Text> localizationKey: {currentPointer.data.localizationKey}</Text>
-				<Text>originalLocalizeId : {currentPointer.data.originalLocalizeId}</Text>
-				<Button
+				{/* <Button
 					onClick={async () => {
 						// 변경할 키가 없으면 추가하고
 						const randomId = Math.random().toString(36).substring(2, 15);
@@ -189,26 +221,30 @@ const StylePage = () => {
 					}}
 					secondary
 				>
-					추가
-				</Button>
-				<Button
-					onClick={() => {
-						emit(DOWNLOAD_STYLE.REQUEST_KEY, {
-							localizationKey: currentPointer.data.localizationKey,
-						});
-						focusUpdateCountSignal.value = focusUpdateCount + 1;
-					}}
-				>
-					키 있는 상태에서 origin 스타일 받는 테스트
-				</Button>
-				<Button
-					onClick={() => {
-						emit(SET_STYLE.REQUEST_KEY);
-						focusUpdateCountSignal.value = focusUpdateCount + 1;
-					}}
-				>
-					키 있는 상태에서 업데이트
-				</Button>
+					랜덤으로 이름 추가
+				</Button> */}
+
+				{isStyle && isKeySetting && (
+					<Button
+						onClick={() => {
+							emit(DOWNLOAD_STYLE.REQUEST_KEY, {
+								localizationKey: currentPointer.data.localizationKey,
+							});
+							focusUpdateCountSignal.value = focusUpdateCount + 1;
+						}}
+					>
+						Download
+					</Button>
+				)}
+				{isKeySetting && (
+					<Button
+						onClick={() => {
+							emit(SET_STYLE.REQUEST_KEY);
+						}}
+					>
+						Update
+					</Button>
+				)}
 
 				<Toggle
 					value={styleTagMode === 'id'}
@@ -218,15 +254,7 @@ const StylePage = () => {
 				>
 					name, id 태그 선택
 				</Toggle>
-				<Text>
-					1. Group 의 갯수가 1개면 단일 스타일을 가지고 있는 것이다
-					<br />- 이 경우 group 0 에서 전체 길이와 텍스트를 얻을 수 있다
-				</Text>
 
-				<Text>
-					1. Group 의 갯수가 2개 이상일 경우 복합 스타일을 가지고 있는 것이다
-					<br /> - 이 경우 defaultStyle 을 base로 group 별로 스타일을 정의할 수 있다
-				</Text>
 				<VerticalSpace space="small" />
 				<Text>{(domainSetting.domainId, currentPointer.characters, styleData)}</Text>
 
@@ -258,20 +286,12 @@ const StylePage = () => {
 						{(resource) => {
 							return (
 								<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
-									<StyleXml resource={resource} />
+									<StyleXml resource={resource} focusUpdateCount={focusUpdateCount} />
 								</Suspense>
 							);
 						}}
 					</ResourceProvider>
 				</ErrorBoundary>
-
-				<Button
-					onClick={() => {
-						emit(SET_STYLE.REQUEST_KEY);
-					}}
-				>
-					aasf
-				</Button>
 			</div>
 		);
 	}

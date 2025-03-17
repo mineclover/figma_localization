@@ -150,7 +150,6 @@ const TranslatePage = () => {
 	const localizationKeyValue = useSignal(localizationKeySignal);
 
 	const variableData = useSignal(variableDataSignal);
-	console.log('🚀 ~ TranslatePage ~ variableData:', variableData);
 
 	const targetArray = ['origin', ...languageCodes];
 

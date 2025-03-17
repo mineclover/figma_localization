@@ -157,7 +157,6 @@ function SettingPage() {
 					<Button
 						onClick={async () => {
 							const clientFetch = clientFetchDBCurry(domainSetting?.domainId!);
-							console.log('🚀 ~ SettingPage ~ domainSetting:', domainSetting);
 
 							await clientFetch(
 								('/domains/' + domainSetting?.domainName + '/languages') as '/domains/{name}/languages',

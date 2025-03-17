@@ -239,7 +239,7 @@ interface StyleResourceCacheItem {
 	style: any;
 }
 
-const styleResourceCache: Record<string, StyleResourceCacheItem> = {};
+export const styleResourceCache: Record<string, StyleResourceCacheItem> = {};
 
 export const styleToXml = async (
 	domainId: number | string,
@@ -270,6 +270,7 @@ export const styleToXml = async (
 				style: cachedData.style,
 				ranges: style.ranges, // 현재 계산된 ranges 사용
 			};
+
 			continue;
 		}
 

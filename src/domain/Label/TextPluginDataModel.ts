@@ -120,7 +120,6 @@ export const localizationTranslationMapping = (dto: LocalizationTranslationDTO):
 };
 
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
-	console.log('🚀 ~ generateLocalizationName ~ keyData:', keyData);
 	/** 임시 값이면 @ 붙이고 아니면 # 붙임 */
 	const prefix = keyData.is_temporary ? '❎' : '✅';
 	const name = prefix + keyData.name;
@@ -376,12 +375,10 @@ export const addTranslation = async (node: TextNode) => {
 	}
 
 	const data = (await result.json()) as LocalizationTranslationDTO;
-	console.log('🚀 ~ addTranslation ~ data:', data);
 
 	if (result.status === 200) {
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
 		const nodeData = getNodeData(node);
-		console.log('🚀 ~ addTranslation ~ nodeData:', nodeData);
 
 		return data;
 	} else {

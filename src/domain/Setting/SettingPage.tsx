@@ -45,6 +45,17 @@ const LanguageCode = ({ languageCode }: { languageCode: string }) => {
 						return temp;
 					});
 				}}
+				onBlur={(e) => {
+					const value = e.currentTarget.value.toLowerCase();
+					languageCodesSignal.value = languageCodesSignal.value
+						.filter((item) => item != '')
+						.map((temp) => {
+							if (temp === languageCode) {
+								return value;
+							}
+							return temp;
+						});
+				}}
 			/>
 		</div>
 	);
@@ -153,7 +164,7 @@ function SettingPage() {
 								{
 									method: 'PUT',
 									body: JSON.stringify({
-										languageCodes: languageCodes,
+										languageCodes: languageCodes.filter((item) => item != ''),
 									}),
 								}
 							);

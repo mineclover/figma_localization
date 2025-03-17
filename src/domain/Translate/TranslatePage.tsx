@@ -43,6 +43,7 @@ import { NullDisableText } from '../Label/LabelSearch';
 import { clc } from '@/components/modal/utils';
 import { currentSectionSignal } from '@/model/signal';
 import { localizationKeySignal } from '@/model/signal';
+import ProcessBar from '../System/ProcessBar';
 // 있든 없든 수정 가능하게 구성
 
 const TranslateItem = ({
@@ -190,6 +191,7 @@ const TranslatePage = () => {
 
 	return (
 		<div>
+			<ProcessBar />
 			<div className={styles.translateItem}>
 				<Button
 					onClick={() => {

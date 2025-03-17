@@ -14,8 +14,9 @@ import { isDirectSignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import StylePage from '@/domain/Style/StylePage';
 import BatchPage from '@/domain/Batch/BatchPage';
+import LogsPage from '@/domain/Logs/LogsPage';
 
-const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch'];
+const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs'];
 
 function Plugin() {
 	const isBatch = useSignal(isDirectSignal);
@@ -59,6 +60,10 @@ function Plugin() {
 		{
 			children: <SettingPage />,
 			value: nav[4],
+		},
+		{
+			children: <LogsPage />,
+			value: nav[8],
 		},
 		// {
 		//   children: <Inspect></Inspect>,

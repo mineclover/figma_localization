@@ -8,9 +8,9 @@ export const newGetStyleData = async (nodeId: string) => {
 	if (!node || node.type !== 'TEXT') {
 		return null;
 	}
-	const { styleData, boundVariables } = getAllStyleRanges(node);
+	const { styleData, boundVariables, effectStyleData } = getAllStyleRanges(node);
 	// emit(GET_STYLE_DATA.RESPONSE_KEY, { styleData, boundVariables });
-	return { styleData, boundVariables };
+	return { styleData, boundVariables, effectStyleData };
 };
 
 export const onGetStyleData = () => {

@@ -12,7 +12,6 @@ import {
 
 import { FilePathNodeSearch, notify } from '@/figmaPluginUtils';
 import { getNodeData } from './TextPluginDataModel';
-import { getAllStyleRanges } from '@/figmaPluginUtils/text';
 import { fetchDB } from '../utils/fetchDB';
 import { ERROR_CODE } from '../errorCode';
 import { removeLeadingSymbols } from '@/utils/textTools';

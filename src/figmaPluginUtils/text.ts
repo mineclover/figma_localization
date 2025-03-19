@@ -1,4 +1,5 @@
 import { ResourceDTO } from '@/model/types';
+import { deepEqual } from '@/utils/data';
 
 // 스타일 객체 타입 정의
 interface StyleRange<T> {
@@ -176,6 +177,19 @@ function getLetterSpacingRanges(textNode: TextNode): StyleRange<LetterSpacing>[]
 	];
 }
 
+function getParagraphSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.paragraphSpacing == null || textNode.paragraphSpacing === 0) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.paragraphSpacing,
+		},
+	];
+}
+
 function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>[] | null {
 	if (textNode.textDecoration === figma.mixed) {
 		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration);
@@ -191,6 +205,101 @@ function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>
 		},
 	];
 }
+
+function getTextDecorationStyleRanges(textNode: TextNode): StyleRange<TextDecorationStyle>[] | null {
+	if (textNode.textDecorationStyle === figma.mixed) {
+		return getStyleRanges<TextDecorationStyle>(textNode, textNode.getRangeTextDecorationStyle);
+	}
+	if (textNode.textDecorationStyle == null || textNode.textDecorationStyle) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecorationStyle,
+		},
+	];
+}
+
+function getTextDecorationOffsetRanges(textNode: TextNode): StyleRange<TextDecorationOffset>[] | null {
+	if (textNode.textDecorationOffset === figma.mixed) {
+		return getStyleRanges<TextDecorationOffset>(textNode, textNode.getRangeTextDecorationOffset);
+	}
+	if (textNode.textDecorationOffset == null || textNode.textDecorationOffset) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecorationOffset,
+		},
+	];
+}
+
+function getTextDecorationThicknessRanges(textNode: TextNode): StyleRange<TextDecorationThickness>[] | null {
+	if (textNode.textDecorationThickness === figma.mixed) {
+		return getStyleRanges<TextDecorationThickness>(textNode, textNode.getRangeTextDecorationThickness);
+	}
+	if (textNode.textDecorationThickness == null || textNode.textDecorationThickness) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecorationThickness,
+		},
+	];
+}
+function getTextDecorationColorRanges(textNode: TextNode): StyleRange<TextDecorationColor>[] | null {
+	if (textNode.textDecorationColor === figma.mixed) {
+		return getStyleRanges<TextDecorationColor>(textNode, textNode.getRangeTextDecorationColor);
+	}
+	if (textNode.textDecorationColor == null || textNode.textDecorationColor) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecorationColor,
+		},
+	];
+}
+
+function getTextDecorationSkipInkRanges(textNode: TextNode): StyleRange<boolean>[] | null {
+	if (textNode.textDecorationSkipInk === figma.mixed) {
+		return getStyleRanges<boolean>(textNode, textNode.getRangeTextDecorationSkipInk);
+	}
+	if (textNode.textDecorationSkipInk == null || textNode.textDecorationSkipInk) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecorationSkipInk,
+		},
+	];
+}
+
+export const getTextDecorationSkipInk = (textNode: TextNode): StyleRange<TextDecoration>[] | null => {
+	if (textNode.textDecoration === figma.mixed) {
+		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration);
+	}
+	if (textNode.textDecoration == null || textNode.textDecoration === 'NONE') {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.textDecoration,
+		},
+	];
+};
 
 function getTextCaseRanges(textNode: TextNode): StyleRange<TextCase>[] | null {
 	if (textNode.textCase === figma.mixed) {
@@ -224,21 +333,22 @@ function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	];
 }
 
-function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
-	if (textNode.fontWeight === figma.mixed) {
-		return getStyleRanges<number>(textNode, textNode.getRangeFontWeight);
-	}
-	if (textNode.fontWeight == null) {
-		return null;
-	}
-	return [
-		{
-			start: 0,
-			end: textNode.characters.length,
-			value: textNode.fontWeight,
-		},
-	];
-}
+// 있긴 한데 폰트 페밀리에서 얻어서 안쓰는 것 같음
+// function getFontWeightRanges(textNode: TextNode): StyleRange<number>[] | null {
+// 	if (textNode.fontWeight === figma.mixed) {
+// 		return getStyleRanges<number>(textNode, textNode.getRangeFontWeight);
+// 	}
+// 	if (textNode.fontWeight == null) {
+// 		return null;
+// 	}
+// 	return [
+// 		{
+// 			start: 0,
+// 			end: textNode.characters.length,
+// 			value: textNode.fontWeight,
+// 		},
+// 	];
+// }
 
 /** 제대로 동작하지 않음 */
 // function getAllFontNamesRanges(textNode: TextNode): StyleRange<FontName>[] | null {
@@ -321,6 +431,16 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	];
 }
 
+function getStroke(textNode: TextNode): Paint[] | null {
+	const strokes = textNode.strokes;
+	console.log('🚀 ~ getStroke ~ strokes:', strokes);
+
+	if (strokes == null || strokes.length === 0) {
+		return null;
+	}
+	return [...strokes];
+}
+
 /** TODO: 값이 약간 다름.. 체크 해야함.. */
 const targetVariableBindableFields = [
 	'fontFamily',
@@ -365,18 +485,30 @@ export interface AllStyleRanges {
 	fontName?: StyleRange<FontName>[] | null;
 	lineHeight?: StyleRange<LineHeight>[] | null;
 	letterSpacing?: StyleRange<LetterSpacing>[] | null;
-	textDecoration?: StyleRange<TextDecoration>[] | null;
+
 	textCase?: StyleRange<TextCase>[] | null;
 	textStyleId?: StyleRange<string>[] | null;
-	fontWeight?: StyleRange<number>[] | null;
+	// fontWeight?: StyleRange<number>[] | null; // styleData에서 사용하지 않음 (주석처리됨)
 
-	openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null;
+	// openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null; // styleData에서 사용하지 않음 (주석처리됨)
 	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null;
 	fills?: StyleRange<Paint[]>[] | null;
 	fillStyleId?: StyleRange<string>[] | null;
-	boundVariables?: any;
-	// listOptions: StyleRange<TextListOptions>[] | null
-	// indentation: StyleRange<number>[] | null
+	// boundVariables?: any; // 별도로 처리됨
+	listOptions: StyleRange<TextListOptions>[] | null;
+	listSpacing: StyleRange<number>[] | null;
+	indentation: StyleRange<number>[] | null;
+	textDecoration?: StyleRange<TextDecoration>[] | null;
+	textDecorationStyle?: StyleRange<TextDecorationStyle>[] | null;
+	textDecorationColor?: StyleRange<TextDecorationColor>[] | null;
+	textDecorationOffset?: StyleRange<TextDecorationOffset>[] | null;
+	textDecorationThickness?: StyleRange<TextDecorationThickness>[] | null;
+	textDecorationSkipInk?: StyleRange<boolean>[] | null;
+
+	paragraphSpacing?: StyleRange<number>[] | null;
+	paragraphIndent?: StyleRange<number>[] | null;
+
+	// strokes?: ValidStyleRange<Paint[]>[] | null; // styleData에서 사용하지 않음
 }
 
 interface ValidStyleRange<T> {
@@ -398,6 +530,14 @@ export type ValidAllStyleRangesType = {
 	hyperlink?: ValidStyleRange<HyperlinkTarget>[];
 	fills?: ValidStyleRange<Paint[]>[];
 	fillStyleId?: ValidStyleRange<string>[];
+	textDecorationColor?: ValidStyleRange<TextDecorationColor>[];
+	textDecorationOffset?: ValidStyleRange<TextDecorationOffset>[];
+	textDecorationThickness?: ValidStyleRange<TextDecorationThickness>[];
+	textDecorationSkipInk?: ValidStyleRange<boolean>[];
+	leadingTrim?: ValidStyleRange<LeadingTrim>[];
+	paragraphSpacing?: ValidStyleRange<number>[];
+	paragraphIndent?: ValidStyleRange<number>[];
+
 	boundVariables?: ValidStyleRange<{
 		type: string;
 		id: string;
@@ -461,18 +601,36 @@ export const setAllStyleRanges = async ({
 	const { boundVariables, ...styles } = styleData;
 
 	const functionMap = {
+		// Text styling
 		fontName: 'setRangeFontName',
 		fontSize: 'setRangeFontSize',
 		lineHeight: 'setRangeLineHeight',
 		letterSpacing: 'setRangeLetterSpacing',
 		textDecoration: 'setRangeTextDecoration',
 		textCase: 'setRangeTextCase',
-		// fontWeight: "setRangeFontWeight",
+		// fontWeight: "setRangeFontWeight", // No corresponding setter exists
 		hyperlink: 'setRangeHyperlink',
 		fills: 'setRangeFills',
-		// openTypeFeatures: "openTypeFeatures",
+		// openTypeFeatures: "openTypeFeatures", // No corresponding setter exists
+
+		// Text decoration details
+		textDecorationStyle: 'setRangeTextDecorationStyle',
+		textDecorationOffset: 'setRangeTextDecorationOffset',
+		textDecorationThickness: 'setRangeTextDecorationThickness',
+		textDecorationColor: 'setRangeTextDecorationColor',
+		textDecorationSkipInk: 'setRangeTextDecorationSkipInk',
+
+		// List and paragraph formatting
+		listOptions: 'setRangeListOptions',
+		listSpacing: 'setRangeListSpacing',
+		paragraphIndent: 'setRangeParagraphIndent',
+		paragraphSpacing: 'setRangeParagraphSpacing',
+		indentation: 'setRangeIndentation',
+
+		// Variable binding
 		textStyleId: 'setRangeTextStyleIdAsync',
 		fillStyleId: 'setRangeFillStyleIdAsync',
+		// boundVariable: 'setRangeBoundVariable'
 	} as const;
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(functionMap)) {
@@ -519,7 +677,61 @@ export const setAllStyleRanges = async ({
 	}
 };
 
-export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyleRangesType; boundVariables: any } {
+const defaultEffectStyleData = {
+	strokes: [],
+	strokeWeight: 1,
+	strokeAlign: 'OUTSIDE',
+	strokeCap: 'NONE',
+	strokeJoin: 'MITER',
+	strokeMiterLimit: 4,
+	opacity: 1,
+	blendMode: 'PASS_THROUGH',
+	textAlignHorizontal: 'CENTER',
+	textAlignVertical: 'CENTER',
+	textAutoResize: 'WIDTH_AND_HEIGHT',
+	textTruncation: 'DISABLED',
+	maxLines: null,
+	targetAspectRatio: null,
+	annotations: [],
+	hangingPunctuation: false,
+	hangingList: false,
+	constraints: {
+		horizontal: 'MIN',
+		vertical: 'MIN',
+	},
+	reactions: [],
+	isMask: false,
+	maskType: 'ALPHA',
+	effects: [],
+	effectStyleId: '',
+	layoutAlign: 'INHERIT',
+	layoutGrow: 0,
+	layoutPositioning: 'AUTO',
+	layoutSizingHorizontal: 'FIXED',
+	layoutSizingVertical: 'FIXED',
+	leadingTrim: 'NONE',
+	rotation: 0,
+	locked: false,
+	visible: true,
+	minWidth: null,
+	maxWidth: null,
+	minHeight: null,
+	maxHeight: null,
+	boundVariables: {},
+};
+
+export type EffectStyleData = Record<string, any[]>;
+type Prettify<T> = {
+	[K in keyof T]: T[K];
+} & {};
+export type PlanType = Prettify<TextNode>;
+
+export function getAllStyleRanges(textNode: TextNode): {
+	styleData: ValidAllStyleRangesType;
+	boundVariables: any;
+	effectStyleData: EffectStyleData;
+} {
+	// 텍스트 노드만을 위한 개념임
 	const boundVariables = getBoundVariablesRanges(textNode);
 
 	const styleData: AllStyleRanges = {
@@ -534,12 +746,83 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 		// fontWeight: getFontWeightRanges(textNode),
 		hyperlink: getHyperlinkRanges(textNode),
 		fills: getFillsRanges(textNode),
-		openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
+		// openTypeFeatures: getOpenTypeFeaturesRanges(textNode),
+
+		// Text decoration details
+		textDecorationStyle: getTextDecorationStyleRanges(textNode),
+		textDecorationColor: getTextDecorationColorRanges(textNode),
+		textDecorationOffset: getTextDecorationOffsetRanges(textNode),
+		textDecorationThickness: getTextDecorationThicknessRanges(textNode),
+		textDecorationSkipInk: getTextDecorationSkipInkRanges(textNode),
+
+		// List and paragraph formatting
+		listOptions: getListOptionsRanges(textNode),
+		listSpacing: getListSpacingRanges(textNode),
+		paragraphIndent: getParagraphIndentRanges(textNode),
+		paragraphSpacing: getParagraphSpacingRanges(textNode),
+		indentation: getIndentationRanges(textNode),
 
 		// 나중에는 분리해서 스타일 호출 순서를 지정하고 관리해야하는데 일단 지금은 range를 유효하게 뽑는게 중요하므로 생략함
 		fillStyleId: getFillStyleIdRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
 	};
+	console.log('🚀 ~ getAllStyleRanges ~ styleData: AllStyleRanges.textNode:', textNode, Object.values(textNode));
+
+	const singleBoundVariables = textNode.boundVariables as Record<string, VariableAlias>;
+
+	for (const key of targetVariableBindableFields) {
+		delete singleBoundVariables[key];
+	}
+
+	const effectStyleData = {
+		strokes: textNode.strokes,
+		strokeWeight: textNode.strokeWeight,
+		strokeAlign: textNode.strokeAlign,
+		strokeCap: textNode.strokeCap,
+		strokeJoin: textNode.strokeJoin,
+		strokeMiterLimit: textNode.strokeMiterLimit,
+		opacity: textNode.opacity,
+		blendMode: textNode.blendMode,
+		textAlignHorizontal: textNode.textAlignHorizontal,
+		textAlignVertical: textNode.textAlignVertical,
+		textAutoResize: textNode.textAutoResize,
+		textTruncation: textNode.textTruncation,
+		maxLines: textNode.maxLines,
+		targetAspectRatio: textNode.targetAspectRatio,
+		annotations: textNode.annotations,
+		hangingPunctuation: textNode.hangingPunctuation,
+		hangingList: textNode.hangingList,
+		constraints: textNode.constraints,
+		reactions: textNode.reactions,
+		isMask: textNode.isMask,
+		maskType: textNode.maskType,
+		effects: textNode.effects,
+		effectStyleId: textNode.effectStyleId,
+		layoutAlign: textNode.layoutAlign,
+		layoutGrow: textNode.layoutGrow,
+		layoutPositioning: textNode.layoutPositioning,
+		layoutSizingHorizontal: textNode.layoutSizingHorizontal,
+		layoutSizingVertical: textNode.layoutSizingVertical,
+		leadingTrim: textNode.leadingTrim,
+		rotation: textNode.rotation,
+		locked: textNode.locked,
+		visible: textNode.visible,
+		// 위치 값
+		// absoluteBoundingBox: textNode.absoluteBoundingBox,
+		// 추가된 누락 속성들
+		minWidth: textNode.minWidth,
+		maxWidth: textNode.maxWidth,
+		minHeight: textNode.minHeight,
+		maxHeight: textNode.maxHeight,
+		boundVariables: singleBoundVariables,
+	} as const;
+
+	const EffectAction = {
+		setEffectStyleIdAsync: textNode.setEffectStyleIdAsync,
+	};
+
+	// 변수 적용 가능 필드명
+	// VariableBindableNodeField
 
 	const styleIds = {
 		fillStyleId: getFillStyleIdRanges(textNode),
@@ -551,8 +834,29 @@ export function getAllStyleRanges(textNode: TextNode): { styleData: ValidAllStyl
 			delete styleData[key as keyof AllStyleRanges];
 		}
 	}
+	for (const key in effectStyleData) {
+		const target = effectStyleData[key as keyof typeof effectStyleData];
+		if (target == null) {
+			delete effectStyleData[key as keyof typeof effectStyleData];
+		} else if (defaultEffectStyleData[key as keyof typeof defaultEffectStyleData] == target) {
+			delete effectStyleData[key as keyof typeof effectStyleData];
+		} else if (
+			typeof target === 'object' &&
+			deepEqual(target, defaultEffectStyleData[key as keyof typeof defaultEffectStyleData])
+		) {
+			delete effectStyleData[key as keyof typeof effectStyleData];
+		} else if (typeof target === 'object' && Object.keys(target).length === 0) {
+			delete effectStyleData[key as keyof typeof effectStyleData];
+		} else if (Array.isArray(target) && target.length === 0) {
+			delete effectStyleData[key as keyof typeof effectStyleData];
+		}
+	}
 
-	return { styleData: styleData as ValidAllStyleRangesType, boundVariables };
+	return {
+		styleData: styleData as ValidAllStyleRangesType,
+		boundVariables,
+		effectStyleData: effectStyleData as unknown as EffectStyleData,
+	};
 }
 
 export const textFontLoad = async (textNode: TextNode) => {
@@ -567,3 +871,42 @@ export const textFontLoad = async (textNode: TextNode) => {
 	}
 	return;
 };
+
+/**
+ * 텍스트가 리스트 객체로 정의된 경우에 대한 판단
+ * 기본적으로 줄바꿈이 있는 텍스트에서 표현되기에 조건부가 없음
+ */
+function getListOptionsRanges(textNode: TextNode): StyleRange<TextListOptions>[] | null {
+	return getStyleRanges<TextListOptions>(textNode, textNode.getRangeListOptions);
+}
+
+function getListSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.listSpacing == null || textNode.listSpacing === 0) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.listSpacing,
+		},
+	];
+}
+
+function getParagraphIndentRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.paragraphIndent == null || textNode.paragraphIndent === 0) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.paragraphIndent,
+		},
+	];
+}
+
+/** 기본 값이 줄 단위로 들어가기에 */
+function getIndentationRanges(textNode: TextNode): StyleRange<number>[] | null {
+	return getStyleRanges<number>(textNode, textNode.getRangeIndentation);
+}

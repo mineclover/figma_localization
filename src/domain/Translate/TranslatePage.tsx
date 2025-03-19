@@ -77,7 +77,7 @@ const TranslateItem = ({
 
 	return (
 		<div className={clc(styles.translateItem, isSelect && styles.translateBorder)}>
-			<section className={styles.translateLeft}>
+			<section className={styles.nationLeft}>
 				<Text className={styles.smallText}>#{localization_id ?? 'NaN'}</Text>
 				<Bold>{language_code}</Bold>
 			</section>
@@ -86,7 +86,7 @@ const TranslateItem = ({
 				value={translation}
 				rows={2}
 				onChange={(e) => {
-					const nextText = e.currentTarget.value.replace(/\n/g, '<br/>');
+					const nextText = e.currentTarget.value.replace(/\n/g, '\n');
 					setTranslation(nextText);
 				}}
 			/>

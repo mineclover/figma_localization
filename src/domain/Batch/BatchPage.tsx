@@ -2,7 +2,7 @@ import { useSignal } from '@/hooks/useSignal';
 import { Fragment, h } from 'preact';
 import { CurrentNode } from '@/model/types';
 import { currentSectionSignal } from '@/model/signal';
-import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useState } from 'preact/hooks';
+import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import {
 	Bold,
 	Button,
@@ -246,7 +246,7 @@ const SearchSection = ({
 					/>
 
 					<SearchTextbox
-						onInput={(e) => {
+						onChange={(e) => {
 							setSearchValue(e.currentTarget.value);
 						}}
 						placeholder="검색..."
@@ -414,9 +414,6 @@ function BatchPage() {
 	/** 옵션 열기 */
 	const [openOption, setOpenOption] = useState<boolean>(false);
 
-	/** 검색 값 */
-	const [searchValue, setSearchValue] = useState<string>('');
-
 	/** 검색 옵션 */
 	const [searchOption, setSearchOption] = useState<SearchOption>('text');
 
@@ -428,6 +425,17 @@ function BatchPage() {
 		viewOption,
 		groupOption
 	);
+
+	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id));
+
+	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>();
+
+	// const textList = Array.from(matchDataSet.values()).sort()
+
+	const [tabValue, setTabValue] = useState<string>('Scan');
+
+	/** 검색 값 */
+	const [searchValue, setSearchValue] = useState<string>('');
 
 	const patternMatchDataGroup = allPatternData.filter((item) => {
 		{
@@ -446,13 +454,6 @@ function BatchPage() {
 		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase());
 	});
 
-	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id));
-
-	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>();
-
-	// const textList = Array.from(matchDataSet.values()).sort()
-
-	const [tabValue, setTabValue] = useState<string>('Scan');
 	const nav = ['Scan', 'Search'];
 	function handleChange(
 		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
@@ -527,7 +528,12 @@ function BatchPage() {
 							disabled={hasSelectedKey}
 							placeholder="새로운 키 값 입력"
 							value={hasSelectedKey ? selectedKeyData?.name : localizationKey}
-							onChange={(e) => setLocalizationKey(keyConventionRegex(e.currentTarget.value))}
+							onChange={(e) => {
+								const next = keyConventionRegex(e.currentTarget.value);
+								setLocalizationKey(next);
+								setSearch(next);
+								setTabValue('Search');
+							}}
 						></Textbox>
 						<IconButton
 							onClick={() => {

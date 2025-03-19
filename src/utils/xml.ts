@@ -3,6 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 export type ParseTextBlock = {
 	[key: string]: {
 		'#text': string;
+		[key: string]: ParseTextBlock | string;
 	}[];
 };
 
@@ -11,6 +12,8 @@ export type ParseTextBlock = {
  * [0].root 반환하는 코드
  */
 export const parseXML = (xml: string) => {
+	const saveXml = xml.replace(/<br\/>/g, '\n');
+
 	const parser = new XMLParser({
 		ignoreAttributes: false,
 		trimValues: false,
@@ -20,17 +23,45 @@ export const parseXML = (xml: string) => {
 			return false;
 		},
 	});
-	const parsedObj = parser.parse(`<root>${xml}</root>`);
+	const parsedObj = parser.parse(`<root>${saveXml}</root>`);
 	const parsedDataArr = parsedObj[0].root as ParseTextBlock[];
 	return parsedDataArr;
 };
-export const parseTextBlock = (block: ParseTextBlock) => {
-	const key = Object.keys(block)[0];
-	const target = block[key];
-	const value = target[0];
 
-	return value['#text'];
+/** 재귀 호출 방식으로 파싱하도록 변경함 */
+export const parseTextBlock = (block: ParseTextBlock) => {
+	console.log('🚀 ~ parseTextBlock ~ block:', block);
+
+	const keys = Object.keys(block);
+
+	const result = keys
+		.map((key): string => {
+			const target = block[key];
+			console.log('🚀 ~ .map ~ key:', key, typeof key);
+			if (key === '#text' && typeof target === 'string') {
+				return target;
+			}
+			// @ts-ignore
+			const t = parseTextBlock(target);
+			if (t === '' && key === 'br') {
+				return '\n';
+			}
+			return t;
+		})
+
+		.join('');
+
+	return result;
 };
+
+// export const parseTextBlock = (block: ParseTextBlock) => {
+// 	console.log('🚀 ~ parseTextBlock ~ block:', block);
+// 	const key = Object.keys(block)[0];
+// 	const target = block[key];
+// 	const value = target[0];
+
+// 	return value['#text'];
+// };
 
 export const parseTextBlock2 = (
 	block: ParseTextBlock,
@@ -80,6 +111,7 @@ export const parseTextBlockSimple = (block: ParseTextBlock) => {
 };
 
 export const parseXML2 = (xml: string) => {
+	const saveXml = xml.replace(/<br\/>/g, '\n');
 	const parser = new XMLParser({
 		ignoreAttributes: false,
 		trimValues: false,
@@ -89,7 +121,7 @@ export const parseXML2 = (xml: string) => {
 			return false;
 		},
 	});
-	const parsedObj = parser.parse(`<root>${xml}</root>`);
+	const parsedObj = parser.parse(`<root>${saveXml}</root>`);
 	const parsedDataArr = parsedObj as ParseTextBlock[];
 	return parsedDataArr;
 };

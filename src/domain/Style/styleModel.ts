@@ -339,7 +339,7 @@ export const groupAllSegmentsByStyle = (
  */
 export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
-	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey }: { localizationKey: string }) => {
+	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey, lang }: { localizationKey: string; lang: string }) => {
 		const xNode = figma.currentPage.selection[0];
 		const domainSetting = getDomainSetting();
 
@@ -359,7 +359,7 @@ export const onDownloadStyle = () => {
 			return;
 		}
 		// 디자인된 버전의 텍스트로 변경
-		await TargetNodeStyleUpdate(xNode, localizationKey, 'origin', Date.now());
+		await TargetNodeStyleUpdate(xNode, localizationKey, lang, Date.now());
 	});
 };
 

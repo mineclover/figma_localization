@@ -1,7 +1,7 @@
 .container {
 	display: flex;
 	flex-direction: column;
-
+	width: 100%;
 	justify-content: flex-start;
 	padding-inline: 4px;
 	gap: 8px;
@@ -253,4 +253,24 @@
 
 .padding {
 	padding: 8px;
+}
+
+.metadataContainer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	justify-content: flex-start;
+	padding-inline: 4px;
+	gap: 2px;
+	& > div {
+		flex-grow: 1;
+	}
+}
+
+.dangerText {
+	color: var(--figma-color-text-danger);
+}
+
+.span {
+	flex-grow: 1;
 }

@@ -344,17 +344,40 @@ export const addTranslation = async (node: TextNode) => {
 		'id'
 	);
 
-	const result = await fetchDB('/localization/translations', {
-		method: 'PUT',
-		body: JSON.stringify({
-			keyId: nodeData.localizationKey,
-			language: 'origin',
-			translation: xmlString,
-		}),
-	});
-	if (!result) {
-		console.log('🚀 ~ addTranslation ~ result:', result);
-		return;
+	// 대부분의 시스템에서 \n는 공백으로 처리되기 때문에 시각적으로 보이지 않음
+	// 따라서 시각적으로 보이게 하기 위해 br로 처리하는게 합리적이게 보임
+	const brString = xmlString.replace(/\n/g, '<br/>');
+
+	try {
+		const translations = await fetchDB('/localization/translations', {
+			method: 'PUT',
+			body: JSON.stringify({
+				keyId: nodeData.localizationKey,
+				language: 'origin',
+				translation: brString,
+			}),
+		});
+		if (!translations) {
+			return;
+		}
+		console.log('🚀 ~ addTranslation ~ result:', translations);
+		if (translations.status === 200) {
+			const data = (await translations.json()) as LocalizationTranslationDTO;
+			node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
+
+			return data;
+		} else {
+			const data = await translations.json();
+
+			// 잘못 등록된  경우도 에러임
+			if (data.message.details === 'SQLITE_CONSTRAINT: FOREIGN KEY constraint failed') {
+				notify('로컬라이제이션 키를 찾을 수 없음', 'error');
+			} else {
+				notify('오리진 값이 등록되지 않았을 확률이 큼', 'error');
+			}
+		}
+	} catch (error) {
+		console.log('🚀 ~ addTranslation ~ error:', error);
 	}
 
 	for (const style of styleStoreArray) {
@@ -370,17 +393,6 @@ export const addTranslation = async (node: TextNode) => {
 			notify('Failed to set resource mapping ' + style.id, 'error');
 			continue;
 		}
-	}
-
-	const data = (await result.json()) as LocalizationTranslationDTO;
-
-	if (result.status === 200) {
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
-		const nodeData = getNodeData(node);
-
-		return data;
-	} else {
-		notify('Failed to set location', 'error');
 	}
 };
 

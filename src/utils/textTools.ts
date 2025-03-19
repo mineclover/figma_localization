@@ -212,10 +212,11 @@ export const applyLocalization = (template: string, variables: Record<string, st
 		const variableName = useNameField ? variable.name : variable.content;
 
 		if (variables[variableName] !== undefined) {
-			result = result.replace(variable.variable, variables[variableName]);
+			// split과 join을 사용하여 replaceAll 구현
+			result = result.split(variable.variable).join(variables[variableName]);
 		} else if (useNameField && variables[variable.content] !== undefined) {
 			// name으로 찾지 못했을 경우 content로 한번 더 시도
-			result = result.replace(variable.variable, variables[variable.content]);
+			result = result.split(variable.variable).join(variables[variable.content]);
 		}
 	});
 

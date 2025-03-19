@@ -196,7 +196,7 @@ export type Resource = {
 export type ResourceDTO = {
 	resource_id: number;
 	style_name: string;
-	style_value: string;
+	style_value: Record<string, any>;
 	hash_value: string;
 	alias?: string;
 	is_deleted: number;

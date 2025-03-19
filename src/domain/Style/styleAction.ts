@@ -1,7 +1,7 @@
 import { notify } from '@/figmaPluginUtils';
 import { textFontLoad, setAllStyleRanges } from '@/figmaPluginUtils/text';
 import { ResourceDTO, ParsedResourceDTO, StyleSync } from '@/model/types';
-import { parseXML, parseTextBlock } from '@/utils/xml';
+import { parseXML, parseTextBlock2, parseTextBlock } from '@/utils/xml';
 
 import { DOWNLOAD_STYLE, VARIABLE_PREFIX } from '../constant';
 import { getLocalizationKeyData, generateLocalizationName, getTargetTranslations } from '../Label/TextPluginDataModel';
@@ -83,11 +83,13 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	);
 
 	const fullText = applyLocalization(targetText.text, variablesKey);
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ fullText:', fullText);
 
 	/**
 	 * 등록된 번역 값
 	 */
 	const parsedData = parseXML(fullText ?? '');
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedData:', parsedData);
 	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 		method: 'GET',
 	});
@@ -101,7 +103,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	const resourceMap = new Map<string, ParsedResourceDTO>();
 	for (const item of data) {
-		const styleValue = safeJsonParse<Record<string, any>>(item.style_value) ?? {};
+		const styleValue = item.style_value ?? {};
 		resourceMap.set(item.resource_id.toString(), {
 			...item,
 			style_value: styleValue,
@@ -113,6 +115,8 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 			return parseTextBlock(item);
 		})
 		.join('');
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedText:', parsedText);
+
 	try {
 		await textFontLoad(node);
 		if (parsedText === '') {
@@ -151,7 +155,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 				return;
 			}
 			const onlineData = (await onlineStyle.json()) as ResourceDTO;
-			const styleValue = safeJsonParse<Record<string, any>>(onlineData.style_value) ?? {};
+			const styleValue = onlineData.style_value ?? {};
 			resourceMap.set(key, {
 				...onlineData,
 				style_value: styleValue,
@@ -213,7 +217,7 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 			const newId = responseResult.resource_id.toString();
 			const newAlias = responseResult.alias;
 			const newName = responseResult.style_name;
-			const newStyle = safeJsonParse<Record<string, any>>(responseResult.style_value) ?? {};
+			const newStyle = responseResult.style_value ?? {};
 			const newRanges = {
 				start,
 				end,
@@ -252,11 +256,13 @@ export const styleResourceCache: Record<string, StyleResourceCacheItem> = {};
 
 export const styleToXml = async (
 	domainId: number | string,
-	characters: string,
+	originCharacters: string,
 	styleData: StyleData,
 	mode: 'id' | 'name'
 ) => {
 	console.log('characters 업데이트 시점과 styleData시점이 별개임으로 스플릿이 과도하게 생길 수 있음');
+
+	const characters = originCharacters.replace(/\u2028/g, '<br/>');
 
 	const clientFetchDB = clientFetchDBCurry(domainId);
 	const segments = createStyleSegments(characters, styleData.styleData);
@@ -264,6 +270,7 @@ export const styleToXml = async (
 	const allStyleGroups = groupAllSegmentsByStyle(characters, segments, boundVariables);
 
 	const exportStyleGroups = allStyleGroups.exportStyleGroups;
+
 	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {
@@ -294,7 +301,7 @@ export const styleToXml = async (
 				hashValue: style.hashId,
 			}),
 		});
-		console.log('🚀 ~ style temp:', temp);
+
 		if (!temp) {
 			continue;
 		}

@@ -21,13 +21,13 @@ export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) =>
 };
 
 export const clientFetchDBCurry =
-	(domainId: number | string) =>
+	(domainId?: number | string) =>
 	<V extends keyof paths>(url: V, options?: RequestInit) => {
 		return fetch(baseURL + url, {
 			...options,
 			headers: {
 				'Content-Type': 'application/json',
-				'X-Domain-Id': domainId.toString(),
+				'X-Domain-Id': domainId?.toString() ?? '',
 			},
 		});
 	};

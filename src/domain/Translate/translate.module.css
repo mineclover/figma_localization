@@ -20,13 +20,26 @@
 	align-items: stretch;
 }
 
+.row {
+	display: flex;
+}
+
 .translateLeft {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 4px;
 
-	width: 40px;
+	width: 80px;
+}
+
+.nationLeft {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+
+	width: 48px;
 }
 
 .smallText {

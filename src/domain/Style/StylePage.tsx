@@ -164,12 +164,14 @@ export const StyleXml = ({
 		read: () => {
 			xmlString: string;
 			styleStoreArray: StyleSync[];
+			effectStyle: Omit<StyleSync, 'ranges'> | null;
 		};
 	};
 	focusUpdateCount: number;
 }) => {
-	const { xmlString, styleStoreArray: styleValues } = resource.read();
+	const { xmlString, styleStoreArray: styleValues, effectStyle } = resource.read();
 
+	console.log('🚀 ~ effectStyle:', effectStyle);
 	// br로 할지 br로 할지 결정되지 않음
 	// 안정적인 건 br긴 함
 	const brString = xmlString.replace(/\n/g, '<br/>');

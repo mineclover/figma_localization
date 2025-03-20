@@ -24,6 +24,34 @@ const innerTextExtract = (text: any): string => {
 
 // 캐시 맵
 const resourceMap = new Map<string, ParsedResourceDTO>();
+
+const resourceRequest = async (key: string) => {
+	const cache = resourceMap.get(key);
+
+	const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
+		method: 'GET',
+	});
+
+	if (onlineStyle == null) {
+		notify('Failed to get resource by key', 'error');
+		return false;
+	}
+
+	const data = (await onlineStyle.json()) as ResourceDTO;
+	if (data == null) {
+		notify('Failed to get resource by key', 'error');
+		return false;
+	}
+
+	const styleValue = data.style_value ?? {};
+	resourceMap.set(key, {
+		...data,
+		style_value: styleValue,
+	});
+
+	return true;
+};
+
 /**
  * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
  * 요청은 date 값으로 캐싱함
@@ -91,7 +119,16 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	 * 등록된 번역 값
 	 */
 	const parsedData = parseXML(fullText ?? '');
+
+	const { xmlString, styleStoreArray, effectStyle } = await xmlToStyle(fullText, domainSetting.domainId);
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ { xmlString, styleStoreArray, effectStyle }:', {
+		xmlString,
+		styleStoreArray,
+		effectStyle,
+	});
+
 	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedData:', parsedData);
+
 	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
 		method: 'GET',
 	});
@@ -154,20 +191,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 		if (key2 == null || key2 == '' || key === '#text') {
 		} else if (resource == null) {
-			const onlineStyle = await fetchDB(('/resources/' + key2) as '/resources/{id}', {
-				method: 'GET',
-			});
-			if (onlineStyle == null) {
-				notify('Failed to get resource by key', 'error');
-
-				return;
-			}
-			const onlineData = (await onlineStyle.json()) as ResourceDTO;
-			const styleValue = onlineData.style_value ?? {};
-			resourceMap.set(key2, {
-				...onlineData,
-				style_value: styleValue,
-			});
+			const onlineStyle = await resourceRequest(key2);
 			resource = resourceMap.get(key2);
 		}
 		const styleValue = resource?.style_value;
@@ -196,6 +220,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	// 여기서 변수 처리?
 };
 
+/** 이거 클라이언트용임 */
 export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	const parsedData = parseXML(xml);
 	const clientFetchDB = clientFetchDBCurry(domainId);
@@ -204,15 +229,32 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	let start = 0;
 	let end = 0;
 
+	let effectStyle: Omit<StyleSync, 'ranges'> | null = null;
+
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
 		console.log('🚀 ~ xmlToStyle ~ key:', key);
+		const [effectKey, key2] = key.split(':');
+		if (effectStyle == null) {
+			const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
+				method: 'GET',
+			});
+			const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
+			effectStyle = {
+				hashId: EffectResourceResult.hash_value,
+				name: EffectResourceResult.style_name,
+				id: EffectResourceResult.resource_id.toString(),
+				alias: EffectResourceResult.alias,
+				style: EffectResourceResult.style_value ?? {},
+			};
+		}
+
 		const value = parseTextBlock(item);
 
 		const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
 
-		const onlineStyle = await clientFetchDB(('/resources/' + key) as '/resources/{id}', {
+		const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
 			method: 'GET',
 		});
 		const responseResult = (await onlineStyle.json()) as ResourceDTO;
@@ -246,7 +288,7 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 		}
 	}
 
-	return { xmlString: xml, styleStoreArray: Object.values(styleStore) };
+	return { xmlString: xml, styleStoreArray: Object.values(styleStore), effectStyle };
 };
 
 // 전역 캐시 객체 추가 - ranges 정보 제외

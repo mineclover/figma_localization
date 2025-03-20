@@ -431,14 +431,43 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	];
 }
 
-function getStroke(textNode: TextNode): Paint[] | null {
-	const strokes = textNode.strokes;
-	console.log('🚀 ~ getStroke ~ strokes:', strokes);
+/**
+ * 텍스트가 리스트 객체로 정의된 경우에 대한 판단
+ * 기본적으로 줄바꿈이 있는 텍스트에서 표현되기에 조건부가 없음
+ */
+function getListOptionsRanges(textNode: TextNode): StyleRange<TextListOptions>[] | null {
+	return getStyleRanges<TextListOptions>(textNode, textNode.getRangeListOptions);
+}
 
-	if (strokes == null || strokes.length === 0) {
+function getListSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.listSpacing == null || textNode.listSpacing === 0) {
 		return null;
 	}
-	return [...strokes];
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.listSpacing,
+		},
+	];
+}
+
+function getParagraphIndentRanges(textNode: TextNode): StyleRange<number>[] | null {
+	if (textNode.paragraphIndent == null || textNode.paragraphIndent === 0) {
+		return null;
+	}
+	return [
+		{
+			start: 0,
+			end: textNode.characters.length,
+			value: textNode.paragraphIndent,
+		},
+	];
+}
+
+/** 기본 값이 줄 단위로 들어가기에 */
+function getIndentationRanges(textNode: TextNode): StyleRange<number>[] | null {
+	return getStyleRanges<number>(textNode, textNode.getRangeIndentation);
 }
 
 /** TODO: 값이 약간 다름.. 체크 해야함.. */
@@ -598,9 +627,14 @@ export const setAllStyleRanges = async ({
 	// 	fillStyleId: textNode.setRangeFillStyleIdAsync,
 	// }
 
-	const { boundVariables, ...styles } = styleData;
+	const { boundVariables, effectStyleData, styleData: tempStyleData } = styleData;
 
-	const functionMap = {
+	const styles = {
+		...effectStyleData,
+		...tempStyleData,
+	};
+
+	const rangeFunctionMap = {
 		// Text styling
 		fontName: 'setRangeFontName',
 		fontSize: 'setRangeFontSize',
@@ -629,11 +663,22 @@ export const setAllStyleRanges = async ({
 
 		// Variable binding
 		textStyleId: 'setRangeTextStyleIdAsync',
-		fillStyleId: 'setRangeFillStyleIdAsync',
+
 		// boundVariable: 'setRangeBoundVariable'
+
+		// 나머지 range
 	} as const;
+
+	const functionMap = {
+		textStyleId: 'setTextStyleIdAsync',
+		fillStyleId: 'setFillStyleIdAsync',
+		effectStyleId: 'setEffectStyleIdAsync',
+		strokeStyleId: 'setStrokeStyleIdAsync',
+		reactions: 'setReactionsAsync',
+	} as const;
+
 	// textNode.setRangeBoundVariable,
-	for (const key of Object.keys(functionMap)) {
+	for (const key of Object.keys(rangeFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
 		if (style == null) {
 			continue;
@@ -642,16 +687,16 @@ export const setAllStyleRanges = async ({
 			await figma.loadFontAsync(style as FontName);
 		}
 		try {
-			const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function;
+			const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 			if (setRange) {
-				textNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never);
+				textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](range.start, range.end, style as never);
 			}
 		} catch (error) {
 			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode;
 			if (targetNode) {
-				const setRange = targetNode[functionMap[key as keyof typeof functionMap]] as Function;
+				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 				if (setRange) {
-					targetNode[functionMap[key as keyof typeof functionMap]](range.start, range.end, style as never);
+					targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](range.start, range.end, style as never);
 				}
 			}
 		}
@@ -669,11 +714,33 @@ export const setAllStyleRanges = async ({
 	} as const;
 
 	for (const field of Object.keys(boundVariablesMap)) {
+		console.log('🚀 ~  boundVariablesMap field:', field);
 		const value = boundVariables[field as keyof typeof boundVariables];
 		if (value) {
 			console.log('🚀 ~  boundVariablesMap value:', field, value);
-			textNode.setRangeBoundVariable(range.start, range.end, field as VariableBindableTextField, value as never);
+			await textNode.setRangeBoundVariable(range.start, range.end, field as VariableBindableTextField, value as never);
 		}
+	}
+
+	for (const key of Object.keys(functionMap)) {
+		const style = styles[key as keyof ResourceDTO];
+		console.log('🚀 ~  functionMap style:', key, ' : ', style);
+		if (style == null) {
+			continue;
+		}
+		const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function;
+		if (setRange) {
+			await textNode[functionMap[key as keyof typeof functionMap]](style);
+		}
+	}
+
+	for (const key of Object.keys(effectFunctionMap)) {
+		const style = styles[key as keyof ResourceDTO];
+		console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		if (style == null) {
+			continue;
+		}
+		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
 	}
 };
 
@@ -870,43 +937,55 @@ export const textFontLoad = async (textNode: TextNode) => {
 		}
 	}
 	return;
+
+	textNode.annotations;
 };
 
-/**
- * 텍스트가 리스트 객체로 정의된 경우에 대한 판단
- * 기본적으로 줄바꿈이 있는 텍스트에서 표현되기에 조건부가 없음
- */
-function getListOptionsRanges(textNode: TextNode): StyleRange<TextListOptions>[] | null {
-	return getStyleRanges<TextListOptions>(textNode, textNode.getRangeListOptions);
-}
+const effectFunctionMap = {
+	// 스트로크 관련
+	strokes: 'strokes',
+	strokeWeight: 'strokeWeight',
+	strokeAlign: 'strokeAlign',
+	strokeCap: 'strokeCap',
+	strokeJoin: 'strokeJoin',
+	strokeMiterLimit: 'strokeMiterLimit',
 
-function getListSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
-	if (textNode.listSpacing == null || textNode.listSpacing === 0) {
-		return null;
-	}
-	return [
-		{
-			start: 0,
-			end: textNode.characters.length,
-			value: textNode.listSpacing,
-		},
-	];
-}
+	// 일반 스타일 관련
+	opacity: 'opacity',
+	blendMode: 'blendMode',
+	effects: 'effects',
 
-function getParagraphIndentRanges(textNode: TextNode): StyleRange<number>[] | null {
-	if (textNode.paragraphIndent == null || textNode.paragraphIndent === 0) {
-		return null;
-	}
-	return [
-		{
-			start: 0,
-			end: textNode.characters.length,
-			value: textNode.paragraphIndent,
-		},
-	];
-}
+	// 텍스트 정렬 관련
+	textAlignHorizontal: 'textAlignHorizontal',
+	textAlignVertical: 'textAlignVertical',
+	textAutoResize: 'textAutoResize',
+	textTruncation: 'textTruncation',
+	maxLines: 'maxLines',
 
-/** 기본 값이 줄 단위로 들어가기에 */
-function getIndentationRanges(textNode: TextNode): StyleRange<number>[] | null {
-	return getStyleRanges<number>(textNode, textNode.getRangeIndentation);
-}
+	// 레이아웃 관련
+	// 기존 사이즈를 기반으로 레이아웃 적용됨
+	// targetAspectRatio: 'targetAspectRatio',
+	constraints: 'constraints',
+	layoutAlign: 'layoutAlign',
+	layoutGrow: 'layoutGrow',
+	layoutPositioning: 'layoutPositioning',
+	layoutSizingHorizontal: 'layoutSizingHorizontal',
+	layoutSizingVertical: 'layoutSizingVertical',
+
+	// 크기 제한 관련
+	minWidth: 'minWidth',
+	maxWidth: 'maxWidth',
+	minHeight: 'minHeight',
+	maxHeight: 'maxHeight',
+
+	// 기타 설정
+	annotations: 'annotations',
+	hangingPunctuation: 'hangingPunctuation',
+	hangingList: 'hangingList',
+	leadingTrim: 'leadingTrim',
+	rotation: 'rotation',
+	locked: 'locked',
+	visible: 'visible',
+	isMask: 'isMask',
+	maskType: 'maskType',
+} as const;

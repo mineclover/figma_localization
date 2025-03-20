@@ -18,10 +18,6 @@ import { fetchDB } from '../utils/fetchDB';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
 import { components } from 'types/i18n';
-import { createStyleSegments, groupAllSegmentsByStyle } from '../Style/styleModel';
-
-import { generateXmlString } from '../Style/StylePage';
-import { StyleSync } from '@/model/types';
 
 import {
 	LocationDTO,

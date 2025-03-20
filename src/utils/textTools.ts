@@ -95,9 +95,11 @@ export const keyConventionRegex = (text: string) => {
 	return /^\d/.test(trimmed) ? '_' + trimmed : trimmed;
 };
 
-export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
+export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name', effectStyle: Omit<StyleSync, 'ranges'>) => {
 	// 모든 스타일 정보를 위치별로 정렬
 	const allRanges: Array<StyleHashSegment> = [];
+
+	const effectTag = effectStyle[tag];
 
 	styles.forEach((style) => {
 		if (style.ranges) {
@@ -122,7 +124,9 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
 
 	return allRanges
 		.map((item) => {
-			return `<${item[tag]}>${item.text}</${item[tag]}>`;
+			const addTag = item[tag] + ':' + effectTag;
+
+			return `<${addTag}>${item.text}</${addTag}>`;
 		})
 		.join('');
 };

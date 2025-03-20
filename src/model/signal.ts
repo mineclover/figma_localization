@@ -56,6 +56,7 @@ export type StyleStore = Record<string, StyleSync>;
 export type StyleData = {
 	styleData: ValidAllStyleRangesType;
 	boundVariables: any;
+	effectStyleData: any;
 };
 
 export const styleDataSignal = signal<StyleData | null>(null);

@@ -23,7 +23,7 @@ import {
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
-import { styleToXml, TargetNodeStyleUpdate } from './styleAction';
+import { TargetNodeStyleUpdate } from './styleAction';
 import toNumber from 'strnum';
 
 const range = (start: number, end: number) => {
@@ -238,6 +238,14 @@ export interface StylePosition {
 	position: number[];
 }
 
+// 생성 비용이 높은데 매번 처리하는 것에 대해 좀 더 최적화 필요
+export const createStyleHashId = (style: Record<string, any>) => {
+	const jsonString = createStableStyleKey(style);
+	const hashId = sha256Hash(jsonString);
+
+	return hashId;
+};
+
 /**
  * 스타일과 Ranges 를 분리해서 정리함
  * 이전 세그멘테이션은 중복 스타일이여도 허용했다면 스타일 집군으로 range를 모아서 중복 스타일을 제거함
@@ -318,9 +326,8 @@ export const groupAllSegmentsByStyle = (
 			...group.style,
 			boundVariables: { ...allDefaultStyle.boundVariables, ...group.style.boundVariables },
 		};
-		const jsonString = createStableStyleKey(allStyle);
-		// 생성 비용이 높은데 매번 처리하는 것에 대해 좀 더 최적화 필요
-		const hashId = sha256Hash(jsonString);
+
+		const hashId = createStyleHashId(allStyle);
 
 		return {
 			style: allStyle,

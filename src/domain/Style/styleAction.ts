@@ -8,8 +8,8 @@ import { getLocalizationKeyData, generateLocalizationName, getTargetTranslations
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB } from '../utils/fetchDB';
 import { StyleData } from '@/model/signal';
-import { createStyleSegments, groupAllSegmentsByStyle } from './styleModel';
-import { generateXmlString } from './StylePage';
+import { createStyleHashId, createStyleSegments, groupAllSegmentsByStyle } from './styleModel';
+import { generateXmlString } from '@/utils/textTools';
 import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
 import { searchTranslationCode } from '../Translate/TranslateModel';
@@ -22,6 +22,8 @@ const innerTextExtract = (text: any): string => {
 	return text[0]['#text'];
 };
 
+// 캐시 맵
+const resourceMap = new Map<string, ParsedResourceDTO>();
 /**
  * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
  * 요청은 date 값으로 캐싱함
@@ -101,7 +103,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	const data = (await result2.json()) as ResourceDTO[];
 
-	const resourceMap = new Map<string, ParsedResourceDTO>();
 	for (const item of data) {
 		const styleValue = item.style_value ?? {};
 		resourceMap.set(item.resource_id.toString(), {
@@ -134,33 +135,40 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
-		if (key == null) {
+
+		console.log('🚀 ~ 137 key:', key);
+		const [effectKey, key2] = key.split(':');
+
+		if (effectKey == null || key2 == null) {
 			continue;
 		}
 		// 만약 단일 키일 경우 target 값이 배열이 아니라 문자열로 나온다.
+
 		const targetObject = item[key];
+
 		const value = innerTextExtract(targetObject);
 
 		const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
-		let resource = resourceMap.get(key);
+		let resource = resourceMap.get(key2);
 
-		if (key == null || key == '' || key === '#text') {
+		if (key2 == null || key2 == '' || key === '#text') {
 		} else if (resource == null) {
-			const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
+			const onlineStyle = await fetchDB(('/resources/' + key2) as '/resources/{id}', {
 				method: 'GET',
 			});
 			if (onlineStyle == null) {
 				notify('Failed to get resource by key', 'error');
+
 				return;
 			}
 			const onlineData = (await onlineStyle.json()) as ResourceDTO;
 			const styleValue = onlineData.style_value ?? {};
-			resourceMap.set(key, {
+			resourceMap.set(key2, {
 				...onlineData,
 				style_value: styleValue,
 			});
-			resource = resourceMap.get(key);
+			resource = resourceMap.get(key2);
 		}
 		const styleValue = resource?.style_value;
 		// 문자열만 있을 경우 첫번째 타겟이 문자열로 나온다
@@ -198,6 +206,7 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
+		console.log('🚀 ~ xmlToStyle ~ key:', key);
 		const value = parseTextBlock(item);
 
 		const length = typeof value === 'string' ? value.length : 0;
@@ -238,10 +247,6 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	}
 
 	return { xmlString: xml, styleStoreArray: Object.values(styleStore) };
-
-	// const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
-	// 	method: 'GET',
-	// });
 };
 
 // 전역 캐시 객체 추가 - ranges 정보 제외
@@ -258,6 +263,7 @@ export const styleToXml = async (
 	domainId: number | string,
 	originCharacters: string,
 	styleData: StyleData,
+
 	mode: 'id' | 'name'
 ) => {
 	console.log('characters 업데이트 시점과 styleData시점이 별개임으로 스플릿이 과도하게 생길 수 있음');
@@ -268,12 +274,37 @@ export const styleToXml = async (
 	const segments = createStyleSegments(characters, styleData.styleData);
 	const boundVariables = createStyleSegments(characters, styleData.boundVariables);
 	const allStyleGroups = groupAllSegmentsByStyle(characters, segments, boundVariables);
-
 	const exportStyleGroups = allStyleGroups.exportStyleGroups;
+
+	const effectData = styleData.effectStyleData;
+	const hashId = createStyleHashId(effectData);
+
+	const effectResource = await clientFetchDB('/resources', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			styleValue: JSON.stringify(effectData),
+			hashValue: hashId,
+		}),
+	});
+	console.log('🚀 ~ effectResource:', effectResource);
+	const responseResult = (await effectResource.json()) as ResourceDTO;
+	console.log('🚀 ~ responseResult:', responseResult);
+
+	const effectStyle: Omit<StyleSync, 'ranges'> = {
+		hashId: responseResult.hash_value,
+		name: responseResult.style_name,
+		id: responseResult.resource_id.toString(),
+		alias: responseResult.alias,
+		style: responseResult.style_value,
+	};
 
 	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {
+		console.log('🚀 ~ style:', style);
 		// 캐시 확인 - 이미 같은 해시 ID로 요청한 적이 있는지 확인
 		if (styleResourceCache[style.hashId]) {
 			// 캐시된 값 사용하되, ranges는 현재 계산된 값 사용
@@ -301,7 +332,6 @@ export const styleToXml = async (
 				hashValue: style.hashId,
 			}),
 		});
-
 		if (!temp) {
 			continue;
 		}
@@ -333,7 +363,7 @@ export const styleToXml = async (
 
 	const styleStoreArray = Object.values(styleStore);
 
-	const xmlString = generateXmlString(styleStoreArray, mode);
+	const xmlString = generateXmlString(styleStoreArray, mode, effectStyle);
 
-	return { xmlString, styleStoreArray };
+	return { xmlString, styleStoreArray, effectStyle };
 };

@@ -155,37 +155,6 @@ const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => 
 		</div>
 	);
 };
-export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name') => {
-	// 모든 스타일 정보를 위치별로 정렬
-	const allRanges: Array<StyleHashSegment> = [];
-
-	styles.forEach((style) => {
-		if (style.ranges) {
-			style.ranges.forEach((range) => {
-				// 시작 태그 정보
-				allRanges.push({
-					id: style.id ?? '',
-					name: style.name ?? '',
-					total: range.end + range.start,
-					text: range.text,
-					hashId: style.hashId,
-					styles: style.style,
-				});
-			});
-		}
-	});
-
-	// 위치에 따라 정렬 (시작 위치가 같으면 닫는 태그가 먼저 오도록)
-	allRanges.sort((a, b) => {
-		return a.total - b.total;
-	});
-
-	return allRanges
-		.map((item) => {
-			return `<${item[tag]}>${item.text}</${item[tag]}>`;
-		})
-		.join('');
-};
 
 export const StyleXml = ({
 	resource,

@@ -37,7 +37,7 @@ export const parseTextBlock = (block: ParseTextBlock) => {
 	const result = keys
 		.map((key): string => {
 			const target = block[key];
-			console.log('🚀 ~ .map ~ key:', key, typeof key);
+			console.log('🚀 ~ .map ~ key:', key, typeof key, target);
 			if (key === '#text' && typeof target === 'string') {
 				return target;
 			}

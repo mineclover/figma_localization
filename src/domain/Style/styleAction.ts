@@ -1,5 +1,5 @@
 import { notify } from '@/figmaPluginUtils';
-import { textFontLoad, setAllStyleRanges } from '@/figmaPluginUtils/text';
+import { textFontLoad, setAllStyleRanges, setResetStyle } from '@/figmaPluginUtils/text';
 import { ResourceDTO, ParsedResourceDTO, StyleSync } from '@/model/types';
 import { parseXML, parseTextBlock2, parseTextBlock } from '@/utils/xml';
 
@@ -113,133 +113,66 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	);
 
 	const fullText = applyLocalization(targetText.text, variablesKey);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ fullText:', fullText);
 
 	/**
 	 * 등록된 번역 값
 	 */
-	const parsedData = parseXML(fullText ?? '');
 
-	const { xmlString, styleStoreArray, effectStyle } = await xmlToStyle(fullText, domainSetting.domainId);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ { xmlString, styleStoreArray, effectStyle }:', {
-		xmlString,
-		styleStoreArray,
-		effectStyle,
-	});
+	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, domainSetting.domainId);
+	console.log('🚀 ~ textFontLoad TargetNodeStyleUpdate ~ effectStyle:', effectStyle);
 
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedData:', parsedData);
+	await textFontLoad(node);
+	node.characters = rowText;
 
-	const result2 = await fetchDB(('/resources/by-key/' + localizationKey) as '/resources/by-key/{keyId}', {
-		method: 'GET',
-	});
-
-	if (result2 == null) {
-		notify('Failed to get resource by key', 'error');
-		return;
-	}
-
-	const data = (await result2.json()) as ResourceDTO[];
-
-	for (const item of data) {
-		const styleValue = item.style_value ?? {};
-		resourceMap.set(item.resource_id.toString(), {
-			...item,
-			style_value: styleValue,
-		});
-	}
-
-	const parsedText = parsedData
-		.map((item) => {
-			return parseTextBlock(item);
-		})
-		.join('');
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ parsedText:', parsedText);
-
-	try {
-		await textFontLoad(node);
-		if (parsedText === '') {
-			node.characters = fullText;
-			return;
-		} else {
-			node.characters = parsedText;
-		}
-	} catch (error) {
-		if (typeof error === 'string') figma.notify('폰트 로드 실패 :' + error);
-	}
-
-	let start = 0;
-	let end = 0;
-
-	for (const item of parsedData) {
-		const key = Object.keys(item)[0];
-
-		console.log('🚀 ~ 137 key:', key);
-		const [effectKey, key2] = key.split(':');
-
-		if (effectKey == null || key2 == null) {
-			continue;
-		}
-		// 만약 단일 키일 경우 target 값이 배열이 아니라 문자열로 나온다.
-
-		const targetObject = item[key];
-
-		const value = innerTextExtract(targetObject);
-
-		const length = typeof value === 'string' ? value.length : 0;
-		end = start + length;
-		let resource = resourceMap.get(key2);
-
-		if (key2 == null || key2 == '' || key === '#text') {
-		} else if (resource == null) {
-			const onlineStyle = await resourceRequest(key2);
-			resource = resourceMap.get(key2);
-		}
-		const styleValue = resource?.style_value;
-		// 문자열만 있을 경우 첫번째 타겟이 문자열로 나온다
-		if (typeof targetObject === 'string') {
-			// 단일 키일 경우 문자열로 처리
-			parsedData.length === 1;
-		} else if (styleValue == null) {
-			// 스타일 값이 없을 경우 오류 처리
-			notify('Failed to get resource by key style_value', 'error');
-			return;
-		} else {
+	for (const item of styleStoreArray) {
+		for (const range of item.ranges) {
+			await setResetStyle({
+				textNode: node,
+			});
 			await setAllStyleRanges({
 				textNode: node,
 				xNodeId,
-				styleData: styleValue,
-
+				styleData: {
+					styleData: item.style,
+					boundVariables: item.style.boundVariables,
+					effectStyleData: effectStyle?.style,
+				},
 				range: {
-					start,
-					end,
+					start: range.start,
+					end: range.end,
 				},
 			});
-			start = end;
 		}
 	}
+
 	// 여기서 변수 처리?
 };
 
 /** 이거 클라이언트용임 */
 export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	const parsedData = parseXML(xml);
+	console.log('🚀 ~ xmlToStyle ~ parsedData:', parsedData);
 	const clientFetchDB = clientFetchDBCurry(domainId);
 	const styleStore: Record<string, StyleSync> = {};
 
 	let start = 0;
 	let end = 0;
 
-	let effectStyle: Omit<StyleSync, 'ranges'> | null = null;
+	let effectStyle = {} as Omit<StyleSync, 'ranges'>;
+
+	let rowText = '';
 
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
-		console.log('🚀 ~ xmlToStyle ~ key:', key);
 		const [effectKey, key2] = key.split(':');
-		if (effectStyle == null) {
+		console.log('🚀 ~ xmlToStyle ~ [effectKey, key2]:', [effectKey, key2]);
+		if (Object.keys(effectStyle).length === 0) {
 			const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
 				method: 'GET',
 			});
 			const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
+			console.log(effectKey, '🚀 ~ xmlToStyle ~ EffectResourceResult:', EffectResourceResult);
+
 			effectStyle = {
 				hashId: EffectResourceResult.hash_value,
 				name: EffectResourceResult.style_name,
@@ -250,45 +183,52 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 		}
 
 		const value = parseTextBlock(item);
+		rowText += value;
 
 		const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
 
-		const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
-			method: 'GET',
-		});
-		const responseResult = (await onlineStyle.json()) as ResourceDTO;
-		if (responseResult) {
-			const newHashId = responseResult.hash_value;
+		if (!['br', '#text'].includes(key2)) {
+			const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
+				method: 'GET',
+			});
 
-			const before = styleStore[newHashId];
-
-			const ranges = before?.ranges ?? [];
-
-			const newId = responseResult.resource_id.toString();
-			const newAlias = responseResult.alias;
-			const newName = responseResult.style_name;
-			const newStyle = responseResult.style_value ?? {};
-			const newRanges = {
-				start,
-				end,
-				text: value,
-			};
-
-			const store = {
-				hashId: newHashId,
-				name: newName,
-				id: newId,
-				alias: newAlias,
-				style: newStyle,
-				ranges: [...ranges, newRanges],
-			};
-			styleStore[newHashId] = store;
-			start = end;
+			if (onlineStyle.status === 200) {
+				const responseResult = (await onlineStyle.json()) as ResourceDTO;
+				console.log(key2, '🚀 ~ xmlToStyle ~ responseResult:', responseResult);
+				if (responseResult) {
+					const newHashId = responseResult.hash_value;
+					const before = styleStore[newHashId];
+					const ranges = before?.ranges ?? [];
+					const newId = responseResult.resource_id.toString();
+					const newAlias = responseResult.alias;
+					const newName = responseResult.style_name;
+					const newStyle = responseResult.style_value ?? {};
+					console.log('🚀 ~ xmlToStyle ~ newStyle:', newStyle);
+					const newRanges = {
+						start,
+						end,
+						text: value,
+					};
+					const store = {
+						hashId: newHashId,
+						name: newName,
+						id: newId,
+						alias: newAlias,
+						style: newStyle,
+						ranges: [...ranges, newRanges],
+					};
+					styleStore[newHashId] = store;
+				}
+			}
+		} else {
+			console.log('🚀 ~ xmlToStyle ~ key2:', key2);
 		}
+		start = end;
 	}
 
-	return { xmlString: xml, styleStoreArray: Object.values(styleStore), effectStyle };
+	console.log('🚀 ~ xmlToStyle ~ styleStore:', styleStore, effectStyle);
+	return { xmlString: xml, styleStoreArray: Object.values(styleStore), effectStyle, rowText };
 };
 
 // 전역 캐시 객체 추가 - ranges 정보 제외
@@ -377,11 +317,11 @@ export const styleToXml = async (
 		if (!temp) {
 			continue;
 		}
-		const responseResult = (await temp.json()) as ResourceDTO;
-		if (responseResult) {
-			const newId = responseResult.resource_id.toString();
-			const newAlias = responseResult.alias;
-			const newName = responseResult.style_name;
+		const tempResponseResult = (await temp.json()) as ResourceDTO;
+		if (tempResponseResult) {
+			const newId = tempResponseResult.resource_id.toString();
+			const newAlias = tempResponseResult.alias;
+			const newName = tempResponseResult.style_name;
 
 			// 결과를 캐시에 저장 (ranges 제외)
 			styleResourceCache[style.hashId] = {

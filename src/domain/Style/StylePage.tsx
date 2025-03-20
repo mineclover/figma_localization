@@ -230,17 +230,16 @@ const StylePage = () => {
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
 	const currentPointer = useSignal(currentPointerSignal);
-	console.log('🚀 ~ StylePage ~ currentPointer:', currentPointer);
+
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);
 	console.log('🚀 ~ StylePage ~ styleData:', styleData);
+
 	const focusUpdateCount = useSignal(focusUpdateCountSignal);
 	const domainSetting = useSignal(domainSettingSignal);
-	console.log('🚀 ~ StylePage ~ domainSetting:', domainSetting);
-	const localizationKeyValue = useSignal(localizationKeySignal);
-	console.log('🚀 ~ StylePage ~ localizationKeyValue:', localizationKeyValue);
 
-	const pageLock = currentPointer?.pageLock ?? false;
+	// const localizationKeyValue = useSignal(localizationKeySignal);
+	// const pageLock = currentPointer?.pageLock ?? false;
 
 	const targetArray = ['origin', ...languageCodes];
 	const isStyle = currentPointer && currentPointer.data.originalLocalizeId !== '';

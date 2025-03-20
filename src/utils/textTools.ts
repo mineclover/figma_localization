@@ -124,10 +124,12 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name', effec
 
 	return allRanges
 		.map((item) => {
-			const addTag = item[tag] + ':' + effectTag;
+			console.log('🚀 ~ .map ~ item effectTag:', item, effectTag);
+			const addTag = effectTag + ':' + item[tag];
 
 			return `<${addTag}>${item.text}</${addTag}>`;
 		})
+
 		.join('');
 };
 

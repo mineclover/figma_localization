@@ -1,3 +1,4 @@
+import { StyleData } from '@/model/signal';
 import { ResourceDTO } from '@/model/types';
 import { deepEqual } from '@/utils/data';
 
@@ -596,6 +597,55 @@ export type ValidAllStyleRangesType = {
 // 	'boundVariables',
 // ]
 
+const rangeFunctionMap = {
+	// Text styling
+	fontName: 'setRangeFontName',
+	fontSize: 'setRangeFontSize',
+	lineHeight: 'setRangeLineHeight',
+	letterSpacing: 'setRangeLetterSpacing',
+	textDecoration: 'setRangeTextDecoration',
+	textCase: 'setRangeTextCase',
+	// fontWeight: "setRangeFontWeight", // No corresponding setter exists
+	hyperlink: 'setRangeHyperlink',
+	fills: 'setRangeFills',
+	// openTypeFeatures: "openTypeFeatures", // No corresponding setter exists
+
+	// Text decoration details
+	textDecorationStyle: 'setRangeTextDecorationStyle',
+	textDecorationOffset: 'setRangeTextDecorationOffset',
+	textDecorationThickness: 'setRangeTextDecorationThickness',
+	textDecorationColor: 'setRangeTextDecorationColor',
+	textDecorationSkipInk: 'setRangeTextDecorationSkipInk',
+	// List and paragraph formatting
+	listOptions: 'setRangeListOptions',
+	listSpacing: 'setRangeListSpacing',
+	paragraphIndent: 'setRangeParagraphIndent',
+	paragraphSpacing: 'setRangeParagraphSpacing',
+	indentation: 'setRangeIndentation',
+	// Variable binding
+	textStyleId: 'setRangeTextStyleIdAsync',
+	// boundVariable: 'setRangeBoundVariable'
+	// 나머지 range
+} as const;
+
+const boundVariablesMap = {
+	fontFamily: 'fontFamily',
+	fontSize: 'fontSize',
+	fontStyle: 'fontStyle',
+	fontWeight: 'fontWeight',
+	letterSpacing: 'letterSpacing',
+	lineHeight: 'lineHeight',
+	paragraphSpacing: 'paragraphSpacing',
+	paragraphIndent: 'paragraphIndent',
+} as const;
+const functionMap = {
+	textStyleId: 'setTextStyleIdAsync',
+	fillStyleId: 'setFillStyleIdAsync',
+	effectStyleId: 'setEffectStyleIdAsync',
+	strokeStyleId: 'setStrokeStyleIdAsync',
+	reactions: 'setReactionsAsync',
+} as const;
+
 export const setAllStyleRanges = async ({
 	textNode,
 	styleData,
@@ -603,9 +653,10 @@ export const setAllStyleRanges = async ({
 	range,
 	xNodeId,
 }: {
+	/** 노드 데이터가 옛날 스코프일 때 실시간 조회해서 다시 찾는 목적 */
 	xNodeId: string;
 	textNode: TextNode;
-	styleData: Record<string, any>;
+	styleData: StyleData;
 
 	range: {
 		start: number;
@@ -627,6 +678,7 @@ export const setAllStyleRanges = async ({
 	// 	fillStyleId: textNode.setRangeFillStyleIdAsync,
 	// }
 
+	// 스타일데이터 내에서의 boundVariables 가 유효한게 맞음
 	const { boundVariables, effectStyleData, styleData: tempStyleData } = styleData;
 
 	const styles = {
@@ -634,52 +686,10 @@ export const setAllStyleRanges = async ({
 		...tempStyleData,
 	};
 
-	const rangeFunctionMap = {
-		// Text styling
-		fontName: 'setRangeFontName',
-		fontSize: 'setRangeFontSize',
-		lineHeight: 'setRangeLineHeight',
-		letterSpacing: 'setRangeLetterSpacing',
-		textDecoration: 'setRangeTextDecoration',
-		textCase: 'setRangeTextCase',
-		// fontWeight: "setRangeFontWeight", // No corresponding setter exists
-		hyperlink: 'setRangeHyperlink',
-		fills: 'setRangeFills',
-		// openTypeFeatures: "openTypeFeatures", // No corresponding setter exists
-
-		// Text decoration details
-		textDecorationStyle: 'setRangeTextDecorationStyle',
-		textDecorationOffset: 'setRangeTextDecorationOffset',
-		textDecorationThickness: 'setRangeTextDecorationThickness',
-		textDecorationColor: 'setRangeTextDecorationColor',
-		textDecorationSkipInk: 'setRangeTextDecorationSkipInk',
-
-		// List and paragraph formatting
-		listOptions: 'setRangeListOptions',
-		listSpacing: 'setRangeListSpacing',
-		paragraphIndent: 'setRangeParagraphIndent',
-		paragraphSpacing: 'setRangeParagraphSpacing',
-		indentation: 'setRangeIndentation',
-
-		// Variable binding
-		textStyleId: 'setRangeTextStyleIdAsync',
-
-		// boundVariable: 'setRangeBoundVariable'
-
-		// 나머지 range
-	} as const;
-
-	const functionMap = {
-		textStyleId: 'setTextStyleIdAsync',
-		fillStyleId: 'setFillStyleIdAsync',
-		effectStyleId: 'setEffectStyleIdAsync',
-		strokeStyleId: 'setStrokeStyleIdAsync',
-		reactions: 'setReactionsAsync',
-	} as const;
-
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(rangeFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
+		console.log('🚀 ~ key:', key, style);
 		if (style == null) {
 			continue;
 		}
@@ -693,6 +703,7 @@ export const setAllStyleRanges = async ({
 			}
 		} catch (error) {
 			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode;
+			console.log('🚀 ~ error targetNode:', targetNode);
 			if (targetNode) {
 				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 				if (setRange) {
@@ -702,23 +713,18 @@ export const setAllStyleRanges = async ({
 		}
 	}
 
-	const boundVariablesMap = {
-		fontFamily: 'fontFamily',
-		fontSize: 'fontSize',
-		fontStyle: 'fontStyle',
-		fontWeight: 'fontWeight',
-		letterSpacing: 'letterSpacing',
-		lineHeight: 'lineHeight',
-		paragraphSpacing: 'paragraphSpacing',
-		paragraphIndent: 'paragraphIndent',
-	} as const;
+	if (boundVariables) {
+		for (const field of Object.keys(boundVariablesMap)) {
+			const value = boundVariables[field as keyof typeof boundVariables];
 
-	for (const field of Object.keys(boundVariablesMap)) {
-		console.log('🚀 ~  boundVariablesMap field:', field);
-		const value = boundVariables[field as keyof typeof boundVariables];
-		if (value) {
-			console.log('🚀 ~  boundVariablesMap value:', field, value);
-			await textNode.setRangeBoundVariable(range.start, range.end, field as VariableBindableTextField, value as never);
+			if (value) {
+				await textNode.setRangeBoundVariable(
+					range.start,
+					range.end,
+					field as VariableBindableTextField,
+					value as never
+				);
+			}
 		}
 	}
 
@@ -736,7 +742,7 @@ export const setAllStyleRanges = async ({
 
 	for (const key of Object.keys(effectFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
-		console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
 		if (style == null) {
 			continue;
 		}
@@ -744,47 +750,37 @@ export const setAllStyleRanges = async ({
 	}
 };
 
-const defaultEffectStyleData = {
-	strokes: [],
-	strokeWeight: 1,
-	strokeAlign: 'OUTSIDE',
-	strokeCap: 'NONE',
-	strokeJoin: 'MITER',
-	strokeMiterLimit: 4,
-	opacity: 1,
-	blendMode: 'PASS_THROUGH',
-	textAlignHorizontal: 'CENTER',
-	textAlignVertical: 'CENTER',
-	textAutoResize: 'WIDTH_AND_HEIGHT',
-	textTruncation: 'DISABLED',
-	maxLines: null,
-	targetAspectRatio: null,
-	annotations: [],
-	hangingPunctuation: false,
-	hangingList: false,
-	constraints: {
-		horizontal: 'MIN',
-		vertical: 'MIN',
-	},
-	reactions: [],
-	isMask: false,
-	maskType: 'ALPHA',
-	effects: [],
-	effectStyleId: '',
-	layoutAlign: 'INHERIT',
-	layoutGrow: 0,
-	layoutPositioning: 'AUTO',
-	layoutSizingHorizontal: 'FIXED',
-	layoutSizingVertical: 'FIXED',
-	leadingTrim: 'NONE',
-	rotation: 0,
-	locked: false,
-	visible: true,
-	minWidth: null,
-	maxWidth: null,
-	minHeight: null,
-	maxHeight: null,
-	boundVariables: {},
+export const setResetStyle = async ({
+	textNode,
+}: {
+	/** 노드 데이터가 옛날 스코프일 때 실시간 조회해서 다시 찾는 목적 */
+
+	textNode: TextNode;
+}) => {
+	// textNode.setRangeBoundVariable,
+	for (const key of Object.keys(rangeFunctionMap)) {
+		const style = defaultRangeData[key as keyof typeof defaultRangeData];
+
+		if (style == null) {
+			continue;
+		}
+		if (key === 'fontName') {
+			await figma.loadFontAsync(style as FontName);
+		}
+		const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
+		if (setRange) {
+			textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](0, textNode.characters.length, style as never);
+		}
+	}
+
+	for (const key of Object.keys(effectFunctionMap)) {
+		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData];
+		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		if (style == null) {
+			continue;
+		}
+		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+	}
 };
 
 export type EffectStyleData = Record<string, any[]>;
@@ -837,10 +833,6 @@ export function getAllStyleRanges(textNode: TextNode): {
 
 	const singleBoundVariables = textNode.boundVariables as Record<string, VariableAlias>;
 
-	for (const key of targetVariableBindableFields) {
-		delete singleBoundVariables[key];
-	}
-
 	const effectStyleData = {
 		strokes: textNode.strokes,
 		strokeWeight: textNode.strokeWeight,
@@ -884,18 +876,16 @@ export function getAllStyleRanges(textNode: TextNode): {
 		boundVariables: singleBoundVariables,
 	} as const;
 
-	const EffectAction = {
-		setEffectStyleIdAsync: textNode.setEffectStyleIdAsync,
-	};
-
 	// 변수 적용 가능 필드명
 	// VariableBindableNodeField
 
-	const styleIds = {
-		fillStyleId: getFillStyleIdRanges(textNode),
-		textStyleId: getTextStyleIdRanges(textNode),
-	};
-
+	// const styleIds = {
+	// 	fillStyleId: getFillStyleIdRanges(textNode),
+	// 	textStyleId: getTextStyleIdRanges(textNode),
+	// };
+	for (const key of targetVariableBindableFields) {
+		delete singleBoundVariables[key];
+	}
 	for (const key in styleData) {
 		if (styleData[key as keyof AllStyleRanges] == null) {
 			delete styleData[key as keyof AllStyleRanges];
@@ -937,8 +927,6 @@ export const textFontLoad = async (textNode: TextNode) => {
 		}
 	}
 	return;
-
-	textNode.annotations;
 };
 
 const effectFunctionMap = {
@@ -979,7 +967,7 @@ const effectFunctionMap = {
 	maxHeight: 'maxHeight',
 
 	// 기타 설정
-	annotations: 'annotations',
+
 	hangingPunctuation: 'hangingPunctuation',
 	hangingList: 'hangingList',
 	leadingTrim: 'leadingTrim',
@@ -989,3 +977,91 @@ const effectFunctionMap = {
 	isMask: 'isMask',
 	maskType: 'maskType',
 } as const;
+
+export const defaultEffectStyleData = {
+	strokes: [],
+	strokeWeight: 1,
+	strokeAlign: 'OUTSIDE',
+	strokeCap: 'NONE',
+	strokeJoin: 'MITER',
+	strokeMiterLimit: 4,
+	opacity: 1,
+	blendMode: 'PASS_THROUGH',
+	textAlignHorizontal: 'CENTER',
+	textAlignVertical: 'CENTER',
+	textAutoResize: 'WIDTH_AND_HEIGHT',
+	textTruncation: 'DISABLED',
+	maxLines: null,
+
+	hangingPunctuation: false,
+	hangingList: false,
+	constraints: {
+		horizontal: 'MIN',
+		vertical: 'MIN',
+	},
+
+	isMask: false,
+	maskType: 'ALPHA',
+	effects: [],
+
+	layoutAlign: 'INHERIT',
+	layoutGrow: 0,
+	layoutPositioning: 'AUTO',
+	layoutSizingHorizontal: 'FIXED',
+	layoutSizingVertical: 'FIXED',
+	leadingTrim: 'NONE',
+	rotation: 0,
+	locked: false,
+	visible: true,
+	minWidth: null,
+	maxWidth: null,
+	minHeight: null,
+	maxHeight: null,
+} as const;
+
+export const defaultRangeData = {
+	fontSize: 14,
+	fontName: { family: 'Inter', style: 'Regular' },
+	lineHeight: {
+		unit: 'AUTO',
+	},
+	letterSpacing: { unit: 'PERCENT', value: 0 },
+	textDecoration: 'NONE',
+	textCase: 'ORIGINAL',
+	hyperlink: null,
+	fills: [
+		{
+			type: 'SOLID',
+			visible: true,
+			opacity: 1,
+			blendMode: 'NORMAL',
+			color: {
+				r: 1,
+				g: 1,
+				b: 1,
+			},
+			boundVariables: {},
+		},
+	],
+	// textDecoration 가 NONE 이면 설정하지 않아도 됨
+	// textDecorationStyle: 'SOLID',
+	// textDecorationColor: {
+	// 	value: 'AUTO',
+	// },
+	// textDecorationOffset: {
+	// 	unit: 'AUTO',
+	// },
+	// textDecorationThickness: {
+	// 	unit: 'AUTO',
+	// },
+	// textDecorationSkipInk: false,
+	listOptions: {
+		type: 'NONE',
+	},
+	listSpacing: 0,
+	paragraphIndent: 0,
+	paragraphSpacing: 0,
+	indentation: 0,
+	fillStyleId: '',
+	textStyleId: '',
+};

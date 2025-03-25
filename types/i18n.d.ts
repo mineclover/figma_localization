@@ -538,6 +538,77 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/localization/actions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 키 ID와 액션으로 리스트 조회 */
+		get: operations['GetKeyActionsByKeyIdAndAction'];
+		put?: never;
+		/** 단일 키 액션 추가 또는 편집 */
+		post: operations['CreateOrUpdateKeyAction'];
+		/** 특정 키 액션 삭제 */
+		delete: operations['DeleteKeyAction'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/actions/bulk': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** 다중 키 액션 추가 또는 편집 */
+		post: operations['CreateOrUpdateKeyActionsBulk'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/actions/key/{keyId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 키 ID로 모든 액션 조회 */
+		get: operations['GetKeyActionsByKeyId'];
+		put?: never;
+		post?: never;
+		/** 키 ID 기준으로 모든 액션 삭제 */
+		delete: operations['DeleteKeyActionsByKeyId'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/actions/detail': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 특정 키 액션 상세 조회 */
+		get: operations['GetKeyActionDetail'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/localization/translations': {
 		parameters: {
 			query?: never;
@@ -1520,9 +1591,36 @@ export interface components {
 			translation_count: number;
 			translated_languages: string[];
 		};
+		/** @description From T, pick a set of properties whose keys are in the union K */
+		'Pick_Resource.Exclude_keyofResource.style_value__': {
+			/** Format: double */
+			resource_id: number;
+			style_name: string;
+			style_type: string;
+			hash_value: string;
+			alias: string;
+			/** Format: double */
+			is_deleted: number;
+			created_at: string;
+			updated_at: string;
+		};
+		ResourceResponse: {
+			/** Format: double */
+			resource_id: number;
+			style_name: string;
+			style_type: string;
+			hash_value: string;
+			alias: string;
+			/** Format: double */
+			is_deleted: number;
+			created_at: string;
+			updated_at: string;
+			style_value: unknown;
+		};
 		CreateResourceDTO: {
 			styleValue: string;
 			hashValue: string;
+			styleType: string;
 		};
 		UpdateResourceDTO: {
 			styleName?: string;
@@ -1599,6 +1697,19 @@ export interface components {
 			/** Format: double */
 			version?: number;
 			isDeleted?: boolean;
+		};
+		LocalizationKeyActionDTO: {
+			/** Format: double */
+			key_id: number;
+			action: string;
+			from_enum: string;
+			/** Format: double */
+			style_resource_id: number;
+			/** Format: double */
+			effect_resource_id: number;
+		};
+		LocalizationKeyActionBulkDTO: {
+			actions: components['schemas']['LocalizationKeyActionDTO'][];
 		};
 		Localization: {
 			/** Format: double */
@@ -1998,7 +2109,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'][];
 				};
 			};
 		};
@@ -2022,7 +2133,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'];
 				};
 			};
 		};
@@ -2044,7 +2155,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'];
 				};
 			};
 		};
@@ -2070,7 +2181,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'];
 				};
 			};
 		};
@@ -2134,7 +2245,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'] | Record<string, never>;
 				};
 			};
 		};
@@ -2156,7 +2267,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown[];
+					'application/json': components['schemas']['ResourceResponse'][];
 				};
 			};
 		};
@@ -2288,6 +2399,7 @@ export interface operations {
 							alias?: string;
 							hashValue: string;
 							styleValue: string;
+							styleType?: string;
 							styleName: string;
 						};
 						resourceId?: string;
@@ -2325,7 +2437,7 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': components['schemas']['ResourceResponse'][];
 				};
 			};
 		};
@@ -2586,6 +2698,169 @@ export interface operations {
 			header?: {
 				'X-Domain-Id'?: string;
 			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyActionsByKeyIdAndAction: {
+		parameters: {
+			query: {
+				key_id: string;
+				action?: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	CreateOrUpdateKeyAction: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['LocalizationKeyActionDTO'];
+			};
+		};
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	DeleteKeyAction: {
+		parameters: {
+			query: {
+				key_id: string;
+				action: string;
+				from_enum: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	CreateOrUpdateKeyActionsBulk: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['LocalizationKeyActionBulkDTO'];
+			};
+		};
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyActionsByKeyId: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				keyId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	DeleteKeyActionsByKeyId: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				keyId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyActionDetail: {
+		parameters: {
+			query: {
+				key_id: string;
+				action: string;
+				from_enum: string;
+			};
+			header?: never;
 			path?: never;
 			cookie?: never;
 		};

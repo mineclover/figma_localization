@@ -107,6 +107,8 @@ const parseSame = (style: string, serverStyle: string) => {
 	return deepEqual(styleValue, styleValue2);
 };
 
+const textStylesName = ['default', 'first', 'second', 'third', 'fourth', 'fifth'];
+
 const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => {
 	// const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
 

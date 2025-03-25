@@ -121,14 +121,18 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, domainSetting.domainId);
 	console.log('🚀 ~ textFontLoad TargetNodeStyleUpdate ~ effectStyle:', effectStyle);
 
+	const tempPosition = {
+		x: node.x,
+		y: node.y,
+	};
+
 	await textFontLoad(node);
 	node.characters = rowText;
-
+	await setResetStyle({
+		textNode: node,
+	});
 	for (const item of styleStoreArray) {
 		for (const range of item.ranges) {
-			await setResetStyle({
-				textNode: node,
-			});
 			await setAllStyleRanges({
 				textNode: node,
 				xNodeId,
@@ -144,6 +148,8 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 			});
 		}
 	}
+	node.x = tempPosition.x;
+	node.y = tempPosition.y;
 
 	// 여기서 변수 처리?
 };
@@ -245,7 +251,6 @@ export const styleToXml = async (
 	domainId: number | string,
 	originCharacters: string,
 	styleData: StyleData,
-
 	mode: 'id' | 'name'
 ) => {
 	console.log('characters 업데이트 시점과 styleData시점이 별개임으로 스플릿이 과도하게 생길 수 있음');
@@ -269,11 +274,11 @@ export const styleToXml = async (
 		body: JSON.stringify({
 			styleValue: JSON.stringify(effectData),
 			hashValue: hashId,
+			styleType: 'effect',
 		}),
 	});
-	console.log('🚀 ~ effectResource:', effectResource);
+
 	const responseResult = (await effectResource.json()) as ResourceDTO;
-	console.log('🚀 ~ responseResult:', responseResult);
 
 	const effectStyle: Omit<StyleSync, 'ranges'> = {
 		hashId: responseResult.hash_value,
@@ -286,7 +291,6 @@ export const styleToXml = async (
 	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {
-		console.log('🚀 ~ style:', style);
 		// 캐시 확인 - 이미 같은 해시 ID로 요청한 적이 있는지 확인
 		if (styleResourceCache[style.hashId]) {
 			// 캐시된 값 사용하되, ranges는 현재 계산된 값 사용
@@ -312,6 +316,7 @@ export const styleToXml = async (
 			body: JSON.stringify({
 				styleValue: JSON.stringify(style.style),
 				hashValue: style.hashId,
+				styleType: 'style',
 			}),
 		});
 		if (!temp) {
@@ -344,7 +349,6 @@ export const styleToXml = async (
 	}
 
 	const styleStoreArray = Object.values(styleStore);
-
 	const xmlString = generateXmlString(styleStoreArray, mode, effectStyle);
 
 	return { xmlString, styleStoreArray, effectStyle };

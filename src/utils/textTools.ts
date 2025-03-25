@@ -118,6 +118,7 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name', effec
 	});
 
 	// 위치에 따라 정렬 (시작 위치가 같으면 닫는 태그가 먼저 오도록)
+	// total 합은 항상 단어의 순서를 보장함
 	allRanges.sort((a, b) => {
 		return a.total - b.total;
 	});
@@ -129,7 +130,6 @@ export const generateXmlString = (styles: StyleSync[], tag: 'id' | 'name', effec
 
 			return `<${addTag}>${item.text}</${addTag}>`;
 		})
-
 		.join('');
 };
 

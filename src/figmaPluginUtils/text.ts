@@ -758,6 +758,14 @@ export const setResetStyle = async ({
 	textNode: TextNode;
 }) => {
 	// textNode.setRangeBoundVariable,
+	for (const key of Object.keys(effectFunctionMap)) {
+		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData];
+		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		if (style == null) {
+			continue;
+		}
+		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+	}
 	for (const key of Object.keys(rangeFunctionMap)) {
 		const style = defaultRangeData[key as keyof typeof defaultRangeData];
 
@@ -769,17 +777,12 @@ export const setResetStyle = async ({
 		}
 		const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 		if (setRange) {
-			textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](0, textNode.characters.length, style as never);
+			await textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](
+				0,
+				textNode.characters.length,
+				style as never
+			);
 		}
-	}
-
-	for (const key of Object.keys(effectFunctionMap)) {
-		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData];
-		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
-		if (style == null) {
-			continue;
-		}
-		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
 	}
 };
 

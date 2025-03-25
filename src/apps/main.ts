@@ -36,6 +36,7 @@ import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel';
 import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 import { onSetPageLockOpen } from '@/domain/System/lock';
+import { runExample } from '@/utils/test';
 
 export default function () {
 	// 세팅
@@ -79,6 +80,7 @@ export default function () {
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
 	onStyleChange();
 	onGetStyleData();
+	runExample();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

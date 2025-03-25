@@ -4,5976 +4,6329 @@
  */
 
 export interface paths {
-    "/v1/files/{file_key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get file JSON
-         * @description Returns the document identified by `file_key` as a JSON object. The file key can be parsed from any Figma file url: `https://www.figma.com/file/{file_key}/{title}`.
-         *
-         *     The `document` property contains a node of type `DOCUMENT`.
-         *
-         *     The `components` property contains a mapping from node IDs to component metadata. This is to help you determine which components each instance comes from.
-         */
-        get: operations["getFile"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/nodes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get file JSON for specific nodes
-         * @description Returns the nodes referenced to by `ids` as a JSON object. The nodes are retrieved from the Figma file referenced to by `file_key`.
-         *
-         *     The node ID and file key can be parsed from any Figma node url: `https://www.figma.com/file/{file_key}/{title}?node-id={id}`
-         *
-         *     The `name`, `lastModified`, `thumbnailUrl`, `editorType`, and `version` attributes are all metadata of the specified file.
-         *
-         *     The `linkAccess` field describes the file link share permission level. There are 5 types of permissions a shared link can have: `"inherit"`, `"view"`, `"edit"`, `"org_view"`, and `"org_edit"`. `"inherit"` is the default permission applied to files created in a team project, and will inherit the project's permissions. `"org_view"` and `"org_edit"` restrict the link to org users.
-         *
-         *     The `document` attribute contains a Node of type `DOCUMENT`.
-         *
-         *     The `components` key contains a mapping from node IDs to component metadata. This is to help you determine which components each instance comes from.
-         *
-         *     By default, no vector data is returned. To return vector data, pass the geometry=paths parameter to the endpoint.
-         *     Each node can also inherit properties from applicable styles. The styles key contains a mapping from style IDs to style metadata.
-         *
-         *     Important: the nodes map may contain values that are `null`. This may be due to the node id not existing within the specified file.
-         */
-        get: operations["getFileNodes"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/images/{file_key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Render images of file nodes
-         * @description Renders images from a file.
-         *
-         *     If no error occurs, `"images"` will be populated with a map from node IDs to URLs of the rendered images, and `"status"` will be omitted. The image assets will expire after 30 days. Images up to 32 megapixels can be exported. Any images that are larger will be scaled down.
-         *
-         *     Important: the image map may contain values that are `null`. This indicates that rendering of that specific node has failed. This may be due to the node id not existing, or other reasons such has the node having no renderable components. It is guaranteed that any node that was requested for rendering will be represented in this map whether or not the render succeeded.
-         *
-         *     To render multiple images from the same file, use the `ids` query parameter to specify multiple node ids.
-         *
-         *     ```
-         *     GET /v1/images/:key?ids=1:2,1:3,1:4
-         *     ```
-         *
-         */
-        get: operations["getImages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/images": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get image fills
-         * @description Returns download links for all images present in image fills in a document. Image fills are how Figma represents any user supplied images. When you drag an image into Figma, we create a rectangle with a single fill that represents the image, and the user is able to transform the rectangle (and properties on the fill) as they wish.
-         *
-         *     This endpoint returns a mapping from image references to the URLs at which the images may be download. Image URLs will expire after no more than 14 days. Image references are located in the output of the GET files endpoint under the `imageRef` attribute in a `Paint`.
-         */
-        get: operations["getImageFills"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/teams/{team_id}/projects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get projects in a team
-         * @description You can use this endpoint to get a list of all the Projects within the specified team. This will only return projects visible to the authenticated user or owner of the developer token. Note: it is not currently possible to programmatically obtain the team id of a user just from a token. To obtain a team id, navigate to a team page of a team you are a part of. The team id will be present in the URL after the word team and before your team name.
-         */
-        get: operations["getTeamProjects"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/files": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get files in a project
-         * @description Get a list of all the Files within the specified project.
-         */
-        get: operations["getProjectFiles"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/versions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get versions of a file
-         * @description This endpoint fetches the version history of a file, allowing you to see the progression of a file over time. You can then use this information to render a specific version of the file, via another endpoint.
-         */
-        get: operations["getFileVersions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/comments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get comments in a file
-         * @description Gets a list of comments left on the file.
-         */
-        get: operations["getComments"];
-        put?: never;
-        /**
-         * Add a comment to a file
-         * @description Posts a new comment on the file.
-         */
-        post: operations["postComment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/comments/{comment_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete a comment
-         * @description Deletes a specific comment. Only the person who made the comment is allowed to delete it.
-         */
-        delete: operations["deleteComment"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/comments/{comment_id}/reactions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get reactions for a comment
-         * @description Gets a paginated list of reactions left on the comment.
-         */
-        get: operations["getCommentReactions"];
-        put?: never;
-        /**
-         * Add a reaction to a comment
-         * @description Posts a new comment reaction on a file comment.
-         */
-        post: operations["postCommentReaction"];
-        /**
-         * Delete a reaction
-         * @description Deletes a specific comment reaction. Only the person who made the reaction is allowed to delete it.
-         */
-        delete: operations["deleteCommentReaction"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get current user
-         * @description Returns the user information for the currently authenticated user.
-         */
-        get: operations["getMe"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/teams/{team_id}/components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get team components
-         * @description Get a paginated list of published components within a team library.
-         */
-        get: operations["getTeamComponents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get file components
-         * @description Get a list of published components within a file library.
-         */
-        get: operations["getFileComponents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/components/{key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get component
-         * @description Get metadata on a component by key.
-         */
-        get: operations["getComponent"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/teams/{team_id}/component_sets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get team component sets
-         * @description Get a paginated list of published component sets within a team library.
-         */
-        get: operations["getTeamComponentSets"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/component_sets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get file component sets
-         * @description Get a list of published component sets within a file library.
-         */
-        get: operations["getFileComponentSets"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/component_sets/{key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get component set
-         * @description Get metadata on a published component set by key.
-         */
-        get: operations["getComponentSet"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/teams/{team_id}/styles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get team styles
-         * @description Get a paginated list of published styles within a team library.
-         */
-        get: operations["getTeamStyles"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/styles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get file styles
-         * @description Get a list of published styles within a file library.
-         */
-        get: operations["getFileStyles"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/styles/{key}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get style
-         * @description Get metadata on a style by key.
-         */
-        get: operations["getStyle"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/webhooks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create a webhook
-         * @description Create a new webhook which will call the specified endpoint when the event triggers. By default, this webhook will automatically send a PING event to the endpoint when it is created. If this behavior is not desired, you can create the webhook and set the status to PAUSED and reactivate it later.
-         */
-        post: operations["postWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/webhooks/{webhook_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a webhook
-         * @description Get a webhook by ID.
-         */
-        get: operations["getWebhook"];
-        /**
-         * Update a webhook
-         * @description Update a webhook by ID.
-         */
-        put: operations["putWebhook"];
-        post?: never;
-        /**
-         * Delete a webhook
-         * @description Deletes the specified webhook. This operation cannot be reversed.
-         */
-        delete: operations["deleteWebhook"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/teams/{team_id}/webhooks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get team webhooks
-         * @description Returns all webhooks registered under the specified team.
-         */
-        get: operations["getTeamWebhooks"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v2/webhooks/{webhook_id}/requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get webhook requests
-         * @description Returns all webhook requests sent within the last week. Useful for debugging.
-         */
-        get: operations["getWebhookRequests"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/activity_logs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get activity logs
-         * @description Returns a list of activity log events
-         */
-        get: operations["getActivityLogs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/payments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get payments
-         * @description There are two methods to query for a user's payment information on a plugin, widget, or Community file. The first method, using plugin payment tokens, is typically used when making queries from a plugin's or widget's code. The second method, providing a user ID and resource ID, is typically used when making queries from anywhere else.
-         *
-         *     Note that you can only query for resources that you own. In most cases, this means that you can only query resources that you originally created.
-         */
-        get: operations["getPayments"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/variables/local": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get local variables
-         * @description **This API is available to full members of Enterprise orgs.**
-         *
-         *     The `GET /v1/files/:file_key/variables/local` endpoint lets you enumerate local variables created in the file and remote variables used in the file. Remote variables are referenced by their `subscribed_id`.
-         *
-         *     As a part of the Variables related API additions, the `GET /v1/files/:file_key` endpoint now returns a `boundVariables` property, containing the `variableId` of the bound variable. The `GET /v1/files/:file_key/variables/local` endpoint can be used to get the full variable or variable collection object.
-         *
-         *     Note that `GET /v1/files/:file_key/variables/published` does not return modes. Instead, you will need to use the `GET /v1/files/:file_key/variables/local` endpoint, in the same file, to examine the mode values.
-         *
-         */
-        get: operations["getLocalVariables"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/variables/published": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get published variables
-         * @description **This API is available to full members of Enterprise orgs.**
-         *
-         *     The `GET /v1/files/:file_key/variables/published` endpoint returns the variables that are published from the given file.
-         *
-         *     The response for this endpoint contains some key differences compared to the `GET /v1/files/:file_key/variables/local` endpoint:
-         *
-         *     - Each variable and variable collection contains a `subscribed_id`.
-         *     - Modes are omitted for published variable collections
-         *
-         *     Published variables have two ids: an id that is assigned in the file where it is created (`id`), and an id that is used by subscribing files (`subscribed_id`). The `id` and `key` are stable over the lifetime of the variable. The `subscribed_id` changes every time the variable is modified and published. The same is true for variable collections.
-         *
-         *     The `updatedAt` fields are ISO 8601 timestamps that indicate the last time that a change to a variable was published. For variable collections, this timestamp will change any time a variable in the collection is changed.
-         */
-        get: operations["getPublishedVariables"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/variables": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create/modify/delete variables
-         * @description **This API is available to full members of Enterprise orgs with Editor seats.**
-         *
-         *     The `POST /v1/files/:file_key/variables` endpoint lets you bulk create, update, and delete variables and variable collections.
-         *
-         *     The request body supports the following 4 top-level arrays. Changes from these arrays will be applied in the below order, and within each array, by array order.
-         *
-         *     - **variableCollections**: For creating, updating, and deleting variable collections
-         *     - **variableModes**: For creating, updating, and deleting modes within variable collections
-         *       - Each collection can have a maximum of 40 modes
-         *       - Mode names cannot be longer than 40 characters
-         *     - **variables**: For creating, updating, and deleting variables
-         *       - Each collection can have a maximum of 5000 variables
-         *       - Variable names must be unique within a collection and cannot contain certain special characters such as `.{}`
-         *     - **variableModeValues**: For setting a variable value under a specific mode.
-         *       - When setting aliases, a variable cannot be aliased to itself or form an alias cycle
-         *
-         *     Temporary ids can be used to reference an object later in the same POST request body. They can be used at create time in the `id` property of variable collections, modes, variables, and in the `initialModeId` property of variable collections. They are scoped to a single request body, and must be unique within the body. The mapping of temporary ids to real ids is returned in the response.
-         *
-         *     This endpoint has the following key behaviors:
-         *
-         *     - The request body must be 4MB or less.
-         *     - Must include an `action` property for collections, modes, and variables to tell the API whether to create, update, or delete the object.
-         *     - When creating a collection, mode, or variable, you can include a temporary `id` that can be referenced in dependent objects in the same request. For example, you can create a new collection with the id `"my_new_collection"`. You can then set `variableCollectionId` to `"my_new_collection"` in new modes or variables. Temporary ids must be unique in the request body.
-         *     - New collections always come with one mode. You can reference this mode by setting `initialModeId` to a temporary id in the request body. This is useful if you want to set values for variables in the mode in the `variableModeValues` array.
-         *       - The `tempIdToRealId` array returns a mapping of the temporary ids in the request, to the real ids of the newly created objects.
-         *     - When adding new modes or variables, default variable values will be applied, consistent with what happens in the UI.
-         *     - Everything to be created, updated, and deleted in the request body is treated as one atomic operation. If there is any validation failure, you will get a 400 status code response, and no changes will be persisted.
-         *     - You will not be able to update remote variables or variable collections. You can only update variables in the file where they were originally created.
-         */
-        post: operations["postVariables"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/dev_resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get dev resources
-         * @description Get dev resources in a file
-         */
-        get: operations["getDevResources"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dev_resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Update dev resources
-         * @description Bulk update dev resources across multiple files.
-         *
-         *     Ids for dev resources that are successfully updated will show up in the `links_updated` array in the response.
-         *
-         *     If there are any dev resources that cannot be updated, you may still get a 200 response. These resources will show up in the `errors` array.
-         */
-        put: operations["putDevResources"];
-        /**
-         * Create dev resources
-         * @description Bulk create dev resources across multiple files.
-         *     Dev resources that are successfully created will show up in the links_created array in the response.
-         *
-         *     If there are any dev resources that cannot be created, you may still get a 200 response. These resources will show up in the errors array. Some reasons a dev resource cannot be created include:
-         *
-         *     - Resource points to a `file_key` that cannot be found.
-         *     - The node already has the maximum of 10 dev resources.
-         *     - Another dev resource for the node has the same url.
-         */
-        post: operations["postDevResources"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/files/{file_key}/dev_resources/{dev_resource_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete dev resource
-         * @description Delete a dev resource from a file
-         */
-        delete: operations["deleteDevResource"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/component/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics component action data.
-         * @description Returns a list of library analytics component actions data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsComponentActions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/component/usages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics component usage data.
-         * @description Returns a list of library analytics component usage data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsComponentUsages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/style/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics style action data.
-         * @description Returns a list of library analytics style actions data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsStyleActions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/style/usages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics style usage data.
-         * @description Returns a list of library analytics style usage data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsStyleUsages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/variable/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics variable action data.
-         * @description Returns a list of library analytics variable actions data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsVariableActions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/analytics/libraries/{file_key}/variable/usages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get library analytics variable usage data.
-         * @description Returns a list of library analytics variable usage data broken down by the requested dimension.
-         */
-        get: operations["getLibraryAnalyticsVariableUsages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+	'/v1/files/{file_key}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get file JSON
+		 * @description Returns the document identified by `file_key` as a JSON object. The file key can be parsed from any Figma file url: `https://www.figma.com/file/{file_key}/{title}`.
+		 *
+		 *     The `document` property contains a node of type `DOCUMENT`.
+		 *
+		 *     The `components` property contains a mapping from node IDs to component metadata. This is to help you determine which components each instance comes from.
+		 */
+		get: operations['getFile'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/nodes': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get file JSON for specific nodes
+		 * @description Returns the nodes referenced to by `ids` as a JSON object. The nodes are retrieved from the Figma file referenced to by `file_key`.
+		 *
+		 *     The node ID and file key can be parsed from any Figma node url: `https://www.figma.com/file/{file_key}/{title}?node-id={id}`
+		 *
+		 *     The `name`, `lastModified`, `thumbnailUrl`, `editorType`, and `version` attributes are all metadata of the specified file.
+		 *
+		 *     The `linkAccess` field describes the file link share permission level. There are 5 types of permissions a shared link can have: `"inherit"`, `"view"`, `"edit"`, `"org_view"`, and `"org_edit"`. `"inherit"` is the default permission applied to files created in a team project, and will inherit the project's permissions. `"org_view"` and `"org_edit"` restrict the link to org users.
+		 *
+		 *     The `document` attribute contains a Node of type `DOCUMENT`.
+		 *
+		 *     The `components` key contains a mapping from node IDs to component metadata. This is to help you determine which components each instance comes from.
+		 *
+		 *     By default, no vector data is returned. To return vector data, pass the geometry=paths parameter to the endpoint.
+		 *     Each node can also inherit properties from applicable styles. The styles key contains a mapping from style IDs to style metadata.
+		 *
+		 *     Important: the nodes map may contain values that are `null`. This may be due to the node id not existing within the specified file.
+		 */
+		get: operations['getFileNodes'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/images/{file_key}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Render images of file nodes
+		 * @description Renders images from a file.
+		 *
+		 *     If no error occurs, `"images"` will be populated with a map from node IDs to URLs of the rendered images, and `"status"` will be omitted. The image assets will expire after 30 days. Images up to 32 megapixels can be exported. Any images that are larger will be scaled down.
+		 *
+		 *     Important: the image map may contain values that are `null`. This indicates that rendering of that specific node has failed. This may be due to the node id not existing, or other reasons such has the node having no renderable components. It is guaranteed that any node that was requested for rendering will be represented in this map whether or not the render succeeded.
+		 *
+		 *     To render multiple images from the same file, use the `ids` query parameter to specify multiple node ids.
+		 *
+		 *     ```
+		 *     GET /v1/images/:key?ids=1:2,1:3,1:4
+		 *     ```
+		 *
+		 */
+		get: operations['getImages'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/images': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get image fills
+		 * @description Returns download links for all images present in image fills in a document. Image fills are how Figma represents any user supplied images. When you drag an image into Figma, we create a rectangle with a single fill that represents the image, and the user is able to transform the rectangle (and properties on the fill) as they wish.
+		 *
+		 *     This endpoint returns a mapping from image references to the URLs at which the images may be download. Image URLs will expire after no more than 14 days. Image references are located in the output of the GET files endpoint under the `imageRef` attribute in a `Paint`.
+		 */
+		get: operations['getImageFills'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/teams/{team_id}/projects': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get projects in a team
+		 * @description You can use this endpoint to get a list of all the Projects within the specified team. This will only return projects visible to the authenticated user or owner of the developer token. Note: it is not currently possible to programmatically obtain the team id of a user just from a token. To obtain a team id, navigate to a team page of a team you are a part of. The team id will be present in the URL after the word team and before your team name.
+		 */
+		get: operations['getTeamProjects'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/files': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get files in a project
+		 * @description Get a list of all the Files within the specified project.
+		 */
+		get: operations['getProjectFiles'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/versions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get versions of a file
+		 * @description This endpoint fetches the version history of a file, allowing you to see the progression of a file over time. You can then use this information to render a specific version of the file, via another endpoint.
+		 */
+		get: operations['getFileVersions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/comments': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get comments in a file
+		 * @description Gets a list of comments left on the file.
+		 */
+		get: operations['getComments'];
+		put?: never;
+		/**
+		 * Add a comment to a file
+		 * @description Posts a new comment on the file.
+		 */
+		post: operations['postComment'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/comments/{comment_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/**
+		 * Delete a comment
+		 * @description Deletes a specific comment. Only the person who made the comment is allowed to delete it.
+		 */
+		delete: operations['deleteComment'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/comments/{comment_id}/reactions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get reactions for a comment
+		 * @description Gets a paginated list of reactions left on the comment.
+		 */
+		get: operations['getCommentReactions'];
+		put?: never;
+		/**
+		 * Add a reaction to a comment
+		 * @description Posts a new comment reaction on a file comment.
+		 */
+		post: operations['postCommentReaction'];
+		/**
+		 * Delete a reaction
+		 * @description Deletes a specific comment reaction. Only the person who made the reaction is allowed to delete it.
+		 */
+		delete: operations['deleteCommentReaction'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/me': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get current user
+		 * @description Returns the user information for the currently authenticated user.
+		 */
+		get: operations['getMe'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/teams/{team_id}/components': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get team components
+		 * @description Get a paginated list of published components within a team library.
+		 */
+		get: operations['getTeamComponents'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/components': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get file components
+		 * @description Get a list of published components within a file library.
+		 */
+		get: operations['getFileComponents'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/components/{key}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get component
+		 * @description Get metadata on a component by key.
+		 */
+		get: operations['getComponent'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/teams/{team_id}/component_sets': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get team component sets
+		 * @description Get a paginated list of published component sets within a team library.
+		 */
+		get: operations['getTeamComponentSets'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/component_sets': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get file component sets
+		 * @description Get a list of published component sets within a file library.
+		 */
+		get: operations['getFileComponentSets'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/component_sets/{key}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get component set
+		 * @description Get metadata on a published component set by key.
+		 */
+		get: operations['getComponentSet'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/teams/{team_id}/styles': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get team styles
+		 * @description Get a paginated list of published styles within a team library.
+		 */
+		get: operations['getTeamStyles'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/styles': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get file styles
+		 * @description Get a list of published styles within a file library.
+		 */
+		get: operations['getFileStyles'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/styles/{key}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get style
+		 * @description Get metadata on a style by key.
+		 */
+		get: operations['getStyle'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v2/webhooks': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Create a webhook
+		 * @description Create a new webhook which will call the specified endpoint when the event triggers. By default, this webhook will automatically send a PING event to the endpoint when it is created. If this behavior is not desired, you can create the webhook and set the status to PAUSED and reactivate it later.
+		 */
+		post: operations['postWebhook'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v2/webhooks/{webhook_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get a webhook
+		 * @description Get a webhook by ID.
+		 */
+		get: operations['getWebhook'];
+		/**
+		 * Update a webhook
+		 * @description Update a webhook by ID.
+		 */
+		put: operations['putWebhook'];
+		post?: never;
+		/**
+		 * Delete a webhook
+		 * @description Deletes the specified webhook. This operation cannot be reversed.
+		 */
+		delete: operations['deleteWebhook'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v2/teams/{team_id}/webhooks': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get team webhooks
+		 * @description Returns all webhooks registered under the specified team.
+		 */
+		get: operations['getTeamWebhooks'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v2/webhooks/{webhook_id}/requests': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get webhook requests
+		 * @description Returns all webhook requests sent within the last week. Useful for debugging.
+		 */
+		get: operations['getWebhookRequests'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/activity_logs': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get activity logs
+		 * @description Returns a list of activity log events
+		 */
+		get: operations['getActivityLogs'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/payments': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get payments
+		 * @description There are two methods to query for a user's payment information on a plugin, widget, or Community file. The first method, using plugin payment tokens, is typically used when making queries from a plugin's or widget's code. The second method, providing a user ID and resource ID, is typically used when making queries from anywhere else.
+		 *
+		 *     Note that you can only query for resources that you own. In most cases, this means that you can only query resources that you originally created.
+		 */
+		get: operations['getPayments'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/variables/local': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get local variables
+		 * @description **This API is available to full members of Enterprise orgs.**
+		 *
+		 *     The `GET /v1/files/:file_key/variables/local` endpoint lets you enumerate local variables created in the file and remote variables used in the file. Remote variables are referenced by their `subscribed_id`.
+		 *
+		 *     As a part of the Variables related API additions, the `GET /v1/files/:file_key` endpoint now returns a `boundVariables` property, containing the `variableId` of the bound variable. The `GET /v1/files/:file_key/variables/local` endpoint can be used to get the full variable or variable collection object.
+		 *
+		 *     Note that `GET /v1/files/:file_key/variables/published` does not return modes. Instead, you will need to use the `GET /v1/files/:file_key/variables/local` endpoint, in the same file, to examine the mode values.
+		 *
+		 */
+		get: operations['getLocalVariables'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/variables/published': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get published variables
+		 * @description **This API is available to full members of Enterprise orgs.**
+		 *
+		 *     The `GET /v1/files/:file_key/variables/published` endpoint returns the variables that are published from the given file.
+		 *
+		 *     The response for this endpoint contains some key differences compared to the `GET /v1/files/:file_key/variables/local` endpoint:
+		 *
+		 *     - Each variable and variable collection contains a `subscribed_id`.
+		 *     - Modes are omitted for published variable collections
+		 *
+		 *     Published variables have two ids: an id that is assigned in the file where it is created (`id`), and an id that is used by subscribing files (`subscribed_id`). The `id` and `key` are stable over the lifetime of the variable. The `subscribed_id` changes every time the variable is modified and published. The same is true for variable collections.
+		 *
+		 *     The `updatedAt` fields are ISO 8601 timestamps that indicate the last time that a change to a variable was published. For variable collections, this timestamp will change any time a variable in the collection is changed.
+		 */
+		get: operations['getPublishedVariables'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/variables': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Create/modify/delete variables
+		 * @description **This API is available to full members of Enterprise orgs with Editor seats.**
+		 *
+		 *     The `POST /v1/files/:file_key/variables` endpoint lets you bulk create, update, and delete variables and variable collections.
+		 *
+		 *     The request body supports the following 4 top-level arrays. Changes from these arrays will be applied in the below order, and within each array, by array order.
+		 *
+		 *     - **variableCollections**: For creating, updating, and deleting variable collections
+		 *     - **variableModes**: For creating, updating, and deleting modes within variable collections
+		 *       - Each collection can have a maximum of 40 modes
+		 *       - Mode names cannot be longer than 40 characters
+		 *     - **variables**: For creating, updating, and deleting variables
+		 *       - Each collection can have a maximum of 5000 variables
+		 *       - Variable names must be unique within a collection and cannot contain certain special characters such as `.{}`
+		 *     - **variableModeValues**: For setting a variable value under a specific mode.
+		 *       - When setting aliases, a variable cannot be aliased to itself or form an alias cycle
+		 *
+		 *     Temporary ids can be used to reference an object later in the same POST request body. They can be used at create time in the `id` property of variable collections, modes, variables, and in the `initialModeId` property of variable collections. They are scoped to a single request body, and must be unique within the body. The mapping of temporary ids to real ids is returned in the response.
+		 *
+		 *     This endpoint has the following key behaviors:
+		 *
+		 *     - The request body must be 4MB or less.
+		 *     - Must include an `action` property for collections, modes, and variables to tell the API whether to create, update, or delete the object.
+		 *     - When creating a collection, mode, or variable, you can include a temporary `id` that can be referenced in dependent objects in the same request. For example, you can create a new collection with the id `"my_new_collection"`. You can then set `variableCollectionId` to `"my_new_collection"` in new modes or variables. Temporary ids must be unique in the request body.
+		 *     - New collections always come with one mode. You can reference this mode by setting `initialModeId` to a temporary id in the request body. This is useful if you want to set values for variables in the mode in the `variableModeValues` array.
+		 *       - The `tempIdToRealId` array returns a mapping of the temporary ids in the request, to the real ids of the newly created objects.
+		 *     - When adding new modes or variables, default variable values will be applied, consistent with what happens in the UI.
+		 *     - Everything to be created, updated, and deleted in the request body is treated as one atomic operation. If there is any validation failure, you will get a 400 status code response, and no changes will be persisted.
+		 *     - You will not be able to update remote variables or variable collections. You can only update variables in the file where they were originally created.
+		 */
+		post: operations['postVariables'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/dev_resources': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get dev resources
+		 * @description Get dev resources in a file
+		 */
+		get: operations['getDevResources'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/dev_resources': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		/**
+		 * Update dev resources
+		 * @description Bulk update dev resources across multiple files.
+		 *
+		 *     Ids for dev resources that are successfully updated will show up in the `links_updated` array in the response.
+		 *
+		 *     If there are any dev resources that cannot be updated, you may still get a 200 response. These resources will show up in the `errors` array.
+		 */
+		put: operations['putDevResources'];
+		/**
+		 * Create dev resources
+		 * @description Bulk create dev resources across multiple files.
+		 *     Dev resources that are successfully created will show up in the links_created array in the response.
+		 *
+		 *     If there are any dev resources that cannot be created, you may still get a 200 response. These resources will show up in the errors array. Some reasons a dev resource cannot be created include:
+		 *
+		 *     - Resource points to a `file_key` that cannot be found.
+		 *     - The node already has the maximum of 10 dev resources.
+		 *     - Another dev resource for the node has the same url.
+		 */
+		post: operations['postDevResources'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/files/{file_key}/dev_resources/{dev_resource_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/**
+		 * Delete dev resource
+		 * @description Delete a dev resource from a file
+		 */
+		delete: operations['deleteDevResource'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/component/actions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics component action data.
+		 * @description Returns a list of library analytics component actions data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsComponentActions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/component/usages': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics component usage data.
+		 * @description Returns a list of library analytics component usage data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsComponentUsages'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/style/actions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics style action data.
+		 * @description Returns a list of library analytics style actions data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsStyleActions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/style/usages': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics style usage data.
+		 * @description Returns a list of library analytics style usage data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsStyleUsages'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/variable/actions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics variable action data.
+		 * @description Returns a list of library analytics variable actions data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsVariableActions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/analytics/libraries/{file_key}/variable/usages': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get library analytics variable usage data.
+		 * @description Returns a list of library analytics variable usage data broken down by the requested dimension.
+		 */
+		get: operations['getLibraryAnalyticsVariableUsages'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        IsLayerTrait: {
-            /** @description A string uniquely identifying this node within the document. */
-            id: string;
-            /** @description The name given to the node by the user in the tool. */
-            name: string;
-            /** @description The type of the node */
-            type: string;
-            /**
-             * @description Whether or not the node is visible on the canvas.
-             * @default true
-             */
-            visible: boolean;
-            /**
-             * @description If true, layer is locked and cannot be edited
-             * @default false
-             */
-            locked: boolean;
-            /**
-             * @deprecated
-             * @description Whether the layer is fixed while the parent is scrolling
-             * @default false
-             */
-            isFixed: boolean;
-            /**
-             * @description How layer should be treated when the frame is resized
-             * @default SCROLLS
-             * @enum {string}
-             */
-            scrollBehavior: "SCROLLS" | "FIXED" | "STICKY_SCROLLS";
-            /**
-             * @description The rotation of the node, if not 0.
-             * @default 0
-             */
-            rotation: number;
-            /** @description A mapping of a layer's property to component property name of component properties attached to this node. The component property name can be used to look up more information on the corresponding component's or component set's componentPropertyDefinitions. */
-            componentPropertyReferences?: {
-                [key: string]: string;
-            };
-            /** @description Data written by plugins that is visible only to the plugin that wrote it. Requires the `pluginData` to include the ID of the plugin. */
-            pluginData?: unknown;
-            /** @description Data written by plugins that is visible to all plugins. Requires the `pluginData` parameter to include the string "shared". */
-            sharedPluginData?: unknown;
-            /** @description A mapping of field to the variables applied to this field. Most fields will only map to a single `VariableAlias`. However, for properties like `fills`, `strokes`, `size`, `componentProperties`, and `textRangeFills`, it is possible to have multiple variables bound to the field. */
-            boundVariables?: {
-                size?: {
-                    x?: components["schemas"]["VariableAlias"];
-                    y?: components["schemas"]["VariableAlias"];
-                };
-                individualStrokeWeights?: {
-                    top?: components["schemas"]["VariableAlias"];
-                    bottom?: components["schemas"]["VariableAlias"];
-                    left?: components["schemas"]["VariableAlias"];
-                    right?: components["schemas"]["VariableAlias"];
-                };
-                characters?: components["schemas"]["VariableAlias"];
-                itemSpacing?: components["schemas"]["VariableAlias"];
-                paddingLeft?: components["schemas"]["VariableAlias"];
-                paddingRight?: components["schemas"]["VariableAlias"];
-                paddingTop?: components["schemas"]["VariableAlias"];
-                paddingBottom?: components["schemas"]["VariableAlias"];
-                visible?: components["schemas"]["VariableAlias"];
-                topLeftRadius?: components["schemas"]["VariableAlias"];
-                topRightRadius?: components["schemas"]["VariableAlias"];
-                bottomLeftRadius?: components["schemas"]["VariableAlias"];
-                bottomRightRadius?: components["schemas"]["VariableAlias"];
-                minWidth?: components["schemas"]["VariableAlias"];
-                maxWidth?: components["schemas"]["VariableAlias"];
-                minHeight?: components["schemas"]["VariableAlias"];
-                maxHeight?: components["schemas"]["VariableAlias"];
-                counterAxisSpacing?: components["schemas"]["VariableAlias"];
-                opacity?: components["schemas"]["VariableAlias"];
-                fontFamily?: components["schemas"]["VariableAlias"][];
-                fontSize?: components["schemas"]["VariableAlias"][];
-                fontStyle?: components["schemas"]["VariableAlias"][];
-                fontWeight?: components["schemas"]["VariableAlias"][];
-                letterSpacing?: components["schemas"]["VariableAlias"][];
-                lineHeight?: components["schemas"]["VariableAlias"][];
-                paragraphSpacing?: components["schemas"]["VariableAlias"][];
-                paragraphIndent?: components["schemas"]["VariableAlias"][];
-                fills?: components["schemas"]["VariableAlias"][];
-                strokes?: components["schemas"]["VariableAlias"][];
-                componentProperties?: {
-                    [key: string]: components["schemas"]["VariableAlias"];
-                };
-                textRangeFills?: components["schemas"]["VariableAlias"][];
-                effects?: components["schemas"]["VariableAlias"][];
-                layoutGrids?: components["schemas"]["VariableAlias"][];
-            };
-            /** @description A mapping of variable collection ID to mode ID representing the explicitly set modes for this node. */
-            explicitVariableModes?: {
-                [key: string]: string;
-            };
-        };
-        HasChildrenTrait: {
-            /** @description An array of nodes that are direct children of this node */
-            children: components["schemas"]["SubcanvasNode"][];
-        };
-        HasLayoutTrait: {
-            /** @description Bounding box of the node in absolute space coordinates. */
-            absoluteBoundingBox: components["schemas"]["Rectangle"] | null;
-            /** @description The actual bounds of a node accounting for drop shadows, thick strokes, and anything else that may fall outside the node's regular bounding box defined in `x`, `y`, `width`, and `height`. The `x` and `y` inside this property represent the absolute position of the node on the page. This value will be `null` if the node is invisible. */
-            absoluteRenderBounds: components["schemas"]["Rectangle"] | null;
-            /**
-             * @description Keep height and width constrained to same ratio.
-             * @default false
-             */
-            preserveRatio: boolean;
-            /** @description Horizontal and vertical layout constraints for node. */
-            constraints?: components["schemas"]["LayoutConstraint"];
-            /** @description The top two rows of a matrix that represents the 2D transform of this node relative to its parent. The bottom row of the matrix is implicitly always (0, 0, 1). Use to transform coordinates in geometry. Only present if `geometry=paths` is passed. */
-            relativeTransform?: components["schemas"]["Transform"];
-            /** @description Width and height of element. This is different from the width and height of the bounding box in that the absolute bounding box represents the element after scaling and rotation. Only present if `geometry=paths` is passed. */
-            size?: components["schemas"]["Vector"];
-            /**
-             * @description
-             *     Determines if the layer should stretch along the parent's counter axis. This property is only provided for direct children of auto-layout frames.
-             *
-             *     - `INHERIT`
-             *     - `STRETCH`
-             *
-             *     In previous versions of auto layout, determined how the layer is aligned inside an auto-layout frame. This property is only provided for direct children of auto-layout frames.
-             *
-             *     - `MIN`
-             *     - `CENTER`
-             *     - `MAX`
-             *     - `STRETCH`
-             *
-             *     In horizontal auto-layout frames, "MIN" and "MAX" correspond to "TOP" and "BOTTOM". In vertical auto-layout frames, "MIN" and "MAX" correspond to "LEFT" and "RIGHT".
-             * @enum {string}
-             */
-            layoutAlign?: "INHERIT" | "STRETCH" | "MIN" | "CENTER" | "MAX";
-            /**
-             * @description This property is applicable only for direct children of auto-layout frames, ignored otherwise. Determines whether a layer should stretch along the parent's primary axis. A `0` corresponds to a fixed size and `1` corresponds to stretch.
-             * @default 0
-             * @enum {number}
-             */
-            layoutGrow: 0 | 1;
-            /**
-             * @description Determines whether a layer's size and position should be determined by auto-layout settings or manually adjustable.
-             * @default AUTO
-             * @enum {string}
-             */
-            layoutPositioning: "AUTO" | "ABSOLUTE";
-            /**
-             * @description The minimum width of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
-             * @default 0
-             */
-            minWidth: number;
-            /**
-             * @description The maximum width of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
-             * @default 0
-             */
-            maxWidth: number;
-            /**
-             * @description The minimum height of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
-             * @default 0
-             */
-            minHeight: number;
-            /**
-             * @description The maximum height of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
-             * @default 0
-             */
-            maxHeight: number;
-            /**
-             * @description The horizontal sizing setting on this auto-layout frame or frame child.
-             *     - `FIXED`
-             *     - `HUG`: only valid on auto-layout frames and text nodes
-             *     - `FILL`: only valid on auto-layout frame children
-             * @enum {string}
-             */
-            layoutSizingHorizontal?: "FIXED" | "HUG" | "FILL";
-            /**
-             * @description The vertical sizing setting on this auto-layout frame or frame child.
-             *     - `FIXED`
-             *     - `HUG`: only valid on auto-layout frames and text nodes
-             *     - `FILL`: only valid on auto-layout frame children
-             * @enum {string}
-             */
-            layoutSizingVertical?: "FIXED" | "HUG" | "FILL";
-        };
-        HasFramePropertiesTrait: {
-            /** @description Whether or not this node clip content outside of its bounds */
-            clipsContent: boolean;
-            /**
-             * @deprecated
-             * @description Background of the node. This is deprecated, as backgrounds for frames are now in the `fills` field.
-             */
-            background?: components["schemas"]["Paint"][];
-            /**
-             * @deprecated
-             * @description Background color of the node. This is deprecated, as frames now support more than a solid color as a background. Please use the `fills` field instead.
-             */
-            backgroundColor?: components["schemas"]["RGBA"];
-            /** @description An array of layout grids attached to this node (see layout grids section for more details). GROUP nodes do not have this attribute */
-            layoutGrids?: components["schemas"]["LayoutGrid"][];
-            /**
-             * @description Whether a node has primary axis scrolling, horizontal or vertical.
-             * @default NONE
-             * @enum {string}
-             */
-            overflowDirection: "HORIZONTAL_SCROLLING" | "VERTICAL_SCROLLING" | "HORIZONTAL_AND_VERTICAL_SCROLLING" | "NONE";
-            /**
-             * @description Whether this layer uses auto-layout to position its children.
-             * @default NONE
-             * @enum {string}
-             */
-            layoutMode: "NONE" | "HORIZONTAL" | "VERTICAL";
-            /**
-             * @description Whether the primary axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames.
-             * @default AUTO
-             * @enum {string}
-             */
-            primaryAxisSizingMode: "FIXED" | "AUTO";
-            /**
-             * @description Whether the counter axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames.
-             * @default AUTO
-             * @enum {string}
-             */
-            counterAxisSizingMode: "FIXED" | "AUTO";
-            /**
-             * @description Determines how the auto-layout frame's children should be aligned in the primary axis direction. This property is only applicable for auto-layout frames.
-             * @default MIN
-             * @enum {string}
-             */
-            primaryAxisAlignItems: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN";
-            /**
-             * @description Determines how the auto-layout frame's children should be aligned in the counter axis direction. This property is only applicable for auto-layout frames.
-             * @default MIN
-             * @enum {string}
-             */
-            counterAxisAlignItems: "MIN" | "CENTER" | "MAX" | "BASELINE";
-            /**
-             * @description The padding between the left border of the frame and its children. This property is only applicable for auto-layout frames.
-             * @default 0
-             */
-            paddingLeft: number;
-            /**
-             * @description The padding between the right border of the frame and its children. This property is only applicable for auto-layout frames.
-             * @default 0
-             */
-            paddingRight: number;
-            /**
-             * @description The padding between the top border of the frame and its children. This property is only applicable for auto-layout frames.
-             * @default 0
-             */
-            paddingTop: number;
-            /**
-             * @description The padding between the bottom border of the frame and its children. This property is only applicable for auto-layout frames.
-             * @default 0
-             */
-            paddingBottom: number;
-            /**
-             * @description The distance between children of the frame. Can be negative. This property is only applicable for auto-layout frames.
-             * @default 0
-             */
-            itemSpacing: number;
-            /**
-             * @description Determines the canvas stacking order of layers in this frame. When true, the first layer will be draw on top. This property is only applicable for auto-layout frames.
-             * @default false
-             */
-            itemReverseZIndex: boolean;
-            /**
-             * @description Determines whether strokes are included in layout calculations. When true, auto-layout frames behave like css "box-sizing: border-box". This property is only applicable for auto-layout frames.
-             * @default false
-             */
-            strokesIncludedInLayout: boolean;
-            /**
-             * @description Whether this auto-layout frame has wrapping enabled.
-             * @enum {string}
-             */
-            layoutWrap?: "NO_WRAP" | "WRAP";
-            /** @description The distance between wrapped tracks of an auto-layout frame. This property is only applicable for auto-layout frames with `layoutWrap: "WRAP"` */
-            counterAxisSpacing?: number;
-            /**
-             * @description Determines how the auto-layout frame’s wrapped tracks should be aligned in the counter axis direction. This property is only applicable for auto-layout frames with `layoutWrap: "WRAP"`.
-             * @default AUTO
-             * @enum {string}
-             */
-            counterAxisAlignContent: "AUTO" | "SPACE_BETWEEN";
-        };
-        HasBlendModeAndOpacityTrait: {
-            /** @description How this node blends with nodes behind it in the scene (see blend mode section for more details) */
-            blendMode: components["schemas"]["BlendMode"];
-            /**
-             * @description Opacity of the node
-             * @default 1
-             */
-            opacity: number;
-        };
-        HasExportSettingsTrait: {
-            /** @description An array of export settings representing images to export from the node. */
-            exportSettings?: components["schemas"]["ExportSetting"][];
-        };
-        HasGeometryTrait: components["schemas"]["MinimalFillsTrait"] & components["schemas"]["MinimalStrokesTrait"] & {
-            /** @description Map from ID to PaintOverride for looking up fill overrides. To see which regions are overriden, you must use the `geometry=paths` option. Each path returned may have an `overrideID` which maps to this table. */
-            fillOverrideTable?: {
-                [key: string]: components["schemas"]["PaintOverride"] | null;
-            };
-            /** @description Only specified if parameter `geometry=paths` is used. An array of paths representing the object fill. */
-            fillGeometry?: components["schemas"]["Path"][];
-            /** @description Only specified if parameter `geometry=paths` is used. An array of paths representing the object stroke. */
-            strokeGeometry?: components["schemas"]["Path"][];
-            /**
-             * @description A string enum describing the end caps of vector paths.
-             * @default NONE
-             * @enum {string}
-             */
-            strokeCap: "NONE" | "ROUND" | "SQUARE" | "LINE_ARROW" | "TRIANGLE_ARROW" | "DIAMOND_FILLED" | "CIRCLE_FILLED" | "TRIANGLE_FILLED" | "WASHI_TAPE_1" | "WASHI_TAPE_2" | "WASHI_TAPE_3" | "WASHI_TAPE_4" | "WASHI_TAPE_5" | "WASHI_TAPE_6";
-            /**
-             * @description Only valid if `strokeJoin` is "MITER". The corner angle, in degrees, below which `strokeJoin` will be set to "BEVEL" to avoid super sharp corners. By default this is 28.96 degrees.
-             * @default 28.96
-             */
-            strokeMiterAngle: number;
-        };
-        MinimalFillsTrait: {
-            /** @description An array of fill paints applied to the node. */
-            fills: components["schemas"]["Paint"][];
-            /** @description A mapping of a StyleType to style ID (see Style) of styles present on this node. The style ID can be used to look up more information about the style in the top-level styles field. */
-            styles?: {
-                [key: string]: string;
-            };
-        };
-        MinimalStrokesTrait: {
-            /** @description An array of stroke paints applied to the node. */
-            strokes?: components["schemas"]["Paint"][];
-            /**
-             * @description The weight of strokes on the node.
-             * @default 1
-             */
-            strokeWeight: number;
-            /**
-             * @description Position of stroke relative to vector outline, as a string enum
-             *
-             *     - `INSIDE`: stroke drawn inside the shape boundary
-             *     - `OUTSIDE`: stroke drawn outside the shape boundary
-             *     - `CENTER`: stroke drawn centered along the shape boundary
-             * @enum {string}
-             */
-            strokeAlign?: "INSIDE" | "OUTSIDE" | "CENTER";
-            /**
-             * @description A string enum with value of "MITER", "BEVEL", or "ROUND", describing how corners in vector paths are rendered.
-             * @default MITER
-             * @enum {string}
-             */
-            strokeJoin: "MITER" | "BEVEL" | "ROUND";
-            /** @description An array of floating point numbers describing the pattern of dash length and gap lengths that the vector stroke will use when drawn.
-             *
-             *     For example a value of [1, 2] indicates that the stroke will be drawn with a dash of length 1 followed by a gap of length 2, repeated. */
-            strokeDashes?: number[];
-        };
-        IndividualStrokesTrait: {
-            /** @description An object including the top, bottom, left, and right stroke weights. Only returned if individual stroke weights are used. */
-            individualStrokeWeights?: components["schemas"]["StrokeWeights"];
-        };
-        CornerTrait: {
-            /**
-             * @description Radius of each corner if a single radius is set for all corners
-             * @default 0
-             */
-            cornerRadius: number;
-            /** @description A value that lets you control how "smooth" the corners are. Ranges from 0 to 1. 0 is the default and means that the corner is perfectly circular. A value of 0.6 means the corner matches the iOS 7 "squircle" icon shape. Other values produce various other curves. */
-            cornerSmoothing?: number;
-            /** @description Array of length 4 of the radius of each corner of the frame, starting in the top left and proceeding clockwise.
-             *
-             *     Values are given in the order top-left, top-right, bottom-right, bottom-left. */
-            rectangleCornerRadii?: number[];
-        };
-        HasEffectsTrait: {
-            /** @description An array of effects attached to this node (see effects section for more details) */
-            effects: components["schemas"]["Effect"][];
-        };
-        HasMaskTrait: {
-            /**
-             * @description Does this node mask sibling nodes in front of it?
-             * @default false
-             */
-            isMask: boolean;
-            /**
-             * @description If this layer is a mask, this property describes the operation used to mask the layer's siblings. The value may be one of the following:
-             *
-             *     - ALPHA: the mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
-             *     - VECTOR: if the mask node has visible fill paints, every pixel inside the node's fill regions will be fully visible in the masked result. If the mask has visible stroke paints, every pixel inside the node's stroke regions will be fully visible in the masked result.
-             *     - LUMINANCE: the luminance value of each pixel of the mask node will be used to determine the opacity of that pixel in the masked result.
-             * @enum {string}
-             */
-            maskType?: "ALPHA" | "VECTOR" | "LUMINANCE";
-            /**
-             * @deprecated
-             * @description True if maskType is VECTOR. This field is deprecated; use maskType instead.
-             * @default false
-             */
-            isMaskOutline: boolean;
-        };
-        ComponentPropertiesTrait: {
-            /** @description A mapping of name to `ComponentPropertyDefinition` for every component property on this component. Each property has a type, defaultValue, and other optional values. */
-            componentPropertyDefinitions?: {
-                [key: string]: components["schemas"]["ComponentPropertyDefinition"];
-            };
-        };
-        TypePropertiesTrait: {
-            /** @description The raw characters in the text node. */
-            characters: string;
-            /** @description Style of text including font family and weight. */
-            style: components["schemas"]["TypeStyle"];
-            /** @description The array corresponds to characters in the text box, where each element references the 'styleOverrideTable' to apply specific styles to each character. The array's length can be less than or equal to the number of characters due to the removal of trailing zeros. Elements with a value of 0 indicate characters that use the default type style. If the array is shorter than the total number of characters, the characters beyond the array's length also use the default style. */
-            characterStyleOverrides: number[];
-            /** @description Internal property, preserved for backward compatibility. Avoid using this value. */
-            layoutVersion?: number;
-            /** @description Map from ID to TypeStyle for looking up style overrides. */
-            styleOverrideTable: {
-                [key: string]: components["schemas"]["TypeStyle"];
-            };
-            /** @description An array with the same number of elements as lines in the text node, where lines are delimited by newline or paragraph separator characters. Each element in the array corresponds to the list type of a specific line. List types are represented as string enums with one of these possible values:
-             *
-             *     - `NONE`: Not a list item.
-             *     - `ORDERED`: Text is an ordered list (numbered).
-             *     - `UNORDERED`: Text is an unordered list (bulleted). */
-            lineTypes: ("NONE" | "ORDERED" | "UNORDERED")[];
-            /** @description An array with the same number of elements as lines in the text node, where lines are delimited by newline or paragraph separator characters. Each element in the array corresponds to the indentation level of a specific line. */
-            lineIndentations: number[];
-        };
-        HasTextSublayerTrait: {
-            /** @description Text contained within a text box. */
-            characters: string;
-        };
-        TransitionSourceTrait: {
-            /** @description Node ID of node to transition to in prototyping */
-            transitionNodeID?: string;
-            /** @description The duration of the prototyping transition on this node (in milliseconds). This will override the default transition duration on the prototype, for this node. */
-            transitionDuration?: number;
-            /** @description The easing curve used in the prototyping transition on this node. */
-            transitionEasing?: components["schemas"]["EasingType"];
-            interactions?: components["schemas"]["Interaction"][];
-        };
-        DevStatusTrait: {
-            /** @description Represents whether or not a node has a particular handoff (or dev) status applied to it. */
-            devStatus?: {
-                /** @enum {string} */
-                type: "NONE" | "READY_FOR_DEV" | "COMPLETED";
-                /** @description An optional field where the designer can add more information about the design and what has changed. */
-                description?: string;
-            };
-        };
-        AnnotationsTrait: Record<string, never>;
-        FrameTraits: components["schemas"]["IsLayerTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["HasChildrenTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasFramePropertiesTrait"] & components["schemas"]["CornerTrait"] & components["schemas"]["HasGeometryTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasMaskTrait"] & components["schemas"]["TransitionSourceTrait"] & components["schemas"]["IndividualStrokesTrait"] & components["schemas"]["DevStatusTrait"] & components["schemas"]["AnnotationsTrait"];
-        DefaultShapeTraits: components["schemas"]["IsLayerTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasGeometryTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasMaskTrait"] & components["schemas"]["TransitionSourceTrait"];
-        CornerRadiusShapeTraits: components["schemas"]["DefaultShapeTraits"] & components["schemas"]["CornerTrait"];
-        RectangularShapeTraits: components["schemas"]["DefaultShapeTraits"] & components["schemas"]["CornerTrait"] & components["schemas"]["IndividualStrokesTrait"] & components["schemas"]["AnnotationsTrait"];
-        Node: components["schemas"]["BooleanOperationNode"] | components["schemas"]["ComponentNode"] | components["schemas"]["ComponentSetNode"] | components["schemas"]["ConnectorNode"] | components["schemas"]["EllipseNode"] | components["schemas"]["EmbedNode"] | components["schemas"]["FrameNode"] | components["schemas"]["GroupNode"] | components["schemas"]["InstanceNode"] | components["schemas"]["LineNode"] | components["schemas"]["LinkUnfurlNode"] | components["schemas"]["RectangleNode"] | components["schemas"]["RegularPolygonNode"] | components["schemas"]["SectionNode"] | components["schemas"]["ShapeWithTextNode"] | components["schemas"]["SliceNode"] | components["schemas"]["StarNode"] | components["schemas"]["StickyNode"] | components["schemas"]["TableNode"] | components["schemas"]["TableCellNode"] | components["schemas"]["TextNode"] | components["schemas"]["VectorNode"] | components["schemas"]["WashiTapeNode"] | components["schemas"]["WidgetNode"] | components["schemas"]["DocumentNode"] | components["schemas"]["CanvasNode"];
-        DocumentNode: {
-            /** @enum {string} */
-            type: "DOCUMENT";
-            children: components["schemas"]["CanvasNode"][];
-        } & components["schemas"]["IsLayerTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "DOCUMENT";
-        };
-        CanvasNode: {
-            /** @enum {string} */
-            type: "CANVAS";
-            children: components["schemas"]["SubcanvasNode"][];
-            /** @description Background color of the canvas. */
-            backgroundColor: components["schemas"]["RGBA"];
-            /**
-             * @deprecated
-             * @description Node ID that corresponds to the start frame for prototypes. This is deprecated with the introduction of multiple flows. Please use the `flowStartingPoints` field.
-             */
-            prototypeStartNodeID: string | null;
-            /** @description An array of flow starting points sorted by its position in the prototype settings panel. */
-            flowStartingPoints: components["schemas"]["FlowStartingPoint"][];
-            /** @description The device used to view a prototype. */
-            prototypeDevice: components["schemas"]["PrototypeDevice"];
-            measurements?: components["schemas"]["Measurement"][];
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasExportSettingsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "CANVAS";
-        };
-        SubcanvasNode: components["schemas"]["BooleanOperationNode"] | components["schemas"]["ComponentNode"] | components["schemas"]["ComponentSetNode"] | components["schemas"]["ConnectorNode"] | components["schemas"]["EllipseNode"] | components["schemas"]["EmbedNode"] | components["schemas"]["FrameNode"] | components["schemas"]["GroupNode"] | components["schemas"]["InstanceNode"] | components["schemas"]["LineNode"] | components["schemas"]["LinkUnfurlNode"] | components["schemas"]["RectangleNode"] | components["schemas"]["RegularPolygonNode"] | components["schemas"]["SectionNode"] | components["schemas"]["ShapeWithTextNode"] | components["schemas"]["SliceNode"] | components["schemas"]["StarNode"] | components["schemas"]["StickyNode"] | components["schemas"]["TableNode"] | components["schemas"]["TableCellNode"] | components["schemas"]["TextNode"] | components["schemas"]["VectorNode"] | components["schemas"]["WashiTapeNode"] | components["schemas"]["WidgetNode"];
-        BooleanOperationNode: {
-            /**
-             * @description The type of this node, represented by the string literal "BOOLEAN_OPERATION"
-             * @enum {string}
-             */
-            type: "BOOLEAN_OPERATION";
-            /**
-             * @description A string enum indicating the type of boolean operation applied.
-             * @enum {string}
-             */
-            booleanOperation: "UNION" | "INTERSECT" | "SUBTRACT" | "EXCLUDE";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["HasChildrenTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasGeometryTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasMaskTrait"] & components["schemas"]["TransitionSourceTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "BOOLEAN_OPERATION";
-        };
-        SectionNode: {
-            /**
-             * @description The type of this node, represented by the string literal "SECTION"
-             * @enum {string}
-             */
-            type: "SECTION";
-            /**
-             * @description Whether the contents of the section are visible
-             * @default false
-             */
-            sectionContentsHidden: boolean;
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasGeometryTrait"] & components["schemas"]["HasChildrenTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["DevStatusTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SECTION";
-        };
-        FrameNode: {
-            /**
-             * @description The type of this node, represented by the string literal "FRAME"
-             * @enum {string}
-             */
-            type: "FRAME";
-        } & components["schemas"]["FrameTraits"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "FRAME";
-        };
-        GroupNode: {
-            /**
-             * @description The type of this node, represented by the string literal "GROUP"
-             * @enum {string}
-             */
-            type: "GROUP";
-        } & components["schemas"]["FrameTraits"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "GROUP";
-        };
-        ComponentNode: {
-            /**
-             * @description The type of this node, represented by the string literal "COMPONENT"
-             * @enum {string}
-             */
-            type: "COMPONENT";
-        } & components["schemas"]["FrameTraits"] & components["schemas"]["ComponentPropertiesTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "COMPONENT";
-        };
-        ComponentSetNode: {
-            /**
-             * @description The type of this node, represented by the string literal "COMPONENT_SET"
-             * @enum {string}
-             */
-            type: "COMPONENT_SET";
-        } & components["schemas"]["FrameTraits"] & components["schemas"]["ComponentPropertiesTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "COMPONENT_SET";
-        };
-        VectorNode: {
-            /**
-             * @description The type of this node, represented by the string literal "VECTOR"
-             * @enum {string}
-             */
-            type: "VECTOR";
-        } & components["schemas"]["CornerRadiusShapeTraits"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "VECTOR";
-        };
-        StarNode: {
-            /**
-             * @description The type of this node, represented by the string literal "STAR"
-             * @enum {string}
-             */
-            type: "STAR";
-        } & components["schemas"]["CornerRadiusShapeTraits"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "STAR";
-        };
-        LineNode: {
-            /**
-             * @description The type of this node, represented by the string literal "LINE"
-             * @enum {string}
-             */
-            type: "LINE";
-        } & components["schemas"]["DefaultShapeTraits"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "LINE";
-        };
-        EllipseNode: {
-            /**
-             * @description The type of this node, represented by the string literal "ELLIPSE"
-             * @enum {string}
-             */
-            type: "ELLIPSE";
-            arcData: components["schemas"]["ArcData"];
-        } & components["schemas"]["DefaultShapeTraits"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "ELLIPSE";
-        };
-        RegularPolygonNode: {
-            /**
-             * @description The type of this node, represented by the string literal "REGULAR_POLYGON"
-             * @enum {string}
-             */
-            type: "REGULAR_POLYGON";
-        } & components["schemas"]["CornerRadiusShapeTraits"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "REGULAR_POLYGON";
-        };
-        RectangleNode: {
-            /**
-             * @description The type of this node, represented by the string literal "RECTANGLE"
-             * @enum {string}
-             */
-            type: "RECTANGLE";
-        } & components["schemas"]["RectangularShapeTraits"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "RECTANGLE";
-        };
-        TextNode: {
-            /**
-             * @description The type of this node, represented by the string literal "TEXT"
-             * @enum {string}
-             */
-            type: "TEXT";
-        } & components["schemas"]["DefaultShapeTraits"] & components["schemas"]["TypePropertiesTrait"] & components["schemas"]["AnnotationsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "TEXT";
-        };
-        TableNode: {
-            /**
-             * @description The type of this node, represented by the string literal "TABLE"
-             * @enum {string}
-             */
-            type: "TABLE";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasChildrenTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["MinimalStrokesTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["HasExportSettingsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "TABLE";
-        };
-        TableCellNode: {
-            /**
-             * @description The type of this node, represented by the string literal "TABLE_CELL"
-             * @enum {string}
-             */
-            type: "TABLE_CELL";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["MinimalFillsTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasTextSublayerTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "TABLE_CELL";
-        };
-        SliceNode: {
-            /**
-             * @description The type of this node, represented by the string literal "SLICE"
-             * @enum {string}
-             */
-            type: "SLICE";
-        } & components["schemas"]["IsLayerTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SLICE";
-        };
-        InstanceNode: {
-            /**
-             * @description The type of this node, represented by the string literal "INSTANCE"
-             * @enum {string}
-             */
-            type: "INSTANCE";
-            /** @description ID of component that this instance came from. */
-            componentId: string;
-            /**
-             * @description If true, this node has been marked as exposed to its containing component or component set.
-             * @default false
-             */
-            isExposedInstance: boolean;
-            /** @description IDs of instances that have been exposed to this node's level. */
-            exposedInstances?: string[];
-            /** @description A mapping of name to `ComponentProperty` for all component properties on this instance. Each property has a type, value, and other optional values. */
-            componentProperties?: {
-                [key: string]: components["schemas"]["ComponentProperty"];
-            };
-            /** @description An array of all of the fields directly overridden on this instance. Inherited overrides are not included. */
-            overrides: components["schemas"]["Overrides"][];
-        } & components["schemas"]["FrameTraits"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "INSTANCE";
-        };
-        EmbedNode: {
-            /**
-             * @description The type of this node, represented by the string literal "EMBED"
-             * @enum {string}
-             */
-            type: "EMBED";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasExportSettingsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "EMBED";
-        };
-        LinkUnfurlNode: {
-            /**
-             * @description The type of this node, represented by the string literal "LINK_UNFURL"
-             * @enum {string}
-             */
-            type: "LINK_UNFURL";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasExportSettingsTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "LINK_UNFURL";
-        };
-        StickyNode: {
-            /**
-             * @description The type of this node, represented by the string literal "STICKY"
-             * @enum {string}
-             */
-            type: "STICKY";
-            /**
-             * @description If true, author name is visible.
-             * @default false
-             */
-            authorVisible: boolean;
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["MinimalFillsTrait"] & components["schemas"]["HasMaskTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasTextSublayerTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "STICKY";
-        };
-        ShapeWithTextNode: {
-            /**
-             * @description The type of this node, represented by the string literal "SHAPE_WITH_TEXT"
-             * @enum {string}
-             */
-            type: "SHAPE_WITH_TEXT";
-            /** @description Geometric shape type. Most shape types have the same name as their tooltip but there are a few exceptions. ENG_DATABASE: Cylinder, ENG_QUEUE: Horizontal cylinder, ENG_FILE: File, ENG_FOLDER: Folder. */
-            shapeType: components["schemas"]["ShapeType"];
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["MinimalFillsTrait"] & components["schemas"]["HasMaskTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasTextSublayerTrait"] & components["schemas"]["CornerTrait"] & components["schemas"]["MinimalStrokesTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SHAPE_WITH_TEXT";
-        };
-        ConnectorNode: {
-            /**
-             * @description The type of this node, represented by the string literal "CONNECTOR"
-             * @enum {string}
-             */
-            type: "CONNECTOR";
-            /** @description The starting point of the connector. */
-            connectorStart: components["schemas"]["ConnectorEndpoint"];
-            /** @description The ending point of the connector. */
-            connectorEnd: components["schemas"]["ConnectorEndpoint"];
-            /**
-             * @description A string enum describing the end cap of the start of the connector.
-             * @default NONE
-             * @enum {string}
-             */
-            connectorStartStrokeCap: "NONE" | "LINE_ARROW" | "TRIANGLE_ARROW" | "DIAMOND_FILLED" | "CIRCLE_FILLED" | "TRIANGLE_FILLED";
-            /**
-             * @description A string enum describing the end cap of the end of the connector.
-             * @default NONE
-             * @enum {string}
-             */
-            connectorEndStrokeCap: "NONE" | "LINE_ARROW" | "TRIANGLE_ARROW" | "DIAMOND_FILLED" | "CIRCLE_FILLED" | "TRIANGLE_FILLED";
-            /** @description Connector line type. */
-            connectorLineType: components["schemas"]["ConnectorLineType"];
-            /** @description Connector text background. */
-            textBackground?: components["schemas"]["ConnectorTextBackground"];
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasLayoutTrait"] & components["schemas"]["HasBlendModeAndOpacityTrait"] & components["schemas"]["HasEffectsTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasTextSublayerTrait"] & components["schemas"]["MinimalStrokesTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "CONNECTOR";
-        };
-        WashiTapeNode: {
-            /**
-             * @description The type of this node, represented by the string literal "WASHI_TAPE"
-             * @enum {string}
-             */
-            type: "WASHI_TAPE";
-        } & components["schemas"]["DefaultShapeTraits"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "WASHI_TAPE";
-        };
-        WidgetNode: {
-            /**
-             * @description The type of this node, represented by the string literal "WIDGET"
-             * @enum {string}
-             */
-            type: "WIDGET";
-        } & components["schemas"]["IsLayerTrait"] & components["schemas"]["HasExportSettingsTrait"] & components["schemas"]["HasChildrenTrait"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "WIDGET";
-        };
-        /** @description An RGB color */
-        RGB: {
-            /** @description Red channel value, between 0 and 1. */
-            r: number;
-            /** @description Green channel value, between 0 and 1. */
-            g: number;
-            /** @description Blue channel value, between 0 and 1. */
-            b: number;
-        };
-        /** @description An RGBA color */
-        RGBA: {
-            /** @description Red channel value, between 0 and 1. */
-            r: number;
-            /** @description Green channel value, between 0 and 1. */
-            g: number;
-            /** @description Blue channel value, between 0 and 1. */
-            b: number;
-            /** @description Alpha channel value, between 0 and 1. */
-            a: number;
-        };
-        /** @description A flow starting point used when launching a prototype to enter Presentation view. */
-        FlowStartingPoint: {
-            /** @description Unique identifier specifying the frame. */
-            nodeId: string;
-            /** @description Name of flow. */
-            name: string;
-        };
-        /** @description A width and a height. */
-        Size: {
-            /** @description The width of a size. */
-            width: number;
-            /** @description the height of a size. */
-            height: number;
-        };
-        /** @description The device used to view a prototype. */
-        PrototypeDevice: {
-            /** @enum {string} */
-            type: "NONE" | "PRESET" | "CUSTOM" | "PRESENTATION";
-            size?: components["schemas"]["Size"];
-            presetIdentifier?: string;
-            /** @enum {string} */
-            rotation: "NONE" | "CCW_90";
-        };
-        /** @description Sizing constraint for exports. */
-        Constraint: {
-            /**
-             * @description Type of constraint to apply:
-             *
-             *     - `SCALE`: Scale by `value`.
-             *     - `WIDTH`: Scale proportionally and set width to `value`.
-             *     - `HEIGHT`: Scale proportionally and set height to `value`.
-             * @enum {string}
-             */
-            type: "SCALE" | "WIDTH" | "HEIGHT";
-            /** @description See type property for effect of this field. */
-            value: number;
-        };
-        /** @description An export setting. */
-        ExportSetting: {
-            suffix: string;
-            /** @enum {string} */
-            format: "JPG" | "PNG" | "SVG" | "PDF";
-            constraint: components["schemas"]["Constraint"];
-        };
-        /**
-         * @description This type is a string enum with the following possible values
-         *
-         *     Normal blends:
-         *     - `PASS_THROUGH` (only applicable to objects with children)
-         *     - `NORMAL`
-         *
-         *     Darken:
-         *     - `DARKEN`
-         *     - `MULTIPLY`
-         *     - `LINEAR_BURN`
-         *     - `COLOR_BURN`
-         *
-         *     Lighten:
-         *     - `LIGHTEN`
-         *     - `SCREEN`
-         *     - `LINEAR_DODGE`
-         *     - `COLOR_DODGE`
-         *
-         *     Contrast:
-         *     - `OVERLAY`
-         *     - `SOFT_LIGHT`
-         *     - `HARD_LIGHT`
-         *
-         *     Inversion:
-         *     - `DIFFERENCE`
-         *     - `EXCLUSION`
-         *
-         *     Component:
-         *     - `HUE`
-         *     - `SATURATION`
-         *     - `COLOR`
-         *     - `LUMINOSITY`
-         * @enum {string}
-         */
-        BlendMode: "PASS_THROUGH" | "NORMAL" | "DARKEN" | "MULTIPLY" | "LINEAR_BURN" | "COLOR_BURN" | "LIGHTEN" | "SCREEN" | "LINEAR_DODGE" | "COLOR_DODGE" | "OVERLAY" | "SOFT_LIGHT" | "HARD_LIGHT" | "DIFFERENCE" | "EXCLUSION" | "HUE" | "SATURATION" | "COLOR" | "LUMINOSITY";
-        /** @description A 2d vector. */
-        Vector: {
-            /** @description X coordinate of the vector. */
-            x: number;
-            /** @description Y coordinate of the vector. */
-            y: number;
-        };
-        /** @description A single color stop with its position along the gradient axis, color, and bound variables if any */
-        ColorStop: {
-            /** @description Value between 0 and 1 representing position along gradient axis. */
-            position: number;
-            /** @description Color attached to corresponding position. */
-            color: components["schemas"]["RGBA"];
-            /** @description The variables bound to a particular gradient stop */
-            boundVariables?: {
-                color?: components["schemas"]["VariableAlias"];
-            };
-        };
-        /** @description A transformation matrix is standard way in computer graphics to represent translation and rotation. These are the top two rows of a 3x3 matrix. The bottom row of the matrix is assumed to be [0, 0, 1]. This is known as an affine transform and is enough to represent translation, rotation, and skew.
-         *
-         *     The identity transform is [[1, 0, 0], [0, 1, 0]].
-         *
-         *     A translation matrix will typically look like:
-         *
-         *     ```
-         *     [[1, 0, tx],
-         *       [0, 1, ty]]
-         *     ```
-         *
-         *     and a rotation matrix will typically look like:
-         *
-         *     ```
-         *     [[cos(angle), sin(angle), 0],
-         *       [-sin(angle), cos(angle), 0]]
-         *     ```
-         *
-         *     Another way to think about this transform is as three vectors:
-         *
-         *     - The x axis (t[0][0], t[1][0])
-         *     - The y axis (t[0][1], t[1][1])
-         *     - The translation offset (t[0][2], t[1][2])
-         *
-         *     The most common usage of the Transform matrix is the `relativeTransform property`. This particular usage of the matrix has a few additional restrictions. The translation offset can take on any value but we do enforce that the axis vectors are unit vectors (i.e. have length 1). The axes are not required to be at 90° angles to each other. */
-        Transform: number[][];
-        /** @description Image filters to apply to the node. */
-        ImageFilters: {
-            /** @default 0 */
-            exposure: number;
-            /** @default 0 */
-            contrast: number;
-            /** @default 0 */
-            saturation: number;
-            /** @default 0 */
-            temperature: number;
-            /** @default 0 */
-            tint: number;
-            /** @default 0 */
-            highlights: number;
-            /** @default 0 */
-            shadows: number;
-        };
-        BasePaint: {
-            /**
-             * @description Is the paint enabled?
-             * @default true
-             */
-            visible: boolean;
-            /**
-             * @description Overall opacity of paint (colors within the paint can also have opacity values which would blend with this)
-             * @default 1
-             */
-            opacity: number;
-            /** @description How this node blends with nodes behind it in the scene */
-            blendMode: components["schemas"]["BlendMode"];
-        };
-        SolidPaint: {
-            /**
-             * @description The string literal "SOLID" representing the paint's type. Always check the `type` before reading other properties.
-             * @enum {string}
-             */
-            type: "SOLID";
-            /** @description Solid color of the paint */
-            color: components["schemas"]["RGBA"];
-            /** @description The variables bound to a particular field on this paint */
-            boundVariables?: {
-                color?: components["schemas"]["VariableAlias"];
-            };
-        } & components["schemas"]["BasePaint"];
-        GradientPaint: {
-            /**
-             * @description The string literal representing the paint's type. Always check the `type` before reading other properties.
-             * @enum {string}
-             */
-            type: "GRADIENT_LINEAR" | "GRADIENT_RADIAL" | "GRADIENT_ANGULAR" | "GRADIENT_DIAMOND";
-            /** @description This field contains three vectors, each of which are a position in normalized object space (normalized object space is if the top left corner of the bounding box of the object is (0, 0) and the bottom right is (1,1)). The first position corresponds to the start of the gradient (value 0 for the purposes of calculating gradient stops), the second position is the end of the gradient (value 1), and the third handle position determines the width of the gradient. */
-            gradientHandlePositions: components["schemas"]["Vector"][];
-            /** @description Positions of key points along the gradient axis with the colors anchored there. Colors along the gradient are interpolated smoothly between neighboring gradient stops. */
-            gradientStops: components["schemas"]["ColorStop"][];
-        } & components["schemas"]["BasePaint"];
-        ImagePaint: {
-            /**
-             * @description The string literal "IMAGE" representing the paint's type. Always check the `type` before reading other properties.
-             * @enum {string}
-             */
-            type: "IMAGE";
-            /**
-             * @description Image scaling mode.
-             * @enum {string}
-             */
-            scaleMode: "FILL" | "FIT" | "TILE" | "STRETCH";
-            /** @description A reference to an image embedded in this node. To download the image using this reference, use the `GET file images` endpoint to retrieve the mapping from image references to image URLs. */
-            imageRef: string;
-            /** @description Affine transform applied to the image, only present if `scaleMode` is `STRETCH` */
-            imageTransform?: components["schemas"]["Transform"];
-            /** @description Amount image is scaled by in tiling, only present if scaleMode is `TILE`. */
-            scalingFactor?: number;
-            /** @description Defines what image filters have been applied to this paint, if any. If this property is not defined, no filters have been applied. */
-            filters?: components["schemas"]["ImageFilters"];
-            /**
-             * @description Image rotation, in degrees.
-             * @default 0
-             */
-            rotation: number;
-            /** @description A reference to an animated GIF embedded in this node. To download the image using this reference, use the `GET file images` endpoint to retrieve the mapping from image references to image URLs. */
-            gifRef?: string;
-        } & components["schemas"]["BasePaint"];
-        Paint: components["schemas"]["SolidPaint"] | components["schemas"]["GradientPaint"] | components["schemas"]["ImagePaint"];
-        /** @description Layout constraint relative to containing Frame */
-        LayoutConstraint: {
-            /**
-             * @description Vertical constraint (relative to containing frame) as an enum:
-             *
-             *     - `TOP`: Node is laid out relative to top of the containing frame
-             *     - `BOTTOM`: Node is laid out relative to bottom of the containing frame
-             *     - `CENTER`: Node is vertically centered relative to containing frame
-             *     - `TOP_BOTTOM`: Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
-             *     - `SCALE`: Node scales vertically with containing frame
-             * @enum {string}
-             */
-            vertical: "TOP" | "BOTTOM" | "CENTER" | "TOP_BOTTOM" | "SCALE";
-            /**
-             * @description Horizontal constraint (relative to containing frame) as an enum:
-             *
-             *     - `LEFT`: Node is laid out relative to left of the containing frame
-             *     - `RIGHT`: Node is laid out relative to right of the containing frame
-             *     - `CENTER`: Node is horizontally centered relative to containing frame
-             *     - `LEFT_RIGHT`: Both left and right of node are constrained relative to containing frame (node stretches with frame)
-             *     - `SCALE`: Node scales horizontally with containing frame
-             * @enum {string}
-             */
-            horizontal: "LEFT" | "RIGHT" | "CENTER" | "LEFT_RIGHT" | "SCALE";
-        };
-        /** @description A rectangle that expresses a bounding box in absolute coordinates. */
-        Rectangle: {
-            /** @description X coordinate of top left corner of the rectangle. */
-            x: number;
-            /** @description Y coordinate of top left corner of the rectangle. */
-            y: number;
-            /** @description Width of the rectangle. */
-            width: number;
-            /** @description Height of the rectangle. */
-            height: number;
-        };
-        /** @description Guides to align and place objects within a frames. */
-        LayoutGrid: {
-            /**
-             * @description Orientation of the grid as a string enum
-             *
-             *     - `COLUMNS`: Vertical grid
-             *     - `ROWS`: Horizontal grid
-             *     - `GRID`: Square grid
-             * @enum {string}
-             */
-            pattern: "COLUMNS" | "ROWS" | "GRID";
-            /** @description Width of column grid or height of row grid or square grid spacing. */
-            sectionSize: number;
-            /** @description Is the grid currently visible? */
-            visible: boolean;
-            /** @description Color of the grid */
-            color: components["schemas"]["RGBA"];
-            /**
-             * @description Positioning of grid as a string enum
-             *
-             *     - `MIN`: Grid starts at the left or top of the frame
-             *     - `MAX`: Grid starts at the right or bottom of the frame
-             *     - `STRETCH`: Grid is stretched to fit the frame
-             *     - `CENTER`: Grid is center aligned
-             * @enum {string}
-             */
-            alignment: "MIN" | "MAX" | "STRETCH" | "CENTER";
-            /** @description Spacing in between columns and rows */
-            gutterSize: number;
-            /** @description Spacing before the first column or row */
-            offset: number;
-            /** @description Number of columns or rows */
-            count: number;
-            /** @description The variables bound to a particular field on this layout grid */
-            boundVariables?: {
-                gutterSize?: components["schemas"]["VariableAlias"];
-                numSections?: components["schemas"]["VariableAlias"];
-                sectionSize?: components["schemas"]["VariableAlias"];
-                offset?: components["schemas"]["VariableAlias"];
-            };
-        };
-        /** @description Base properties shared by all shadow effects */
-        BaseShadowEffect: {
-            /** @description The color of the shadow */
-            color: components["schemas"]["RGBA"];
-            /** @description Blend mode of the shadow */
-            blendMode: components["schemas"]["BlendMode"];
-            /** @description How far the shadow is projected in the x and y directions */
-            offset: components["schemas"]["Vector"];
-            /** @description Radius of the blur effect (applies to shadows as well) */
-            radius: number;
-            /**
-             * @description The distance by which to expand (or contract) the shadow.
-             *
-             *     For drop shadows, a positive `spread` value creates a shadow larger than the node, whereas a negative value creates a shadow smaller than the node.
-             *
-             *     For inner shadows, a positive `spread` value contracts the shadow. Spread values are only accepted on rectangles and ellipses, or on frames, components, and instances with visible fill paints and `clipsContent` enabled. When left unspecified, the default value is 0.
-             * @default 0
-             */
-            spread: number;
-            /** @description Whether this shadow is visible. */
-            visible: boolean;
-            /** @description The variables bound to a particular field on this shadow effect */
-            boundVariables?: {
-                radius?: components["schemas"]["VariableAlias"];
-                spread?: components["schemas"]["VariableAlias"];
-                color?: components["schemas"]["VariableAlias"];
-                offsetX?: components["schemas"]["VariableAlias"];
-                offsetY?: components["schemas"]["VariableAlias"];
-            };
-        };
-        DropShadowEffect: {
-            /**
-             * @description A string literal representing the effect's type. Always check the type before reading other properties.
-             * @enum {string}
-             */
-            type: "DROP_SHADOW";
-            /**
-             * @description Whether to show the shadow behind translucent or transparent pixels
-             * @default false
-             */
-            showShadowBehindNode: boolean;
-        } & components["schemas"]["BaseShadowEffect"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "DROP_SHADOW";
-        };
-        InnerShadowEffect: {
-            /**
-             * @description A string literal representing the effect's type. Always check the type before reading other properties.
-             * @enum {string}
-             */
-            type?: "INNER_SHADOW";
-        } & components["schemas"]["BaseShadowEffect"] & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "INNER_SHADOW";
-        };
-        /** @description A blur effect */
-        BlurEffect: {
-            /**
-             * @description A string literal representing the effect's type. Always check the type before reading other properties. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "LAYER_BLUR" | "BACKGROUND_BLUR";
-            /** @description Whether this blur is active. */
-            visible: boolean;
-            /** @description Radius of the blur effect */
-            radius: number;
-            /** @description The variables bound to a particular field on this blur effect */
-            boundVariables?: {
-                radius?: components["schemas"]["VariableAlias"];
-            };
-        };
-        Effect: components["schemas"]["DropShadowEffect"] | components["schemas"]["InnerShadowEffect"] | components["schemas"]["BlurEffect"];
-        /** @description A set of properties that can be applied to nodes and published. Styles for a property can be created in the corresponding property's panel while editing a file. */
-        Style: {
-            /** @description The key of the style */
-            key: string;
-            /** @description Name of the style */
-            name: string;
-            /** @description Description of the style */
-            description: string;
-            /** @description Whether this style is a remote style that doesn't live in this file */
-            remote: boolean;
-            styleType: components["schemas"]["StyleType"];
-        };
-        /**
-         * @description This type is a string enum with the following possible values:
-         *
-         *     - `EASE_IN`: Ease in with an animation curve similar to CSS ease-in.
-         *     - `EASE_OUT`: Ease out with an animation curve similar to CSS ease-out.
-         *     - `EASE_IN_AND_OUT`: Ease in and then out with an animation curve similar to CSS ease-in-out.
-         *     - `LINEAR`: No easing, similar to CSS linear.
-         *     - `EASE_IN_BACK`: Ease in with an animation curve that moves past the initial keyframe's value and then accelerates as it reaches the end.
-         *     - `EASE_OUT_BACK`: Ease out with an animation curve that starts fast, then slows and goes past the ending keyframe's value.
-         *     - `EASE_IN_AND_OUT_BACK`: Ease in and then out with an animation curve that overshoots the initial keyframe's value, then accelerates quickly before it slows and overshoots the ending keyframes value.
-         *     - `CUSTOM_CUBIC_BEZIER`: User-defined cubic bezier curve.
-         *     - `GENTLE`: Gentle animation similar to react-spring.
-         *     - `QUICK`: Quick spring animation, great for toasts and notifications.
-         *     - `BOUNCY`: Bouncy spring, for delightful animations like a heart bounce.
-         *     - `SLOW`: Slow spring, useful as a steady, natural way to scale up fullscreen content.
-         *     - `CUSTOM_SPRING`: User-defined spring animation.
-         * @enum {string}
-         */
-        EasingType: "EASE_IN" | "EASE_OUT" | "EASE_IN_AND_OUT" | "LINEAR" | "EASE_IN_BACK" | "EASE_OUT_BACK" | "EASE_IN_AND_OUT_BACK" | "CUSTOM_CUBIC_BEZIER" | "GENTLE" | "QUICK" | "BOUNCY" | "SLOW" | "CUSTOM_SPRING";
-        /** @description Individual stroke weights */
-        StrokeWeights: {
-            /** @description The top stroke weight. */
-            top: number;
-            /** @description The right stroke weight. */
-            right: number;
-            /** @description The bottom stroke weight. */
-            bottom: number;
-            /** @description The left stroke weight. */
-            left: number;
-        };
-        /** @description Paint metadata to override default paints. */
-        PaintOverride: {
-            /** @description Paints applied to characters. */
-            fills?: components["schemas"]["Paint"][];
-            /** @description ID of style node, if any, that this inherits fill data from. */
-            inheritFillStyleId?: string;
-        };
-        /** @description Defines a single path */
-        Path: {
-            /** @description A series of path commands that encodes how to draw the path. */
-            path: string;
-            /**
-             * @description The winding rule for the path (same as in SVGs). This determines whether a given point in space is inside or outside the path.
-             * @enum {string}
-             */
-            windingRule: "NONZERO" | "EVENODD";
-            /** @description If there is a per-region fill, this refers to an ID in the `fillOverrideTable`. */
-            overrideID?: number;
-        };
-        /** @description Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise. */
-        ArcData: {
-            /**
-             * @description Start of the sweep in radians.
-             * @default 0
-             */
-            startingAngle: number;
-            /**
-             * @description End of the sweep in radians.
-             * @default 0
-             */
-            endingAngle: number;
-            /**
-             * @description Inner radius value between 0 and 1
-             * @default 0
-             */
-            innerRadius: number;
-        };
-        /** @description A link to either a URL or another frame (node) in the document. */
-        Hyperlink: {
-            /**
-             * @description The type of hyperlink. Can be either `URL` or `NODE`.
-             * @enum {string}
-             */
-            type: "URL" | "NODE";
-            /** @description The URL that the hyperlink points to, if `type` is `URL`. */
-            url?: string;
-            /** @description The ID of the node that the hyperlink points to, if `type` is `NODE`. */
-            nodeID?: string;
-        };
-        /** @description Metadata for character formatting. */
-        TypeStyle: {
-            /** @description Font family of text (standard name). */
-            fontFamily?: string;
-            /** @description PostScript font name. */
-            fontPostScriptName?: string | null;
-            /** @description Describes visual weight or emphasis, such as Bold or Italic. */
-            fontStyle?: string;
-            /**
-             * @description Space between paragraphs in px, 0 if not present.
-             * @default 0
-             */
-            paragraphSpacing: number;
-            /**
-             * @description Paragraph indentation in px, 0 if not present.
-             * @default 0
-             */
-            paragraphIndent: number;
-            /**
-             * @description Space between list items in px, 0 if not present.
-             * @default 0
-             */
-            listSpacing: number;
-            /**
-             * @description Whether or not text is italicized.
-             * @default false
-             */
-            italic: boolean;
-            /** @description Numeric font weight. */
-            fontWeight?: number;
-            /** @description Font size in px. */
-            fontSize?: number;
-            /**
-             * @description Text casing applied to the node, default is the original casing.
-             * @enum {string}
-             */
-            textCase?: "UPPER" | "LOWER" | "TITLE" | "SMALL_CAPS" | "SMALL_CAPS_FORCED";
-            /**
-             * @description Text decoration applied to the node, default is none.
-             * @default NONE
-             * @enum {string}
-             */
-            textDecoration: "NONE" | "STRIKETHROUGH" | "UNDERLINE";
-            /**
-             * @description Dimensions along which text will auto resize, default is that the text does not auto-resize. TRUNCATE means that the text will be shortened and trailing text will be replaced with "…" if the text contents is larger than the bounds. `TRUNCATE` as a return value is deprecated and will be removed in a future version. Read from `textTruncation` instead.
-             * @default NONE
-             * @enum {string}
-             */
-            textAutoResize: "NONE" | "WIDTH_AND_HEIGHT" | "HEIGHT" | "TRUNCATE";
-            /**
-             * @description Whether this text node will truncate with an ellipsis when the text contents is larger than the text node.
-             * @default DISABLED
-             * @enum {string}
-             */
-            textTruncation: "DISABLED" | "ENDING";
-            /** @description When `textTruncation: "ENDING"` is set, `maxLines` determines how many lines a text node can grow to before it truncates. */
-            maxLines?: number;
-            /**
-             * @description Horizontal text alignment as string enum.
-             * @enum {string}
-             */
-            textAlignHorizontal?: "LEFT" | "RIGHT" | "CENTER" | "JUSTIFIED";
-            /**
-             * @description Vertical text alignment as string enum.
-             * @enum {string}
-             */
-            textAlignVertical?: "TOP" | "CENTER" | "BOTTOM";
-            /** @description Space between characters in px. */
-            letterSpacing?: number;
-            /** @description An array of fill paints applied to the characters. */
-            fills?: components["schemas"]["Paint"][];
-            /** @description Link to a URL or frame. */
-            hyperlink?: components["schemas"]["Hyperlink"];
-            /** @description A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note that some flags aren't reflected here. For example, SMCP (small caps) is still represented by the `textCase` field. */
-            opentypeFlags?: {
-                [key: string]: number;
-            };
-            /** @description Line height in px. */
-            lineHeightPx?: number;
-            /**
-             * @description Line height as a percentage of normal line height. This is deprecated; in a future version of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
-             * @default 100
-             */
-            lineHeightPercent: number;
-            /** @description Line height as a percentage of the font size. Only returned when `lineHeightPercent` (deprecated) is not 100. */
-            lineHeightPercentFontSize?: number;
-            /**
-             * @description The unit of the line height value specified by the user.
-             * @enum {string}
-             */
-            lineHeightUnit?: "PIXELS" | "FONT_SIZE_%" | "INTRINSIC_%";
-            /** @description The variables bound to a particular field on this style */
-            boundVariables?: {
-                fontFamily?: components["schemas"]["VariableAlias"];
-                fontSize?: components["schemas"]["VariableAlias"];
-                fontStyle?: components["schemas"]["VariableAlias"];
-                fontWeight?: components["schemas"]["VariableAlias"];
-                letterSpacing?: components["schemas"]["VariableAlias"];
-                lineHeight?: components["schemas"]["VariableAlias"];
-                paragraphSpacing?: components["schemas"]["VariableAlias"];
-                paragraphIndent?: components["schemas"]["VariableAlias"];
-            };
-            /** @description  Whether or not this style has overrides over a text style. The possible fields to override are semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those fields are overrides if present. */
-            isOverrideOverTextStyle?: boolean;
-            /**
-             * @description Indicates how the font weight was overridden when there is a text style override.
-             * @enum {string}
-             */
-            semanticWeight?: "BOLD" | "NORMAL";
-            /**
-             * @description Indicates how the font style was overridden when there is a text style override.
-             * @enum {string}
-             */
-            semanticItalic?: "ITALIC" | "NORMAL";
-        };
-        /**
-         * @description Component property type.
-         * @enum {string}
-         */
-        ComponentPropertyType: "BOOLEAN" | "INSTANCE_SWAP" | "TEXT" | "VARIANT";
-        /** @description Instance swap preferred value. */
-        InstanceSwapPreferredValue: {
-            /**
-             * @description Type of node for this preferred value.
-             * @enum {string}
-             */
-            type: "COMPONENT" | "COMPONENT_SET";
-            /** @description Key of this component or component set. */
-            key: string;
-        };
-        /** @description A property of a component. */
-        ComponentPropertyDefinition: {
-            /** @description Type of this component property. */
-            type: components["schemas"]["ComponentPropertyType"];
-            /** @description Initial value of this property for instances. */
-            defaultValue: boolean | string;
-            /** @description All possible values for this property. Only exists on VARIANT properties. */
-            variantOptions?: string[];
-            /** @description Preferred values for this property. Only applicable if type is `INSTANCE_SWAP`. */
-            preferredValues?: components["schemas"]["InstanceSwapPreferredValue"][];
-        };
-        /** @description A property of a component. */
-        ComponentProperty: {
-            /** @description Type of this component property. */
-            type: components["schemas"]["ComponentPropertyType"];
-            /** @description Value of the property for this component instance. */
-            value: boolean | string;
-            /** @description Preferred values for this property. Only applicable if type is `INSTANCE_SWAP`. */
-            preferredValues?: components["schemas"]["InstanceSwapPreferredValue"][];
-            /** @description The variables bound to a particular field on this component property */
-            boundVariables?: {
-                value?: components["schemas"]["VariableAlias"];
-            };
-        };
-        /** @description Fields directly overridden on an instance. Inherited overrides are not included. */
-        Overrides: {
-            /** @description A unique ID for a node. */
-            id: string;
-            /** @description An array of properties. */
-            overriddenFields: string[];
-        };
-        /**
-         * @description Geometric shape type.
-         * @enum {string}
-         */
-        ShapeType: "SQUARE" | "ELLIPSE" | "ROUNDED_RECTANGLE" | "DIAMOND" | "TRIANGLE_UP" | "TRIANGLE_DOWN" | "PARALLELOGRAM_RIGHT" | "PARALLELOGRAM_LEFT" | "ENG_DATABASE" | "ENG_QUEUE" | "ENG_FILE" | "ENG_FOLDER" | "TRAPEZOID" | "PREDEFINED_PROCESS" | "SHIELD" | "DOCUMENT_SINGLE" | "DOCUMENT_MULTIPLE" | "MANUAL_INPUT" | "HEXAGON" | "CHEVRON" | "PENTAGON" | "OCTAGON" | "STAR" | "PLUS" | "ARROW_LEFT" | "ARROW_RIGHT" | "SUMMING_JUNCTION" | "OR" | "SPEECH_BUBBLE" | "INTERNAL_STORAGE";
-        /** @description Stores canvas location for a connector start/end point. */
-        ConnectorEndpoint: {
-            /** @description Node ID that this endpoint attaches to. */
-            endpointNodeId?: string;
-            /** @description The position of the endpoint relative to the node. */
-            position?: components["schemas"]["Vector"];
-        } | {
-            /** @description Node ID that this endpoint attaches to. */
-            endpointNodeId?: string;
-            /**
-             * @description The magnet type is a string enum.
-             * @enum {string}
-             */
-            magnet?: "AUTO" | "TOP" | "BOTTOM" | "LEFT" | "RIGHT" | "CENTER";
-        };
-        /**
-         * @description Connector line type.
-         * @enum {string}
-         */
-        ConnectorLineType: "STRAIGHT" | "ELBOWED";
-        ConnectorTextBackground: components["schemas"]["CornerTrait"] & components["schemas"]["MinimalFillsTrait"];
-        /** @description A description of a main component. Helps you identify which component instances are attached to. */
-        Component: {
-            /** @description The key of the component */
-            key: string;
-            /** @description Name of the component */
-            name: string;
-            /** @description The description of the component as entered in the editor */
-            description: string;
-            /** @description The ID of the component set if the component belongs to one */
-            componentSetId?: string;
-            /** @description An array of documentation links attached to this component */
-            documentationLinks: components["schemas"]["DocumentationLink"][];
-            /** @description Whether this component is a remote component that doesn't live in this file */
-            remote: boolean;
-        };
-        /** @description A description of a component set, which is a node containing a set of variants of a component. */
-        ComponentSet: {
-            /** @description The key of the component set */
-            key: string;
-            /** @description Name of the component set */
-            name: string;
-            /** @description The description of the component set as entered in the editor */
-            description: string;
-            /** @description An array of documentation links attached to this component set */
-            documentationLinks?: components["schemas"]["DocumentationLink"][];
-            /** @description Whether this component set is a remote component set that doesn't live in this file */
-            remote?: boolean;
-        };
-        /** @description Represents a link to documentation for a component or component set. */
-        DocumentationLink: {
-            /** @description Should be a valid URI (e.g. https://www.figma.com). */
-            uri: string;
-        };
-        /** @description Contains a variable alias */
-        VariableAlias: {
-            /** @enum {string} */
-            type: "VARIABLE_ALIAS";
-            /** @description The id of the variable that the current variable is aliased to. This variable can be a local or remote variable, and both can be retrieved via the GET /v1/files/:file_key/variables/local endpoint. */
-            id: string;
-        };
-        /** @description An interaction in the Figma viewer, containing a trigger and one or more actions. */
-        Interaction: {
-            /** @description The user event that initiates the interaction. */
-            trigger: components["schemas"]["Trigger"] | null;
-            /** @description The actions that are performed when the trigger is activated. */
-            actions?: components["schemas"]["Action"][];
-        };
-        /** @description The `"ON_HOVER"` and `"ON_PRESS"` trigger types revert the navigation when the trigger is finished (the result is temporary).
-         *     `"MOUSE_ENTER"`, `"MOUSE_LEAVE"`, `"MOUSE_UP"` and `"MOUSE_DOWN"` are permanent, one-way navigation.
-         *     The `delay` parameter requires the trigger to be held for a certain duration of time before the action occurs.
-         *     Both `timeout` and `delay` values are in milliseconds.
-         *     The `"ON_MEDIA_HIT"` and `"ON_MEDIA_END"` trigger types can only trigger from a video.
-         *     They fire when a video reaches a certain time or ends. The `timestamp` value is in seconds. */
-        Trigger: {
-            /** @enum {string} */
-            type: "ON_CLICK" | "ON_HOVER" | "ON_PRESS" | "ON_DRAG";
-        } | components["schemas"]["AfterTimeoutTrigger"] | {
-            /** @enum {string} */
-            type: "MOUSE_ENTER" | "MOUSE_LEAVE" | "MOUSE_UP" | "MOUSE_DOWN";
-            delay: number;
-            /** @description Whether this is a [deprecated version](https://help.figma.com/hc/en-us/articles/360040035834-Prototype-triggers#h_01HHN04REHJNP168R26P1CMP0A) of the trigger that was left unchanged for backwards compatibility.
-             *     If not present, the trigger is the latest version. */
-            deprecatedVersion?: boolean;
-        } | components["schemas"]["OnKeyDownTrigger"] | components["schemas"]["OnMediaHitTrigger"] | {
-            /** @enum {string} */
-            type: "ON_MEDIA_END";
-        };
-        AfterTimeoutTrigger: {
-            /** @enum {string} */
-            type: "AFTER_TIMEOUT";
-            timeout: number;
-        };
-        OnKeyDownTrigger: {
-            /** @enum {string} */
-            type: "ON_KEY_DOWN";
-            /** @enum {string} */
-            device: "KEYBOARD" | "XBOX_ONE" | "PS4" | "SWITCH_PRO" | "UNKNOWN_CONTROLLER";
-            keyCodes: number[];
-        };
-        OnMediaHitTrigger: {
-            /** @enum {string} */
-            type: "ON_MEDIA_HIT";
-            mediaHitTime: number;
-        };
-        /** @description An action that is performed when a trigger is activated. */
-        Action: {
-            /** @enum {string} */
-            type: "BACK" | "CLOSE";
-        } | components["schemas"]["OpenURLAction"] | components["schemas"]["UpdateMediaRuntimeAction"] | components["schemas"]["SetVariableAction"] | components["schemas"]["SetVariableModeAction"] | components["schemas"]["ConditionalAction"] | components["schemas"]["NodeAction"];
-        /** @description An action that opens a URL. */
-        OpenURLAction: {
-            /** @enum {string} */
-            type: "URL";
-            url: string;
-        };
-        /** @description An action that affects a video node in the Figma viewer. For example, to play, pause, or skip. */
-        UpdateMediaRuntimeAction: {
-            /** @enum {string} */
-            type: "UPDATE_MEDIA_RUNTIME";
-            destinationId: string | null;
-            /** @enum {string} */
-            mediaAction: "PLAY" | "PAUSE" | "TOGGLE_PLAY_PAUSE" | "MUTE" | "UNMUTE" | "TOGGLE_MUTE_UNMUTE";
-        } | {
-            /** @enum {string} */
-            type: "UPDATE_MEDIA_RUNTIME";
-            destinationId?: string | null;
-            /** @enum {string} */
-            mediaAction: "SKIP_FORWARD" | "SKIP_BACKWARD";
-            amountToSkip: number;
-        } | {
-            /** @enum {string} */
-            type: "UPDATE_MEDIA_RUNTIME";
-            destinationId?: string | null;
-            /** @enum {string} */
-            mediaAction: "SKIP_TO";
-            newTimestamp: number;
-        };
-        /** @description An action that navigates to a specific node in the Figma viewer. */
-        NodeAction: {
-            /** @enum {string} */
-            type: "NODE";
-            destinationId: string | null;
-            navigation: components["schemas"]["Navigation"];
-            transition: components["schemas"]["Transition"] | null;
-            /** @description Whether the scroll offsets of any scrollable elements in the current screen or overlay are preserved when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same. */
-            preserveScrollPosition?: boolean;
-            /** @description Applicable only when `navigation` is `"OVERLAY"` and the destination is a frame with `overlayPosition` equal to `"MANUAL"`. This value represents the offset by which the overlay is opened relative to this node. */
-            overlayRelativePosition?: components["schemas"]["Vector"];
-            /** @description When true, all videos within the destination frame will reset their memorized playback position to 00:00 before starting to play. */
-            resetVideoPosition?: boolean;
-            /** @description Whether the scroll offsets of any scrollable elements in the current screen or overlay reset when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same. */
-            resetScrollPosition?: boolean;
-            /** @description Whether the state of any interactive components in the current screen or overlay reset when navigating to the destination. This is applicable if there are interactive components in the destination frame. */
-            resetInteractiveComponents?: boolean;
-        };
-        /**
-         * @description The method of navigation. The possible values are:
-         *     - `"NAVIGATE"`: Replaces the current screen with the destination, also closing all overlays.
-         *     - `"OVERLAY"`: Opens the destination as an overlay on the current screen.
-         *     - `"SWAP"`: On an overlay, replaces the current (topmost) overlay with the destination. On a top-level frame,
-         *       behaves the same as `"NAVIGATE"` except that no entry is added to the navigation history.
-         *     - `"SCROLL_TO"`: Scrolls to the destination on the current screen.
-         *     - `"CHANGE_TO"`: Changes the closest ancestor instance of source node to the specified variant.
-         * @enum {string}
-         */
-        Navigation: "NAVIGATE" | "SWAP" | "OVERLAY" | "SCROLL_TO" | "CHANGE_TO";
-        Transition: components["schemas"]["SimpleTransition"] | components["schemas"]["DirectionalTransition"];
-        /** @description Describes an animation used when navigating in a prototype. */
-        SimpleTransition: {
-            /** @enum {string} */
-            type: "DISSOLVE" | "SMART_ANIMATE" | "SCROLL_ANIMATE";
-            /** @description The duration of the transition in milliseconds. */
-            duration: number;
-            /** @description The easing curve of the transition. */
-            easing: components["schemas"]["Easing"];
-        };
-        /** @description Describes an animation used when navigating in a prototype. */
-        DirectionalTransition: {
-            /** @enum {string} */
-            type: "MOVE_IN" | "MOVE_OUT" | "PUSH" | "SLIDE_IN" | "SLIDE_OUT";
-            /** @enum {string} */
-            direction: "LEFT" | "RIGHT" | "TOP" | "BOTTOM";
-            /** @description The duration of the transition in milliseconds. */
-            duration: number;
-            /** @description The easing curve of the transition. */
-            easing: components["schemas"]["Easing"];
-            /** @description When the transition `type` is `"SMART_ANIMATE"` or when `matchLayers` is `true`, then the transition will be performed using smart animate, which attempts to match corresponding layers an interpolate other properties during the animation. */
-            matchLayers?: boolean;
-        };
-        /** @description Describes an easing curve. */
-        Easing: {
-            /** @description The type of easing curve. */
-            type: components["schemas"]["EasingType"];
-            /** @description A cubic bezier curve that defines the easing. */
-            easingFunctionCubicBezier?: {
-                /** @description The x component of the first control point. */
-                x1: number;
-                /** @description The y component of the first control point. */
-                y1: number;
-                /** @description The x component of the second control point. */
-                x2: number;
-                /** @description The y component of the second control point. */
-                y2: number;
-            };
-            /** @description A spring function that defines the easing. */
-            easingFunctionSpring?: {
-                mass: number;
-                stiffness: number;
-                damping: number;
-            };
-        };
-        /** @description Sets a variable to a specific value. */
-        SetVariableAction: {
-            /** @enum {string} */
-            type: "SET_VARIABLE";
-            variableId: string | null;
-            variableValue?: components["schemas"]["VariableData"];
-        };
-        /** @description Sets a variable to a specific mode. */
-        SetVariableModeAction: {
-            /** @enum {string} */
-            type: "SET_VARIABLE_MODE";
-            variableCollectionId?: string | null;
-            variableModeId?: string | null;
-        };
-        /** @description Checks if a condition is met before performing certain actions by using an if/else conditional statement. */
-        ConditionalAction: {
-            /** @enum {string} */
-            type: "CONDITIONAL";
-            conditionalBlocks: components["schemas"]["ConditionalBlock"][];
-        };
-        /** @description A value to set a variable to during prototyping. */
-        VariableData: {
-            type?: components["schemas"]["VariableDataType"];
-            resolvedType?: components["schemas"]["VariableResolvedDataType"];
-            value?: boolean | number | string | components["schemas"]["RGB"] | components["schemas"]["RGBA"] | components["schemas"]["VariableAlias"] | components["schemas"]["Expression"];
-        };
-        /**
-         * @description Defines the types of data a VariableData object can hold
-         * @enum {string}
-         */
-        VariableDataType: "BOOLEAN" | "FLOAT" | "STRING" | "COLOR" | "VARIABLE_ALIAS" | "EXPRESSION";
-        /**
-         * @description Defines the types of data a VariableData object can eventually equal
-         * @enum {string}
-         */
-        VariableResolvedDataType: "BOOLEAN" | "FLOAT" | "STRING" | "COLOR";
-        /** @description Defines the [Expression](https://help.figma.com/hc/en-us/articles/15253194385943) object, which contains a list of `VariableData` objects strung together by operators (`ExpressionFunction`). */
-        Expression: {
-            expressionFunction: components["schemas"]["ExpressionFunction"];
-            expressionArguments: components["schemas"]["VariableData"][];
-        };
-        /**
-         * @description Defines the list of operators available to use in an Expression.
-         * @enum {string}
-         */
-        ExpressionFunction: "ADDITION" | "SUBTRACTION" | "MULTIPLICATION" | "DIVISION" | "EQUALS" | "NOT_EQUAL" | "LESS_THAN" | "LESS_THAN_OR_EQUAL" | "GREATER_THAN" | "GREATER_THAN_OR_EQUAL" | "AND" | "OR" | "VAR_MODE_LOOKUP" | "NEGATE" | "NOT";
-        /** @description Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block. */
-        ConditionalBlock: {
-            condition?: components["schemas"]["VariableData"];
-            actions: components["schemas"]["Action"][];
-        };
-        /** @description A pinned distance between two nodes in Dev Mode */
-        Measurement: {
-            id: string;
-            start: components["schemas"]["MeasurementStartEnd"];
-            end: components["schemas"]["MeasurementStartEnd"];
-            offset: components["schemas"]["MeasurementOffsetInner"] | components["schemas"]["MeasurementOffsetOuter"];
-            /** @description When manually overridden, the displayed value of the measurement */
-            freeText?: string;
-        };
-        /** @description The node and side a measurement is pinned to */
-        MeasurementStartEnd: {
-            nodeId: string;
-            /** @enum {string} */
-            side: "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
-        };
-        /** @description Measurement offset relative to the inside of the start node */
-        MeasurementOffsetInner: {
-            /** @enum {string} */
-            type: "INNER";
-            relative: number;
-        };
-        /** @description Measurement offset relative to the outside of the start node */
-        MeasurementOffsetOuter: {
-            /** @enum {string} */
-            type: "OUTER";
-            fixed: number;
-        };
-        /** @description Position of a comment relative to the frame to which it is attached. */
-        FrameOffset: {
-            /** @description Unique id specifying the frame. */
-            node_id: string;
-            /** @description 2D vector offset within the frame from the top-left corner. */
-            node_offset: components["schemas"]["Vector"];
-        };
-        /** @description Position of a region comment on the canvas. */
-        Region: {
-            /** @description X coordinate of the position. */
-            x: number;
-            /** @description Y coordinate of the position. */
-            y: number;
-            /** @description The height of the comment region. Must be greater than 0. */
-            region_height: number;
-            /** @description The width of the comment region. Must be greater than 0. */
-            region_width: number;
-            /**
-             * @description The corner of the comment region to pin to the node's corner as a string enum.
-             * @default bottom-right
-             * @enum {string}
-             */
-            comment_pin_corner: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-        };
-        /** @description Position of a region comment relative to the frame to which it is attached. */
-        FrameOffsetRegion: {
-            /** @description Unique id specifying the frame. */
-            node_id: string;
-            /** @description 2D vector offset within the frame from the top-left corner. */
-            node_offset: components["schemas"]["Vector"];
-            /** @description The height of the comment region. Must be greater than 0. */
-            region_height: number;
-            /** @description The width of the comment region. Must be greater than 0. */
-            region_width: number;
-            /**
-             * @description The corner of the comment region to pin to the node's corner as a string enum.
-             * @default bottom-right
-             * @enum {string}
-             */
-            comment_pin_corner: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-        };
-        /** @description A comment or reply left by a user. */
-        Comment: {
-            /** @description Unique identifier for comment. */
-            id: string;
-            /** @description Positioning information of the comment. Includes information on the location of the comment pin, which is either the absolute coordinates on the canvas or a relative offset within a frame. If the comment is a region, it will also contain the region height, width, and position of the anchor in regards to the region. */
-            client_meta: components["schemas"]["Vector"] | components["schemas"]["FrameOffset"] | components["schemas"]["Region"] | components["schemas"]["FrameOffsetRegion"];
-            /** @description The file in which the comment lives */
-            file_key: string;
-            /** @description If present, the id of the comment to which this is the reply */
-            parent_id?: string;
-            /** @description The user who left the comment */
-            user: components["schemas"]["User"];
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the comment was left
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description If set, the UTC ISO 8601 time the comment was resolved
-             */
-            resolved_at?: string | null;
-            /** @description The content of the comment */
-            message: string;
-            /** @description Only set for top level comments. The number displayed with the comment in the UI */
-            order_id: string | null;
-            /** @description An array of reactions to the comment */
-            reactions: components["schemas"]["Reaction"][];
-        };
-        /** @description A reaction left by a user. */
-        Reaction: {
-            /** @description The user who left the reaction. */
-            user: components["schemas"]["User"];
-            emoji: components["schemas"]["Emoji"];
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the reaction was left.
-             */
-            created_at: string;
-        };
-        /** @description The emoji type of reaction as shortcode (e.g. `:heart:`, `:+1::skin-tone-2:`). The list of accepted emoji shortcodes can be found in [this file](https://raw.githubusercontent.com/missive/emoji-mart/main/packages/emoji-mart-data/sets/14/native.json) under the top-level emojis and aliases fields, with optional skin tone modifiers when applicable. */
-        Emoji: string;
-        /** @description A description of a user. */
-        User: {
-            /** @description Unique stable id of the user. */
-            id: string;
-            /** @description Name of the user. */
-            handle: string;
-            /** @description URL link to the user's profile image. */
-            img_url: string;
-        };
-        /** @description Data on the frame a component resides in. */
-        FrameInfo: {
-            /** @description The ID of the frame node within the file. */
-            nodeId?: string;
-            /** @description The name of the frame node. */
-            name?: string;
-            /** @description The background color of the frame node. */
-            backgroundColor?: string;
-            /** @description The ID of the page containing the frame node. */
-            pageId: string;
-            /** @description The name of the page containing the frame node. */
-            pageName: string;
-        };
-        /** @description An arrangement of published UI elements that can be instantiated across figma files. */
-        PublishedComponent: {
-            /** @description The unique identifier for the component. */
-            key: string;
-            /** @description The unique identifier of the Figma file that contains the component. */
-            file_key: string;
-            /** @description The unique identifier of the component node within the Figma file. */
-            node_id: string;
-            /** @description A URL to a thumbnail image of the component. */
-            thumbnail_url?: string;
-            /** @description The name of the component. */
-            name: string;
-            /** @description The description of the component as entered by the publisher. */
-            description: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the component was created.
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the component was last updated.
-             */
-            updated_at: string;
-            /** @description The user who last updated the component. */
-            user: components["schemas"]["User"];
-            /** @description The containing frame of the component. */
-            containing_frame?: components["schemas"]["FrameInfo"];
-        };
-        /** @description A node containing a set of variants of a component. */
-        PublishedComponentSet: {
-            /** @description The unique identifier for the component set. */
-            key: string;
-            /** @description The unique identifier of the Figma file that contains the component set. */
-            file_key: string;
-            /** @description The unique identifier of the component set node within the Figma file. */
-            node_id: string;
-            /** @description A URL to a thumbnail image of the component set. */
-            thumbnail_url?: string;
-            /** @description The name of the component set. */
-            name: string;
-            /** @description The description of the component set as entered by the publisher. */
-            description: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the component set was created.
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the component set was last updated.
-             */
-            updated_at: string;
-            /** @description The user who last updated the component set. */
-            user: components["schemas"]["User"];
-            /** @description The containing frame of the component set. */
-            containing_frame?: components["schemas"]["FrameInfo"];
-        };
-        /**
-         * @description The type of style
-         * @enum {string}
-         */
-        StyleType: "FILL" | "TEXT" | "EFFECT" | "GRID";
-        /** @description A set of published properties that can be applied to nodes. */
-        PublishedStyle: {
-            /** @description The unique identifier for the style */
-            key: string;
-            /** @description The unique identifier of the Figma file that contains the style. */
-            file_key: string;
-            /** @description ID of the style node within the figma file */
-            node_id: string;
-            style_type: components["schemas"]["StyleType"];
-            /** @description A URL to a thumbnail image of the style. */
-            thumbnail_url?: string;
-            /** @description The name of the style. */
-            name: string;
-            /** @description The description of the style as entered by the publisher. */
-            description: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the style was created.
-             */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time when the style was last updated.
-             */
-            updated_at: string;
-            /** @description The user who last updated the style. */
-            user: components["schemas"]["User"];
-            /** @description A user specified order number by which the style can be sorted. */
-            sort_position: string;
-        };
-        /** @description A Project can be identified by both the Project name, and the Project ID. */
-        Project: {
-            /** @description The ID of the project. */
-            id: string;
-            /** @description The name of the project. */
-            name: string;
-        };
-        /** @description A version of a file */
-        Version: {
-            /** @description Unique identifier for version */
-            id: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the version was created
-             */
-            created_at: string;
-            /** @description The label given to the version in the editor */
-            label: string | null;
-            /** @description The description of the version as entered in the editor */
-            description: string | null;
-            /** @description The user that created the version */
-            user: components["schemas"]["User"];
-            /** @description A URL to a thumbnail image of the file version. */
-            thumbnail_url?: string;
-        };
-        /** @description A description of an HTTP webhook (from Figma back to your application) */
-        WebhookV2: {
-            /** @description The ID of the webhook */
-            id: string;
-            /** @description The event this webhook triggers on */
-            event_type: components["schemas"]["WebhookV2Event"];
-            /** @description The team id you are subscribed to for updates */
-            team_id: string;
-            /** @description The current status of the webhook */
-            status: components["schemas"]["WebhookV2Status"];
-            /** @description The client ID of the OAuth application that registered this webhook, if any */
-            client_id: string | null;
-            /** @description The passcode that will be passed back to the webhook endpoint */
-            passcode: string;
-            /** @description The endpoint that will be hit when the webhook is triggered */
-            endpoint: string;
-            /** @description Optional user-provided description or name for the webhook. This is provided to help make maintaining a number of webhooks more convenient. Max length 140 characters. */
-            description: string | null;
-        };
-        /**
-         * @description An enum representing the possible events that a webhook can subscribe to
-         * @enum {string}
-         */
-        WebhookV2Event: "PING" | "FILE_UPDATE" | "FILE_VERSION_UPDATE" | "FILE_DELETE" | "LIBRARY_PUBLISH" | "FILE_COMMENT";
-        /**
-         * @description An enum representing the possible statuses you can set a webhook to:
-         *     - `ACTIVE`: The webhook is healthy and receive all events
-         *     - `PAUSED`: The webhook is paused and will not receive any events
-         * @enum {string}
-         */
-        WebhookV2Status: "ACTIVE" | "PAUSED";
-        /** @description Information regarding the most recent interactions sent to a webhook endpoint */
-        WebhookV2Request: {
-            /** @description The ID of the webhook the requests were sent to */
-            webhook_id: string;
-            request_info: components["schemas"]["WebhookV2RequestInfo"];
-            response_info: components["schemas"]["WebhookV2ResponseInfo"];
-            /** @description Error message for this request. NULL if no error occurred */
-            error_msg: string | null;
-        };
-        /** @description Information regarding the request sent to a webhook endpoint */
-        WebhookV2RequestInfo: {
-            /** @description The ID of the webhook */
-            id: string;
-            /** @description The actual endpoint the request was sent to */
-            endpoint: string;
-            /** @description The contents of the request that was sent to the endpoint */
-            payload: Record<string, never>;
-            /**
-             * Format: date-time
-             * @description UTC ISO 8601 timestamp of when the request was sent
-             */
-            sent_at: string;
-        };
-        /** @description Information regarding the reply sent back from a webhook endpoint */
-        WebhookV2ResponseInfo: {
-            /** @description HTTP status code of the response */
-            status: string;
-            /**
-             * Format: date-time
-             * @description UTC ISO 8601 timestamp of when the response was received
-             */
-            received_at: string;
-        } | null;
-        /** @description An object representing the library item information in the payload of the `LIBRARY_PUBLISH` event */
-        LibraryItemData: {
-            /** @description Unique identifier for the library item */
-            key: string;
-            /** @description Name of the library item */
-            name: string;
-        };
-        /** @description An object representing a fragment of a comment left by a user, used in the payload of the `FILE_COMMENT` event. Note only ONE of the fields below will be set */
-        CommentFragment: {
-            /** @description Comment text that is set if a fragment is text based */
-            text?: string;
-            /** @description User id that is set if a fragment refers to a user mention */
-            mention?: string;
-        };
-        WebhookBasePayload: {
-            /** @description The passcode specified when the webhook was created, should match what was initially provided */
-            passcode: string;
-            /**
-             * Format: date-time
-             * @description UTC ISO 8601 timestamp of when the event was triggered.
-             */
-            timestamp: string;
-            /** @description The id of the webhook that caused the callback */
-            webhook_id: string;
-        };
-        WebhookPingPayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "PING";
-        };
-        WebhookFileUpdatePayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "FILE_UPDATE";
-            /** @description The key of the file that was updated */
-            file_key: string;
-            /** @description The name of the file that was updated */
-            file_name: string;
-        };
-        WebhookFileDeletePayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "FILE_DELETE";
-            /** @description The key of the file that was deleted */
-            file_key: string;
-            /** @description The name of the file that was deleted */
-            file_name: string;
-            /** @description The user that deleted the file and triggered this event */
-            triggered_by: components["schemas"]["User"];
-        };
-        WebhookFileVersionUpdatePayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "FILE_VERSION_UPDATE";
-            /**
-             * Format: date-time
-             * @description UTC ISO 8601 timestamp of when the version was created
-             */
-            created_at: string;
-            /** @description Description of the version in the version history */
-            description?: string;
-            /** @description The key of the file that was updated */
-            file_key: string;
-            /** @description The name of the file that was updated */
-            file_name: string;
-            /** @description The user that created the named version and triggered this event */
-            triggered_by: components["schemas"]["User"];
-            /** @description ID of the published version */
-            version_id: string;
-        };
-        WebhookLibraryPublishPayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "LIBRARY_PUBLISH";
-            /** @description Components that were created by the library publish */
-            created_components: components["schemas"]["LibraryItemData"][];
-            /** @description Styles that were created by the library publish */
-            created_styles: components["schemas"]["LibraryItemData"][];
-            /** @description Variables that were created by the library publish */
-            created_variables: components["schemas"]["LibraryItemData"][];
-            /** @description Components that were modified by the library publish */
-            modified_components: components["schemas"]["LibraryItemData"][];
-            /** @description Styles that were modified by the library publish */
-            modified_styles: components["schemas"]["LibraryItemData"][];
-            /** @description Variables that were modified by the library publish */
-            modified_variables: components["schemas"]["LibraryItemData"][];
-            /** @description Components that were deleted by the library publish */
-            deleted_components: components["schemas"]["LibraryItemData"][];
-            /** @description Styles that were deleted by the library publish */
-            deleted_styles: components["schemas"]["LibraryItemData"][];
-            /** @description Variables that were deleted by the library publish */
-            deleted_variables: components["schemas"]["LibraryItemData"][];
-            /** @description Description of the library publish */
-            description?: string;
-            /** @description The key of the file that was published */
-            file_key: string;
-            /** @description The name of the file that was published */
-            file_name: string;
-            /** @description The library item that was published */
-            library_item: components["schemas"]["LibraryItemData"];
-            /** @description The user that published the library and triggered this event */
-            triggered_by: components["schemas"]["User"];
-        };
-        WebhookFileCommentPayload: components["schemas"]["WebhookBasePayload"] & {
-            /** @enum {string} */
-            event_type: "FILE_COMMENT";
-            /** @description Contents of the comment itself */
-            comment: components["schemas"]["CommentFragment"][];
-            /** @description Unique identifier for comment */
-            comment_id: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the comment was left
-             */
-            created_at: string;
-            /** @description The key of the file that was commented on */
-            file_key: string;
-            /** @description The name of the file that was commented on */
-            file_name: string;
-            /** @description Users that were mentioned in the comment */
-            mentions?: components["schemas"]["User"][];
-            /** @description The user that made the comment and triggered this event */
-            triggered_by: components["schemas"]["User"];
-        };
-        /** @description A Figma user */
-        ActivityLogUserEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "user";
-            /** @description Unique stable id of the user. */
-            id: string;
-            /** @description Name of the user. */
-            name: string;
-            /** @description Email associated with the user's account. */
-            email: string;
-        };
-        /** @description A Figma Design or FigJam file */
-        ActivityLogFileEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "file";
-            /** @description Unique identifier of the file. */
-            key: string;
-            /** @description Name of the file. */
-            name: string;
-            /**
-             * @description Indicates if the object is a file on Figma Design or FigJam.
-             * @enum {string}
-             */
-            editor_type: "figma" | "figjam";
-            /**
-             * @description Access policy for users who have the link to the file.
-             * @enum {string}
-             */
-            link_access: "view" | "edit" | "org_view" | "org_edit" | "inherit";
-            /**
-             * @description Access policy for users who have the link to the file's prototype.
-             * @enum {string}
-             */
-            proto_link_access: "view" | "org_view" | "inherit";
-        };
-        /** @description A file branch that diverges from and can be merged back into the main file */
-        ActivityLogFileRepoEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "file_repo";
-            /** @description Unique identifier of the file branch. */
-            id: string;
-            /** @description Name of the file. */
-            name: string;
-            /** @description Key of the main file. */
-            main_file_key: string;
-        };
-        /** @description A project that a collection of Figma files are grouped under */
-        ActivityLogProjectEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "project";
-            /** @description Unique identifier of the project. */
-            id: string;
-            /** @description Name of the project. */
-            name: string;
-        };
-        /** @description A Figma team that contains multiple users and projects */
-        ActivityLogTeamEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "team";
-            /** @description Unique identifier of the team. */
-            id: string;
-            /** @description Name of the team. */
-            name: string;
-        };
-        /** @description Part of the organizational hierarchy of managing files and users within Figma, only available on the Enterprise Plan */
-        ActivityLogWorkspaceEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "workspace";
-            /** @description Unique identifier of the workspace. */
-            id: string;
-            /** @description Name of the workspace. */
-            name: string;
-        };
-        /** @description A Figma organization */
-        ActivityLogOrgEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "org";
-            /** @description Unique identifier of the organization. */
-            id: string;
-            /** @description Name of the organization. */
-            name: string;
-        };
-        /** @description A Figma plugin */
-        ActivityLogPluginEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "plugin";
-            /** @description Unique identifier of the plugin. */
-            id: string;
-            /** @description Name of the plugin. */
-            name: string;
-            /**
-             * @description Indicates if the object is a plugin is available on Figma Design or FigJam.
-             * @enum {string}
-             */
-            editor_type: "figma" | "figjam";
-        };
-        /** @description A Figma widget */
-        ActivityLogWidgetEntity: {
-            /**
-             * @description The type of entity. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            type: "widget";
-            /** @description Unique identifier of the widget. */
-            id: string;
-            /** @description Name of the widget. */
-            name: string;
-            /**
-             * @description Indicates if the object is a widget available on Figma Design or FigJam.
-             * @enum {string}
-             */
-            editor_type: "figma" | "figjam";
-        };
-        /** @description An event returned by the Activity Logs API. */
-        ActivityLog: {
-            /** @description The ID of the event. */
-            id: string;
-            /** @description The timestamp of the event in seconds since the Unix epoch. */
-            timestamp: number;
-            /** @description The user who performed the action. */
-            actor: {
-                /**
-                 * @description The type of the user.
-                 * @enum {string}
-                 */
-                type?: "user";
-                /** @description The ID of the user. */
-                id?: string;
-                /** @description The name of the user. For SCIM events, the value is "SCIM Provider". For official support actions, the value is "Figma Support". */
-                name: string;
-                /** @description The email of the user. */
-                email?: string;
-            } | null;
-            /** @description The task or activity the actor performed. */
-            action: {
-                /** @description The type of the action. */
-                type: string;
-                /** @description Metadata of the action. Each action type supports its own metadata attributes. */
-                details: {
-                    [key: string]: unknown;
-                } | null;
-            };
-            /** @description The resource the actor took the action on. It can be a user, file, project or other resource types. */
-            entity: components["schemas"]["ActivityLogUserEntity"] | components["schemas"]["ActivityLogFileEntity"] | components["schemas"]["ActivityLogFileRepoEntity"] | components["schemas"]["ActivityLogProjectEntity"] | components["schemas"]["ActivityLogTeamEntity"] | components["schemas"]["ActivityLogWorkspaceEntity"] | components["schemas"]["ActivityLogOrgEntity"] | components["schemas"]["ActivityLogPluginEntity"] | components["schemas"]["ActivityLogWidgetEntity"];
-            /** @description Contextual information about the event. */
-            context: {
-                /** @description The third-party application that triggered the event, if applicable. */
-                client_name: string | null;
-                /** @description The IP address from of the client that sent the event request. */
-                ip_address: string;
-                /** @description If Figma's Support team triggered the event. This is either true or false. */
-                is_figma_support_team_action: boolean;
-                /** @description The id of the organization where the event took place. */
-                org_id: string;
-                /** @description The id of the team where the event took place -- if this took place in a specific team. */
-                team_id: string | null;
-            };
-        };
-        /** @description An object describing the user's payment status. */
-        PaymentStatus: {
-            /**
-             * @description The current payment status of the user on the resource, as a string enum:
-             *
-             *     - `UNPAID`: user has not paid for the resource
-             *     - `PAID`: user has an active purchase on the resource
-             *     - `TRIAL`: user is in the trial period for a subscription resource
-             * @enum {string}
-             */
-            type?: "UNPAID" | "PAID" | "TRIAL";
-        };
-        /** @description An object describing a user's payment information for a plugin, widget, or Community file. */
-        PaymentInformation: {
-            /** @description The ID of the user whose payment information was queried. Can be used to verify the validity of a response. */
-            user_id: string;
-            /** @description The ID of the plugin, widget, or Community file that was queried. Can be used to verify the validity of a response. */
-            resource_id: string;
-            /**
-             * @description The type of the resource.
-             * @enum {string}
-             */
-            resource_type: "PLUGIN" | "WIDGET" | "COMMUNITY_FILE";
-            payment_status: components["schemas"]["PaymentStatus"];
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 timestamp indicating when the user purchased the resource. No value is given if the user has never purchased the resource.
-             *
-             *     Note that a value will still be returned if the user had purchased the resource, but no longer has active access to it (e.g. purchase refunded, subscription ended).
-             */
-            date_of_purchase?: string;
-        };
-        /**
-         * @description Scopes allow a variable to be shown or hidden in the variable picker for various fields. This declutters the Figma UI if you have a large number of variables. Variable scopes are currently supported on `FLOAT`, `STRING`, and `COLOR` variables.
-         *
-         *     `ALL_SCOPES` is a special scope that means that the variable will be shown in the variable picker for all variable fields. If `ALL_SCOPES` is set, no additional scopes can be set.
-         *
-         *     `ALL_FILLS` is a special scope that means that the variable will be shown in the variable picker for all fill fields. If `ALL_FILLS` is set, no additional fill scopes can be set.
-         *
-         *     Valid scopes for `FLOAT` variables:
-         *     - `ALL_SCOPES`
-         *     - `TEXT_CONTENT`
-         *     - `WIDTH_HEIGHT`
-         *     - `GAP`
-         *     - `STROKE_FLOAT`
-         *     - `EFFECT_FLOAT`
-         *     - `OPACITY`
-         *     - `FONT_WEIGHT`
-         *     - `FONT_SIZE`
-         *     - `LINE_HEIGHT`
-         *     - `LETTER_SPACING`
-         *     - `PARAGRAPH_SPACING`
-         *     - `PARAGRAPH_INDENT`
-         *
-         *     Valid scopes for `STRING` variables:
-         *     - `ALL_SCOPES`
-         *     - `TEXT_CONTENT`
-         *     - `FONT_FAMILY`
-         *     - `FONT_STYLE`
-         *
-         *     Valid scopes for `COLOR` variables:
-         *     - `ALL_SCOPES`
-         *     - `ALL_FILLS`
-         *     - `FRAME_FILL`
-         *     - `SHAPE_FILL`
-         *     - `TEXT_FILL`
-         *     - `STROKE_COLOR`
-         *     - `EFFECT_COLOR`
-         * @enum {string}
-         */
-        VariableScope: "ALL_SCOPES" | "TEXT_CONTENT" | "CORNER_RADIUS" | "WIDTH_HEIGHT" | "GAP" | "ALL_FILLS" | "FRAME_FILL" | "SHAPE_FILL" | "TEXT_FILL" | "STROKE_COLOR" | "STROKE_FLOAT" | "EFFECT_FLOAT" | "EFFECT_COLOR" | "OPACITY" | "FONT_FAMILY" | "FONT_STYLE" | "FONT_WEIGHT" | "FONT_SIZE" | "LINE_HEIGHT" | "LETTER_SPACING" | "PARAGRAPH_SPACING" | "PARAGRAPH_INDENT";
-        /** @description An object containing platform-specific code syntax definitions for a variable. All platforms are optional. */
-        VariableCodeSyntax: {
-            WEB?: string;
-            ANDROID?: string;
-            iOS?: string;
-        };
-        /** @description A grouping of related Variable objects each with the same modes. */
-        LocalVariableCollection: {
-            /** @description The unique identifier of this variable collection. */
-            id: string;
-            /** @description The name of this variable collection. */
-            name: string;
-            /** @description The key of this variable collection. */
-            key: string;
-            /** @description The modes of this variable collection. */
-            modes: {
-                /** @description The unique identifier of this mode. */
-                modeId: string;
-                /** @description The name of this mode. */
-                name: string;
-            }[];
-            /** @description The id of the default mode. */
-            defaultModeId: string;
-            /** @description Whether this variable collection is remote. */
-            remote: boolean;
-            /**
-             * @description Whether this variable collection is hidden when publishing the current file as a library.
-             * @default false
-             */
-            hiddenFromPublishing: boolean;
-            /** @description The ids of the variables in the collection. Note that the order of these variables is roughly the same as what is shown in Figma Design, however it does not account for groups. As a result, the order of these variables may not exactly reflect the exact ordering and grouping shown in the authoring UI. */
-            variableIds: string[];
-        };
-        /** @description A Variable is a single design token that defines values for each of the modes in its VariableCollection. These values can be applied to various kinds of design properties. */
-        LocalVariable: {
-            /** @description The unique identifier of this variable. */
-            id: string;
-            /** @description The name of this variable. */
-            name: string;
-            /** @description The key of this variable. */
-            key: string;
-            /** @description The id of the variable collection that contains this variable. */
-            variableCollectionId: string;
-            /**
-             * @description The resolved type of the variable.
-             * @enum {string}
-             */
-            resolvedType: "BOOLEAN" | "FLOAT" | "STRING" | "COLOR";
-            /** @description The values for each mode of this variable. */
-            valuesByMode: {
-                [key: string]: boolean | number | string | components["schemas"]["RGBA"] | components["schemas"]["VariableAlias"];
-            };
-            /** @description Whether this variable is remote. */
-            remote: boolean;
-            /** @description The description of this variable. */
-            description: string;
-            /** @description Whether this variable is hidden when publishing the current file as a library.
-             *
-             *     If the parent `VariableCollection` is marked as `hiddenFromPublishing`, then this variable will also be hidden from publishing via the UI. `hiddenFromPublishing` is independently toggled for a variable and collection. However, both must be true for a given variable to be publishable. */
-            hiddenFromPublishing: boolean;
-            /** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields.
-             *
-             *     Setting scopes for a variable does not prevent that variable from being bound in other scopes (for example, via the Plugin API). This only limits the variables that are shown in pickers within the Figma UI. */
-            scopes: components["schemas"]["VariableScope"][];
-            codeSyntax: components["schemas"]["VariableCodeSyntax"];
-            /**
-             * @description Indicates that the variable was deleted in the editor, but the document may still contain references to the variable. References to the variable may exist through bound values or variable aliases.
-             * @default false
-             */
-            deletedButReferenced: boolean;
-        };
-        /** @description A grouping of related Variable objects each with the same modes. */
-        PublishedVariableCollection: {
-            /** @description The unique identifier of this variable collection. */
-            id: string;
-            /** @description The ID of the variable collection that is used by subscribing files. This ID changes every time the variable collection is modified and published. */
-            subscribed_id: string;
-            /** @description The name of this variable collection. */
-            name: string;
-            /** @description The key of this variable collection. */
-            key: string;
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the variable collection was last updated.
-             *
-             *     This timestamp will change any time a variable in the collection is changed.
-             */
-            updatedAt: string;
-        };
-        /** @description A Variable is a single design token that defines values for each of the modes in its VariableCollection. These values can be applied to various kinds of design properties. */
-        PublishedVariable: {
-            /** @description The unique identifier of this variable. */
-            id: string;
-            /** @description The ID of the variable that is used by subscribing files. This ID changes every time the variable is modified and published. */
-            subscribed_id: string;
-            /** @description The name of this variable. */
-            name: string;
-            /** @description The key of this variable. */
-            key: string;
-            /** @description The id of the variable collection that contains this variable. */
-            variableCollectionId: string;
-            /**
-             * @description The resolved type of the variable.
-             * @enum {string}
-             */
-            resolvedDataType: "BOOLEAN" | "FLOAT" | "STRING" | "COLOR";
-            /**
-             * Format: date-time
-             * @description The UTC ISO 8601 time at which the variable was last updated.
-             */
-            updatedAt: string;
-        };
-        /** @description An object that contains details about creating a `VariableCollection`. */
-        VariableCollectionCreate: {
-            /**
-             * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "CREATE";
-            /** @description A temporary id for this variable collection. */
-            id?: string;
-            /** @description The name of this variable collection. */
-            name: string;
-            /** @description The initial mode refers to the mode that is created by default. You can set a temporary id here, in order to reference this mode later in this request. */
-            initialModeId?: string;
-            /**
-             * @description Whether this variable collection is hidden when publishing the current file as a library.
-             * @default false
-             */
-            hiddenFromPublishing: boolean;
-        };
-        /** @description An object that contains details about updating a `VariableCollection`. */
-        VariableCollectionUpdate: {
-            /**
-             * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "UPDATE";
-            /** @description The id of the variable collection to update. */
-            id: string;
-            /** @description The name of this variable collection. */
-            name?: string;
-            /**
-             * @description Whether this variable collection is hidden when publishing the current file as a library.
-             * @default false
-             */
-            hiddenFromPublishing: boolean;
-        };
-        /** @description An object that contains details about deleting a `VariableCollection`. */
-        VariableCollectionDelete: {
-            /**
-             * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "DELETE";
-            /** @description The id of the variable collection to delete. */
-            id: string;
-        };
-        VariableCollectionChange: components["schemas"]["VariableCollectionCreate"] | components["schemas"]["VariableCollectionUpdate"] | components["schemas"]["VariableCollectionDelete"];
-        /** @description An object that contains details about creating a `VariableMode`. */
-        VariableModeCreate: {
-            /**
-             * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "CREATE";
-            /** @description A temporary id for this variable mode. */
-            id?: string;
-            /** @description The name of this variable mode. */
-            name: string;
-            /** @description The variable collection that will contain the mode. You can use the temporary id of a variable collection. */
-            variableCollectionId: string;
-        };
-        /** @description An object that contains details about updating a `VariableMode`. */
-        VariableModeUpdate: {
-            /**
-             * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "UPDATE";
-            /** @description The id of the variable mode to update. */
-            id: string;
-            /** @description The name of this variable mode. */
-            name?: string;
-            /** @description The variable collection that contains the mode. */
-            variableCollectionId: string;
-        };
-        /** @description An object that contains details about deleting a `VariableMode`. */
-        VariableModeDelete: {
-            /**
-             * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "DELETE";
-            /** @description The id of the variable mode to delete. */
-            id: string;
-        };
-        VariableModeChange: components["schemas"]["VariableModeCreate"] | components["schemas"]["VariableModeUpdate"] | components["schemas"]["VariableModeDelete"];
-        /** @description An object that contains details about creating a `Variable`. */
-        VariableCreate: {
-            /**
-             * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "CREATE";
-            /** @description A temporary id for this variable. */
-            id?: string;
-            /** @description The name of this variable. */
-            name: string;
-            /** @description The variable collection that will contain the variable. You can use the temporary id of a variable collection. */
-            variableCollectionId: string;
-            /**
-             * @description The resolved type of the variable.
-             * @enum {string}
-             */
-            resolvedType: "BOOLEAN" | "FLOAT" | "STRING" | "COLOR";
-            /** @description The description of this variable. */
-            description?: string;
-            /**
-             * @description Whether this variable is hidden when publishing the current file as a library.
-             * @default false
-             */
-            hiddenFromPublishing: boolean;
-            /** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields. */
-            scopes?: components["schemas"]["VariableScope"][];
-            codeSyntax?: components["schemas"]["VariableCodeSyntax"];
-        };
-        /** @description An object that contains details about updating a `Variable`. */
-        VariableUpdate: {
-            /**
-             * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "UPDATE";
-            /** @description The id of the variable to update. */
-            id: string;
-            /** @description The name of this variable. */
-            name?: string;
-            /** @description The description of this variable. */
-            description?: string;
-            /**
-             * @description Whether this variable is hidden when publishing the current file as a library.
-             * @default false
-             */
-            hiddenFromPublishing: boolean;
-            /** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields. */
-            scopes?: components["schemas"]["VariableScope"][];
-            codeSyntax?: components["schemas"]["VariableCodeSyntax"];
-        };
-        /** @description An object that contains details about deleting a `Variable`. */
-        VariableDelete: {
-            /**
-             * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
-             * @enum {string}
-             */
-            action: "DELETE";
-            /** @description The id of the variable to delete. */
-            id: string;
-        };
-        VariableChange: components["schemas"]["VariableCreate"] | components["schemas"]["VariableUpdate"] | components["schemas"]["VariableDelete"];
-        /** @description An object that represents a value for a given mode of a variable. All properties are required. */
-        VariableModeValue: {
-            /** @description The target variable. You can use the temporary id of a variable. */
-            variableId: string;
-            /** @description Must correspond to a mode in the variable collection that contains the target variable. */
-            modeId: string;
-            value: components["schemas"]["VariableValue"];
-        };
-        /** @description The value for the variable. The value must match the variable's type. If setting to a variable alias, the alias must resolve to this type. */
-        VariableValue: boolean | number | string | components["schemas"]["RGB"] | components["schemas"]["RGBA"] | components["schemas"]["VariableAlias"];
-        /** @description A dev resource in a file */
-        DevResource: {
-            /** @description Unique identifier of the dev resource */
-            id: string;
-            /** @description The name of the dev resource. */
-            name: string;
-            /** @description The URL of the dev resource. */
-            url: string;
-            /** @description The file key where the dev resource belongs. */
-            file_key: string;
-            /** @description The target node to attach the dev resource to. */
-            node_id: string;
-        };
-        /** @description Library analytics component actions data broken down by asset. */
-        LibraryAnalyticsComponentActionsByAsset: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description Unique, stable id of the component. */
-            component_key: string;
-            /** @description Name of the component. */
-            component_name: string;
-            /** @description Unique, stable id of the component set that this component belongs to. */
-            component_set_key?: string;
-            /** @description Name of the component set that this component belongs to. */
-            component_set_name?: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics action data broken down by team. */
-        LibraryAnalyticsComponentActionsByTeam: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description The name of the team using the library. */
-            team_name: string;
-            /** @description The name of the workspace that the team belongs to. */
-            workspace_name?: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics component usage data broken down by component. */
-        LibraryAnalyticsComponentUsagesByAsset: {
-            /** @description Unique, stable id of the component. */
-            component_key: string;
-            /** @description Name of the component. */
-            component_name: string;
-            /** @description Unique, stable id of the component set that this component belongs to. */
-            component_set_key?: string;
-            /** @description Name of the component set that this component belongs to. */
-            component_set_name?: string;
-            /** @description The number of instances of the component within the organization. */
-            usages: number;
-            /** @description The number of teams using the component within the organization. */
-            teams_using: number;
-            /** @description The number of files using the component within the organization. */
-            files_using: number;
-        };
-        /** @description Library analytics component usage data broken down by file. */
-        LibraryAnalyticsComponentUsagesByFile: {
-            /** @description The name of the file using the library. */
-            file_name: string;
-            /** @description The name of the team the file belongs to. */
-            team_name: string;
-            /** @description The name of the workspace that the file belongs to. */
-            workspace_name?: string;
-            /** @description The number of component instances from the library used within the file. */
-            usages: number;
-        };
-        /** @description Library analytics style actions data broken down by asset. */
-        LibraryAnalyticsStyleActionsByAsset: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description Unique, stable id of the style. */
-            style_key: string;
-            /** @description The name of the style. */
-            style_name: string;
-            /** @description The type of the style. */
-            style_type: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics style action data broken down by team. */
-        LibraryAnalyticsStyleActionsByTeam: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description The name of the team using the library. */
-            team_name: string;
-            /** @description The name of the workspace that the team belongs to. */
-            workspace_name?: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics style usage data broken down by component. */
-        LibraryAnalyticsStyleUsagesByAsset: {
-            /** @description Unique, stable id of the style. */
-            style_key: string;
-            /** @description The name of the style. */
-            style_name: string;
-            /** @description The type of the style. */
-            style_type: string;
-            /** @description The number of usages of the style within the organization. */
-            usages: number;
-            /** @description The number of teams using the style within the organization. */
-            teams_using: number;
-            /** @description The number of files using the style within the organization. */
-            files_using: number;
-        };
-        /** @description Library analytics style usage data broken down by file. */
-        LibraryAnalyticsStyleUsagesByFile: {
-            /** @description The name of the file using the library. */
-            file_name: string;
-            /** @description The name of the team the file belongs to. */
-            team_name: string;
-            /** @description The name of the workspace that the file belongs to. */
-            workspace_name?: string;
-            /** @description The number of times styles from this library are used within the file. */
-            usages: number;
-        };
-        /** @description Library analytics variable actions data broken down by asset. */
-        LibraryAnalyticsVariableActionsByAsset: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description Unique, stable id of the variable. */
-            variable_key: string;
-            /** @description The name of the variable. */
-            variable_name: string;
-            /** @description The type of the variable. */
-            variable_type: string;
-            /** @description Unique, stable id of the collection the variable belongs to. */
-            collection_key: string;
-            /** @description The name of the collection the variable belongs to. */
-            collection_name: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics variable action data broken down by team. */
-        LibraryAnalyticsVariableActionsByTeam: {
-            /** @description The date in ISO 8601 format. e.g. 2023-12-13 */
-            week: string;
-            /** @description The name of the team using the library. */
-            team_name: string;
-            /** @description The name of the workspace that the team belongs to. */
-            workspace_name?: string;
-            /** @description The number of detach events for this period. */
-            detachments: number;
-            /** @description The number of insertion events for this period. */
-            insertions: number;
-        };
-        /** @description Library analytics variable usage data broken down by component. */
-        LibraryAnalyticsVariableUsagesByAsset: {
-            /** @description Unique, stable id of the variable. */
-            variable_key: string;
-            /** @description The name of the variable. */
-            variable_name: string;
-            /** @description The type of the variable. */
-            variable_type: string;
-            /** @description Unique, stable id of the collection the variable belongs to. */
-            collection_key: string;
-            /** @description The name of the collection the variable belongs to. */
-            collection_name: string;
-            /** @description The number of usages of the variable within the organization. */
-            usages: number;
-            /** @description The number of teams using the variable within the organization. */
-            teams_using: number;
-            /** @description The number of files using the variable within the organization. */
-            files_using: number;
-        };
-        /** @description Library analytics variable usage data broken down by file. */
-        LibraryAnalyticsVariableUsagesByFile: {
-            /** @description The name of the file using the library. */
-            file_name: string;
-            /** @description The name of the team the file belongs to. */
-            team_name: string;
-            /** @description The name of the workspace that the file belongs to. */
-            workspace_name?: string;
-            /** @description The number of times variables from this library are used within the file. */
-            usages: number;
-        };
-        /** @description If pagination is needed due to the length of the response, identifies the next and previous pages. */
-        ResponsePagination: {
-            /** @description A URL that calls the previous page of the response. */
-            prev_page?: string;
-            /** @description A URL that calls the next page of the response. */
-            next_page?: string;
-        };
-        /** @description Pagination cursor */
-        ResponseCursor: {
-            before?: number;
-            after?: number;
-        };
-        /** @description A response indicating an error occurred. */
-        ErrorResponsePayloadWithErrMessage: {
-            /** @description Status code */
-            status: number;
-            /** @description A string describing the error */
-            err: string;
-        };
-        /** @description A response indicating an error occurred. */
-        ErrorResponsePayloadWithErrorBoolean: {
-            /**
-             * @description For erroneous requests, this value is always `true`.
-             * @enum {boolean}
-             */
-            error: true;
-            /** @description Status code */
-            status: number;
-            /** @description A string describing the error */
-            message: string;
-        };
-    };
-    responses: {
-        /** @description Response from the GET /v1/files/{file_key} endpoint. */
-        GetFileResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description The name of the file as it appears in the editor. */
-                    name: string;
-                    /**
-                     * @description The role of the user making the API request in relation to the file.
-                     * @enum {string}
-                     */
-                    role: "owner" | "editor" | "viewer";
-                    /**
-                     * Format: date-time
-                     * @description The UTC ISO 8601 time at which the file was last modified.
-                     */
-                    lastModified: string;
-                    /**
-                     * @description The type of editor associated with this file.
-                     * @enum {string}
-                     */
-                    editorType: "figma" | "figjam";
-                    /** @description A URL to a thumbnail image of the file. */
-                    thumbnailUrl?: string;
-                    /** @description The version number of the file. This number is incremented when a file is modified and can be used to check if the file has changed between requests. */
-                    version: string;
-                    document: components["schemas"]["DocumentNode"];
-                    /** @description A mapping from component IDs to component metadata. */
-                    components: {
-                        [key: string]: components["schemas"]["Component"];
-                    };
-                    /** @description A mapping from component set IDs to component set metadata. */
-                    componentSets: {
-                        [key: string]: components["schemas"]["ComponentSet"];
-                    };
-                    /**
-                     * @description The version of the file schema that this file uses.
-                     * @default 0
-                     */
-                    schemaVersion: number;
-                    /** @description A mapping from style IDs to style metadata. */
-                    styles: {
-                        [key: string]: components["schemas"]["Style"];
-                    };
-                    /** @description The share permission level of the file link. */
-                    linkAccess?: string;
-                    /** @description The key of the main file for this file. If present, this file is a component or component set. */
-                    mainFileKey?: string;
-                    /** @description A list of branches for this file. */
-                    branches?: {
-                        /** @description The key of the branch. */
-                        key: string;
-                        /** @description The name of the branch. */
-                        name: string;
-                        /** @description A URL to a thumbnail image of the branch. */
-                        thumbnail_url: string;
-                        /**
-                         * Format: date-time
-                         * @description The UTC ISO 8601 time at which the branch was last modified.
-                         */
-                        last_modified: string;
-                    }[];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/nodes endpoint. */
-        GetFileNodesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description The name of the file as it appears in the editor. */
-                    name: string;
-                    /**
-                     * @description The role of the user making the API request in relation to the file.
-                     * @enum {string}
-                     */
-                    role: "owner" | "editor" | "viewer";
-                    /**
-                     * Format: date-time
-                     * @description The UTC ISO 8601 time at which the file was last modified.
-                     */
-                    lastModified: string;
-                    /**
-                     * @description The type of editor associated with this file.
-                     * @enum {string}
-                     */
-                    editorType: "figma" | "figjam";
-                    /** @description A URL to a thumbnail image of the file. */
-                    thumbnailUrl: string;
-                    /** @description The version number of the file. This number is incremented when a file is modified and can be used to check if the file has changed between requests. */
-                    version: string;
-                    /** @description A mapping from node IDs to node metadata. */
-                    nodes: {
-                        [key: string]: {
-                            document: components["schemas"]["Node"];
-                            /** @description A mapping from component IDs to component metadata. */
-                            components: {
-                                [key: string]: components["schemas"]["Component"];
-                            };
-                            /** @description A mapping from component set IDs to component set metadata. */
-                            componentSets: {
-                                [key: string]: components["schemas"]["ComponentSet"];
-                            };
-                            /**
-                             * @description The version of the file schema that this file uses.
-                             * @default 0
-                             */
-                            schemaVersion: number;
-                            /** @description A mapping from style IDs to style metadata. */
-                            styles: {
-                                [key: string]: components["schemas"]["Style"];
-                            };
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/images/{file_key} endpoint. */
-        GetImagesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description For successful requests, this value is always `null`. */
-                    err: null;
-                    /** @description A map from node IDs to URLs of the rendered images. */
-                    images: {
-                        [key: string]: string | null;
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/images endpoint. */
-        GetImageFillsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 200;
-                    meta: {
-                        /** @description A map of image references to URLs of the image fills. */
-                        images: {
-                            [key: string]: string;
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/teams/{team_id}/projects endpoint. */
-        GetTeamProjectsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description The team's name. */
-                    name: string;
-                    /** @description An array of projects. */
-                    projects: components["schemas"]["Project"][];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/projects/{project_id}/files endpoint. */
-        GetProjectFilesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description The project's name. */
-                    name: string;
-                    /** @description An array of files. */
-                    files: {
-                        /** @description The file's key. */
-                        key: string;
-                        /** @description The file's name. */
-                        name: string;
-                        /** @description The file's thumbnail URL. */
-                        thumbnail_url?: string;
-                        /**
-                         * Format: date-time
-                         * @description The UTC ISO 8601 time at which the file was last modified.
-                         */
-                        last_modified: string;
-                    }[];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/versions endpoint. */
-        GetFileVersionsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of versions. */
-                    versions: components["schemas"]["Version"][];
-                    pagination: components["schemas"]["ResponsePagination"];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/comments endpoint. */
-        GetCommentsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of comments. */
-                    comments: components["schemas"]["Comment"][];
-                };
-            };
-        };
-        /** @description Response from the POST /v1/files/{file_key}/comments endpoint. */
-        PostCommentResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Comment"];
-            };
-        };
-        /** @description Response from the DELETE /v1/files/{file_key}/comments/{comment_id} endpoint. */
-        DeleteCommentResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
-        GetCommentReactionsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of reactions. */
-                    reactions: components["schemas"]["Reaction"][];
-                    pagination: components["schemas"]["ResponsePagination"];
-                };
-            };
-        };
-        /** @description Response from the POST /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
-        PostCommentReactionResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                };
-            };
-        };
-        /** @description Response from the DELETE /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
-        DeleteCommentReactionResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                };
-            };
-        };
-        /** @description Response from the GET /v1/me endpoint. */
-        GetMeResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["User"] & {
-                    /** @description Email associated with the user's account. This property is only present on the /v1/me endpoint. */
-                    email: string;
-                };
-            };
-        };
-        /** @description Response from the GET /v1/teams/{team_id}/components endpoint. */
-        GetTeamComponentsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        components: components["schemas"]["PublishedComponent"][];
-                        cursor?: components["schemas"]["ResponseCursor"];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/components endpoint. */
-        GetFileComponentsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        components: components["schemas"]["PublishedComponent"][];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/components/{key} endpoint. */
-        GetComponentResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: components["schemas"]["PublishedComponent"];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/teams/{team_id}/component_sets endpoint. */
-        GetTeamComponentSetsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        component_sets: components["schemas"]["PublishedComponentSet"][];
-                        cursor?: components["schemas"]["ResponseCursor"];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/component_sets endpoint. */
-        GetFileComponentSetsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        component_sets: components["schemas"]["PublishedComponentSet"][];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/component_sets/{key} endpoint. */
-        GetComponentSetResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: components["schemas"]["PublishedComponentSet"];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/teams/{team_id}/styles endpoint. */
-        GetTeamStylesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        styles: components["schemas"]["PublishedStyle"][];
-                        cursor?: components["schemas"]["ResponseCursor"];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/styles endpoint. */
-        GetFileStylesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        styles: components["schemas"]["PublishedStyle"][];
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/styles/{key} endpoint. */
-        GetStyleResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The status of the request.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: components["schemas"]["PublishedStyle"];
-                };
-            };
-        };
-        /** @description Response from the POST /v2/webhooks endpoint. */
-        PostWebhookResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["WebhookV2"];
-            };
-        };
-        /** @description Response from the GET /v2/webhooks/{webhook_id} endpoint. */
-        GetWebhookResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["WebhookV2"];
-            };
-        };
-        /** @description Response from the PUT /v2/webhooks/{webhook_id} endpoint. */
-        PutWebhookResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["WebhookV2"];
-            };
-        };
-        /** @description Response from the DELETE /v2/webhooks/{webhook_id} endpoint. */
-        DeleteWebhookResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["WebhookV2"];
-            };
-        };
-        /** @description Response from the GET /v2/teams/{team_id}/webhooks endpoint. */
-        GetTeamWebhooksResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of webhooks. */
-                    webhooks: components["schemas"]["WebhookV2"][];
-                };
-            };
-        };
-        /** @description Response from the GET /v2/webhooks/{webhook_id}/requests endpoint. */
-        GetWebhookRequestsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of webhook requests. */
-                    requests: components["schemas"]["WebhookV2Request"][];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/activity_logs endpoint. */
-        GetActivityLogsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The response status code.
-                     * @enum {number}
-                     */
-                    status?: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error?: false;
-                    meta?: {
-                        /** @description An array of activity logs sorted by timestamp in ascending order by default. */
-                        activity_logs?: components["schemas"]["ActivityLog"][];
-                        /** @description Encodes the last event (the most recent event) */
-                        cursor?: string;
-                        /** @description Whether there is a next page of events */
-                        next_page?: boolean;
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/payments endpoint. */
-        GetPaymentsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The response status code.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: components["schemas"]["PaymentInformation"];
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/variables/local endpoint. */
-        GetLocalVariablesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The response status code.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        /** @description A map of variable ids to variables */
-                        variables: {
-                            [key: string]: components["schemas"]["LocalVariable"];
-                        };
-                        /** @description A map of variable collection ids to variable collections */
-                        variableCollections: {
-                            [key: string]: components["schemas"]["LocalVariableCollection"];
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/variables/published endpoint. */
-        GetPublishedVariablesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The response status code.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        /** @description A map of variable ids to variables */
-                        variables: {
-                            [key: string]: components["schemas"]["PublishedVariable"];
-                        };
-                        /** @description A map of variable collection ids to variable collections */
-                        variableCollections: {
-                            [key: string]: components["schemas"]["PublishedVariableCollection"];
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Response from the POST /v1/files/{file_key}/variables endpoint. */
-        PostVariablesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description The response status code.
-                     * @enum {number}
-                     */
-                    status: 200;
-                    /**
-                     * @description For successful requests, this value is always `false`.
-                     * @enum {boolean}
-                     */
-                    error: false;
-                    meta: {
-                        /** @description A map of temporary ids in the request to the real ids of the newly created objects */
-                        tempIdToRealId: {
-                            [key: string]: string;
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Response from the GET /v1/files/{file_key}/dev_resources endpoint. */
-        GetDevResourcesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of dev resources. */
-                    dev_resources: components["schemas"]["DevResource"][];
-                };
-            };
-        };
-        /** @description Response from the POST /v1/dev_resources endpoint. */
-        PostDevResourcesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of links created. */
-                    links_created: components["schemas"]["DevResource"][];
-                    /** @description An array of errors. */
-                    errors?: {
-                        /** @description The file key. */
-                        file_key?: string | null;
-                        /** @description The node id. */
-                        node_id?: string | null;
-                        /** @description The error message. */
-                        error: string;
-                    }[];
-                };
-            };
-        };
-        /** @description Response from the PUT /v1/dev_resources endpoint. */
-        PutDevResourcesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of links updated. */
-                    links_updated?: components["schemas"]["DevResource"][];
-                    /** @description An array of errors. */
-                    errors?: {
-                        /** @description The id of the dev resource. */
-                        id?: string;
-                        /** @description The error message. */
-                        error: string;
-                    }[];
-                };
-            };
-        };
-        /** @description Response from the DELETE /v1/files/{file_key}/dev_resources/{dev_resource_id} endpoint. */
-        DeleteDevResourceResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content?: never;
-        };
-        /** @description Response from the GET /v1/analytics/libraries/{file_key}/component/actions. */
-        GetLibraryAnalyticsComponentActionsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsComponentActionsByAsset"][] | components["schemas"]["LibraryAnalyticsComponentActionsByTeam"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Response from the PUT /v1/analytics/libraries/{file_key}/component/usages. */
-        GetLibraryAnalyticsComponentUsagesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsComponentUsagesByAsset"][] | components["schemas"]["LibraryAnalyticsComponentUsagesByFile"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Response from the GET /v1/analytics/libraries/{file_key}/style/actions. */
-        GetLibraryAnalyticsStyleActionsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsStyleActionsByAsset"][] | components["schemas"]["LibraryAnalyticsStyleActionsByTeam"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Response from the PUT /v1/analytics/libraries/{file_key}/style/usages. */
-        GetLibraryAnalyticsStyleUsagesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsStyleUsagesByAsset"][] | components["schemas"]["LibraryAnalyticsStyleUsagesByFile"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Response from the GET /v1/analytics/libraries/{file_key}/variable/actions. */
-        GetLibraryAnalyticsVariableActionsResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsVariableActionsByAsset"][] | components["schemas"]["LibraryAnalyticsVariableActionsByTeam"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Response from the PUT /v1/analytics/libraries/{file_key}/variable/usages. */
-        GetLibraryAnalyticsVariableUsagesResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description An array of analytics data. */
-                    rows: components["schemas"]["LibraryAnalyticsVariableUsagesByAsset"][] | components["schemas"]["LibraryAnalyticsVariableUsagesByFile"][];
-                    /** @description Whether there is a next page of data that can be fetched. */
-                    next_page: boolean;
-                    /** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
-                    cursor?: string;
-                };
-            };
-        };
-        /** @description Bad request. Parameters are invalid or malformed. Please check the input formats. This error can also happen if the requested resources are too large to complete the request, which results in a timeout. Please reduce the number and size of objects requested. */
-        BadRequestErrorResponseWithErrMessage: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrMessage"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 400;
-                };
-            };
-        };
-        /** @description Bad request. Parameters are invalid or malformed. Please check the input formats. This error can also happen if the requested resources are too large to complete the request, which results in a timeout. Please reduce the number and size of objects requested. */
-        BadRequestErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 400;
-                };
-            };
-        };
-        /** @description Token is missing or incorrect. */
-        UnauthorizedErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 401;
-                };
-            };
-        };
-        /** @description The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource, or may need an account of some sort. */
-        ForbiddenErrorResponseWithErrMessage: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrMessage"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 403;
-                };
-            };
-        };
-        /** @description The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource, or may need an account of some sort. */
-        ForbiddenErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 403;
-                };
-            };
-        };
-        /** @description The requested file or resource was not found. */
-        NotFoundErrorResponseWithErrMessage: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrMessage"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 404;
-                };
-            };
-        };
-        /** @description The requested file or resource was not found. */
-        NotFoundErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 404;
-                };
-            };
-        };
-        /** @description In some cases API requests may be throttled or rate limited. Please wait a while before attempting the request again (typically a minute). */
-        TooManyRequestsErrorResponseWithErrMessage: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrMessage"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 429;
-                };
-            };
-        };
-        /** @description In some cases API requests may be throttled or rate limited. Please wait a while before attempting the request again (typically a minute). */
-        TooManyRequestsErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 429;
-                };
-            };
-        };
-        /** @description An internal server error occurred. */
-        InternalServerErrorResponseWithErrMessage: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrMessage"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 500;
-                };
-            };
-        };
-        /** @description An internal server error occurred. */
-        InternalServerErrorResponseWithErrorBoolean: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponsePayloadWithErrorBoolean"] & {
-                    /**
-                     * @description Status code
-                     * @enum {number}
-                     */
-                    status: 500;
-                };
-            };
-        };
-    };
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+	schemas: {
+		IsLayerTrait: {
+			/** @description A string uniquely identifying this node within the document. */
+			id: string;
+			/** @description The name given to the node by the user in the tool. */
+			name: string;
+			/** @description The type of the node */
+			type: string;
+			/**
+			 * @description Whether or not the node is visible on the canvas.
+			 * @default true
+			 */
+			visible: boolean;
+			/**
+			 * @description If true, layer is locked and cannot be edited
+			 * @default false
+			 */
+			locked: boolean;
+			/**
+			 * @deprecated
+			 * @description Whether the layer is fixed while the parent is scrolling
+			 * @default false
+			 */
+			isFixed: boolean;
+			/**
+			 * @description How layer should be treated when the frame is resized
+			 * @default SCROLLS
+			 * @enum {string}
+			 */
+			scrollBehavior: 'SCROLLS' | 'FIXED' | 'STICKY_SCROLLS';
+			/**
+			 * @description The rotation of the node, if not 0.
+			 * @default 0
+			 */
+			rotation: number;
+			/** @description A mapping of a layer's property to component property name of component properties attached to this node. The component property name can be used to look up more information on the corresponding component's or component set's componentPropertyDefinitions. */
+			componentPropertyReferences?: {
+				[key: string]: string;
+			};
+			/** @description Data written by plugins that is visible only to the plugin that wrote it. Requires the `pluginData` to include the ID of the plugin. */
+			pluginData?: unknown;
+			/** @description Data written by plugins that is visible to all plugins. Requires the `pluginData` parameter to include the string "shared". */
+			sharedPluginData?: unknown;
+			/** @description A mapping of field to the variables applied to this field. Most fields will only map to a single `VariableAlias`. However, for properties like `fills`, `strokes`, `size`, `componentProperties`, and `textRangeFills`, it is possible to have multiple variables bound to the field. */
+			boundVariables?: {
+				size?: {
+					x?: components['schemas']['VariableAlias'];
+					y?: components['schemas']['VariableAlias'];
+				};
+				individualStrokeWeights?: {
+					top?: components['schemas']['VariableAlias'];
+					bottom?: components['schemas']['VariableAlias'];
+					left?: components['schemas']['VariableAlias'];
+					right?: components['schemas']['VariableAlias'];
+				};
+				characters?: components['schemas']['VariableAlias'];
+				itemSpacing?: components['schemas']['VariableAlias'];
+				paddingLeft?: components['schemas']['VariableAlias'];
+				paddingRight?: components['schemas']['VariableAlias'];
+				paddingTop?: components['schemas']['VariableAlias'];
+				paddingBottom?: components['schemas']['VariableAlias'];
+				visible?: components['schemas']['VariableAlias'];
+				topLeftRadius?: components['schemas']['VariableAlias'];
+				topRightRadius?: components['schemas']['VariableAlias'];
+				bottomLeftRadius?: components['schemas']['VariableAlias'];
+				bottomRightRadius?: components['schemas']['VariableAlias'];
+				minWidth?: components['schemas']['VariableAlias'];
+				maxWidth?: components['schemas']['VariableAlias'];
+				minHeight?: components['schemas']['VariableAlias'];
+				maxHeight?: components['schemas']['VariableAlias'];
+				counterAxisSpacing?: components['schemas']['VariableAlias'];
+				opacity?: components['schemas']['VariableAlias'];
+				fontFamily?: components['schemas']['VariableAlias'][];
+				fontSize?: components['schemas']['VariableAlias'][];
+				fontStyle?: components['schemas']['VariableAlias'][];
+				fontWeight?: components['schemas']['VariableAlias'][];
+				letterSpacing?: components['schemas']['VariableAlias'][];
+				lineHeight?: components['schemas']['VariableAlias'][];
+				paragraphSpacing?: components['schemas']['VariableAlias'][];
+				paragraphIndent?: components['schemas']['VariableAlias'][];
+				fills?: components['schemas']['VariableAlias'][];
+				strokes?: components['schemas']['VariableAlias'][];
+				componentProperties?: {
+					[key: string]: components['schemas']['VariableAlias'];
+				};
+				textRangeFills?: components['schemas']['VariableAlias'][];
+				effects?: components['schemas']['VariableAlias'][];
+				layoutGrids?: components['schemas']['VariableAlias'][];
+			};
+			/** @description A mapping of variable collection ID to mode ID representing the explicitly set modes for this node. */
+			explicitVariableModes?: {
+				[key: string]: string;
+			};
+		};
+		HasChildrenTrait: {
+			/** @description An array of nodes that are direct children of this node */
+			children: components['schemas']['SubcanvasNode'][];
+		};
+		HasLayoutTrait: {
+			/** @description Bounding box of the node in absolute space coordinates. */
+			absoluteBoundingBox: components['schemas']['Rectangle'] | null;
+			/** @description The actual bounds of a node accounting for drop shadows, thick strokes, and anything else that may fall outside the node's regular bounding box defined in `x`, `y`, `width`, and `height`. The `x` and `y` inside this property represent the absolute position of the node on the page. This value will be `null` if the node is invisible. */
+			absoluteRenderBounds: components['schemas']['Rectangle'] | null;
+			/**
+			 * @description Keep height and width constrained to same ratio.
+			 * @default false
+			 */
+			preserveRatio: boolean;
+			/** @description Horizontal and vertical layout constraints for node. */
+			constraints?: components['schemas']['LayoutConstraint'];
+			/** @description The top two rows of a matrix that represents the 2D transform of this node relative to its parent. The bottom row of the matrix is implicitly always (0, 0, 1). Use to transform coordinates in geometry. Only present if `geometry=paths` is passed. */
+			relativeTransform?: components['schemas']['Transform'];
+			/** @description Width and height of element. This is different from the width and height of the bounding box in that the absolute bounding box represents the element after scaling and rotation. Only present if `geometry=paths` is passed. */
+			size?: components['schemas']['Vector'];
+			/**
+			 * @description
+			 *     Determines if the layer should stretch along the parent's counter axis. This property is only provided for direct children of auto-layout frames.
+			 *
+			 *     - `INHERIT`
+			 *     - `STRETCH`
+			 *
+			 *     In previous versions of auto layout, determined how the layer is aligned inside an auto-layout frame. This property is only provided for direct children of auto-layout frames.
+			 *
+			 *     - `MIN`
+			 *     - `CENTER`
+			 *     - `MAX`
+			 *     - `STRETCH`
+			 *
+			 *     In horizontal auto-layout frames, "MIN" and "MAX" correspond to "TOP" and "BOTTOM". In vertical auto-layout frames, "MIN" and "MAX" correspond to "LEFT" and "RIGHT".
+			 * @enum {string}
+			 */
+			layoutAlign?: 'INHERIT' | 'STRETCH' | 'MIN' | 'CENTER' | 'MAX';
+			/**
+			 * @description This property is applicable only for direct children of auto-layout frames, ignored otherwise. Determines whether a layer should stretch along the parent's primary axis. A `0` corresponds to a fixed size and `1` corresponds to stretch.
+			 * @default 0
+			 * @enum {number}
+			 */
+			layoutGrow: 0 | 1;
+			/**
+			 * @description Determines whether a layer's size and position should be determined by auto-layout settings or manually adjustable.
+			 * @default AUTO
+			 * @enum {string}
+			 */
+			layoutPositioning: 'AUTO' | 'ABSOLUTE';
+			/**
+			 * @description The minimum width of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
+			 * @default 0
+			 */
+			minWidth: number;
+			/**
+			 * @description The maximum width of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
+			 * @default 0
+			 */
+			maxWidth: number;
+			/**
+			 * @description The minimum height of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
+			 * @default 0
+			 */
+			minHeight: number;
+			/**
+			 * @description The maximum height of the frame. This property is only applicable for auto-layout frames or direct children of auto-layout frames.
+			 * @default 0
+			 */
+			maxHeight: number;
+			/**
+			 * @description The horizontal sizing setting on this auto-layout frame or frame child.
+			 *     - `FIXED`
+			 *     - `HUG`: only valid on auto-layout frames and text nodes
+			 *     - `FILL`: only valid on auto-layout frame children
+			 * @enum {string}
+			 */
+			layoutSizingHorizontal?: 'FIXED' | 'HUG' | 'FILL';
+			/**
+			 * @description The vertical sizing setting on this auto-layout frame or frame child.
+			 *     - `FIXED`
+			 *     - `HUG`: only valid on auto-layout frames and text nodes
+			 *     - `FILL`: only valid on auto-layout frame children
+			 * @enum {string}
+			 */
+			layoutSizingVertical?: 'FIXED' | 'HUG' | 'FILL';
+		};
+		HasFramePropertiesTrait: {
+			/** @description Whether or not this node clip content outside of its bounds */
+			clipsContent: boolean;
+			/**
+			 * @deprecated
+			 * @description Background of the node. This is deprecated, as backgrounds for frames are now in the `fills` field.
+			 */
+			background?: components['schemas']['Paint'][];
+			/**
+			 * @deprecated
+			 * @description Background color of the node. This is deprecated, as frames now support more than a solid color as a background. Please use the `fills` field instead.
+			 */
+			backgroundColor?: components['schemas']['RGBA'];
+			/** @description An array of layout grids attached to this node (see layout grids section for more details). GROUP nodes do not have this attribute */
+			layoutGrids?: components['schemas']['LayoutGrid'][];
+			/**
+			 * @description Whether a node has primary axis scrolling, horizontal or vertical.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			overflowDirection: 'HORIZONTAL_SCROLLING' | 'VERTICAL_SCROLLING' | 'HORIZONTAL_AND_VERTICAL_SCROLLING' | 'NONE';
+			/**
+			 * @description Whether this layer uses auto-layout to position its children.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL';
+			/**
+			 * @description Whether the primary axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames.
+			 * @default AUTO
+			 * @enum {string}
+			 */
+			primaryAxisSizingMode: 'FIXED' | 'AUTO';
+			/**
+			 * @description Whether the counter axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames.
+			 * @default AUTO
+			 * @enum {string}
+			 */
+			counterAxisSizingMode: 'FIXED' | 'AUTO';
+			/**
+			 * @description Determines how the auto-layout frame's children should be aligned in the primary axis direction. This property is only applicable for auto-layout frames.
+			 * @default MIN
+			 * @enum {string}
+			 */
+			primaryAxisAlignItems: 'MIN' | 'CENTER' | 'MAX' | 'SPACE_BETWEEN';
+			/**
+			 * @description Determines how the auto-layout frame's children should be aligned in the counter axis direction. This property is only applicable for auto-layout frames.
+			 * @default MIN
+			 * @enum {string}
+			 */
+			counterAxisAlignItems: 'MIN' | 'CENTER' | 'MAX' | 'BASELINE';
+			/**
+			 * @description The padding between the left border of the frame and its children. This property is only applicable for auto-layout frames.
+			 * @default 0
+			 */
+			paddingLeft: number;
+			/**
+			 * @description The padding between the right border of the frame and its children. This property is only applicable for auto-layout frames.
+			 * @default 0
+			 */
+			paddingRight: number;
+			/**
+			 * @description The padding between the top border of the frame and its children. This property is only applicable for auto-layout frames.
+			 * @default 0
+			 */
+			paddingTop: number;
+			/**
+			 * @description The padding between the bottom border of the frame and its children. This property is only applicable for auto-layout frames.
+			 * @default 0
+			 */
+			paddingBottom: number;
+			/**
+			 * @description The distance between children of the frame. Can be negative. This property is only applicable for auto-layout frames.
+			 * @default 0
+			 */
+			itemSpacing: number;
+			/**
+			 * @description Determines the canvas stacking order of layers in this frame. When true, the first layer will be draw on top. This property is only applicable for auto-layout frames.
+			 * @default false
+			 */
+			itemReverseZIndex: boolean;
+			/**
+			 * @description Determines whether strokes are included in layout calculations. When true, auto-layout frames behave like css "box-sizing: border-box". This property is only applicable for auto-layout frames.
+			 * @default false
+			 */
+			strokesIncludedInLayout: boolean;
+			/**
+			 * @description Whether this auto-layout frame has wrapping enabled.
+			 * @enum {string}
+			 */
+			layoutWrap?: 'NO_WRAP' | 'WRAP';
+			/** @description The distance between wrapped tracks of an auto-layout frame. This property is only applicable for auto-layout frames with `layoutWrap: "WRAP"` */
+			counterAxisSpacing?: number;
+			/**
+			 * @description Determines how the auto-layout frame’s wrapped tracks should be aligned in the counter axis direction. This property is only applicable for auto-layout frames with `layoutWrap: "WRAP"`.
+			 * @default AUTO
+			 * @enum {string}
+			 */
+			counterAxisAlignContent: 'AUTO' | 'SPACE_BETWEEN';
+		};
+		HasBlendModeAndOpacityTrait: {
+			/** @description How this node blends with nodes behind it in the scene (see blend mode section for more details) */
+			blendMode: components['schemas']['BlendMode'];
+			/**
+			 * @description Opacity of the node
+			 * @default 1
+			 */
+			opacity: number;
+		};
+		HasExportSettingsTrait: {
+			/** @description An array of export settings representing images to export from the node. */
+			exportSettings?: components['schemas']['ExportSetting'][];
+		};
+		HasGeometryTrait: components['schemas']['MinimalFillsTrait'] &
+			components['schemas']['MinimalStrokesTrait'] & {
+				/** @description Map from ID to PaintOverride for looking up fill overrides. To see which regions are overriden, you must use the `geometry=paths` option. Each path returned may have an `overrideID` which maps to this table. */
+				fillOverrideTable?: {
+					[key: string]: components['schemas']['PaintOverride'] | null;
+				};
+				/** @description Only specified if parameter `geometry=paths` is used. An array of paths representing the object fill. */
+				fillGeometry?: components['schemas']['Path'][];
+				/** @description Only specified if parameter `geometry=paths` is used. An array of paths representing the object stroke. */
+				strokeGeometry?: components['schemas']['Path'][];
+				/**
+				 * @description A string enum describing the end caps of vector paths.
+				 * @default NONE
+				 * @enum {string}
+				 */
+				strokeCap:
+					| 'NONE'
+					| 'ROUND'
+					| 'SQUARE'
+					| 'LINE_ARROW'
+					| 'TRIANGLE_ARROW'
+					| 'DIAMOND_FILLED'
+					| 'CIRCLE_FILLED'
+					| 'TRIANGLE_FILLED'
+					| 'WASHI_TAPE_1'
+					| 'WASHI_TAPE_2'
+					| 'WASHI_TAPE_3'
+					| 'WASHI_TAPE_4'
+					| 'WASHI_TAPE_5'
+					| 'WASHI_TAPE_6';
+				/**
+				 * @description Only valid if `strokeJoin` is "MITER". The corner angle, in degrees, below which `strokeJoin` will be set to "BEVEL" to avoid super sharp corners. By default this is 28.96 degrees.
+				 * @default 28.96
+				 */
+				strokeMiterAngle: number;
+			};
+		MinimalFillsTrait: {
+			/** @description An array of fill paints applied to the node. */
+			fills: components['schemas']['Paint'][];
+			/** @description A mapping of a StyleType to style ID (see Style) of styles present on this node. The style ID can be used to look up more information about the style in the top-level styles field. */
+			styles?: {
+				[key: string]: string;
+			};
+		};
+		MinimalStrokesTrait: {
+			/** @description An array of stroke paints applied to the node. */
+			strokes?: components['schemas']['Paint'][];
+			/**
+			 * @description The weight of strokes on the node.
+			 * @default 1
+			 */
+			strokeWeight: number;
+			/**
+			 * @description Position of stroke relative to vector outline, as a string enum
+			 *
+			 *     - `INSIDE`: stroke drawn inside the shape boundary
+			 *     - `OUTSIDE`: stroke drawn outside the shape boundary
+			 *     - `CENTER`: stroke drawn centered along the shape boundary
+			 * @enum {string}
+			 */
+			strokeAlign?: 'INSIDE' | 'OUTSIDE' | 'CENTER';
+			/**
+			 * @description A string enum with value of "MITER", "BEVEL", or "ROUND", describing how corners in vector paths are rendered.
+			 * @default MITER
+			 * @enum {string}
+			 */
+			strokeJoin: 'MITER' | 'BEVEL' | 'ROUND';
+			/** @description An array of floating point numbers describing the pattern of dash length and gap lengths that the vector stroke will use when drawn.
+			 *
+			 *     For example a value of [1, 2] indicates that the stroke will be drawn with a dash of length 1 followed by a gap of length 2, repeated. */
+			strokeDashes?: number[];
+		};
+		IndividualStrokesTrait: {
+			/** @description An object including the top, bottom, left, and right stroke weights. Only returned if individual stroke weights are used. */
+			individualStrokeWeights?: components['schemas']['StrokeWeights'];
+		};
+		CornerTrait: {
+			/**
+			 * @description Radius of each corner if a single radius is set for all corners
+			 * @default 0
+			 */
+			cornerRadius: number;
+			/** @description A value that lets you control how "smooth" the corners are. Ranges from 0 to 1. 0 is the default and means that the corner is perfectly circular. A value of 0.6 means the corner matches the iOS 7 "squircle" icon shape. Other values produce various other curves. */
+			cornerSmoothing?: number;
+			/** @description Array of length 4 of the radius of each corner of the frame, starting in the top left and proceeding clockwise.
+			 *
+			 *     Values are given in the order top-left, top-right, bottom-right, bottom-left. */
+			rectangleCornerRadii?: number[];
+		};
+		HasEffectsTrait: {
+			/** @description An array of effects attached to this node (see effects section for more details) */
+			effects: components['schemas']['Effect'][];
+		};
+		HasMaskTrait: {
+			/**
+			 * @description Does this node mask sibling nodes in front of it?
+			 * @default false
+			 */
+			isMask: boolean;
+			/**
+			 * @description If this layer is a mask, this property describes the operation used to mask the layer's siblings. The value may be one of the following:
+			 *
+			 *     - ALPHA: the mask node's alpha channel will be used to determine the opacity of each pixel in the masked result.
+			 *     - VECTOR: if the mask node has visible fill paints, every pixel inside the node's fill regions will be fully visible in the masked result. If the mask has visible stroke paints, every pixel inside the node's stroke regions will be fully visible in the masked result.
+			 *     - LUMINANCE: the luminance value of each pixel of the mask node will be used to determine the opacity of that pixel in the masked result.
+			 * @enum {string}
+			 */
+			maskType?: 'ALPHA' | 'VECTOR' | 'LUMINANCE';
+			/**
+			 * @deprecated
+			 * @description True if maskType is VECTOR. This field is deprecated; use maskType instead.
+			 * @default false
+			 */
+			isMaskOutline: boolean;
+		};
+		ComponentPropertiesTrait: {
+			/** @description A mapping of name to `ComponentPropertyDefinition` for every component property on this component. Each property has a type, defaultValue, and other optional values. */
+			componentPropertyDefinitions?: {
+				[key: string]: components['schemas']['ComponentPropertyDefinition'];
+			};
+		};
+		TypePropertiesTrait: {
+			/** @description The raw characters in the text node. */
+			characters: string;
+			/** @description Style of text including font family and weight. */
+			style: components['schemas']['TypeStyle'];
+			/** @description The array corresponds to characters in the text box, where each element references the 'styleOverrideTable' to apply specific styles to each character. The array's length can be less than or equal to the number of characters due to the removal of trailing zeros. Elements with a value of 0 indicate characters that use the default type style. If the array is shorter than the total number of characters, the characters beyond the array's length also use the default style. */
+			characterStyleOverrides: number[];
+			/** @description Internal property, preserved for backward compatibility. Avoid using this value. */
+			layoutVersion?: number;
+			/** @description Map from ID to TypeStyle for looking up style overrides. */
+			styleOverrideTable: {
+				[key: string]: components['schemas']['TypeStyle'];
+			};
+			/** @description An array with the same number of elements as lines in the text node, where lines are delimited by newline or paragraph separator characters. Each element in the array corresponds to the list type of a specific line. List types are represented as string enums with one of these possible values:
+			 *
+			 *     - `NONE`: Not a list item.
+			 *     - `ORDERED`: Text is an ordered list (numbered).
+			 *     - `UNORDERED`: Text is an unordered list (bulleted). */
+			lineTypes: ('NONE' | 'ORDERED' | 'UNORDERED')[];
+			/** @description An array with the same number of elements as lines in the text node, where lines are delimited by newline or paragraph separator characters. Each element in the array corresponds to the indentation level of a specific line. */
+			lineIndentations: number[];
+		};
+		HasTextSublayerTrait: {
+			/** @description Text contained within a text box. */
+			characters: string;
+		};
+		TransitionSourceTrait: {
+			/** @description Node ID of node to transition to in prototyping */
+			transitionNodeID?: string;
+			/** @description The duration of the prototyping transition on this node (in milliseconds). This will override the default transition duration on the prototype, for this node. */
+			transitionDuration?: number;
+			/** @description The easing curve used in the prototyping transition on this node. */
+			transitionEasing?: components['schemas']['EasingType'];
+			interactions?: components['schemas']['Interaction'][];
+		};
+		DevStatusTrait: {
+			/** @description Represents whether or not a node has a particular handoff (or dev) status applied to it. */
+			devStatus?: {
+				/** @enum {string} */
+				type: 'NONE' | 'READY_FOR_DEV' | 'COMPLETED';
+				/** @description An optional field where the designer can add more information about the design and what has changed. */
+				description?: string;
+			};
+		};
+		AnnotationsTrait: Record<string, never>;
+		FrameTraits: components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['HasChildrenTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasFramePropertiesTrait'] &
+			components['schemas']['CornerTrait'] &
+			components['schemas']['HasGeometryTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasMaskTrait'] &
+			components['schemas']['TransitionSourceTrait'] &
+			components['schemas']['IndividualStrokesTrait'] &
+			components['schemas']['DevStatusTrait'] &
+			components['schemas']['AnnotationsTrait'];
+		DefaultShapeTraits: components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasGeometryTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasMaskTrait'] &
+			components['schemas']['TransitionSourceTrait'];
+		CornerRadiusShapeTraits: components['schemas']['DefaultShapeTraits'] & components['schemas']['CornerTrait'];
+		RectangularShapeTraits: components['schemas']['DefaultShapeTraits'] &
+			components['schemas']['CornerTrait'] &
+			components['schemas']['IndividualStrokesTrait'] &
+			components['schemas']['AnnotationsTrait'];
+		Node:
+			| components['schemas']['BooleanOperationNode']
+			| components['schemas']['ComponentNode']
+			| components['schemas']['ComponentSetNode']
+			| components['schemas']['ConnectorNode']
+			| components['schemas']['EllipseNode']
+			| components['schemas']['EmbedNode']
+			| components['schemas']['FrameNode']
+			| components['schemas']['GroupNode']
+			| components['schemas']['InstanceNode']
+			| components['schemas']['LineNode']
+			| components['schemas']['LinkUnfurlNode']
+			| components['schemas']['RectangleNode']
+			| components['schemas']['RegularPolygonNode']
+			| components['schemas']['SectionNode']
+			| components['schemas']['ShapeWithTextNode']
+			| components['schemas']['SliceNode']
+			| components['schemas']['StarNode']
+			| components['schemas']['StickyNode']
+			| components['schemas']['TableNode']
+			| components['schemas']['TableCellNode']
+			| components['schemas']['TextNode']
+			| components['schemas']['VectorNode']
+			| components['schemas']['WashiTapeNode']
+			| components['schemas']['WidgetNode']
+			| components['schemas']['DocumentNode']
+			| components['schemas']['CanvasNode'];
+		DocumentNode: {
+			/** @enum {string} */
+			type: 'DOCUMENT';
+			children: components['schemas']['CanvasNode'][];
+		} & components['schemas']['IsLayerTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'DOCUMENT';
+			};
+		CanvasNode: {
+			/** @enum {string} */
+			type: 'CANVAS';
+			children: components['schemas']['SubcanvasNode'][];
+			/** @description Background color of the canvas. */
+			backgroundColor: components['schemas']['RGBA'];
+			/**
+			 * @deprecated
+			 * @description Node ID that corresponds to the start frame for prototypes. This is deprecated with the introduction of multiple flows. Please use the `flowStartingPoints` field.
+			 */
+			prototypeStartNodeID: string | null;
+			/** @description An array of flow starting points sorted by its position in the prototype settings panel. */
+			flowStartingPoints: components['schemas']['FlowStartingPoint'][];
+			/** @description The device used to view a prototype. */
+			prototypeDevice: components['schemas']['PrototypeDevice'];
+			measurements?: components['schemas']['Measurement'][];
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasExportSettingsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'CANVAS';
+			};
+		SubcanvasNode:
+			| components['schemas']['BooleanOperationNode']
+			| components['schemas']['ComponentNode']
+			| components['schemas']['ComponentSetNode']
+			| components['schemas']['ConnectorNode']
+			| components['schemas']['EllipseNode']
+			| components['schemas']['EmbedNode']
+			| components['schemas']['FrameNode']
+			| components['schemas']['GroupNode']
+			| components['schemas']['InstanceNode']
+			| components['schemas']['LineNode']
+			| components['schemas']['LinkUnfurlNode']
+			| components['schemas']['RectangleNode']
+			| components['schemas']['RegularPolygonNode']
+			| components['schemas']['SectionNode']
+			| components['schemas']['ShapeWithTextNode']
+			| components['schemas']['SliceNode']
+			| components['schemas']['StarNode']
+			| components['schemas']['StickyNode']
+			| components['schemas']['TableNode']
+			| components['schemas']['TableCellNode']
+			| components['schemas']['TextNode']
+			| components['schemas']['VectorNode']
+			| components['schemas']['WashiTapeNode']
+			| components['schemas']['WidgetNode'];
+		BooleanOperationNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "BOOLEAN_OPERATION"
+			 * @enum {string}
+			 */
+			type: 'BOOLEAN_OPERATION';
+			/**
+			 * @description A string enum indicating the type of boolean operation applied.
+			 * @enum {string}
+			 */
+			booleanOperation: 'UNION' | 'INTERSECT' | 'SUBTRACT' | 'EXCLUDE';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['HasChildrenTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasGeometryTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasMaskTrait'] &
+			components['schemas']['TransitionSourceTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'BOOLEAN_OPERATION';
+			};
+		SectionNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "SECTION"
+			 * @enum {string}
+			 */
+			type: 'SECTION';
+			/**
+			 * @description Whether the contents of the section are visible
+			 * @default false
+			 */
+			sectionContentsHidden: boolean;
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasGeometryTrait'] &
+			components['schemas']['HasChildrenTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['DevStatusTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'SECTION';
+			};
+		FrameNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "FRAME"
+			 * @enum {string}
+			 */
+			type: 'FRAME';
+		} & components['schemas']['FrameTraits'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'FRAME';
+			};
+		GroupNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "GROUP"
+			 * @enum {string}
+			 */
+			type: 'GROUP';
+		} & components['schemas']['FrameTraits'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'GROUP';
+			};
+		ComponentNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "COMPONENT"
+			 * @enum {string}
+			 */
+			type: 'COMPONENT';
+		} & components['schemas']['FrameTraits'] &
+			components['schemas']['ComponentPropertiesTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'COMPONENT';
+			};
+		ComponentSetNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "COMPONENT_SET"
+			 * @enum {string}
+			 */
+			type: 'COMPONENT_SET';
+		} & components['schemas']['FrameTraits'] &
+			components['schemas']['ComponentPropertiesTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'COMPONENT_SET';
+			};
+		VectorNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "VECTOR"
+			 * @enum {string}
+			 */
+			type: 'VECTOR';
+		} & components['schemas']['CornerRadiusShapeTraits'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'VECTOR';
+			};
+		StarNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "STAR"
+			 * @enum {string}
+			 */
+			type: 'STAR';
+		} & components['schemas']['CornerRadiusShapeTraits'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'STAR';
+			};
+		LineNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "LINE"
+			 * @enum {string}
+			 */
+			type: 'LINE';
+		} & components['schemas']['DefaultShapeTraits'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'LINE';
+			};
+		EllipseNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "ELLIPSE"
+			 * @enum {string}
+			 */
+			type: 'ELLIPSE';
+			arcData: components['schemas']['ArcData'];
+		} & components['schemas']['DefaultShapeTraits'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'ELLIPSE';
+			};
+		RegularPolygonNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "REGULAR_POLYGON"
+			 * @enum {string}
+			 */
+			type: 'REGULAR_POLYGON';
+		} & components['schemas']['CornerRadiusShapeTraits'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'REGULAR_POLYGON';
+			};
+		RectangleNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "RECTANGLE"
+			 * @enum {string}
+			 */
+			type: 'RECTANGLE';
+		} & components['schemas']['RectangularShapeTraits'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'RECTANGLE';
+			};
+		TextNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "TEXT"
+			 * @enum {string}
+			 */
+			type: 'TEXT';
+		} & components['schemas']['DefaultShapeTraits'] &
+			components['schemas']['TypePropertiesTrait'] &
+			components['schemas']['AnnotationsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'TEXT';
+			};
+		TableNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "TABLE"
+			 * @enum {string}
+			 */
+			type: 'TABLE';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasChildrenTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['MinimalStrokesTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['HasExportSettingsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'TABLE';
+			};
+		TableCellNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "TABLE_CELL"
+			 * @enum {string}
+			 */
+			type: 'TABLE_CELL';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['MinimalFillsTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasTextSublayerTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'TABLE_CELL';
+			};
+		SliceNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "SLICE"
+			 * @enum {string}
+			 */
+			type: 'SLICE';
+		} & components['schemas']['IsLayerTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'SLICE';
+			};
+		InstanceNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "INSTANCE"
+			 * @enum {string}
+			 */
+			type: 'INSTANCE';
+			/** @description ID of component that this instance came from. */
+			componentId: string;
+			/**
+			 * @description If true, this node has been marked as exposed to its containing component or component set.
+			 * @default false
+			 */
+			isExposedInstance: boolean;
+			/** @description IDs of instances that have been exposed to this node's level. */
+			exposedInstances?: string[];
+			/** @description A mapping of name to `ComponentProperty` for all component properties on this instance. Each property has a type, value, and other optional values. */
+			componentProperties?: {
+				[key: string]: components['schemas']['ComponentProperty'];
+			};
+			/** @description An array of all of the fields directly overridden on this instance. Inherited overrides are not included. */
+			overrides: components['schemas']['Overrides'][];
+		} & components['schemas']['FrameTraits'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'INSTANCE';
+			};
+		EmbedNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "EMBED"
+			 * @enum {string}
+			 */
+			type: 'EMBED';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasExportSettingsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'EMBED';
+			};
+		LinkUnfurlNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "LINK_UNFURL"
+			 * @enum {string}
+			 */
+			type: 'LINK_UNFURL';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasExportSettingsTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'LINK_UNFURL';
+			};
+		StickyNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "STICKY"
+			 * @enum {string}
+			 */
+			type: 'STICKY';
+			/**
+			 * @description If true, author name is visible.
+			 * @default false
+			 */
+			authorVisible: boolean;
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['MinimalFillsTrait'] &
+			components['schemas']['HasMaskTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasTextSublayerTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'STICKY';
+			};
+		ShapeWithTextNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "SHAPE_WITH_TEXT"
+			 * @enum {string}
+			 */
+			type: 'SHAPE_WITH_TEXT';
+			/** @description Geometric shape type. Most shape types have the same name as their tooltip but there are a few exceptions. ENG_DATABASE: Cylinder, ENG_QUEUE: Horizontal cylinder, ENG_FILE: File, ENG_FOLDER: Folder. */
+			shapeType: components['schemas']['ShapeType'];
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['MinimalFillsTrait'] &
+			components['schemas']['HasMaskTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasTextSublayerTrait'] &
+			components['schemas']['CornerTrait'] &
+			components['schemas']['MinimalStrokesTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'SHAPE_WITH_TEXT';
+			};
+		ConnectorNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "CONNECTOR"
+			 * @enum {string}
+			 */
+			type: 'CONNECTOR';
+			/** @description The starting point of the connector. */
+			connectorStart: components['schemas']['ConnectorEndpoint'];
+			/** @description The ending point of the connector. */
+			connectorEnd: components['schemas']['ConnectorEndpoint'];
+			/**
+			 * @description A string enum describing the end cap of the start of the connector.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			connectorStartStrokeCap:
+				| 'NONE'
+				| 'LINE_ARROW'
+				| 'TRIANGLE_ARROW'
+				| 'DIAMOND_FILLED'
+				| 'CIRCLE_FILLED'
+				| 'TRIANGLE_FILLED';
+			/**
+			 * @description A string enum describing the end cap of the end of the connector.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			connectorEndStrokeCap:
+				| 'NONE'
+				| 'LINE_ARROW'
+				| 'TRIANGLE_ARROW'
+				| 'DIAMOND_FILLED'
+				| 'CIRCLE_FILLED'
+				| 'TRIANGLE_FILLED';
+			/** @description Connector line type. */
+			connectorLineType: components['schemas']['ConnectorLineType'];
+			/** @description Connector text background. */
+			textBackground?: components['schemas']['ConnectorTextBackground'];
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasLayoutTrait'] &
+			components['schemas']['HasBlendModeAndOpacityTrait'] &
+			components['schemas']['HasEffectsTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasTextSublayerTrait'] &
+			components['schemas']['MinimalStrokesTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'CONNECTOR';
+			};
+		WashiTapeNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "WASHI_TAPE"
+			 * @enum {string}
+			 */
+			type: 'WASHI_TAPE';
+		} & components['schemas']['DefaultShapeTraits'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'WASHI_TAPE';
+			};
+		WidgetNode: {
+			/**
+			 * @description The type of this node, represented by the string literal "WIDGET"
+			 * @enum {string}
+			 */
+			type: 'WIDGET';
+		} & components['schemas']['IsLayerTrait'] &
+			components['schemas']['HasExportSettingsTrait'] &
+			components['schemas']['HasChildrenTrait'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'WIDGET';
+			};
+		/** @description An RGB color */
+		RGB: {
+			/** @description Red channel value, between 0 and 1. */
+			r: number;
+			/** @description Green channel value, between 0 and 1. */
+			g: number;
+			/** @description Blue channel value, between 0 and 1. */
+			b: number;
+		};
+		/** @description An RGBA color */
+		RGBA: {
+			/** @description Red channel value, between 0 and 1. */
+			r: number;
+			/** @description Green channel value, between 0 and 1. */
+			g: number;
+			/** @description Blue channel value, between 0 and 1. */
+			b: number;
+			/** @description Alpha channel value, between 0 and 1. */
+			a: number;
+		};
+		/** @description A flow starting point used when launching a prototype to enter Presentation view. */
+		FlowStartingPoint: {
+			/** @description Unique identifier specifying the frame. */
+			nodeId: string;
+			/** @description Name of flow. */
+			name: string;
+		};
+		/** @description A width and a height. */
+		Size: {
+			/** @description The width of a size. */
+			width: number;
+			/** @description the height of a size. */
+			height: number;
+		};
+		/** @description The device used to view a prototype. */
+		PrototypeDevice: {
+			/** @enum {string} */
+			type: 'NONE' | 'PRESET' | 'CUSTOM' | 'PRESENTATION';
+			size?: components['schemas']['Size'];
+			presetIdentifier?: string;
+			/** @enum {string} */
+			rotation: 'NONE' | 'CCW_90';
+		};
+		/** @description Sizing constraint for exports. */
+		Constraint: {
+			/**
+			 * @description Type of constraint to apply:
+			 *
+			 *     - `SCALE`: Scale by `value`.
+			 *     - `WIDTH`: Scale proportionally and set width to `value`.
+			 *     - `HEIGHT`: Scale proportionally and set height to `value`.
+			 * @enum {string}
+			 */
+			type: 'SCALE' | 'WIDTH' | 'HEIGHT';
+			/** @description See type property for effect of this field. */
+			value: number;
+		};
+		/** @description An export setting. */
+		ExportSetting: {
+			suffix: string;
+			/** @enum {string} */
+			format: 'JPG' | 'PNG' | 'SVG' | 'PDF';
+			constraint: components['schemas']['Constraint'];
+		};
+		/**
+		 * @description This type is a string enum with the following possible values
+		 *
+		 *     Normal blends:
+		 *     - `PASS_THROUGH` (only applicable to objects with children)
+		 *     - `NORMAL`
+		 *
+		 *     Darken:
+		 *     - `DARKEN`
+		 *     - `MULTIPLY`
+		 *     - `LINEAR_BURN`
+		 *     - `COLOR_BURN`
+		 *
+		 *     Lighten:
+		 *     - `LIGHTEN`
+		 *     - `SCREEN`
+		 *     - `LINEAR_DODGE`
+		 *     - `COLOR_DODGE`
+		 *
+		 *     Contrast:
+		 *     - `OVERLAY`
+		 *     - `SOFT_LIGHT`
+		 *     - `HARD_LIGHT`
+		 *
+		 *     Inversion:
+		 *     - `DIFFERENCE`
+		 *     - `EXCLUSION`
+		 *
+		 *     Component:
+		 *     - `HUE`
+		 *     - `SATURATION`
+		 *     - `COLOR`
+		 *     - `LUMINOSITY`
+		 * @enum {string}
+		 */
+		BlendMode:
+			| 'PASS_THROUGH'
+			| 'NORMAL'
+			| 'DARKEN'
+			| 'MULTIPLY'
+			| 'LINEAR_BURN'
+			| 'COLOR_BURN'
+			| 'LIGHTEN'
+			| 'SCREEN'
+			| 'LINEAR_DODGE'
+			| 'COLOR_DODGE'
+			| 'OVERLAY'
+			| 'SOFT_LIGHT'
+			| 'HARD_LIGHT'
+			| 'DIFFERENCE'
+			| 'EXCLUSION'
+			| 'HUE'
+			| 'SATURATION'
+			| 'COLOR'
+			| 'LUMINOSITY';
+		/** @description A 2d vector. */
+		Vector: {
+			/** @description X coordinate of the vector. */
+			x: number;
+			/** @description Y coordinate of the vector. */
+			y: number;
+		};
+		/** @description A single color stop with its position along the gradient axis, color, and bound variables if any */
+		ColorStop: {
+			/** @description Value between 0 and 1 representing position along gradient axis. */
+			position: number;
+			/** @description Color attached to corresponding position. */
+			color: components['schemas']['RGBA'];
+			/** @description The variables bound to a particular gradient stop */
+			boundVariables?: {
+				color?: components['schemas']['VariableAlias'];
+			};
+		};
+		/** @description A transformation matrix is standard way in computer graphics to represent translation and rotation. These are the top two rows of a 3x3 matrix. The bottom row of the matrix is assumed to be [0, 0, 1]. This is known as an affine transform and is enough to represent translation, rotation, and skew.
+		 *
+		 *     The identity transform is [[1, 0, 0], [0, 1, 0]].
+		 *
+		 *     A translation matrix will typically look like:
+		 *
+		 *     ```
+		 *     [[1, 0, tx],
+		 *       [0, 1, ty]]
+		 *     ```
+		 *
+		 *     and a rotation matrix will typically look like:
+		 *
+		 *     ```
+		 *     [[cos(angle), sin(angle), 0],
+		 *       [-sin(angle), cos(angle), 0]]
+		 *     ```
+		 *
+		 *     Another way to think about this transform is as three vectors:
+		 *
+		 *     - The x axis (t[0][0], t[1][0])
+		 *     - The y axis (t[0][1], t[1][1])
+		 *     - The translation offset (t[0][2], t[1][2])
+		 *
+		 *     The most common usage of the Transform matrix is the `relativeTransform property`. This particular usage of the matrix has a few additional restrictions. The translation offset can take on any value but we do enforce that the axis vectors are unit vectors (i.e. have length 1). The axes are not required to be at 90° angles to each other. */
+		Transform: number[][];
+		/** @description Image filters to apply to the node. */
+		ImageFilters: {
+			/** @default 0 */
+			exposure: number;
+			/** @default 0 */
+			contrast: number;
+			/** @default 0 */
+			saturation: number;
+			/** @default 0 */
+			temperature: number;
+			/** @default 0 */
+			tint: number;
+			/** @default 0 */
+			highlights: number;
+			/** @default 0 */
+			shadows: number;
+		};
+		BasePaint: {
+			/**
+			 * @description Is the paint enabled?
+			 * @default true
+			 */
+			visible: boolean;
+			/**
+			 * @description Overall opacity of paint (colors within the paint can also have opacity values which would blend with this)
+			 * @default 1
+			 */
+			opacity: number;
+			/** @description How this node blends with nodes behind it in the scene */
+			blendMode: components['schemas']['BlendMode'];
+		};
+		SolidPaint: {
+			/**
+			 * @description The string literal "SOLID" representing the paint's type. Always check the `type` before reading other properties.
+			 * @enum {string}
+			 */
+			type: 'SOLID';
+			/** @description Solid color of the paint */
+			color: components['schemas']['RGBA'];
+			/** @description The variables bound to a particular field on this paint */
+			boundVariables?: {
+				color?: components['schemas']['VariableAlias'];
+			};
+		} & components['schemas']['BasePaint'];
+		GradientPaint: {
+			/**
+			 * @description The string literal representing the paint's type. Always check the `type` before reading other properties.
+			 * @enum {string}
+			 */
+			type: 'GRADIENT_LINEAR' | 'GRADIENT_RADIAL' | 'GRADIENT_ANGULAR' | 'GRADIENT_DIAMOND';
+			/** @description This field contains three vectors, each of which are a position in normalized object space (normalized object space is if the top left corner of the bounding box of the object is (0, 0) and the bottom right is (1,1)). The first position corresponds to the start of the gradient (value 0 for the purposes of calculating gradient stops), the second position is the end of the gradient (value 1), and the third handle position determines the width of the gradient. */
+			gradientHandlePositions: components['schemas']['Vector'][];
+			/** @description Positions of key points along the gradient axis with the colors anchored there. Colors along the gradient are interpolated smoothly between neighboring gradient stops. */
+			gradientStops: components['schemas']['ColorStop'][];
+		} & components['schemas']['BasePaint'];
+		ImagePaint: {
+			/**
+			 * @description The string literal "IMAGE" representing the paint's type. Always check the `type` before reading other properties.
+			 * @enum {string}
+			 */
+			type: 'IMAGE';
+			/**
+			 * @description Image scaling mode.
+			 * @enum {string}
+			 */
+			scaleMode: 'FILL' | 'FIT' | 'TILE' | 'STRETCH';
+			/** @description A reference to an image embedded in this node. To download the image using this reference, use the `GET file images` endpoint to retrieve the mapping from image references to image URLs. */
+			imageRef: string;
+			/** @description Affine transform applied to the image, only present if `scaleMode` is `STRETCH` */
+			imageTransform?: components['schemas']['Transform'];
+			/** @description Amount image is scaled by in tiling, only present if scaleMode is `TILE`. */
+			scalingFactor?: number;
+			/** @description Defines what image filters have been applied to this paint, if any. If this property is not defined, no filters have been applied. */
+			filters?: components['schemas']['ImageFilters'];
+			/**
+			 * @description Image rotation, in degrees.
+			 * @default 0
+			 */
+			rotation: number;
+			/** @description A reference to an animated GIF embedded in this node. To download the image using this reference, use the `GET file images` endpoint to retrieve the mapping from image references to image URLs. */
+			gifRef?: string;
+		} & components['schemas']['BasePaint'];
+		Paint:
+			| components['schemas']['SolidPaint']
+			| components['schemas']['GradientPaint']
+			| components['schemas']['ImagePaint'];
+		/** @description Layout constraint relative to containing Frame */
+		LayoutConstraint: {
+			/**
+			 * @description Vertical constraint (relative to containing frame) as an enum:
+			 *
+			 *     - `TOP`: Node is laid out relative to top of the containing frame
+			 *     - `BOTTOM`: Node is laid out relative to bottom of the containing frame
+			 *     - `CENTER`: Node is vertically centered relative to containing frame
+			 *     - `TOP_BOTTOM`: Both top and bottom of node are constrained relative to containing frame (node stretches with frame)
+			 *     - `SCALE`: Node scales vertically with containing frame
+			 * @enum {string}
+			 */
+			vertical: 'TOP' | 'BOTTOM' | 'CENTER' | 'TOP_BOTTOM' | 'SCALE';
+			/**
+			 * @description Horizontal constraint (relative to containing frame) as an enum:
+			 *
+			 *     - `LEFT`: Node is laid out relative to left of the containing frame
+			 *     - `RIGHT`: Node is laid out relative to right of the containing frame
+			 *     - `CENTER`: Node is horizontally centered relative to containing frame
+			 *     - `LEFT_RIGHT`: Both left and right of node are constrained relative to containing frame (node stretches with frame)
+			 *     - `SCALE`: Node scales horizontally with containing frame
+			 * @enum {string}
+			 */
+			horizontal: 'LEFT' | 'RIGHT' | 'CENTER' | 'LEFT_RIGHT' | 'SCALE';
+		};
+		/** @description A rectangle that expresses a bounding box in absolute coordinates. */
+		Rectangle: {
+			/** @description X coordinate of top left corner of the rectangle. */
+			x: number;
+			/** @description Y coordinate of top left corner of the rectangle. */
+			y: number;
+			/** @description Width of the rectangle. */
+			width: number;
+			/** @description Height of the rectangle. */
+			height: number;
+		};
+		/** @description Guides to align and place objects within a frames. */
+		LayoutGrid: {
+			/**
+			 * @description Orientation of the grid as a string enum
+			 *
+			 *     - `COLUMNS`: Vertical grid
+			 *     - `ROWS`: Horizontal grid
+			 *     - `GRID`: Square grid
+			 * @enum {string}
+			 */
+			pattern: 'COLUMNS' | 'ROWS' | 'GRID';
+			/** @description Width of column grid or height of row grid or square grid spacing. */
+			sectionSize: number;
+			/** @description Is the grid currently visible? */
+			visible: boolean;
+			/** @description Color of the grid */
+			color: components['schemas']['RGBA'];
+			/**
+			 * @description Positioning of grid as a string enum
+			 *
+			 *     - `MIN`: Grid starts at the left or top of the frame
+			 *     - `MAX`: Grid starts at the right or bottom of the frame
+			 *     - `STRETCH`: Grid is stretched to fit the frame
+			 *     - `CENTER`: Grid is center aligned
+			 * @enum {string}
+			 */
+			alignment: 'MIN' | 'MAX' | 'STRETCH' | 'CENTER';
+			/** @description Spacing in between columns and rows */
+			gutterSize: number;
+			/** @description Spacing before the first column or row */
+			offset: number;
+			/** @description Number of columns or rows */
+			count: number;
+			/** @description The variables bound to a particular field on this layout grid */
+			boundVariables?: {
+				gutterSize?: components['schemas']['VariableAlias'];
+				numSections?: components['schemas']['VariableAlias'];
+				sectionSize?: components['schemas']['VariableAlias'];
+				offset?: components['schemas']['VariableAlias'];
+			};
+		};
+		/** @description Base properties shared by all shadow effects */
+		BaseShadowEffect: {
+			/** @description The color of the shadow */
+			color: components['schemas']['RGBA'];
+			/** @description Blend mode of the shadow */
+			blendMode: components['schemas']['BlendMode'];
+			/** @description How far the shadow is projected in the x and y directions */
+			offset: components['schemas']['Vector'];
+			/** @description Radius of the blur effect (applies to shadows as well) */
+			radius: number;
+			/**
+			 * @description The distance by which to expand (or contract) the shadow.
+			 *
+			 *     For drop shadows, a positive `spread` value creates a shadow larger than the node, whereas a negative value creates a shadow smaller than the node.
+			 *
+			 *     For inner shadows, a positive `spread` value contracts the shadow. Spread values are only accepted on rectangles and ellipses, or on frames, components, and instances with visible fill paints and `clipsContent` enabled. When left unspecified, the default value is 0.
+			 * @default 0
+			 */
+			spread: number;
+			/** @description Whether this shadow is visible. */
+			visible: boolean;
+			/** @description The variables bound to a particular field on this shadow effect */
+			boundVariables?: {
+				radius?: components['schemas']['VariableAlias'];
+				spread?: components['schemas']['VariableAlias'];
+				color?: components['schemas']['VariableAlias'];
+				offsetX?: components['schemas']['VariableAlias'];
+				offsetY?: components['schemas']['VariableAlias'];
+			};
+		};
+		DropShadowEffect: {
+			/**
+			 * @description A string literal representing the effect's type. Always check the type before reading other properties.
+			 * @enum {string}
+			 */
+			type: 'DROP_SHADOW';
+			/**
+			 * @description Whether to show the shadow behind translucent or transparent pixels
+			 * @default false
+			 */
+			showShadowBehindNode: boolean;
+		} & components['schemas']['BaseShadowEffect'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'DROP_SHADOW';
+			};
+		InnerShadowEffect: {
+			/**
+			 * @description A string literal representing the effect's type. Always check the type before reading other properties.
+			 * @enum {string}
+			 */
+			type?: 'INNER_SHADOW';
+		} & components['schemas']['BaseShadowEffect'] & {
+				/**
+				 * @description discriminator enum property added by openapi-typescript
+				 * @enum {string}
+				 */
+				type: 'INNER_SHADOW';
+			};
+		/** @description A blur effect */
+		BlurEffect: {
+			/**
+			 * @description A string literal representing the effect's type. Always check the type before reading other properties. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'LAYER_BLUR' | 'BACKGROUND_BLUR';
+			/** @description Whether this blur is active. */
+			visible: boolean;
+			/** @description Radius of the blur effect */
+			radius: number;
+			/** @description The variables bound to a particular field on this blur effect */
+			boundVariables?: {
+				radius?: components['schemas']['VariableAlias'];
+			};
+		};
+		Effect:
+			| components['schemas']['DropShadowEffect']
+			| components['schemas']['InnerShadowEffect']
+			| components['schemas']['BlurEffect'];
+		/** @description A set of properties that can be applied to nodes and published. Styles for a property can be created in the corresponding property's panel while editing a file. */
+		Style: {
+			/** @description The key of the style */
+			key: string;
+			/** @description Name of the style */
+			name: string;
+			/** @description Description of the style */
+			description: string;
+			/** @description Whether this style is a remote style that doesn't live in this file */
+			remote: boolean;
+			styleType: components['schemas']['StyleType'];
+		};
+		/**
+		 * @description This type is a string enum with the following possible values:
+		 *
+		 *     - `EASE_IN`: Ease in with an animation curve similar to CSS ease-in.
+		 *     - `EASE_OUT`: Ease out with an animation curve similar to CSS ease-out.
+		 *     - `EASE_IN_AND_OUT`: Ease in and then out with an animation curve similar to CSS ease-in-out.
+		 *     - `LINEAR`: No easing, similar to CSS linear.
+		 *     - `EASE_IN_BACK`: Ease in with an animation curve that moves past the initial keyframe's value and then accelerates as it reaches the end.
+		 *     - `EASE_OUT_BACK`: Ease out with an animation curve that starts fast, then slows and goes past the ending keyframe's value.
+		 *     - `EASE_IN_AND_OUT_BACK`: Ease in and then out with an animation curve that overshoots the initial keyframe's value, then accelerates quickly before it slows and overshoots the ending keyframes value.
+		 *     - `CUSTOM_CUBIC_BEZIER`: User-defined cubic bezier curve.
+		 *     - `GENTLE`: Gentle animation similar to react-spring.
+		 *     - `QUICK`: Quick spring animation, great for toasts and notifications.
+		 *     - `BOUNCY`: Bouncy spring, for delightful animations like a heart bounce.
+		 *     - `SLOW`: Slow spring, useful as a steady, natural way to scale up fullscreen content.
+		 *     - `CUSTOM_SPRING`: User-defined spring animation.
+		 * @enum {string}
+		 */
+		EasingType:
+			| 'EASE_IN'
+			| 'EASE_OUT'
+			| 'EASE_IN_AND_OUT'
+			| 'LINEAR'
+			| 'EASE_IN_BACK'
+			| 'EASE_OUT_BACK'
+			| 'EASE_IN_AND_OUT_BACK'
+			| 'CUSTOM_CUBIC_BEZIER'
+			| 'GENTLE'
+			| 'QUICK'
+			| 'BOUNCY'
+			| 'SLOW'
+			| 'CUSTOM_SPRING';
+		/** @description Individual stroke weights */
+		StrokeWeights: {
+			/** @description The top stroke weight. */
+			top: number;
+			/** @description The right stroke weight. */
+			right: number;
+			/** @description The bottom stroke weight. */
+			bottom: number;
+			/** @description The left stroke weight. */
+			left: number;
+		};
+		/** @description Paint metadata to override default paints. */
+		PaintOverride: {
+			/** @description Paints applied to characters. */
+			fills?: components['schemas']['Paint'][];
+			/** @description ID of style node, if any, that this inherits fill data from. */
+			inheritFillStyleId?: string;
+		};
+		/** @description Defines a single path */
+		Path: {
+			/** @description A series of path commands that encodes how to draw the path. */
+			path: string;
+			/**
+			 * @description The winding rule for the path (same as in SVGs). This determines whether a given point in space is inside or outside the path.
+			 * @enum {string}
+			 */
+			windingRule: 'NONZERO' | 'EVENODD';
+			/** @description If there is a per-region fill, this refers to an ID in the `fillOverrideTable`. */
+			overrideID?: number;
+		};
+		/** @description Information about the arc properties of an ellipse. 0° is the x axis and increasing angles rotate clockwise. */
+		ArcData: {
+			/**
+			 * @description Start of the sweep in radians.
+			 * @default 0
+			 */
+			startingAngle: number;
+			/**
+			 * @description End of the sweep in radians.
+			 * @default 0
+			 */
+			endingAngle: number;
+			/**
+			 * @description Inner radius value between 0 and 1
+			 * @default 0
+			 */
+			innerRadius: number;
+		};
+		/** @description A link to either a URL or another frame (node) in the document. */
+		Hyperlink: {
+			/**
+			 * @description The type of hyperlink. Can be either `URL` or `NODE`.
+			 * @enum {string}
+			 */
+			type: 'URL' | 'NODE';
+			/** @description The URL that the hyperlink points to, if `type` is `URL`. */
+			url?: string;
+			/** @description The ID of the node that the hyperlink points to, if `type` is `NODE`. */
+			nodeID?: string;
+		};
+		/** @description Metadata for character formatting. */
+		TypeStyle: {
+			/** @description Font family of text (standard name). */
+			fontFamily?: string;
+			/** @description PostScript font name. */
+			fontPostScriptName?: string | null;
+			/** @description Describes visual weight or emphasis, such as Bold or Italic. */
+			fontStyle?: string;
+			/**
+			 * @description Space between paragraphs in px, 0 if not present.
+			 * @default 0
+			 */
+			paragraphSpacing: number;
+			/**
+			 * @description Paragraph indentation in px, 0 if not present.
+			 * @default 0
+			 */
+			paragraphIndent: number;
+			/**
+			 * @description Space between list items in px, 0 if not present.
+			 * @default 0
+			 */
+			listSpacing: number;
+			/**
+			 * @description Whether or not text is italicized.
+			 * @default false
+			 */
+			italic: boolean;
+			/** @description Numeric font weight. */
+			fontWeight?: number;
+			/** @description Font size in px. */
+			fontSize?: number;
+			/**
+			 * @description Text casing applied to the node, default is the original casing.
+			 * @enum {string}
+			 */
+			textCase?: 'UPPER' | 'LOWER' | 'TITLE' | 'SMALL_CAPS' | 'SMALL_CAPS_FORCED';
+			/**
+			 * @description Text decoration applied to the node, default is none.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			textDecoration: 'NONE' | 'STRIKETHROUGH' | 'UNDERLINE';
+			/**
+			 * @description Dimensions along which text will auto resize, default is that the text does not auto-resize. TRUNCATE means that the text will be shortened and trailing text will be replaced with "…" if the text contents is larger than the bounds. `TRUNCATE` as a return value is deprecated and will be removed in a future version. Read from `textTruncation` instead.
+			 * @default NONE
+			 * @enum {string}
+			 */
+			textAutoResize: 'NONE' | 'WIDTH_AND_HEIGHT' | 'HEIGHT' | 'TRUNCATE';
+			/**
+			 * @description Whether this text node will truncate with an ellipsis when the text contents is larger than the text node.
+			 * @default DISABLED
+			 * @enum {string}
+			 */
+			textTruncation: 'DISABLED' | 'ENDING';
+			/** @description When `textTruncation: "ENDING"` is set, `maxLines` determines how many lines a text node can grow to before it truncates. */
+			maxLines?: number;
+			/**
+			 * @description Horizontal text alignment as string enum.
+			 * @enum {string}
+			 */
+			textAlignHorizontal?: 'LEFT' | 'RIGHT' | 'CENTER' | 'JUSTIFIED';
+			/**
+			 * @description Vertical text alignment as string enum.
+			 * @enum {string}
+			 */
+			textAlignVertical?: 'TOP' | 'CENTER' | 'BOTTOM';
+			/** @description Space between characters in px. */
+			letterSpacing?: number;
+			/** @description An array of fill paints applied to the characters. */
+			fills?: components['schemas']['Paint'][];
+			/** @description Link to a URL or frame. */
+			hyperlink?: components['schemas']['Hyperlink'];
+			/** @description A map of OpenType feature flags to 1 or 0, 1 if it is enabled and 0 if it is disabled. Note that some flags aren't reflected here. For example, SMCP (small caps) is still represented by the `textCase` field. */
+			opentypeFlags?: {
+				[key: string]: number;
+			};
+			/** @description Line height in px. */
+			lineHeightPx?: number;
+			/**
+			 * @description Line height as a percentage of normal line height. This is deprecated; in a future version of the API only lineHeightPx and lineHeightPercentFontSize will be returned.
+			 * @default 100
+			 */
+			lineHeightPercent: number;
+			/** @description Line height as a percentage of the font size. Only returned when `lineHeightPercent` (deprecated) is not 100. */
+			lineHeightPercentFontSize?: number;
+			/**
+			 * @description The unit of the line height value specified by the user.
+			 * @enum {string}
+			 */
+			lineHeightUnit?: 'PIXELS' | 'FONT_SIZE_%' | 'INTRINSIC_%';
+			/** @description The variables bound to a particular field on this style */
+			boundVariables?: {
+				fontFamily?: components['schemas']['VariableAlias'];
+				fontSize?: components['schemas']['VariableAlias'];
+				fontStyle?: components['schemas']['VariableAlias'];
+				fontWeight?: components['schemas']['VariableAlias'];
+				letterSpacing?: components['schemas']['VariableAlias'];
+				lineHeight?: components['schemas']['VariableAlias'];
+				paragraphSpacing?: components['schemas']['VariableAlias'];
+				paragraphIndent?: components['schemas']['VariableAlias'];
+			};
+			/** @description  Whether or not this style has overrides over a text style. The possible fields to override are semanticWeight, semanticItalic, hyperlink, and textDecoration. If this is true, then those fields are overrides if present. */
+			isOverrideOverTextStyle?: boolean;
+			/**
+			 * @description Indicates how the font weight was overridden when there is a text style override.
+			 * @enum {string}
+			 */
+			semanticWeight?: 'BOLD' | 'NORMAL';
+			/**
+			 * @description Indicates how the font style was overridden when there is a text style override.
+			 * @enum {string}
+			 */
+			semanticItalic?: 'ITALIC' | 'NORMAL';
+		};
+		/**
+		 * @description Component property type.
+		 * @enum {string}
+		 */
+		ComponentPropertyType: 'BOOLEAN' | 'INSTANCE_SWAP' | 'TEXT' | 'VARIANT';
+		/** @description Instance swap preferred value. */
+		InstanceSwapPreferredValue: {
+			/**
+			 * @description Type of node for this preferred value.
+			 * @enum {string}
+			 */
+			type: 'COMPONENT' | 'COMPONENT_SET';
+			/** @description Key of this component or component set. */
+			key: string;
+		};
+		/** @description A property of a component. */
+		ComponentPropertyDefinition: {
+			/** @description Type of this component property. */
+			type: components['schemas']['ComponentPropertyType'];
+			/** @description Initial value of this property for instances. */
+			defaultValue: boolean | string;
+			/** @description All possible values for this property. Only exists on VARIANT properties. */
+			variantOptions?: string[];
+			/** @description Preferred values for this property. Only applicable if type is `INSTANCE_SWAP`. */
+			preferredValues?: components['schemas']['InstanceSwapPreferredValue'][];
+		};
+		/** @description A property of a component. */
+		ComponentProperty: {
+			/** @description Type of this component property. */
+			type: components['schemas']['ComponentPropertyType'];
+			/** @description Value of the property for this component instance. */
+			value: boolean | string;
+			/** @description Preferred values for this property. Only applicable if type is `INSTANCE_SWAP`. */
+			preferredValues?: components['schemas']['InstanceSwapPreferredValue'][];
+			/** @description The variables bound to a particular field on this component property */
+			boundVariables?: {
+				value?: components['schemas']['VariableAlias'];
+			};
+		};
+		/** @description Fields directly overridden on an instance. Inherited overrides are not included. */
+		Overrides: {
+			/** @description A unique ID for a node. */
+			id: string;
+			/** @description An array of properties. */
+			overriddenFields: string[];
+		};
+		/**
+		 * @description Geometric shape type.
+		 * @enum {string}
+		 */
+		ShapeType:
+			| 'SQUARE'
+			| 'ELLIPSE'
+			| 'ROUNDED_RECTANGLE'
+			| 'DIAMOND'
+			| 'TRIANGLE_UP'
+			| 'TRIANGLE_DOWN'
+			| 'PARALLELOGRAM_RIGHT'
+			| 'PARALLELOGRAM_LEFT'
+			| 'ENG_DATABASE'
+			| 'ENG_QUEUE'
+			| 'ENG_FILE'
+			| 'ENG_FOLDER'
+			| 'TRAPEZOID'
+			| 'PREDEFINED_PROCESS'
+			| 'SHIELD'
+			| 'DOCUMENT_SINGLE'
+			| 'DOCUMENT_MULTIPLE'
+			| 'MANUAL_INPUT'
+			| 'HEXAGON'
+			| 'CHEVRON'
+			| 'PENTAGON'
+			| 'OCTAGON'
+			| 'STAR'
+			| 'PLUS'
+			| 'ARROW_LEFT'
+			| 'ARROW_RIGHT'
+			| 'SUMMING_JUNCTION'
+			| 'OR'
+			| 'SPEECH_BUBBLE'
+			| 'INTERNAL_STORAGE';
+		/** @description Stores canvas location for a connector start/end point. */
+		ConnectorEndpoint:
+			| {
+					/** @description Node ID that this endpoint attaches to. */
+					endpointNodeId?: string;
+					/** @description The position of the endpoint relative to the node. */
+					position?: components['schemas']['Vector'];
+			  }
+			| {
+					/** @description Node ID that this endpoint attaches to. */
+					endpointNodeId?: string;
+					/**
+					 * @description The magnet type is a string enum.
+					 * @enum {string}
+					 */
+					magnet?: 'AUTO' | 'TOP' | 'BOTTOM' | 'LEFT' | 'RIGHT' | 'CENTER';
+			  };
+		/**
+		 * @description Connector line type.
+		 * @enum {string}
+		 */
+		ConnectorLineType: 'STRAIGHT' | 'ELBOWED';
+		ConnectorTextBackground: components['schemas']['CornerTrait'] & components['schemas']['MinimalFillsTrait'];
+		/** @description A description of a main component. Helps you identify which component instances are attached to. */
+		Component: {
+			/** @description The key of the component */
+			key: string;
+			/** @description Name of the component */
+			name: string;
+			/** @description The description of the component as entered in the editor */
+			description: string;
+			/** @description The ID of the component set if the component belongs to one */
+			componentSetId?: string;
+			/** @description An array of documentation links attached to this component */
+			documentationLinks: components['schemas']['DocumentationLink'][];
+			/** @description Whether this component is a remote component that doesn't live in this file */
+			remote: boolean;
+		};
+		/** @description A description of a component set, which is a node containing a set of variants of a component. */
+		ComponentSet: {
+			/** @description The key of the component set */
+			key: string;
+			/** @description Name of the component set */
+			name: string;
+			/** @description The description of the component set as entered in the editor */
+			description: string;
+			/** @description An array of documentation links attached to this component set */
+			documentationLinks?: components['schemas']['DocumentationLink'][];
+			/** @description Whether this component set is a remote component set that doesn't live in this file */
+			remote?: boolean;
+		};
+		/** @description Represents a link to documentation for a component or component set. */
+		DocumentationLink: {
+			/** @description Should be a valid URI (e.g. https://www.figma.com). */
+			uri: string;
+		};
+		/** @description Contains a variable alias */
+		VariableAlias: {
+			/** @enum {string} */
+			type: 'VARIABLE_ALIAS';
+			/** @description The id of the variable that the current variable is aliased to. This variable can be a local or remote variable, and both can be retrieved via the GET /v1/files/:file_key/variables/local endpoint. */
+			id: string;
+		};
+		/** @description An interaction in the Figma viewer, containing a trigger and one or more actions. */
+		Interaction: {
+			/** @description The user event that initiates the interaction. */
+			trigger: components['schemas']['Trigger'] | null;
+			/** @description The actions that are performed when the trigger is activated. */
+			actions?: components['schemas']['Action'][];
+		};
+		/** @description The `"ON_HOVER"` and `"ON_PRESS"` trigger types revert the navigation when the trigger is finished (the result is temporary).
+		 *     `"MOUSE_ENTER"`, `"MOUSE_LEAVE"`, `"MOUSE_UP"` and `"MOUSE_DOWN"` are permanent, one-way navigation.
+		 *     The `delay` parameter requires the trigger to be held for a certain duration of time before the action occurs.
+		 *     Both `timeout` and `delay` values are in milliseconds.
+		 *     The `"ON_MEDIA_HIT"` and `"ON_MEDIA_END"` trigger types can only trigger from a video.
+		 *     They fire when a video reaches a certain time or ends. The `timestamp` value is in seconds. */
+		Trigger:
+			| {
+					/** @enum {string} */
+					type: 'ON_CLICK' | 'ON_HOVER' | 'ON_PRESS' | 'ON_DRAG';
+			  }
+			| components['schemas']['AfterTimeoutTrigger']
+			| {
+					/** @enum {string} */
+					type: 'MOUSE_ENTER' | 'MOUSE_LEAVE' | 'MOUSE_UP' | 'MOUSE_DOWN';
+					delay: number;
+					/** @description Whether this is a [deprecated version](https://help.figma.com/hc/en-us/articles/360040035834-Prototype-triggers#h_01HHN04REHJNP168R26P1CMP0A) of the trigger that was left unchanged for backwards compatibility.
+					 *     If not present, the trigger is the latest version. */
+					deprecatedVersion?: boolean;
+			  }
+			| components['schemas']['OnKeyDownTrigger']
+			| components['schemas']['OnMediaHitTrigger']
+			| {
+					/** @enum {string} */
+					type: 'ON_MEDIA_END';
+			  };
+		AfterTimeoutTrigger: {
+			/** @enum {string} */
+			type: 'AFTER_TIMEOUT';
+			timeout: number;
+		};
+		OnKeyDownTrigger: {
+			/** @enum {string} */
+			type: 'ON_KEY_DOWN';
+			/** @enum {string} */
+			device: 'KEYBOARD' | 'XBOX_ONE' | 'PS4' | 'SWITCH_PRO' | 'UNKNOWN_CONTROLLER';
+			keyCodes: number[];
+		};
+		OnMediaHitTrigger: {
+			/** @enum {string} */
+			type: 'ON_MEDIA_HIT';
+			mediaHitTime: number;
+		};
+		/** @description An action that is performed when a trigger is activated. */
+		Action:
+			| {
+					/** @enum {string} */
+					type: 'BACK' | 'CLOSE';
+			  }
+			| components['schemas']['OpenURLAction']
+			| components['schemas']['UpdateMediaRuntimeAction']
+			| components['schemas']['SetVariableAction']
+			| components['schemas']['SetVariableModeAction']
+			| components['schemas']['ConditionalAction']
+			| components['schemas']['NodeAction'];
+		/** @description An action that opens a URL. */
+		OpenURLAction: {
+			/** @enum {string} */
+			type: 'URL';
+			url: string;
+		};
+		/** @description An action that affects a video node in the Figma viewer. For example, to play, pause, or skip. */
+		UpdateMediaRuntimeAction:
+			| {
+					/** @enum {string} */
+					type: 'UPDATE_MEDIA_RUNTIME';
+					destinationId: string | null;
+					/** @enum {string} */
+					mediaAction: 'PLAY' | 'PAUSE' | 'TOGGLE_PLAY_PAUSE' | 'MUTE' | 'UNMUTE' | 'TOGGLE_MUTE_UNMUTE';
+			  }
+			| {
+					/** @enum {string} */
+					type: 'UPDATE_MEDIA_RUNTIME';
+					destinationId?: string | null;
+					/** @enum {string} */
+					mediaAction: 'SKIP_FORWARD' | 'SKIP_BACKWARD';
+					amountToSkip: number;
+			  }
+			| {
+					/** @enum {string} */
+					type: 'UPDATE_MEDIA_RUNTIME';
+					destinationId?: string | null;
+					/** @enum {string} */
+					mediaAction: 'SKIP_TO';
+					newTimestamp: number;
+			  };
+		/** @description An action that navigates to a specific node in the Figma viewer. */
+		NodeAction: {
+			/** @enum {string} */
+			type: 'NODE';
+			destinationId: string | null;
+			navigation: components['schemas']['Navigation'];
+			transition: components['schemas']['Transition'] | null;
+			/** @description Whether the scroll offsets of any scrollable elements in the current screen or overlay are preserved when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same. */
+			preserveScrollPosition?: boolean;
+			/** @description Applicable only when `navigation` is `"OVERLAY"` and the destination is a frame with `overlayPosition` equal to `"MANUAL"`. This value represents the offset by which the overlay is opened relative to this node. */
+			overlayRelativePosition?: components['schemas']['Vector'];
+			/** @description When true, all videos within the destination frame will reset their memorized playback position to 00:00 before starting to play. */
+			resetVideoPosition?: boolean;
+			/** @description Whether the scroll offsets of any scrollable elements in the current screen or overlay reset when navigating to the destination. This is applicable only if the layout of both the current frame and its destination are the same. */
+			resetScrollPosition?: boolean;
+			/** @description Whether the state of any interactive components in the current screen or overlay reset when navigating to the destination. This is applicable if there are interactive components in the destination frame. */
+			resetInteractiveComponents?: boolean;
+		};
+		/**
+		 * @description The method of navigation. The possible values are:
+		 *     - `"NAVIGATE"`: Replaces the current screen with the destination, also closing all overlays.
+		 *     - `"OVERLAY"`: Opens the destination as an overlay on the current screen.
+		 *     - `"SWAP"`: On an overlay, replaces the current (topmost) overlay with the destination. On a top-level frame,
+		 *       behaves the same as `"NAVIGATE"` except that no entry is added to the navigation history.
+		 *     - `"SCROLL_TO"`: Scrolls to the destination on the current screen.
+		 *     - `"CHANGE_TO"`: Changes the closest ancestor instance of source node to the specified variant.
+		 * @enum {string}
+		 */
+		Navigation: 'NAVIGATE' | 'SWAP' | 'OVERLAY' | 'SCROLL_TO' | 'CHANGE_TO';
+		Transition: components['schemas']['SimpleTransition'] | components['schemas']['DirectionalTransition'];
+		/** @description Describes an animation used when navigating in a prototype. */
+		SimpleTransition: {
+			/** @enum {string} */
+			type: 'DISSOLVE' | 'SMART_ANIMATE' | 'SCROLL_ANIMATE';
+			/** @description The duration of the transition in milliseconds. */
+			duration: number;
+			/** @description The easing curve of the transition. */
+			easing: components['schemas']['Easing'];
+		};
+		/** @description Describes an animation used when navigating in a prototype. */
+		DirectionalTransition: {
+			/** @enum {string} */
+			type: 'MOVE_IN' | 'MOVE_OUT' | 'PUSH' | 'SLIDE_IN' | 'SLIDE_OUT';
+			/** @enum {string} */
+			direction: 'LEFT' | 'RIGHT' | 'TOP' | 'BOTTOM';
+			/** @description The duration of the transition in milliseconds. */
+			duration: number;
+			/** @description The easing curve of the transition. */
+			easing: components['schemas']['Easing'];
+			/** @description When the transition `type` is `"SMART_ANIMATE"` or when `matchLayers` is `true`, then the transition will be performed using smart animate, which attempts to match corresponding layers an interpolate other properties during the animation. */
+			matchLayers?: boolean;
+		};
+		/** @description Describes an easing curve. */
+		Easing: {
+			/** @description The type of easing curve. */
+			type: components['schemas']['EasingType'];
+			/** @description A cubic bezier curve that defines the easing. */
+			easingFunctionCubicBezier?: {
+				/** @description The x component of the first control point. */
+				x1: number;
+				/** @description The y component of the first control point. */
+				y1: number;
+				/** @description The x component of the second control point. */
+				x2: number;
+				/** @description The y component of the second control point. */
+				y2: number;
+			};
+			/** @description A spring function that defines the easing. */
+			easingFunctionSpring?: {
+				mass: number;
+				stiffness: number;
+				damping: number;
+			};
+		};
+		/** @description Sets a variable to a specific value. */
+		SetVariableAction: {
+			/** @enum {string} */
+			type: 'SET_VARIABLE';
+			variableId: string | null;
+			variableValue?: components['schemas']['VariableData'];
+		};
+		/** @description Sets a variable to a specific mode. */
+		SetVariableModeAction: {
+			/** @enum {string} */
+			type: 'SET_VARIABLE_MODE';
+			variableCollectionId?: string | null;
+			variableModeId?: string | null;
+		};
+		/** @description Checks if a condition is met before performing certain actions by using an if/else conditional statement. */
+		ConditionalAction: {
+			/** @enum {string} */
+			type: 'CONDITIONAL';
+			conditionalBlocks: components['schemas']['ConditionalBlock'][];
+		};
+		/** @description A value to set a variable to during prototyping. */
+		VariableData: {
+			type?: components['schemas']['VariableDataType'];
+			resolvedType?: components['schemas']['VariableResolvedDataType'];
+			value?:
+				| boolean
+				| number
+				| string
+				| components['schemas']['RGB']
+				| components['schemas']['RGBA']
+				| components['schemas']['VariableAlias']
+				| components['schemas']['Expression'];
+		};
+		/**
+		 * @description Defines the types of data a VariableData object can hold
+		 * @enum {string}
+		 */
+		VariableDataType: 'BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR' | 'VARIABLE_ALIAS' | 'EXPRESSION';
+		/**
+		 * @description Defines the types of data a VariableData object can eventually equal
+		 * @enum {string}
+		 */
+		VariableResolvedDataType: 'BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR';
+		/** @description Defines the [Expression](https://help.figma.com/hc/en-us/articles/15253194385943) object, which contains a list of `VariableData` objects strung together by operators (`ExpressionFunction`). */
+		Expression: {
+			expressionFunction: components['schemas']['ExpressionFunction'];
+			expressionArguments: components['schemas']['VariableData'][];
+		};
+		/**
+		 * @description Defines the list of operators available to use in an Expression.
+		 * @enum {string}
+		 */
+		ExpressionFunction:
+			| 'ADDITION'
+			| 'SUBTRACTION'
+			| 'MULTIPLICATION'
+			| 'DIVISION'
+			| 'EQUALS'
+			| 'NOT_EQUAL'
+			| 'LESS_THAN'
+			| 'LESS_THAN_OR_EQUAL'
+			| 'GREATER_THAN'
+			| 'GREATER_THAN_OR_EQUAL'
+			| 'AND'
+			| 'OR'
+			| 'VAR_MODE_LOOKUP'
+			| 'NEGATE'
+			| 'NOT';
+		/** @description Either the if or else conditional blocks. The if block contains a condition to check. If that condition is met then it will run those list of actions, else it will run the actions in the else block. */
+		ConditionalBlock: {
+			condition?: components['schemas']['VariableData'];
+			actions: components['schemas']['Action'][];
+		};
+		/** @description A pinned distance between two nodes in Dev Mode */
+		Measurement: {
+			id: string;
+			start: components['schemas']['MeasurementStartEnd'];
+			end: components['schemas']['MeasurementStartEnd'];
+			offset: components['schemas']['MeasurementOffsetInner'] | components['schemas']['MeasurementOffsetOuter'];
+			/** @description When manually overridden, the displayed value of the measurement */
+			freeText?: string;
+		};
+		/** @description The node and side a measurement is pinned to */
+		MeasurementStartEnd: {
+			nodeId: string;
+			/** @enum {string} */
+			side: 'TOP' | 'RIGHT' | 'BOTTOM' | 'LEFT';
+		};
+		/** @description Measurement offset relative to the inside of the start node */
+		MeasurementOffsetInner: {
+			/** @enum {string} */
+			type: 'INNER';
+			relative: number;
+		};
+		/** @description Measurement offset relative to the outside of the start node */
+		MeasurementOffsetOuter: {
+			/** @enum {string} */
+			type: 'OUTER';
+			fixed: number;
+		};
+		/** @description Position of a comment relative to the frame to which it is attached. */
+		FrameOffset: {
+			/** @description Unique id specifying the frame. */
+			node_id: string;
+			/** @description 2D vector offset within the frame from the top-left corner. */
+			node_offset: components['schemas']['Vector'];
+		};
+		/** @description Position of a region comment on the canvas. */
+		Region: {
+			/** @description X coordinate of the position. */
+			x: number;
+			/** @description Y coordinate of the position. */
+			y: number;
+			/** @description The height of the comment region. Must be greater than 0. */
+			region_height: number;
+			/** @description The width of the comment region. Must be greater than 0. */
+			region_width: number;
+			/**
+			 * @description The corner of the comment region to pin to the node's corner as a string enum.
+			 * @default bottom-right
+			 * @enum {string}
+			 */
+			comment_pin_corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+		};
+		/** @description Position of a region comment relative to the frame to which it is attached. */
+		FrameOffsetRegion: {
+			/** @description Unique id specifying the frame. */
+			node_id: string;
+			/** @description 2D vector offset within the frame from the top-left corner. */
+			node_offset: components['schemas']['Vector'];
+			/** @description The height of the comment region. Must be greater than 0. */
+			region_height: number;
+			/** @description The width of the comment region. Must be greater than 0. */
+			region_width: number;
+			/**
+			 * @description The corner of the comment region to pin to the node's corner as a string enum.
+			 * @default bottom-right
+			 * @enum {string}
+			 */
+			comment_pin_corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+		};
+		/** @description A comment or reply left by a user. */
+		Comment: {
+			/** @description Unique identifier for comment. */
+			id: string;
+			/** @description Positioning information of the comment. Includes information on the location of the comment pin, which is either the absolute coordinates on the canvas or a relative offset within a frame. If the comment is a region, it will also contain the region height, width, and position of the anchor in regards to the region. */
+			client_meta:
+				| components['schemas']['Vector']
+				| components['schemas']['FrameOffset']
+				| components['schemas']['Region']
+				| components['schemas']['FrameOffsetRegion'];
+			/** @description The file in which the comment lives */
+			file_key: string;
+			/** @description If present, the id of the comment to which this is the reply */
+			parent_id?: string;
+			/** @description The user who left the comment */
+			user: components['schemas']['User'];
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the comment was left
+			 */
+			created_at: string;
+			/**
+			 * Format: date-time
+			 * @description If set, the UTC ISO 8601 time the comment was resolved
+			 */
+			resolved_at?: string | null;
+			/** @description The content of the comment */
+			message: string;
+			/** @description Only set for top level comments. The number displayed with the comment in the UI */
+			order_id: string | null;
+			/** @description An array of reactions to the comment */
+			reactions: components['schemas']['Reaction'][];
+		};
+		/** @description A reaction left by a user. */
+		Reaction: {
+			/** @description The user who left the reaction. */
+			user: components['schemas']['User'];
+			emoji: components['schemas']['Emoji'];
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the reaction was left.
+			 */
+			created_at: string;
+		};
+		/** @description The emoji type of reaction as shortcode (e.g. `:heart:`, `:+1::skin-tone-2:`). The list of accepted emoji shortcodes can be found in [this file](https://raw.githubusercontent.com/missive/emoji-mart/main/packages/emoji-mart-data/sets/14/native.json) under the top-level emojis and aliases fields, with optional skin tone modifiers when applicable. */
+		Emoji: string;
+		/** @description A description of a user. */
+		User: {
+			/** @description Unique stable id of the user. */
+			id: string;
+			/** @description Name of the user. */
+			handle: string;
+			/** @description URL link to the user's profile image. */
+			img_url: string;
+		};
+		/** @description Data on the frame a component resides in. */
+		FrameInfo: {
+			/** @description The ID of the frame node within the file. */
+			nodeId?: string;
+			/** @description The name of the frame node. */
+			name?: string;
+			/** @description The background color of the frame node. */
+			backgroundColor?: string;
+			/** @description The ID of the page containing the frame node. */
+			pageId: string;
+			/** @description The name of the page containing the frame node. */
+			pageName: string;
+			/**
+			 * @deprecated
+			 * @description Deprecated - Use containingComponentSet instead.
+			 */
+			containingStateGroup?: {
+				/** @description The ID of the state group node. */
+				nodeId?: string;
+				/** @description The name of the state group node. */
+				name?: string;
+			} | null;
+			/** @description The component set node that contains the frame node. */
+			containingComponentSet?: {
+				/** @description The ID of the component set node. */
+				nodeId?: string;
+				/** @description The name of the component set node. */
+				name?: string;
+			} | null;
+		};
+		/** @description An arrangement of published UI elements that can be instantiated across figma files. */
+		PublishedComponent: {
+			/** @description The unique identifier for the component. */
+			key: string;
+			/** @description The unique identifier of the Figma file that contains the component. */
+			file_key: string;
+			/** @description The unique identifier of the component node within the Figma file. */
+			node_id: string;
+			/** @description A URL to a thumbnail image of the component. */
+			thumbnail_url?: string;
+			/** @description The name of the component. */
+			name: string;
+			/** @description The description of the component as entered by the publisher. */
+			description: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the component was created.
+			 */
+			created_at: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the component was last updated.
+			 */
+			updated_at: string;
+			/** @description The user who last updated the component. */
+			user: components['schemas']['User'];
+			/** @description The containing frame of the component. */
+			containing_frame?: components['schemas']['FrameInfo'];
+		};
+		/** @description A node containing a set of variants of a component. */
+		PublishedComponentSet: {
+			/** @description The unique identifier for the component set. */
+			key: string;
+			/** @description The unique identifier of the Figma file that contains the component set. */
+			file_key: string;
+			/** @description The unique identifier of the component set node within the Figma file. */
+			node_id: string;
+			/** @description A URL to a thumbnail image of the component set. */
+			thumbnail_url?: string;
+			/** @description The name of the component set. */
+			name: string;
+			/** @description The description of the component set as entered by the publisher. */
+			description: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the component set was created.
+			 */
+			created_at: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the component set was last updated.
+			 */
+			updated_at: string;
+			/** @description The user who last updated the component set. */
+			user: components['schemas']['User'];
+			/** @description The containing frame of the component set. */
+			containing_frame?: components['schemas']['FrameInfo'];
+		};
+		/**
+		 * @description The type of style
+		 * @enum {string}
+		 */
+		StyleType: 'FILL' | 'TEXT' | 'EFFECT' | 'GRID';
+		/** @description A set of published properties that can be applied to nodes. */
+		PublishedStyle: {
+			/** @description The unique identifier for the style */
+			key: string;
+			/** @description The unique identifier of the Figma file that contains the style. */
+			file_key: string;
+			/** @description ID of the style node within the figma file */
+			node_id: string;
+			style_type: components['schemas']['StyleType'];
+			/** @description A URL to a thumbnail image of the style. */
+			thumbnail_url?: string;
+			/** @description The name of the style. */
+			name: string;
+			/** @description The description of the style as entered by the publisher. */
+			description: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the style was created.
+			 */
+			created_at: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time when the style was last updated.
+			 */
+			updated_at: string;
+			/** @description The user who last updated the style. */
+			user: components['schemas']['User'];
+			/** @description A user specified order number by which the style can be sorted. */
+			sort_position: string;
+		};
+		/** @description A Project can be identified by both the Project name, and the Project ID. */
+		Project: {
+			/** @description The ID of the project. */
+			id: string;
+			/** @description The name of the project. */
+			name: string;
+		};
+		/** @description A version of a file */
+		Version: {
+			/** @description Unique identifier for version */
+			id: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the version was created
+			 */
+			created_at: string;
+			/** @description The label given to the version in the editor */
+			label: string | null;
+			/** @description The description of the version as entered in the editor */
+			description: string | null;
+			/** @description The user that created the version */
+			user: components['schemas']['User'];
+			/** @description A URL to a thumbnail image of the file version. */
+			thumbnail_url?: string;
+		};
+		/** @description A description of an HTTP webhook (from Figma back to your application) */
+		WebhookV2: {
+			/** @description The ID of the webhook */
+			id: string;
+			/** @description The event this webhook triggers on */
+			event_type: components['schemas']['WebhookV2Event'];
+			/** @description The team id you are subscribed to for updates */
+			team_id: string;
+			/** @description The current status of the webhook */
+			status: components['schemas']['WebhookV2Status'];
+			/** @description The client ID of the OAuth application that registered this webhook, if any */
+			client_id: string | null;
+			/** @description The passcode that will be passed back to the webhook endpoint */
+			passcode: string;
+			/** @description The endpoint that will be hit when the webhook is triggered */
+			endpoint: string;
+			/** @description Optional user-provided description or name for the webhook. This is provided to help make maintaining a number of webhooks more convenient. Max length 140 characters. */
+			description: string | null;
+		};
+		/**
+		 * @description An enum representing the possible events that a webhook can subscribe to
+		 * @enum {string}
+		 */
+		WebhookV2Event: 'PING' | 'FILE_UPDATE' | 'FILE_VERSION_UPDATE' | 'FILE_DELETE' | 'LIBRARY_PUBLISH' | 'FILE_COMMENT';
+		/**
+		 * @description An enum representing the possible statuses you can set a webhook to:
+		 *     - `ACTIVE`: The webhook is healthy and receive all events
+		 *     - `PAUSED`: The webhook is paused and will not receive any events
+		 * @enum {string}
+		 */
+		WebhookV2Status: 'ACTIVE' | 'PAUSED';
+		/** @description Information regarding the most recent interactions sent to a webhook endpoint */
+		WebhookV2Request: {
+			/** @description The ID of the webhook the requests were sent to */
+			webhook_id: string;
+			request_info: components['schemas']['WebhookV2RequestInfo'];
+			response_info: components['schemas']['WebhookV2ResponseInfo'];
+			/** @description Error message for this request. NULL if no error occurred */
+			error_msg: string | null;
+		};
+		/** @description Information regarding the request sent to a webhook endpoint */
+		WebhookV2RequestInfo: {
+			/** @description The ID of the webhook */
+			id: string;
+			/** @description The actual endpoint the request was sent to */
+			endpoint: string;
+			/** @description The contents of the request that was sent to the endpoint */
+			payload: Record<string, never>;
+			/**
+			 * Format: date-time
+			 * @description UTC ISO 8601 timestamp of when the request was sent
+			 */
+			sent_at: string;
+		};
+		/** @description Information regarding the reply sent back from a webhook endpoint */
+		WebhookV2ResponseInfo: {
+			/** @description HTTP status code of the response */
+			status: string;
+			/**
+			 * Format: date-time
+			 * @description UTC ISO 8601 timestamp of when the response was received
+			 */
+			received_at: string;
+		} | null;
+		/** @description An object representing the library item information in the payload of the `LIBRARY_PUBLISH` event */
+		LibraryItemData: {
+			/** @description Unique identifier for the library item */
+			key: string;
+			/** @description Name of the library item */
+			name: string;
+		};
+		/** @description An object representing a fragment of a comment left by a user, used in the payload of the `FILE_COMMENT` event. Note only ONE of the fields below will be set */
+		CommentFragment: {
+			/** @description Comment text that is set if a fragment is text based */
+			text?: string;
+			/** @description User id that is set if a fragment refers to a user mention */
+			mention?: string;
+		};
+		WebhookBasePayload: {
+			/** @description The passcode specified when the webhook was created, should match what was initially provided */
+			passcode: string;
+			/**
+			 * Format: date-time
+			 * @description UTC ISO 8601 timestamp of when the event was triggered.
+			 */
+			timestamp: string;
+			/** @description The id of the webhook that caused the callback */
+			webhook_id: string;
+		};
+		WebhookPingPayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'PING';
+		};
+		WebhookFileUpdatePayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'FILE_UPDATE';
+			/** @description The key of the file that was updated */
+			file_key: string;
+			/** @description The name of the file that was updated */
+			file_name: string;
+		};
+		WebhookFileDeletePayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'FILE_DELETE';
+			/** @description The key of the file that was deleted */
+			file_key: string;
+			/** @description The name of the file that was deleted */
+			file_name: string;
+			/** @description The user that deleted the file and triggered this event */
+			triggered_by: components['schemas']['User'];
+		};
+		WebhookFileVersionUpdatePayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'FILE_VERSION_UPDATE';
+			/**
+			 * Format: date-time
+			 * @description UTC ISO 8601 timestamp of when the version was created
+			 */
+			created_at: string;
+			/** @description Description of the version in the version history */
+			description?: string;
+			/** @description The key of the file that was updated */
+			file_key: string;
+			/** @description The name of the file that was updated */
+			file_name: string;
+			/** @description The user that created the named version and triggered this event */
+			triggered_by: components['schemas']['User'];
+			/** @description ID of the published version */
+			version_id: string;
+		};
+		WebhookLibraryPublishPayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'LIBRARY_PUBLISH';
+			/** @description Components that were created by the library publish */
+			created_components: components['schemas']['LibraryItemData'][];
+			/** @description Styles that were created by the library publish */
+			created_styles: components['schemas']['LibraryItemData'][];
+			/** @description Variables that were created by the library publish */
+			created_variables: components['schemas']['LibraryItemData'][];
+			/** @description Components that were modified by the library publish */
+			modified_components: components['schemas']['LibraryItemData'][];
+			/** @description Styles that were modified by the library publish */
+			modified_styles: components['schemas']['LibraryItemData'][];
+			/** @description Variables that were modified by the library publish */
+			modified_variables: components['schemas']['LibraryItemData'][];
+			/** @description Components that were deleted by the library publish */
+			deleted_components: components['schemas']['LibraryItemData'][];
+			/** @description Styles that were deleted by the library publish */
+			deleted_styles: components['schemas']['LibraryItemData'][];
+			/** @description Variables that were deleted by the library publish */
+			deleted_variables: components['schemas']['LibraryItemData'][];
+			/** @description Description of the library publish */
+			description?: string;
+			/** @description The key of the file that was published */
+			file_key: string;
+			/** @description The name of the file that was published */
+			file_name: string;
+			/** @description The library item that was published */
+			library_item: components['schemas']['LibraryItemData'];
+			/** @description The user that published the library and triggered this event */
+			triggered_by: components['schemas']['User'];
+		};
+		WebhookFileCommentPayload: components['schemas']['WebhookBasePayload'] & {
+			/** @enum {string} */
+			event_type: 'FILE_COMMENT';
+			/** @description Contents of the comment itself */
+			comment: components['schemas']['CommentFragment'][];
+			/** @description Unique identifier for comment */
+			comment_id: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the comment was left
+			 */
+			created_at: string;
+			/** @description The key of the file that was commented on */
+			file_key: string;
+			/** @description The name of the file that was commented on */
+			file_name: string;
+			/** @description Users that were mentioned in the comment */
+			mentions?: components['schemas']['User'][];
+			/** @description The user that made the comment and triggered this event */
+			triggered_by: components['schemas']['User'];
+		};
+		/** @description A Figma user */
+		ActivityLogUserEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'user';
+			/** @description Unique stable id of the user. */
+			id: string;
+			/** @description Name of the user. */
+			name: string;
+			/** @description Email associated with the user's account. */
+			email: string;
+		};
+		/** @description A Figma Design or FigJam file */
+		ActivityLogFileEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'file';
+			/** @description Unique identifier of the file. */
+			key: string;
+			/** @description Name of the file. */
+			name: string;
+			/**
+			 * @description Indicates if the object is a file on Figma Design or FigJam.
+			 * @enum {string}
+			 */
+			editor_type: 'figma' | 'figjam';
+			/**
+			 * @description Access policy for users who have the link to the file.
+			 * @enum {string}
+			 */
+			link_access: 'view' | 'edit' | 'org_view' | 'org_edit' | 'inherit';
+			/**
+			 * @description Access policy for users who have the link to the file's prototype.
+			 * @enum {string}
+			 */
+			proto_link_access: 'view' | 'org_view' | 'inherit';
+		};
+		/** @description A file branch that diverges from and can be merged back into the main file */
+		ActivityLogFileRepoEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'file_repo';
+			/** @description Unique identifier of the file branch. */
+			id: string;
+			/** @description Name of the file. */
+			name: string;
+			/** @description Key of the main file. */
+			main_file_key: string;
+		};
+		/** @description A project that a collection of Figma files are grouped under */
+		ActivityLogProjectEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'project';
+			/** @description Unique identifier of the project. */
+			id: string;
+			/** @description Name of the project. */
+			name: string;
+		};
+		/** @description A Figma team that contains multiple users and projects */
+		ActivityLogTeamEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'team';
+			/** @description Unique identifier of the team. */
+			id: string;
+			/** @description Name of the team. */
+			name: string;
+		};
+		/** @description Part of the organizational hierarchy of managing files and users within Figma, only available on the Enterprise Plan */
+		ActivityLogWorkspaceEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'workspace';
+			/** @description Unique identifier of the workspace. */
+			id: string;
+			/** @description Name of the workspace. */
+			name: string;
+		};
+		/** @description A Figma organization */
+		ActivityLogOrgEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'org';
+			/** @description Unique identifier of the organization. */
+			id: string;
+			/** @description Name of the organization. */
+			name: string;
+		};
+		/** @description A Figma plugin */
+		ActivityLogPluginEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'plugin';
+			/** @description Unique identifier of the plugin. */
+			id: string;
+			/** @description Name of the plugin. */
+			name: string;
+			/**
+			 * @description Indicates if the object is a plugin is available on Figma Design or FigJam.
+			 * @enum {string}
+			 */
+			editor_type: 'figma' | 'figjam';
+		};
+		/** @description A Figma widget */
+		ActivityLogWidgetEntity: {
+			/**
+			 * @description The type of entity. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			type: 'widget';
+			/** @description Unique identifier of the widget. */
+			id: string;
+			/** @description Name of the widget. */
+			name: string;
+			/**
+			 * @description Indicates if the object is a widget available on Figma Design or FigJam.
+			 * @enum {string}
+			 */
+			editor_type: 'figma' | 'figjam';
+		};
+		/** @description An event returned by the Activity Logs API. */
+		ActivityLog: {
+			/** @description The ID of the event. */
+			id: string;
+			/** @description The timestamp of the event in seconds since the Unix epoch. */
+			timestamp: number;
+			/** @description The user who performed the action. */
+			actor: {
+				/**
+				 * @description The type of the user.
+				 * @enum {string}
+				 */
+				type?: 'user';
+				/** @description The ID of the user. */
+				id?: string;
+				/** @description The name of the user. For SCIM events, the value is "SCIM Provider". For official support actions, the value is "Figma Support". */
+				name: string;
+				/** @description The email of the user. */
+				email?: string;
+			} | null;
+			/** @description The task or activity the actor performed. */
+			action: {
+				/** @description The type of the action. */
+				type: string;
+				/** @description Metadata of the action. Each action type supports its own metadata attributes. */
+				details: {
+					[key: string]: unknown;
+				} | null;
+			};
+			/** @description The resource the actor took the action on. It can be a user, file, project or other resource types. */
+			entity:
+				| components['schemas']['ActivityLogUserEntity']
+				| components['schemas']['ActivityLogFileEntity']
+				| components['schemas']['ActivityLogFileRepoEntity']
+				| components['schemas']['ActivityLogProjectEntity']
+				| components['schemas']['ActivityLogTeamEntity']
+				| components['schemas']['ActivityLogWorkspaceEntity']
+				| components['schemas']['ActivityLogOrgEntity']
+				| components['schemas']['ActivityLogPluginEntity']
+				| components['schemas']['ActivityLogWidgetEntity'];
+			/** @description Contextual information about the event. */
+			context: {
+				/** @description The third-party application that triggered the event, if applicable. */
+				client_name: string | null;
+				/** @description The IP address from of the client that sent the event request. */
+				ip_address: string;
+				/** @description If Figma's Support team triggered the event. This is either true or false. */
+				is_figma_support_team_action: boolean;
+				/** @description The id of the organization where the event took place. */
+				org_id: string;
+				/** @description The id of the team where the event took place -- if this took place in a specific team. */
+				team_id: string | null;
+			};
+		};
+		/** @description An object describing the user's payment status. */
+		PaymentStatus: {
+			/**
+			 * @description The current payment status of the user on the resource, as a string enum:
+			 *
+			 *     - `UNPAID`: user has not paid for the resource
+			 *     - `PAID`: user has an active purchase on the resource
+			 *     - `TRIAL`: user is in the trial period for a subscription resource
+			 * @enum {string}
+			 */
+			type?: 'UNPAID' | 'PAID' | 'TRIAL';
+		};
+		/** @description An object describing a user's payment information for a plugin, widget, or Community file. */
+		PaymentInformation: {
+			/** @description The ID of the user whose payment information was queried. Can be used to verify the validity of a response. */
+			user_id: string;
+			/** @description The ID of the plugin, widget, or Community file that was queried. Can be used to verify the validity of a response. */
+			resource_id: string;
+			/**
+			 * @description The type of the resource.
+			 * @enum {string}
+			 */
+			resource_type: 'PLUGIN' | 'WIDGET' | 'COMMUNITY_FILE';
+			payment_status: components['schemas']['PaymentStatus'];
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 timestamp indicating when the user purchased the resource. No value is given if the user has never purchased the resource.
+			 *
+			 *     Note that a value will still be returned if the user had purchased the resource, but no longer has active access to it (e.g. purchase refunded, subscription ended).
+			 */
+			date_of_purchase?: string;
+		};
+		/**
+		 * @description Scopes allow a variable to be shown or hidden in the variable picker for various fields. This declutters the Figma UI if you have a large number of variables. Variable scopes are currently supported on `FLOAT`, `STRING`, and `COLOR` variables.
+		 *
+		 *     `ALL_SCOPES` is a special scope that means that the variable will be shown in the variable picker for all variable fields. If `ALL_SCOPES` is set, no additional scopes can be set.
+		 *
+		 *     `ALL_FILLS` is a special scope that means that the variable will be shown in the variable picker for all fill fields. If `ALL_FILLS` is set, no additional fill scopes can be set.
+		 *
+		 *     Valid scopes for `FLOAT` variables:
+		 *     - `ALL_SCOPES`
+		 *     - `TEXT_CONTENT`
+		 *     - `WIDTH_HEIGHT`
+		 *     - `GAP`
+		 *     - `STROKE_FLOAT`
+		 *     - `EFFECT_FLOAT`
+		 *     - `OPACITY`
+		 *     - `FONT_WEIGHT`
+		 *     - `FONT_SIZE`
+		 *     - `LINE_HEIGHT`
+		 *     - `LETTER_SPACING`
+		 *     - `PARAGRAPH_SPACING`
+		 *     - `PARAGRAPH_INDENT`
+		 *
+		 *     Valid scopes for `STRING` variables:
+		 *     - `ALL_SCOPES`
+		 *     - `TEXT_CONTENT`
+		 *     - `FONT_FAMILY`
+		 *     - `FONT_STYLE`
+		 *
+		 *     Valid scopes for `COLOR` variables:
+		 *     - `ALL_SCOPES`
+		 *     - `ALL_FILLS`
+		 *     - `FRAME_FILL`
+		 *     - `SHAPE_FILL`
+		 *     - `TEXT_FILL`
+		 *     - `STROKE_COLOR`
+		 *     - `EFFECT_COLOR`
+		 * @enum {string}
+		 */
+		VariableScope:
+			| 'ALL_SCOPES'
+			| 'TEXT_CONTENT'
+			| 'CORNER_RADIUS'
+			| 'WIDTH_HEIGHT'
+			| 'GAP'
+			| 'ALL_FILLS'
+			| 'FRAME_FILL'
+			| 'SHAPE_FILL'
+			| 'TEXT_FILL'
+			| 'STROKE_COLOR'
+			| 'STROKE_FLOAT'
+			| 'EFFECT_FLOAT'
+			| 'EFFECT_COLOR'
+			| 'OPACITY'
+			| 'FONT_FAMILY'
+			| 'FONT_STYLE'
+			| 'FONT_WEIGHT'
+			| 'FONT_SIZE'
+			| 'LINE_HEIGHT'
+			| 'LETTER_SPACING'
+			| 'PARAGRAPH_SPACING'
+			| 'PARAGRAPH_INDENT';
+		/** @description An object containing platform-specific code syntax definitions for a variable. All platforms are optional. */
+		VariableCodeSyntax: {
+			WEB?: string;
+			ANDROID?: string;
+			iOS?: string;
+		};
+		/** @description A grouping of related Variable objects each with the same modes. */
+		LocalVariableCollection: {
+			/** @description The unique identifier of this variable collection. */
+			id: string;
+			/** @description The name of this variable collection. */
+			name: string;
+			/** @description The key of this variable collection. */
+			key: string;
+			/** @description The modes of this variable collection. */
+			modes: {
+				/** @description The unique identifier of this mode. */
+				modeId: string;
+				/** @description The name of this mode. */
+				name: string;
+			}[];
+			/** @description The id of the default mode. */
+			defaultModeId: string;
+			/** @description Whether this variable collection is remote. */
+			remote: boolean;
+			/**
+			 * @description Whether this variable collection is hidden when publishing the current file as a library.
+			 * @default false
+			 */
+			hiddenFromPublishing: boolean;
+			/** @description The ids of the variables in the collection. Note that the order of these variables is roughly the same as what is shown in Figma Design, however it does not account for groups. As a result, the order of these variables may not exactly reflect the exact ordering and grouping shown in the authoring UI. */
+			variableIds: string[];
+		};
+		/** @description A Variable is a single design token that defines values for each of the modes in its VariableCollection. These values can be applied to various kinds of design properties. */
+		LocalVariable: {
+			/** @description The unique identifier of this variable. */
+			id: string;
+			/** @description The name of this variable. */
+			name: string;
+			/** @description The key of this variable. */
+			key: string;
+			/** @description The id of the variable collection that contains this variable. */
+			variableCollectionId: string;
+			/**
+			 * @description The resolved type of the variable.
+			 * @enum {string}
+			 */
+			resolvedType: 'BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR';
+			/** @description The values for each mode of this variable. */
+			valuesByMode: {
+				[key: string]:
+					| boolean
+					| number
+					| string
+					| components['schemas']['RGBA']
+					| components['schemas']['VariableAlias'];
+			};
+			/** @description Whether this variable is remote. */
+			remote: boolean;
+			/** @description The description of this variable. */
+			description: string;
+			/** @description Whether this variable is hidden when publishing the current file as a library.
+			 *
+			 *     If the parent `VariableCollection` is marked as `hiddenFromPublishing`, then this variable will also be hidden from publishing via the UI. `hiddenFromPublishing` is independently toggled for a variable and collection. However, both must be true for a given variable to be publishable. */
+			hiddenFromPublishing: boolean;
+			/** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields.
+			 *
+			 *     Setting scopes for a variable does not prevent that variable from being bound in other scopes (for example, via the Plugin API). This only limits the variables that are shown in pickers within the Figma UI. */
+			scopes: components['schemas']['VariableScope'][];
+			codeSyntax: components['schemas']['VariableCodeSyntax'];
+			/**
+			 * @description Indicates that the variable was deleted in the editor, but the document may still contain references to the variable. References to the variable may exist through bound values or variable aliases.
+			 * @default false
+			 */
+			deletedButReferenced: boolean;
+		};
+		/** @description A grouping of related Variable objects each with the same modes. */
+		PublishedVariableCollection: {
+			/** @description The unique identifier of this variable collection. */
+			id: string;
+			/** @description The ID of the variable collection that is used by subscribing files. This ID changes every time the variable collection is modified and published. */
+			subscribed_id: string;
+			/** @description The name of this variable collection. */
+			name: string;
+			/** @description The key of this variable collection. */
+			key: string;
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the variable collection was last updated.
+			 *
+			 *     This timestamp will change any time a variable in the collection is changed.
+			 */
+			updatedAt: string;
+		};
+		/** @description A Variable is a single design token that defines values for each of the modes in its VariableCollection. These values can be applied to various kinds of design properties. */
+		PublishedVariable: {
+			/** @description The unique identifier of this variable. */
+			id: string;
+			/** @description The ID of the variable that is used by subscribing files. This ID changes every time the variable is modified and published. */
+			subscribed_id: string;
+			/** @description The name of this variable. */
+			name: string;
+			/** @description The key of this variable. */
+			key: string;
+			/** @description The id of the variable collection that contains this variable. */
+			variableCollectionId: string;
+			/**
+			 * @description The resolved type of the variable.
+			 * @enum {string}
+			 */
+			resolvedDataType: 'BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR';
+			/**
+			 * Format: date-time
+			 * @description The UTC ISO 8601 time at which the variable was last updated.
+			 */
+			updatedAt: string;
+		};
+		/** @description An object that contains details about creating a `VariableCollection`. */
+		VariableCollectionCreate: {
+			/**
+			 * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'CREATE';
+			/** @description A temporary id for this variable collection. */
+			id?: string;
+			/** @description The name of this variable collection. */
+			name: string;
+			/** @description The initial mode refers to the mode that is created by default. You can set a temporary id here, in order to reference this mode later in this request. */
+			initialModeId?: string;
+			/**
+			 * @description Whether this variable collection is hidden when publishing the current file as a library.
+			 * @default false
+			 */
+			hiddenFromPublishing: boolean;
+		};
+		/** @description An object that contains details about updating a `VariableCollection`. */
+		VariableCollectionUpdate: {
+			/**
+			 * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'UPDATE';
+			/** @description The id of the variable collection to update. */
+			id: string;
+			/** @description The name of this variable collection. */
+			name?: string;
+			/**
+			 * @description Whether this variable collection is hidden when publishing the current file as a library.
+			 * @default false
+			 */
+			hiddenFromPublishing: boolean;
+		};
+		/** @description An object that contains details about deleting a `VariableCollection`. */
+		VariableCollectionDelete: {
+			/**
+			 * @description The action to perform for the variable collection. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'DELETE';
+			/** @description The id of the variable collection to delete. */
+			id: string;
+		};
+		VariableCollectionChange:
+			| components['schemas']['VariableCollectionCreate']
+			| components['schemas']['VariableCollectionUpdate']
+			| components['schemas']['VariableCollectionDelete'];
+		/** @description An object that contains details about creating a `VariableMode`. */
+		VariableModeCreate: {
+			/**
+			 * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'CREATE';
+			/** @description A temporary id for this variable mode. */
+			id?: string;
+			/** @description The name of this variable mode. */
+			name: string;
+			/** @description The variable collection that will contain the mode. You can use the temporary id of a variable collection. */
+			variableCollectionId: string;
+		};
+		/** @description An object that contains details about updating a `VariableMode`. */
+		VariableModeUpdate: {
+			/**
+			 * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'UPDATE';
+			/** @description The id of the variable mode to update. */
+			id: string;
+			/** @description The name of this variable mode. */
+			name?: string;
+			/** @description The variable collection that contains the mode. */
+			variableCollectionId: string;
+		};
+		/** @description An object that contains details about deleting a `VariableMode`. */
+		VariableModeDelete: {
+			/**
+			 * @description The action to perform for the variable mode. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'DELETE';
+			/** @description The id of the variable mode to delete. */
+			id: string;
+		};
+		VariableModeChange:
+			| components['schemas']['VariableModeCreate']
+			| components['schemas']['VariableModeUpdate']
+			| components['schemas']['VariableModeDelete'];
+		/** @description An object that contains details about creating a `Variable`. */
+		VariableCreate: {
+			/**
+			 * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'CREATE';
+			/** @description A temporary id for this variable. */
+			id?: string;
+			/** @description The name of this variable. */
+			name: string;
+			/** @description The variable collection that will contain the variable. You can use the temporary id of a variable collection. */
+			variableCollectionId: string;
+			/**
+			 * @description The resolved type of the variable.
+			 * @enum {string}
+			 */
+			resolvedType: 'BOOLEAN' | 'FLOAT' | 'STRING' | 'COLOR';
+			/** @description The description of this variable. */
+			description?: string;
+			/**
+			 * @description Whether this variable is hidden when publishing the current file as a library.
+			 * @default false
+			 */
+			hiddenFromPublishing: boolean;
+			/** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields. */
+			scopes?: components['schemas']['VariableScope'][];
+			codeSyntax?: components['schemas']['VariableCodeSyntax'];
+		};
+		/** @description An object that contains details about updating a `Variable`. */
+		VariableUpdate: {
+			/**
+			 * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'UPDATE';
+			/** @description The id of the variable to update. */
+			id: string;
+			/** @description The name of this variable. */
+			name?: string;
+			/** @description The description of this variable. */
+			description?: string;
+			/**
+			 * @description Whether this variable is hidden when publishing the current file as a library.
+			 * @default false
+			 */
+			hiddenFromPublishing: boolean;
+			/** @description An array of scopes in the UI where this variable is shown. Setting this property will show/hide this variable in the variable picker UI for different fields. */
+			scopes?: components['schemas']['VariableScope'][];
+			codeSyntax?: components['schemas']['VariableCodeSyntax'];
+		};
+		/** @description An object that contains details about deleting a `Variable`. */
+		VariableDelete: {
+			/**
+			 * @description The action to perform for the variable. (enum property replaced by openapi-typescript)
+			 * @enum {string}
+			 */
+			action: 'DELETE';
+			/** @description The id of the variable to delete. */
+			id: string;
+		};
+		VariableChange:
+			| components['schemas']['VariableCreate']
+			| components['schemas']['VariableUpdate']
+			| components['schemas']['VariableDelete'];
+		/** @description An object that represents a value for a given mode of a variable. All properties are required. */
+		VariableModeValue: {
+			/** @description The target variable. You can use the temporary id of a variable. */
+			variableId: string;
+			/** @description Must correspond to a mode in the variable collection that contains the target variable. */
+			modeId: string;
+			value: components['schemas']['VariableValue'];
+		};
+		/** @description The value for the variable. The value must match the variable's type. If setting to a variable alias, the alias must resolve to this type. */
+		VariableValue:
+			| boolean
+			| number
+			| string
+			| components['schemas']['RGB']
+			| components['schemas']['RGBA']
+			| components['schemas']['VariableAlias'];
+		/** @description A dev resource in a file */
+		DevResource: {
+			/** @description Unique identifier of the dev resource */
+			id: string;
+			/** @description The name of the dev resource. */
+			name: string;
+			/** @description The URL of the dev resource. */
+			url: string;
+			/** @description The file key where the dev resource belongs. */
+			file_key: string;
+			/** @description The target node to attach the dev resource to. */
+			node_id: string;
+		};
+		/** @description Library analytics component actions data broken down by asset. */
+		LibraryAnalyticsComponentActionsByAsset: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description Unique, stable id of the component. */
+			component_key: string;
+			/** @description Name of the component. */
+			component_name: string;
+			/** @description Unique, stable id of the component set that this component belongs to. */
+			component_set_key?: string;
+			/** @description Name of the component set that this component belongs to. */
+			component_set_name?: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics action data broken down by team. */
+		LibraryAnalyticsComponentActionsByTeam: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description The name of the team using the library. */
+			team_name: string;
+			/** @description The name of the workspace that the team belongs to. */
+			workspace_name?: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics component usage data broken down by component. */
+		LibraryAnalyticsComponentUsagesByAsset: {
+			/** @description Unique, stable id of the component. */
+			component_key: string;
+			/** @description Name of the component. */
+			component_name: string;
+			/** @description Unique, stable id of the component set that this component belongs to. */
+			component_set_key?: string;
+			/** @description Name of the component set that this component belongs to. */
+			component_set_name?: string;
+			/** @description The number of instances of the component within the organization. */
+			usages: number;
+			/** @description The number of teams using the component within the organization. */
+			teams_using: number;
+			/** @description The number of files using the component within the organization. */
+			files_using: number;
+		};
+		/** @description Library analytics component usage data broken down by file. */
+		LibraryAnalyticsComponentUsagesByFile: {
+			/** @description The name of the file using the library. */
+			file_name: string;
+			/** @description The name of the team the file belongs to. */
+			team_name: string;
+			/** @description The name of the workspace that the file belongs to. */
+			workspace_name?: string;
+			/** @description The number of component instances from the library used within the file. */
+			usages: number;
+		};
+		/** @description Library analytics style actions data broken down by asset. */
+		LibraryAnalyticsStyleActionsByAsset: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description Unique, stable id of the style. */
+			style_key: string;
+			/** @description The name of the style. */
+			style_name: string;
+			/** @description The type of the style. */
+			style_type: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics style action data broken down by team. */
+		LibraryAnalyticsStyleActionsByTeam: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description The name of the team using the library. */
+			team_name: string;
+			/** @description The name of the workspace that the team belongs to. */
+			workspace_name?: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics style usage data broken down by component. */
+		LibraryAnalyticsStyleUsagesByAsset: {
+			/** @description Unique, stable id of the style. */
+			style_key: string;
+			/** @description The name of the style. */
+			style_name: string;
+			/** @description The type of the style. */
+			style_type: string;
+			/** @description The number of usages of the style within the organization. */
+			usages: number;
+			/** @description The number of teams using the style within the organization. */
+			teams_using: number;
+			/** @description The number of files using the style within the organization. */
+			files_using: number;
+		};
+		/** @description Library analytics style usage data broken down by file. */
+		LibraryAnalyticsStyleUsagesByFile: {
+			/** @description The name of the file using the library. */
+			file_name: string;
+			/** @description The name of the team the file belongs to. */
+			team_name: string;
+			/** @description The name of the workspace that the file belongs to. */
+			workspace_name?: string;
+			/** @description The number of times styles from this library are used within the file. */
+			usages: number;
+		};
+		/** @description Library analytics variable actions data broken down by asset. */
+		LibraryAnalyticsVariableActionsByAsset: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description Unique, stable id of the variable. */
+			variable_key: string;
+			/** @description The name of the variable. */
+			variable_name: string;
+			/** @description The type of the variable. */
+			variable_type: string;
+			/** @description Unique, stable id of the collection the variable belongs to. */
+			collection_key: string;
+			/** @description The name of the collection the variable belongs to. */
+			collection_name: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics variable action data broken down by team. */
+		LibraryAnalyticsVariableActionsByTeam: {
+			/** @description The date in ISO 8601 format. e.g. 2023-12-13 */
+			week: string;
+			/** @description The name of the team using the library. */
+			team_name: string;
+			/** @description The name of the workspace that the team belongs to. */
+			workspace_name?: string;
+			/** @description The number of detach events for this period. */
+			detachments: number;
+			/** @description The number of insertion events for this period. */
+			insertions: number;
+		};
+		/** @description Library analytics variable usage data broken down by component. */
+		LibraryAnalyticsVariableUsagesByAsset: {
+			/** @description Unique, stable id of the variable. */
+			variable_key: string;
+			/** @description The name of the variable. */
+			variable_name: string;
+			/** @description The type of the variable. */
+			variable_type: string;
+			/** @description Unique, stable id of the collection the variable belongs to. */
+			collection_key: string;
+			/** @description The name of the collection the variable belongs to. */
+			collection_name: string;
+			/** @description The number of usages of the variable within the organization. */
+			usages: number;
+			/** @description The number of teams using the variable within the organization. */
+			teams_using: number;
+			/** @description The number of files using the variable within the organization. */
+			files_using: number;
+		};
+		/** @description Library analytics variable usage data broken down by file. */
+		LibraryAnalyticsVariableUsagesByFile: {
+			/** @description The name of the file using the library. */
+			file_name: string;
+			/** @description The name of the team the file belongs to. */
+			team_name: string;
+			/** @description The name of the workspace that the file belongs to. */
+			workspace_name?: string;
+			/** @description The number of times variables from this library are used within the file. */
+			usages: number;
+		};
+		/** @description If pagination is needed due to the length of the response, identifies the next and previous pages. */
+		ResponsePagination: {
+			/** @description A URL that calls the previous page of the response. */
+			prev_page?: string;
+			/** @description A URL that calls the next page of the response. */
+			next_page?: string;
+		};
+		/** @description Pagination cursor */
+		ResponseCursor: {
+			before?: number;
+			after?: number;
+		};
+		/** @description A response indicating an error occurred. */
+		ErrorResponsePayloadWithErrMessage: {
+			/** @description Status code */
+			status: number;
+			/** @description A string describing the error */
+			err: string;
+		};
+		/** @description A response indicating an error occurred. */
+		ErrorResponsePayloadWithErrorBoolean: {
+			/**
+			 * @description For erroneous requests, this value is always `true`.
+			 * @enum {boolean}
+			 */
+			error: true;
+			/** @description Status code */
+			status: number;
+			/** @description A string describing the error */
+			message: string;
+		};
+	};
+	responses: {
+		/** @description Response from the GET /v1/files/{file_key} endpoint. */
+		GetFileResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description The name of the file as it appears in the editor. */
+					name: string;
+					/**
+					 * @description The role of the user making the API request in relation to the file.
+					 * @enum {string}
+					 */
+					role: 'owner' | 'editor' | 'viewer';
+					/**
+					 * Format: date-time
+					 * @description The UTC ISO 8601 time at which the file was last modified.
+					 */
+					lastModified: string;
+					/**
+					 * @description The type of editor associated with this file.
+					 * @enum {string}
+					 */
+					editorType: 'figma' | 'figjam';
+					/** @description A URL to a thumbnail image of the file. */
+					thumbnailUrl?: string;
+					/** @description The version number of the file. This number is incremented when a file is modified and can be used to check if the file has changed between requests. */
+					version: string;
+					document: components['schemas']['DocumentNode'];
+					/** @description A mapping from component IDs to component metadata. */
+					components: {
+						[key: string]: components['schemas']['Component'];
+					};
+					/** @description A mapping from component set IDs to component set metadata. */
+					componentSets: {
+						[key: string]: components['schemas']['ComponentSet'];
+					};
+					/**
+					 * @description The version of the file schema that this file uses.
+					 * @default 0
+					 */
+					schemaVersion: number;
+					/** @description A mapping from style IDs to style metadata. */
+					styles: {
+						[key: string]: components['schemas']['Style'];
+					};
+					/** @description The share permission level of the file link. */
+					linkAccess?: string;
+					/** @description The key of the main file for this file. If present, this file is a component or component set. */
+					mainFileKey?: string;
+					/** @description A list of branches for this file. */
+					branches?: {
+						/** @description The key of the branch. */
+						key: string;
+						/** @description The name of the branch. */
+						name: string;
+						/** @description A URL to a thumbnail image of the branch. */
+						thumbnail_url: string;
+						/**
+						 * Format: date-time
+						 * @description The UTC ISO 8601 time at which the branch was last modified.
+						 */
+						last_modified: string;
+					}[];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/nodes endpoint. */
+		GetFileNodesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description The name of the file as it appears in the editor. */
+					name: string;
+					/**
+					 * @description The role of the user making the API request in relation to the file.
+					 * @enum {string}
+					 */
+					role: 'owner' | 'editor' | 'viewer';
+					/**
+					 * Format: date-time
+					 * @description The UTC ISO 8601 time at which the file was last modified.
+					 */
+					lastModified: string;
+					/**
+					 * @description The type of editor associated with this file.
+					 * @enum {string}
+					 */
+					editorType: 'figma' | 'figjam';
+					/** @description A URL to a thumbnail image of the file. */
+					thumbnailUrl: string;
+					/** @description The version number of the file. This number is incremented when a file is modified and can be used to check if the file has changed between requests. */
+					version: string;
+					/** @description A mapping from node IDs to node metadata. */
+					nodes: {
+						[key: string]: {
+							document: components['schemas']['Node'];
+							/** @description A mapping from component IDs to component metadata. */
+							components: {
+								[key: string]: components['schemas']['Component'];
+							};
+							/** @description A mapping from component set IDs to component set metadata. */
+							componentSets: {
+								[key: string]: components['schemas']['ComponentSet'];
+							};
+							/**
+							 * @description The version of the file schema that this file uses.
+							 * @default 0
+							 */
+							schemaVersion: number;
+							/** @description A mapping from style IDs to style metadata. */
+							styles: {
+								[key: string]: components['schemas']['Style'];
+							};
+						};
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/images/{file_key} endpoint. */
+		GetImagesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description For successful requests, this value is always `null`. */
+					err: null;
+					/** @description A map from node IDs to URLs of the rendered images. */
+					images: {
+						[key: string]: string | null;
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/images endpoint. */
+		GetImageFillsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 200;
+					meta: {
+						/** @description A map of image references to URLs of the image fills. */
+						images: {
+							[key: string]: string;
+						};
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/teams/{team_id}/projects endpoint. */
+		GetTeamProjectsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description The team's name. */
+					name: string;
+					/** @description An array of projects. */
+					projects: components['schemas']['Project'][];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/projects/{project_id}/files endpoint. */
+		GetProjectFilesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description The project's name. */
+					name: string;
+					/** @description An array of files. */
+					files: {
+						/** @description The file's key. */
+						key: string;
+						/** @description The file's name. */
+						name: string;
+						/** @description The file's thumbnail URL. */
+						thumbnail_url?: string;
+						/**
+						 * Format: date-time
+						 * @description The UTC ISO 8601 time at which the file was last modified.
+						 */
+						last_modified: string;
+					}[];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/versions endpoint. */
+		GetFileVersionsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of versions. */
+					versions: components['schemas']['Version'][];
+					pagination: components['schemas']['ResponsePagination'];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/comments endpoint. */
+		GetCommentsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of comments. */
+					comments: components['schemas']['Comment'][];
+				};
+			};
+		};
+		/** @description Response from the POST /v1/files/{file_key}/comments endpoint. */
+		PostCommentResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['Comment'];
+			};
+		};
+		/** @description Response from the DELETE /v1/files/{file_key}/comments/{comment_id} endpoint. */
+		DeleteCommentResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
+		GetCommentReactionsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of reactions. */
+					reactions: components['schemas']['Reaction'][];
+					pagination: components['schemas']['ResponsePagination'];
+				};
+			};
+		};
+		/** @description Response from the POST /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
+		PostCommentReactionResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+				};
+			};
+		};
+		/** @description Response from the DELETE /v1/files/{file_key}/comments/{comment_id}/reactions endpoint. */
+		DeleteCommentReactionResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+				};
+			};
+		};
+		/** @description Response from the GET /v1/me endpoint. */
+		GetMeResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['User'] & {
+					/** @description Email associated with the user's account. This property is only present on the /v1/me endpoint. */
+					email: string;
+				};
+			};
+		};
+		/** @description Response from the GET /v1/teams/{team_id}/components endpoint. */
+		GetTeamComponentsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						components: components['schemas']['PublishedComponent'][];
+						cursor?: components['schemas']['ResponseCursor'];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/components endpoint. */
+		GetFileComponentsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						components: components['schemas']['PublishedComponent'][];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/components/{key} endpoint. */
+		GetComponentResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: components['schemas']['PublishedComponent'];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/teams/{team_id}/component_sets endpoint. */
+		GetTeamComponentSetsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						component_sets: components['schemas']['PublishedComponentSet'][];
+						cursor?: components['schemas']['ResponseCursor'];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/component_sets endpoint. */
+		GetFileComponentSetsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						component_sets: components['schemas']['PublishedComponentSet'][];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/component_sets/{key} endpoint. */
+		GetComponentSetResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: components['schemas']['PublishedComponentSet'];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/teams/{team_id}/styles endpoint. */
+		GetTeamStylesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						styles: components['schemas']['PublishedStyle'][];
+						cursor?: components['schemas']['ResponseCursor'];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/styles endpoint. */
+		GetFileStylesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						styles: components['schemas']['PublishedStyle'][];
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/styles/{key} endpoint. */
+		GetStyleResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The status of the request.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: components['schemas']['PublishedStyle'];
+				};
+			};
+		};
+		/** @description Response from the POST /v2/webhooks endpoint. */
+		PostWebhookResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['WebhookV2'];
+			};
+		};
+		/** @description Response from the GET /v2/webhooks/{webhook_id} endpoint. */
+		GetWebhookResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['WebhookV2'];
+			};
+		};
+		/** @description Response from the PUT /v2/webhooks/{webhook_id} endpoint. */
+		PutWebhookResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['WebhookV2'];
+			};
+		};
+		/** @description Response from the DELETE /v2/webhooks/{webhook_id} endpoint. */
+		DeleteWebhookResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['WebhookV2'];
+			};
+		};
+		/** @description Response from the GET /v2/teams/{team_id}/webhooks endpoint. */
+		GetTeamWebhooksResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of webhooks. */
+					webhooks: components['schemas']['WebhookV2'][];
+				};
+			};
+		};
+		/** @description Response from the GET /v2/webhooks/{webhook_id}/requests endpoint. */
+		GetWebhookRequestsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of webhook requests. */
+					requests: components['schemas']['WebhookV2Request'][];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/activity_logs endpoint. */
+		GetActivityLogsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The response status code.
+					 * @enum {number}
+					 */
+					status?: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error?: false;
+					meta?: {
+						/** @description An array of activity logs sorted by timestamp in ascending order by default. */
+						activity_logs?: components['schemas']['ActivityLog'][];
+						/** @description Encodes the last event (the most recent event) */
+						cursor?: string;
+						/** @description Whether there is a next page of events */
+						next_page?: boolean;
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/payments endpoint. */
+		GetPaymentsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The response status code.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: components['schemas']['PaymentInformation'];
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/variables/local endpoint. */
+		GetLocalVariablesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The response status code.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						/** @description A map of variable ids to variables */
+						variables: {
+							[key: string]: components['schemas']['LocalVariable'];
+						};
+						/** @description A map of variable collection ids to variable collections */
+						variableCollections: {
+							[key: string]: components['schemas']['LocalVariableCollection'];
+						};
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/variables/published endpoint. */
+		GetPublishedVariablesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The response status code.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						/** @description A map of variable ids to variables */
+						variables: {
+							[key: string]: components['schemas']['PublishedVariable'];
+						};
+						/** @description A map of variable collection ids to variable collections */
+						variableCollections: {
+							[key: string]: components['schemas']['PublishedVariableCollection'];
+						};
+					};
+				};
+			};
+		};
+		/** @description Response from the POST /v1/files/{file_key}/variables endpoint. */
+		PostVariablesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/**
+					 * @description The response status code.
+					 * @enum {number}
+					 */
+					status: 200;
+					/**
+					 * @description For successful requests, this value is always `false`.
+					 * @enum {boolean}
+					 */
+					error: false;
+					meta: {
+						/** @description A map of temporary ids in the request to the real ids of the newly created objects */
+						tempIdToRealId: {
+							[key: string]: string;
+						};
+					};
+				};
+			};
+		};
+		/** @description Response from the GET /v1/files/{file_key}/dev_resources endpoint. */
+		GetDevResourcesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of dev resources. */
+					dev_resources: components['schemas']['DevResource'][];
+				};
+			};
+		};
+		/** @description Response from the POST /v1/dev_resources endpoint. */
+		PostDevResourcesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of links created. */
+					links_created: components['schemas']['DevResource'][];
+					/** @description An array of errors. */
+					errors?: {
+						/** @description The file key. */
+						file_key?: string | null;
+						/** @description The node id. */
+						node_id?: string | null;
+						/** @description The error message. */
+						error: string;
+					}[];
+				};
+			};
+		};
+		/** @description Response from the PUT /v1/dev_resources endpoint. */
+		PutDevResourcesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of links updated. */
+					links_updated?: components['schemas']['DevResource'][];
+					/** @description An array of errors. */
+					errors?: {
+						/** @description The id of the dev resource. */
+						id?: string;
+						/** @description The error message. */
+						error: string;
+					}[];
+				};
+			};
+		};
+		/** @description Response from the DELETE /v1/files/{file_key}/dev_resources/{dev_resource_id} endpoint. */
+		DeleteDevResourceResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content?: never;
+		};
+		/** @description Response from the GET /v1/analytics/libraries/{file_key}/component/actions. */
+		GetLibraryAnalyticsComponentActionsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsComponentActionsByAsset'][]
+						| components['schemas']['LibraryAnalyticsComponentActionsByTeam'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Response from the PUT /v1/analytics/libraries/{file_key}/component/usages. */
+		GetLibraryAnalyticsComponentUsagesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsComponentUsagesByAsset'][]
+						| components['schemas']['LibraryAnalyticsComponentUsagesByFile'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Response from the GET /v1/analytics/libraries/{file_key}/style/actions. */
+		GetLibraryAnalyticsStyleActionsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsStyleActionsByAsset'][]
+						| components['schemas']['LibraryAnalyticsStyleActionsByTeam'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Response from the PUT /v1/analytics/libraries/{file_key}/style/usages. */
+		GetLibraryAnalyticsStyleUsagesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsStyleUsagesByAsset'][]
+						| components['schemas']['LibraryAnalyticsStyleUsagesByFile'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Response from the GET /v1/analytics/libraries/{file_key}/variable/actions. */
+		GetLibraryAnalyticsVariableActionsResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsVariableActionsByAsset'][]
+						| components['schemas']['LibraryAnalyticsVariableActionsByTeam'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Response from the PUT /v1/analytics/libraries/{file_key}/variable/usages. */
+		GetLibraryAnalyticsVariableUsagesResponse: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': {
+					/** @description An array of analytics data. */
+					rows:
+						| components['schemas']['LibraryAnalyticsVariableUsagesByAsset'][]
+						| components['schemas']['LibraryAnalyticsVariableUsagesByFile'][];
+					/** @description Whether there is a next page of data that can be fetched. */
+					next_page: boolean;
+					/** @description The cursor to use to fetch the next page of data. Not present if next_page is false. */
+					cursor?: string;
+				};
+			};
+		};
+		/** @description Bad request. Parameters are invalid or malformed. Please check the input formats. This error can also happen if the requested resources are too large to complete the request, which results in a timeout. Please reduce the number and size of objects requested. */
+		BadRequestErrorResponseWithErrMessage: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrMessage'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 400;
+				};
+			};
+		};
+		/** @description Bad request. Parameters are invalid or malformed. Please check the input formats. This error can also happen if the requested resources are too large to complete the request, which results in a timeout. Please reduce the number and size of objects requested. */
+		BadRequestErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 400;
+				};
+			};
+		};
+		/** @description Token is missing or incorrect. */
+		UnauthorizedErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 401;
+				};
+			};
+		};
+		/** @description The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource, or may need an account of some sort. */
+		ForbiddenErrorResponseWithErrMessage: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrMessage'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 403;
+				};
+			};
+		};
+		/** @description The request was valid, but the server is refusing action. The user might not have the necessary permissions for a resource, or may need an account of some sort. */
+		ForbiddenErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 403;
+				};
+			};
+		};
+		/** @description The requested file or resource was not found. */
+		NotFoundErrorResponseWithErrMessage: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrMessage'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 404;
+				};
+			};
+		};
+		/** @description The requested file or resource was not found. */
+		NotFoundErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 404;
+				};
+			};
+		};
+		/** @description In some cases API requests may be throttled or rate limited. Please wait a while before attempting the request again (typically a minute). */
+		TooManyRequestsErrorResponseWithErrMessage: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrMessage'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 429;
+				};
+			};
+		};
+		/** @description In some cases API requests may be throttled or rate limited. Please wait a while before attempting the request again (typically a minute). */
+		TooManyRequestsErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 429;
+				};
+			};
+		};
+		/** @description An internal server error occurred. */
+		InternalServerErrorResponseWithErrMessage: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrMessage'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 500;
+				};
+			};
+		};
+		/** @description An internal server error occurred. */
+		InternalServerErrorResponseWithErrorBoolean: {
+			headers: {
+				[name: string]: unknown;
+			};
+			content: {
+				'application/json': components['schemas']['ErrorResponsePayloadWithErrorBoolean'] & {
+					/**
+					 * @description Status code
+					 * @enum {number}
+					 */
+					status: 500;
+				};
+			};
+		};
+	};
+	parameters: never;
+	requestBodies: never;
+	headers: never;
+	pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getFile: {
-        parameters: {
-            query?: {
-                /** @description A specific version ID to get. Omitting this will get the current version of the file. */
-                version?: string;
-                /** @description Comma separated list of nodes that you care about in the document. If specified, only a subset of the document will be returned corresponding to the nodes listed, their children, and everything between the root node and the listed nodes.
-                 *
-                 *     Note: There may be other nodes included in the returned JSON that are outside the ancestor chains of the desired nodes. The response may also include dependencies of anything in the nodes' subtrees. For example, if a node subtree contains an instance of a local component that lives elsewhere in that file, that component and its ancestor chain will also be included.
-                 *
-                 *     For historical reasons, top-level canvas nodes are always returned, regardless of whether they are listed in the `ids` parameter. This quirk may be removed in a future version of the API. */
-                ids?: string;
-                /** @description Positive integer representing how deep into the document tree to traverse. For example, setting this to 1 returns only Pages, setting it to 2 returns Pages and all top level objects on each page. Not setting this parameter returns all nodes. */
-                depth?: number;
-                /** @description Set to "paths" to export vector data. */
-                geometry?: string;
-                /** @description A comma separated list of plugin IDs and/or the string "shared". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties. */
-                plugin_data?: string;
-                /** @description Returns branch metadata for the requested file. If the file is a branch, the main file's key will be included in the returned response. If the file has branches, their metadata will be included in the returned response. Default: false. */
-                branch_data?: boolean;
-            };
-            header?: never;
-            path: {
-                /** @description File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getFileNodes: {
-        parameters: {
-            query: {
-                /** @description A comma separated list of node IDs to retrieve and convert. */
-                ids: string;
-                /** @description A specific version ID to get. Omitting this will get the current version of the file. */
-                version?: string;
-                /** @description Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.
-                 *
-                 *     Note: this parameter behaves differently from the same parameter in the `GET /v1/files/:key` endpoint. In this endpoint, the depth will be counted starting from the desired node rather than the document root node. */
-                depth?: number;
-                /** @description Set to "paths" to export vector data. */
-                geometry?: string;
-                /** @description A comma separated list of plugin IDs and/or the string "shared". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties. */
-                plugin_data?: string;
-            };
-            header?: never;
-            path: {
-                /** @description File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileNodesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getImages: {
-        parameters: {
-            query: {
-                /** @description A comma separated list of node IDs to render. */
-                ids: string;
-                /** @description A specific version ID to get. Omitting this will get the current version of the file. */
-                version?: string;
-                /** @description A number between 0.01 and 4, the image scaling factor. */
-                scale?: number;
-                /** @description A string enum for the image output format. */
-                format?: "jpg" | "png" | "svg" | "pdf";
-                /** @description Whether text elements are rendered as outlines (vector paths) or as `<text>` elements in SVGs.
-                 *
-                 *     Rendering text elements as outlines guarantees that the text looks exactly the same in the SVG as it does in the browser/inside Figma.
-                 *
-                 *     Exporting as `<text>` allows text to be selectable inside SVGs and generally makes the SVG easier to read. However, this relies on the browser's rendering engine which can vary between browsers and/or operating systems. As such, visual accuracy is not guaranteed as the result could look different than in Figma. */
-                svg_outline_text?: boolean;
-                /** @description Whether to include id attributes for all SVG elements. Adds the layer name to the `id` attribute of an svg element. */
-                svg_include_id?: boolean;
-                /** @description Whether to include node id attributes for all SVG elements. Adds the node id to a `data-node-id` attribute of an svg element. */
-                svg_include_node_id?: boolean;
-                /** @description Whether to simplify inside/outside strokes and use stroke attribute if possible instead of `<mask>`. */
-                svg_simplify_stroke?: boolean;
-                /** @description Whether content that overlaps the node should be excluded from rendering. Passing false (i.e., rendering overlaps) may increase processing time, since more of the document must be included in rendering. */
-                contents_only?: boolean;
-                /** @description Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping. */
-                use_absolute_bounds?: boolean;
-            };
-            header?: never;
-            path: {
-                /** @description File to export images from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetImagesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getImageFills: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to get image URLs from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetImageFillsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getTeamProjects: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the team to list projects from */
-                team_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetTeamProjectsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getProjectFiles: {
-        parameters: {
-            query?: {
-                /** @description Returns branch metadata in the response for each main file with a branch inside the project. */
-                branch_data?: boolean;
-            };
-            header?: never;
-            path: {
-                /** @description ID of the project to list files from */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetProjectFilesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getFileVersions: {
-        parameters: {
-            query?: {
-                /** @description The number of items returned in a page of the response. If not included, `page_size` is `30`. */
-                page_size?: number;
-                /** @description A version ID for one of the versions in the history. Gets versions before this ID. Used for paginating. If the response is not paginated, this link returns the same data in the current response. */
-                before?: number;
-                /** @description A version ID for one of the versions in the history. Gets versions after this ID. Used for paginating. If the response is not paginated, this property is not included. */
-                after?: number;
-            };
-            header?: never;
-            path: {
-                /** @description File to get version history from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileVersionsResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getComments: {
-        parameters: {
-            query?: {
-                /** @description If enabled, will return comments as their markdown equivalents when applicable. */
-                as_md?: boolean;
-            };
-            header?: never;
-            path: {
-                /** @description File to get comments from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetCommentsResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    postComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to add comments in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        /** @description Comment to post. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description The text contents of the comment to post. */
-                    message: string;
-                    /** @description The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id). */
-                    comment_id?: string;
-                    /** @description The position where to place the comment. */
-                    client_meta?: components["schemas"]["Vector"] | components["schemas"]["FrameOffset"] | components["schemas"]["Region"] | components["schemas"]["FrameOffsetRegion"];
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PostCommentResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    deleteComment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to delete comment from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-                /** @description Comment id of comment to delete */
-                comment_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["DeleteCommentResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getCommentReactions: {
-        parameters: {
-            query?: {
-                /** @description Cursor for pagination, retrieved from the response of the previous call. */
-                cursor?: string;
-            };
-            header?: never;
-            path: {
-                /** @description File to get comment containing reactions from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-                /** @description ID of comment to get reactions from. */
-                comment_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetCommentReactionsResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    postCommentReaction: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to post comment reactions to. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-                /** @description ID of comment to react to. */
-                comment_id: string;
-            };
-            cookie?: never;
-        };
-        /** @description Reaction to post. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    emoji: components["schemas"]["Emoji"];
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PostCommentReactionResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    deleteCommentReaction: {
-        parameters: {
-            query: {
-                emoji: components["schemas"]["Emoji"];
-            };
-            header?: never;
-            path: {
-                /** @description File to delete comment reaction from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-                /** @description ID of comment to delete reaction from. */
-                comment_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["DeleteCommentReactionResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetMeResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getTeamComponents: {
-        parameters: {
-            query?: {
-                /** @description Number of items to return in a paged list of results. Defaults to 30. */
-                page_size?: number;
-                /** @description Cursor indicating which id after which to start retrieving components for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                after?: number;
-                /** @description Cursor indicating which id before which to start retrieving components for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                before?: number;
-            };
-            header?: never;
-            path: {
-                /** @description Id of the team to list components from. */
-                team_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetTeamComponentsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getFileComponents: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to list components from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileComponentsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getComponent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The unique identifier of the component. */
-                key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetComponentResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getTeamComponentSets: {
-        parameters: {
-            query?: {
-                /** @description Number of items to return in a paged list of results. Defaults to 30. */
-                page_size?: number;
-                /** @description Cursor indicating which id after which to start retrieving component sets for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                after?: number;
-                /** @description Cursor indicating which id before which to start retrieving component sets for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                before?: number;
-            };
-            header?: never;
-            path: {
-                /** @description Id of the team to list component sets from. */
-                team_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetTeamComponentSetsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getFileComponentSets: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to list component sets from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileComponentSetsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getComponentSet: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The unique identifier of the component set. */
-                key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetComponentSetResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getTeamStyles: {
-        parameters: {
-            query?: {
-                /** @description Number of items to return in a paged list of results. Defaults to 30. */
-                page_size?: number;
-                /** @description Cursor indicating which id after which to start retrieving styles for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                after?: number;
-                /** @description Cursor indicating which id before which to start retrieving styles for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
-                before?: number;
-            };
-            header?: never;
-            path: {
-                /** @description Id of the team to list styles from. */
-                team_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetTeamStylesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getFileStyles: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to list styles from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetFileStylesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getStyle: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The unique identifier of the style. */
-                key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetStyleResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrMessage"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    postWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description The webhook to create. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    event_type: components["schemas"]["WebhookV2Event"];
-                    /** @description Team id to receive updates about */
-                    team_id: string;
-                    /** @description The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters. */
-                    endpoint: string;
-                    /** @description String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters. */
-                    passcode: string;
-                    /** @description State of the webhook, including any error state it may be in */
-                    status?: components["schemas"]["WebhookV2Status"];
-                    /** @description User provided description or name for the webhook. Max length 150 characters. */
-                    description?: string;
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PostWebhookResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of webhook to get */
-                webhook_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetWebhookResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    putWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of webhook to update */
-                webhook_id: string;
-            };
-            cookie?: never;
-        };
-        /** @description The webhook to update. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    event_type: components["schemas"]["WebhookV2Event"];
-                    /** @description The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters. */
-                    endpoint: string;
-                    /** @description String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters. */
-                    passcode: string;
-                    /** @description State of the webhook, including any error state it may be in */
-                    status?: components["schemas"]["WebhookV2Status"];
-                    /** @description User provided description or name for the webhook. Max length 150 characters. */
-                    description?: string;
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PutWebhookResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    deleteWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of webhook to delete */
-                webhook_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["DeleteWebhookResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getTeamWebhooks: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of team to get webhooks for */
-                team_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetTeamWebhooksResponse"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrMessage"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrMessage"];
-        };
-    };
-    getWebhookRequests: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The id of the webhook subscription you want to see events from */
-                webhook_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetWebhookRequestsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrMessage"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrMessage"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getActivityLogs: {
-        parameters: {
-            query?: {
-                /** @description Event type(s) to include in the response. Can have multiple values separated by comma. All events are returned by default. */
-                events?: string;
-                /** @description Unix timestamp of the least recent event to include. This param defaults to one year ago if unspecified. Events prior to one year ago are not available. */
-                start_time?: number;
-                /** @description Unix timestamp of the most recent event to include. This param defaults to the current timestamp if unspecified. */
-                end_time?: number;
-                /** @description Maximum number of events to return. This param defaults to 1000 if unspecified. */
-                limit?: number;
-                /** @description Event order by timestamp. This param can be either "asc" (default) or "desc". */
-                order?: "asc" | "desc";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetActivityLogsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getPayments: {
-        parameters: {
-            query?: {
-                /** @description Short-lived token returned from "getPluginPaymentTokenAsync" in the plugin payments API and used to authenticate to this endpoint. Read more about generating this token through "Calling the Payments REST API from a plugin or widget" below. */
-                plugin_payment_token?: string;
-                /** @description The ID of the user to query payment information about. You can get the user ID by having the user OAuth2 to the Figma REST API. */
-                user_id?: number;
-                /** @description The ID of the Community file to query a user's payment information on. You can get the Community file ID from the file's Community page (look for the number after "file/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-                community_file_id?: number;
-                /** @description The ID of the plugin to query a user's payment information on. You can get the plugin ID from the plugin's manifest, or from the plugin's Community page (look for the number after "plugin/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-                plugin_id?: number;
-                /** @description The ID of the widget to query a user's payment information on. You can get the widget ID from the widget's manifest, or from the widget's Community page (look for the number after "widget/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-                widget_id?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetPaymentsResponse"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLocalVariables: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to get variables from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLocalVariablesResponse"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getPublishedVariables: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to get variables from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetPublishedVariablesResponse"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    postVariables: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description File to modify variables in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description For creating, updating, and deleting variable collections. */
-                    variableCollections?: components["schemas"]["VariableCollectionChange"][];
-                    /** @description For creating, updating, and deleting modes within variable collections. */
-                    variableModes?: components["schemas"]["VariableModeChange"][];
-                    /** @description For creating, updating, and deleting variables. */
-                    variables?: components["schemas"]["VariableChange"][];
-                    /** @description For setting a specific value, given a variable and a mode. */
-                    variableModeValues?: components["schemas"]["VariableModeValue"][];
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PostVariablesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getDevResources: {
-        parameters: {
-            query?: {
-                /** @description Comma separated list of nodes that you care about in the document. If specified, only dev resources attached to these nodes will be returned. If not specified, all dev resources in the file will be returned. */
-                node_ids?: string;
-            };
-            header?: never;
-            path: {
-                /** @description The file to get the dev resources from. This must be a main file key, not a branch key. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetDevResourcesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    putDevResources: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description A list of dev resources that you want to update. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description An array of dev resources. */
-                    dev_resources: {
-                        /** @description Unique identifier of the dev resource */
-                        id: string;
-                        /** @description The name of the dev resource. */
-                        name?: string;
-                        /** @description The URL of the dev resource. */
-                        url?: string;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PutDevResourcesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    postDevResources: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description A list of dev resources that you want to create. */
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @description An array of dev resources. */
-                    dev_resources: {
-                        /** @description The name of the dev resource. */
-                        name: string;
-                        /** @description The URL of the dev resource. */
-                        url: string;
-                        /** @description The file key where the dev resource belongs. */
-                        file_key: string;
-                        /** @description The target node to attach the dev resource to. */
-                        node_id: string;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["PostDevResourcesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    deleteDevResource: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The file to delete the dev resource from. This must be a main file key, not a branch key. */
-                file_key: string;
-                /** @description The id of the dev resource to delete. */
-                dev_resource_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["DeleteDevResourceResponse"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            404: components["responses"]["NotFoundErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsComponentActions: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "component" | "team";
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
-                start_date?: string;
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
-                end_date?: string;
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsComponentActionsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsComponentUsages: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "component" | "file";
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsComponentUsagesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsStyleActions: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "style" | "team";
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
-                start_date?: string;
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
-                end_date?: string;
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsStyleActionsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsStyleUsages: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "style" | "file";
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsStyleUsagesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsVariableActions: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "variable" | "team";
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
-                start_date?: string;
-                /** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
-                end_date?: string;
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsVariableActionsResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
-    getLibraryAnalyticsVariableUsages: {
-        parameters: {
-            query: {
-                /** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
-                cursor?: string;
-                /** @description A dimension to group returned analytics data by. */
-                group_by: "variable" | "file";
-            };
-            header?: never;
-            path: {
-                /** @description File key of the library to fetch analytics data for. */
-                file_key: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: components["responses"]["GetLibraryAnalyticsVariableUsagesResponse"];
-            400: components["responses"]["BadRequestErrorResponseWithErrorBoolean"];
-            401: components["responses"]["UnauthorizedErrorResponseWithErrorBoolean"];
-            403: components["responses"]["ForbiddenErrorResponseWithErrorBoolean"];
-            429: components["responses"]["TooManyRequestsErrorResponseWithErrorBoolean"];
-            500: components["responses"]["InternalServerErrorResponseWithErrorBoolean"];
-        };
-    };
+	getFile: {
+		parameters: {
+			query?: {
+				/** @description A specific version ID to get. Omitting this will get the current version of the file. */
+				version?: string;
+				/** @description Comma separated list of nodes that you care about in the document. If specified, only a subset of the document will be returned corresponding to the nodes listed, their children, and everything between the root node and the listed nodes.
+				 *
+				 *     Note: There may be other nodes included in the returned JSON that are outside the ancestor chains of the desired nodes. The response may also include dependencies of anything in the nodes' subtrees. For example, if a node subtree contains an instance of a local component that lives elsewhere in that file, that component and its ancestor chain will also be included.
+				 *
+				 *     For historical reasons, top-level canvas nodes are always returned, regardless of whether they are listed in the `ids` parameter. This quirk may be removed in a future version of the API. */
+				ids?: string;
+				/** @description Positive integer representing how deep into the document tree to traverse. For example, setting this to 1 returns only Pages, setting it to 2 returns Pages and all top level objects on each page. Not setting this parameter returns all nodes. */
+				depth?: number;
+				/** @description Set to "paths" to export vector data. */
+				geometry?: string;
+				/** @description A comma separated list of plugin IDs and/or the string "shared". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties. */
+				plugin_data?: string;
+				/** @description Returns branch metadata for the requested file. If the file is a branch, the main file's key will be included in the returned response. If the file has branches, their metadata will be included in the returned response. Default: false. */
+				branch_data?: boolean;
+			};
+			header?: never;
+			path: {
+				/** @description File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getFileNodes: {
+		parameters: {
+			query: {
+				/** @description A comma separated list of node IDs to retrieve and convert. */
+				ids: string;
+				/** @description A specific version ID to get. Omitting this will get the current version of the file. */
+				version?: string;
+				/** @description Positive integer representing how deep into the node tree to traverse. For example, setting this to 1 will return only the children directly underneath the desired nodes. Not setting this parameter returns all nodes.
+				 *
+				 *     Note: this parameter behaves differently from the same parameter in the `GET /v1/files/:key` endpoint. In this endpoint, the depth will be counted starting from the desired node rather than the document root node. */
+				depth?: number;
+				/** @description Set to "paths" to export vector data. */
+				geometry?: string;
+				/** @description A comma separated list of plugin IDs and/or the string "shared". Any data present in the document written by those plugins will be included in the result in the `pluginData` and `sharedPluginData` properties. */
+				plugin_data?: string;
+			};
+			header?: never;
+			path: {
+				/** @description File to export JSON from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileNodesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getImages: {
+		parameters: {
+			query: {
+				/** @description A comma separated list of node IDs to render. */
+				ids: string;
+				/** @description A specific version ID to get. Omitting this will get the current version of the file. */
+				version?: string;
+				/** @description A number between 0.01 and 4, the image scaling factor. */
+				scale?: number;
+				/** @description A string enum for the image output format. */
+				format?: 'jpg' | 'png' | 'svg' | 'pdf';
+				/** @description Whether text elements are rendered as outlines (vector paths) or as `<text>` elements in SVGs.
+				 *
+				 *     Rendering text elements as outlines guarantees that the text looks exactly the same in the SVG as it does in the browser/inside Figma.
+				 *
+				 *     Exporting as `<text>` allows text to be selectable inside SVGs and generally makes the SVG easier to read. However, this relies on the browser's rendering engine which can vary between browsers and/or operating systems. As such, visual accuracy is not guaranteed as the result could look different than in Figma. */
+				svg_outline_text?: boolean;
+				/** @description Whether to include id attributes for all SVG elements. Adds the layer name to the `id` attribute of an svg element. */
+				svg_include_id?: boolean;
+				/** @description Whether to include node id attributes for all SVG elements. Adds the node id to a `data-node-id` attribute of an svg element. */
+				svg_include_node_id?: boolean;
+				/** @description Whether to simplify inside/outside strokes and use stroke attribute if possible instead of `<mask>`. */
+				svg_simplify_stroke?: boolean;
+				/** @description Whether content that overlaps the node should be excluded from rendering. Passing false (i.e., rendering overlaps) may increase processing time, since more of the document must be included in rendering. */
+				contents_only?: boolean;
+				/** @description Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping. */
+				use_absolute_bounds?: boolean;
+			};
+			header?: never;
+			path: {
+				/** @description File to export images from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetImagesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getImageFills: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to get image URLs from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetImageFillsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getTeamProjects: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description ID of the team to list projects from */
+				team_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetTeamProjectsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getProjectFiles: {
+		parameters: {
+			query?: {
+				/** @description Returns branch metadata in the response for each main file with a branch inside the project. */
+				branch_data?: boolean;
+			};
+			header?: never;
+			path: {
+				/** @description ID of the project to list files from */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetProjectFilesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getFileVersions: {
+		parameters: {
+			query?: {
+				/** @description The number of items returned in a page of the response. If not included, `page_size` is `30`. */
+				page_size?: number;
+				/** @description A version ID for one of the versions in the history. Gets versions before this ID. Used for paginating. If the response is not paginated, this link returns the same data in the current response. */
+				before?: number;
+				/** @description A version ID for one of the versions in the history. Gets versions after this ID. Used for paginating. If the response is not paginated, this property is not included. */
+				after?: number;
+			};
+			header?: never;
+			path: {
+				/** @description File to get version history from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileVersionsResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getComments: {
+		parameters: {
+			query?: {
+				/** @description If enabled, will return comments as their markdown equivalents when applicable. */
+				as_md?: boolean;
+			};
+			header?: never;
+			path: {
+				/** @description File to get comments from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetCommentsResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	postComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to add comments in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		/** @description Comment to post. */
+		requestBody: {
+			content: {
+				'application/json': {
+					/** @description The text contents of the comment to post. */
+					message: string;
+					/** @description The ID of the comment to reply to, if any. This must be a root comment. You cannot reply to other replies (a comment that has a parent_id). */
+					comment_id?: string;
+					/** @description The position where to place the comment. */
+					client_meta?:
+						| components['schemas']['Vector']
+						| components['schemas']['FrameOffset']
+						| components['schemas']['Region']
+						| components['schemas']['FrameOffsetRegion'];
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PostCommentResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	deleteComment: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to delete comment from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+				/** @description Comment id of comment to delete */
+				comment_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['DeleteCommentResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getCommentReactions: {
+		parameters: {
+			query?: {
+				/** @description Cursor for pagination, retrieved from the response of the previous call. */
+				cursor?: string;
+			};
+			header?: never;
+			path: {
+				/** @description File to get comment containing reactions from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+				/** @description ID of comment to get reactions from. */
+				comment_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetCommentReactionsResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	postCommentReaction: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to post comment reactions to. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+				/** @description ID of comment to react to. */
+				comment_id: string;
+			};
+			cookie?: never;
+		};
+		/** @description Reaction to post. */
+		requestBody: {
+			content: {
+				'application/json': {
+					emoji: components['schemas']['Emoji'];
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PostCommentReactionResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	deleteCommentReaction: {
+		parameters: {
+			query: {
+				emoji: components['schemas']['Emoji'];
+			};
+			header?: never;
+			path: {
+				/** @description File to delete comment reaction from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+				/** @description ID of comment to delete reaction from. */
+				comment_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['DeleteCommentReactionResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getMe: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetMeResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getTeamComponents: {
+		parameters: {
+			query?: {
+				/** @description Number of items to return in a paged list of results. Defaults to 30. */
+				page_size?: number;
+				/** @description Cursor indicating which id after which to start retrieving components for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				after?: number;
+				/** @description Cursor indicating which id before which to start retrieving components for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				before?: number;
+			};
+			header?: never;
+			path: {
+				/** @description Id of the team to list components from. */
+				team_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetTeamComponentsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getFileComponents: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to list components from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileComponentsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getComponent: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description The unique identifier of the component. */
+				key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetComponentResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getTeamComponentSets: {
+		parameters: {
+			query?: {
+				/** @description Number of items to return in a paged list of results. Defaults to 30. */
+				page_size?: number;
+				/** @description Cursor indicating which id after which to start retrieving component sets for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				after?: number;
+				/** @description Cursor indicating which id before which to start retrieving component sets for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				before?: number;
+			};
+			header?: never;
+			path: {
+				/** @description Id of the team to list component sets from. */
+				team_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetTeamComponentSetsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getFileComponentSets: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to list component sets from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileComponentSetsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getComponentSet: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description The unique identifier of the component set. */
+				key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetComponentSetResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getTeamStyles: {
+		parameters: {
+			query?: {
+				/** @description Number of items to return in a paged list of results. Defaults to 30. */
+				page_size?: number;
+				/** @description Cursor indicating which id after which to start retrieving styles for. Exclusive with before. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				after?: number;
+				/** @description Cursor indicating which id before which to start retrieving styles for. Exclusive with after. The cursor value is an internally tracked integer that doesn't correspond to any Ids. */
+				before?: number;
+			};
+			header?: never;
+			path: {
+				/** @description Id of the team to list styles from. */
+				team_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetTeamStylesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getFileStyles: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to list styles from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetFileStylesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getStyle: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description The unique identifier of the style. */
+				key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetStyleResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrMessage'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	postWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description The webhook to create. */
+		requestBody: {
+			content: {
+				'application/json': {
+					event_type: components['schemas']['WebhookV2Event'];
+					/** @description Team id to receive updates about */
+					team_id: string;
+					/** @description The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters. */
+					endpoint: string;
+					/** @description String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters. */
+					passcode: string;
+					/** @description State of the webhook, including any error state it may be in */
+					status?: components['schemas']['WebhookV2Status'];
+					/** @description User provided description or name for the webhook. Max length 150 characters. */
+					description?: string;
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PostWebhookResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description ID of webhook to get */
+				webhook_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetWebhookResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	putWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description ID of webhook to update */
+				webhook_id: string;
+			};
+			cookie?: never;
+		};
+		/** @description The webhook to update. */
+		requestBody: {
+			content: {
+				'application/json': {
+					event_type: components['schemas']['WebhookV2Event'];
+					/** @description The HTTP endpoint that will receive a POST request when the event triggers. Max length 2048 characters. */
+					endpoint: string;
+					/** @description String that will be passed back to your webhook endpoint to verify that it is being called by Figma. Max length 100 characters. */
+					passcode: string;
+					/** @description State of the webhook, including any error state it may be in */
+					status?: components['schemas']['WebhookV2Status'];
+					/** @description User provided description or name for the webhook. Max length 150 characters. */
+					description?: string;
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PutWebhookResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	deleteWebhook: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description ID of webhook to delete */
+				webhook_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['DeleteWebhookResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getTeamWebhooks: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description ID of team to get webhooks for */
+				team_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetTeamWebhooksResponse'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrMessage'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrMessage'];
+		};
+	};
+	getWebhookRequests: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description The id of the webhook subscription you want to see events from */
+				webhook_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetWebhookRequestsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrMessage'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrMessage'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getActivityLogs: {
+		parameters: {
+			query?: {
+				/** @description Event type(s) to include in the response. Can have multiple values separated by comma. All events are returned by default. */
+				events?: string;
+				/** @description Unix timestamp of the least recent event to include. This param defaults to one year ago if unspecified. */
+				start_time?: number;
+				/** @description Unix timestamp of the most recent event to include. This param defaults to the current timestamp if unspecified. */
+				end_time?: number;
+				/** @description Maximum number of events to return. This param defaults to 1000 if unspecified. */
+				limit?: number;
+				/** @description Event order by timestamp. This param can be either "asc" (default) or "desc". */
+				order?: 'asc' | 'desc';
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetActivityLogsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getPayments: {
+		parameters: {
+			query?: {
+				/** @description Short-lived token returned from "getPluginPaymentTokenAsync" in the plugin payments API and used to authenticate to this endpoint. Read more about generating this token through "Calling the Payments REST API from a plugin or widget" below. */
+				plugin_payment_token?: string;
+				/** @description The ID of the user to query payment information about. You can get the user ID by having the user OAuth2 to the Figma REST API. */
+				user_id?: number;
+				/** @description The ID of the Community file to query a user's payment information on. You can get the Community file ID from the file's Community page (look for the number after "file/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
+				community_file_id?: number;
+				/** @description The ID of the plugin to query a user's payment information on. You can get the plugin ID from the plugin's manifest, or from the plugin's Community page (look for the number after "plugin/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
+				plugin_id?: number;
+				/** @description The ID of the widget to query a user's payment information on. You can get the widget ID from the widget's manifest, or from the widget's Community page (look for the number after "widget/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
+				widget_id?: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetPaymentsResponse'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLocalVariables: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to get variables from. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLocalVariablesResponse'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getPublishedVariables: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to get variables from. This must be a main file key, not a branch key, as it is not possible to publish from branches. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetPublishedVariablesResponse'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	postVariables: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description File to modify variables in. This can be a file key or branch key. Use `GET /v1/files/:key` with the `branch_data` query param to get the branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': {
+					/** @description For creating, updating, and deleting variable collections. */
+					variableCollections?: components['schemas']['VariableCollectionChange'][];
+					/** @description For creating, updating, and deleting modes within variable collections. */
+					variableModes?: components['schemas']['VariableModeChange'][];
+					/** @description For creating, updating, and deleting variables. */
+					variables?: components['schemas']['VariableChange'][];
+					/** @description For setting a specific value, given a variable and a mode. */
+					variableModeValues?: components['schemas']['VariableModeValue'][];
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PostVariablesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getDevResources: {
+		parameters: {
+			query?: {
+				/** @description Comma separated list of nodes that you care about in the document. If specified, only dev resources attached to these nodes will be returned. If not specified, all dev resources in the file will be returned. */
+				node_ids?: string;
+			};
+			header?: never;
+			path: {
+				/** @description The file to get the dev resources from. This must be a main file key, not a branch key. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetDevResourcesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	putDevResources: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description A list of dev resources that you want to update. */
+		requestBody: {
+			content: {
+				'application/json': {
+					/** @description An array of dev resources. */
+					dev_resources: {
+						/** @description Unique identifier of the dev resource */
+						id: string;
+						/** @description The name of the dev resource. */
+						name?: string;
+						/** @description The URL of the dev resource. */
+						url?: string;
+					}[];
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PutDevResourcesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	postDevResources: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description A list of dev resources that you want to create. */
+		requestBody: {
+			content: {
+				'application/json': {
+					/** @description An array of dev resources. */
+					dev_resources: {
+						/** @description The name of the dev resource. */
+						name: string;
+						/** @description The URL of the dev resource. */
+						url: string;
+						/** @description The file key where the dev resource belongs. */
+						file_key: string;
+						/** @description The target node to attach the dev resource to. */
+						node_id: string;
+					}[];
+				};
+			};
+		};
+		responses: {
+			200: components['responses']['PostDevResourcesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	deleteDevResource: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description The file to delete the dev resource from. This must be a main file key, not a branch key. */
+				file_key: string;
+				/** @description The id of the dev resource to delete. */
+				dev_resource_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['DeleteDevResourceResponse'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			404: components['responses']['NotFoundErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsComponentActions: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'component' | 'team';
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
+				start_date?: string;
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
+				end_date?: string;
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsComponentActionsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsComponentUsages: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'component' | 'file';
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsComponentUsagesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsStyleActions: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'style' | 'team';
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
+				start_date?: string;
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
+				end_date?: string;
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsStyleActionsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsStyleUsages: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'style' | 'file';
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsStyleUsagesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsVariableActions: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'variable' | 'team';
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the earliest week to include. Dates are rounded back to the nearest start of a week. Defaults to one year prior. */
+				start_date?: string;
+				/** @description ISO 8601 date string (YYYY-MM-DD) of the latest week to include. Dates are rounded forward to the nearest end of a week. Defaults to the latest computed week. */
+				end_date?: string;
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsVariableActionsResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
+	getLibraryAnalyticsVariableUsages: {
+		parameters: {
+			query: {
+				/** @description Cursor indicating what page of data to fetch. Obtained from prior API call. */
+				cursor?: string;
+				/** @description A dimension to group returned analytics data by. */
+				group_by: 'variable' | 'file';
+			};
+			header?: never;
+			path: {
+				/** @description File key of the library to fetch analytics data for. */
+				file_key: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			200: components['responses']['GetLibraryAnalyticsVariableUsagesResponse'];
+			400: components['responses']['BadRequestErrorResponseWithErrorBoolean'];
+			401: components['responses']['UnauthorizedErrorResponseWithErrorBoolean'];
+			403: components['responses']['ForbiddenErrorResponseWithErrorBoolean'];
+			429: components['responses']['TooManyRequestsErrorResponseWithErrorBoolean'];
+			500: components['responses']['InternalServerErrorResponseWithErrorBoolean'];
+		};
+	};
 }

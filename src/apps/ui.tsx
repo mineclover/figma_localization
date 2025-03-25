@@ -6,7 +6,7 @@ import { ResizeWindowHandler } from '../figmaPluginUtils/types';
 
 import { AppProvider } from '@/domain/Provider';
 import { NonNullableComponentTypeExtract } from 'types/utilType';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import LabelPage from '@/domain/Label/LabelPage';
 import SettingPage from '@/domain/Setting/SettingPage';
 import TranslatePage from '@/domain/Translate/TranslatePage';
@@ -15,6 +15,7 @@ import { useSignal } from '@/hooks/useSignal';
 import StylePage from '@/domain/Style/StylePage';
 import BatchPage from '@/domain/Batch/BatchPage';
 import LogsPage from '@/domain/Logs/LogsPage';
+import { runExample } from '@/utils/test';
 
 const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs'];
 
@@ -23,6 +24,11 @@ function Plugin() {
 	function onWindowResize(windowSize: { width: number; height: number }) {
 		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize);
 	}
+
+	useEffect(() => {
+		runExample();
+	}, []);
+
 	useWindowResize(onWindowResize, {
 		maxHeight: 1080,
 		maxWidth: 1920,

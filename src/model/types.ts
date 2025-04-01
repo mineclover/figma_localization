@@ -252,3 +252,44 @@ export type CurrentCursorType = {
 	// styleData?: ValidAllStyleRangesType;
 	// boundVariables?: any;
 }; /**  */
+
+export interface LocalizationKeyAction {
+	/**
+	 * 키 ID
+	 */
+	key_id: number;
+
+	/**
+	 * 액션 타입 (예: "default")
+	 */
+	action: string;
+
+	/**
+	 * 열거형 값
+	 */
+	from_enum: string;
+
+	/**
+	 * 스타일 리소스 ID
+	 */
+	style_resource_id: number;
+
+	/**
+	 * 이펙트 리소스 ID
+	 */
+	effect_resource_id: number;
+
+	/**
+	 * 생성일
+	 */
+	created_at: string;
+
+	/**
+	 * 수정일
+	 */
+	updated_at: string;
+
+	style_value: string;
+
+	effect_value: string;
+}

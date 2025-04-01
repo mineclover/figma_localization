@@ -48,6 +48,7 @@ import { safeJsonParse } from '../utils/getStore';
 import { clc } from '@/components/modal/utils';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
+import Tags from './Tags';
 
 type CurrentMetadata = {
 	nodeId?: string;
@@ -173,6 +174,7 @@ export const StyleXml = ({
 	const currentPointer = useSignal(currentPointerSignal);
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
 
+	console.log('🚀 ~ currentPointer:', currentPointer);
 	return (
 		<div>
 			<VerticalSpace space="small" />
@@ -209,6 +211,7 @@ export const StyleXml = ({
 					</div>
 				)}
 			</div>
+			{/* 조회도 해야하고 변환도 해야하고 */}
 			{/* <ResourceProvider fetchFn={} >
 					{(resource) => (
 						<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
@@ -216,6 +219,7 @@ export const StyleXml = ({
 						</Suspense>
 					)}
 				</ResourceProvider> */}
+			<Tags localizationKey={currentPointer?.data.localizationKey ?? ''} xmlString={brString} action={'default'} />
 			{styleValues.map((item) => {
 				return <StyleItem key={item.hashId + item.name} {...item} />;
 			})}

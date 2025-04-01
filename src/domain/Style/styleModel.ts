@@ -24,7 +24,6 @@ import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
 import { TargetNodeStyleUpdate } from './styleAction';
-import toNumber from 'strnum';
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i);

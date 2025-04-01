@@ -599,7 +599,7 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** 특정 키 액션 상세 조회 */
+		/** 단일 대상 조회 */
 		get: operations['GetKeyActionDetail'];
 		put?: never;
 		post?: never;
@@ -1700,17 +1700,22 @@ export interface components {
 		};
 		LocalizationKeyActionDTO: {
 			/** Format: double */
-			key_id: number;
+			keyId: number;
 			action: string;
-			from_enum: string;
+			fromEnum: string;
 			/** Format: double */
-			style_resource_id: number;
+			styleResourceId: number;
 			/** Format: double */
-			effect_resource_id: number;
+			effectResourceId: number;
 		};
 		LocalizationKeyActionBulkDTO: {
 			actions: components['schemas']['LocalizationKeyActionDTO'][];
 		};
+		/**
+		 * @description action : select 는 동의어
+		 * @enum {string}
+		 */
+		ActionType: 'default' | 'hover' | 'active' | 'disabled' | 'loading' | 'error' | 'visited' | 'readonly';
 		Localization: {
 			/** Format: double */
 			localization_id: number;
@@ -2444,7 +2449,12 @@ export interface operations {
 	};
 	GetKeys: {
 		parameters: {
-			query?: never;
+			query?: {
+				/** @description 페이지 번호 (기본값: 1) */
+				page?: number;
+				/** @description 페이지당 항목 수 (기본값: 10) */
+				limit?: number;
+			};
 			header?: never;
 			path?: never;
 			cookie?: never;
@@ -2457,7 +2467,11 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content: {
-					'application/json': unknown;
+					'application/json': {
+						/** Format: double */
+						total: number;
+						keys: unknown[];
+					};
 				};
 			};
 		};
@@ -2718,7 +2732,7 @@ export interface operations {
 		parameters: {
 			query: {
 				key_id: string;
-				action?: string;
+				action: components['schemas']['ActionType'];
 			};
 			header?: never;
 			path?: never;
@@ -2765,7 +2779,7 @@ export interface operations {
 		parameters: {
 			query: {
 				key_id: string;
-				action: string;
+				action: components['schemas']['ActionType'];
 				from_enum: string;
 			};
 			header?: never;
@@ -2857,7 +2871,7 @@ export interface operations {
 		parameters: {
 			query: {
 				key_id: string;
-				action: string;
+				action: components['schemas']['ActionType'];
 				from_enum: string;
 			};
 			header?: never;

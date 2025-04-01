@@ -265,7 +265,6 @@ export function parseXmlToFlatStructure(
 				flatItems.sort((a, b) => a.order - b.order);
 			}
 
-			console.log('🚀 ~ handler ~ flatItems:', flatItems);
 			resolve(flatItems);
 		});
 
@@ -383,8 +382,9 @@ function nodeToXmlString(node: any): string {
 	return xml;
 }
 
-/**
+/** process_name
  * 평탄화된 XML 구조에서 특정 경로의 노드만 선택하여 XML로 변환합니다.
+ * 문자열로 반환 되기 때문에 순서 값이 없어짐
  * @param {Array<any>} flatItems - 평탄화된 XML 구조 배열
  * @param {string} startPath - 시작 경로 (이 경로와 그 하위 경로만 포함)
  * @returns {string} XML 문자열

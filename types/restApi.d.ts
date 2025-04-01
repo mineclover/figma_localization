@@ -969,6 +969,12 @@ export interface components {
 				textRangeFills?: components['schemas']['VariableAlias'][];
 				effects?: components['schemas']['VariableAlias'][];
 				layoutGrids?: components['schemas']['VariableAlias'][];
+				rectangleCornerRadii?: {
+					RECTANGLE_TOP_LEFT_CORNER_RADIUS?: components['schemas']['VariableAlias'];
+					RECTANGLE_TOP_RIGHT_CORNER_RADIUS?: components['schemas']['VariableAlias'];
+					RECTANGLE_BOTTOM_LEFT_CORNER_RADIUS?: components['schemas']['VariableAlias'];
+					RECTANGLE_BOTTOM_RIGHT_CORNER_RADIUS?: components['schemas']['VariableAlias'];
+				};
 			};
 			/** @description A mapping of variable collection ID to mode ID representing the explicitly set modes for this node. */
 			explicitVariableModes?: {
@@ -1421,6 +1427,8 @@ export interface components {
 			flowStartingPoints: components['schemas']['FlowStartingPoint'][];
 			/** @description The device used to view a prototype. */
 			prototypeDevice: components['schemas']['PrototypeDevice'];
+			/** @description The background color of the prototype (currently only supports a single solid color paint). */
+			prototypeBackgrounds?: components['schemas']['RGBA'][];
 			measurements?: components['schemas']['Measurement'][];
 		} & components['schemas']['IsLayerTrait'] &
 			components['schemas']['HasExportSettingsTrait'] & {
@@ -3635,7 +3643,8 @@ export interface components {
 			| 'LINE_HEIGHT'
 			| 'LETTER_SPACING'
 			| 'PARAGRAPH_SPACING'
-			| 'PARAGRAPH_INDENT';
+			| 'PARAGRAPH_INDENT'
+			| 'FONT_VARIATIONS';
 		/** @description An object containing platform-specific code syntax definitions for a variable. All platforms are optional. */
 		VariableCodeSyntax: {
 			WEB?: string;

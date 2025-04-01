@@ -14,6 +14,7 @@ import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
 import { searchTranslationCode } from '../Translate/TranslateModel';
 import { getPageLockOpen } from '../System/lock';
+import { parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2';
 
 const innerTextExtract = (text: any): string => {
 	if (typeof text === 'string') {
@@ -70,7 +71,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		return;
 	}
 	const pageLock = getPageLockOpen();
-	console.log('🚀 잠금체크', pageLock);
 	if (pageLock === true) {
 		notify('Page is locked', 'ok', 1000);
 		return;
@@ -78,7 +78,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	/** 이름이 없어서 이름 얻는 로직 */
 	const originTextResult = await getLocalizationKeyData(localizationKey, date);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ originTextResult:', originTextResult);
 	if (originTextResult == null) {
 		notify('52 Failed to get localization key data', 'error');
 		return;
@@ -87,7 +86,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	const NULL_TEXT = 'NULL TEXT';
 	/** 클라에서 받는 로컬라이제이션 키로 번역 값들 조회 */
 	const targetText = await searchTranslationCode(localizationKey, code, date);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ targetText:', targetText);
 	if (targetText == null) {
 		notify('60 Failed to get localization data', 'error');
 		return;
@@ -119,7 +117,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	 */
 
 	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, domainSetting.domainId);
-	console.log('🚀 ~ textFontLoad TargetNodeStyleUpdate ~ effectStyle:', effectStyle);
 
 	const tempPosition = {
 		x: node.x,
@@ -148,8 +145,16 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 			});
 		}
 	}
-	node.x = tempPosition.x;
-	node.y = tempPosition.y;
+
+	try {
+		// 인스턴스 노드인 경우 x, y 속성을 변경할 수 없음
+		if (node.parent && node.parent.type !== 'INSTANCE') {
+			node.x = tempPosition.x;
+			node.y = tempPosition.y;
+		}
+	} catch (error) {
+		console.error('위치 속성 설정 중 오류 발생:', error);
+	}
 
 	// 여기서 변수 처리?
 };
@@ -157,7 +162,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 /** 이거 클라이언트용임 */
 export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	const parsedData = parseXML(xml);
-	console.log('🚀 ~ xmlToStyle ~ parsedData:', parsedData);
 	const clientFetchDB = clientFetchDBCurry(domainId);
 	const styleStore: Record<string, StyleSync> = {};
 
@@ -171,13 +175,11 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 	for (const item of parsedData) {
 		const key = Object.keys(item)[0];
 		const [effectKey, key2] = key.split(':');
-		console.log('🚀 ~ xmlToStyle ~ [effectKey, key2]:', [effectKey, key2]);
 		if (Object.keys(effectStyle).length === 0) {
 			const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
 				method: 'GET',
 			});
 			const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
-			console.log(effectKey, '🚀 ~ xmlToStyle ~ EffectResourceResult:', EffectResourceResult);
 
 			effectStyle = {
 				hashId: EffectResourceResult.hash_value,
@@ -201,7 +203,6 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 
 			if (onlineStyle.status === 200) {
 				const responseResult = (await onlineStyle.json()) as ResourceDTO;
-				console.log(key2, '🚀 ~ xmlToStyle ~ responseResult:', responseResult);
 				if (responseResult) {
 					const newHashId = responseResult.hash_value;
 					const before = styleStore[newHashId];
@@ -210,7 +211,6 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 					const newAlias = responseResult.alias;
 					const newName = responseResult.style_name;
 					const newStyle = responseResult.style_value ?? {};
-					console.log('🚀 ~ xmlToStyle ~ newStyle:', newStyle);
 					const newRanges = {
 						start,
 						end,
@@ -228,12 +228,10 @@ export const xmlToStyle = async (xml: string, domainId: number | string) => {
 				}
 			}
 		} else {
-			console.log('🚀 ~ xmlToStyle ~ key2:', key2);
 		}
 		start = end;
 	}
 
-	console.log('🚀 ~ xmlToStyle ~ styleStore:', styleStore, effectStyle);
 	return { xmlString: xml, styleStoreArray: Object.values(styleStore), effectStyle, rowText };
 };
 
@@ -350,6 +348,27 @@ export const styleToXml = async (
 
 	const styleStoreArray = Object.values(styleStore);
 	const xmlString = generateXmlString(styleStoreArray, mode, effectStyle);
+	// 피그마에서 스타일을 항상 가져오고 있기 때문에 값이 있을 수 있음
+	// xml 을 먼저 가져오고 스타일을 가져오게 되면 스타일이 없을 수 있음
+	// key, action 으로 조회 할 때 , xml에 있고 스타일이 없을 수 있다는 말
+	//
+	console.log('🚀 ~ styleToXml ~ xmlString:', xmlString, styleStoreArray, effectStyle);
+
+	const map = {
+		'1:2': 'a',
+		'1:3': 'b',
+	};
+	const brString = xmlString.replace(/\n/g, '<br/>');
+	const flatItems = await parseXmlToFlatStructure(brString);
+	console.log('🚀 ~ flatItems:', flatItems);
+
+	let temp = brString;
+
+	for (const [key, value] of Object.entries(map)) {
+		temp = await replaceTagNames(temp, key, value);
+	}
+
+	console.log('🚀 ~ styleToXml ~ temp:', temp);
 
 	return { xmlString, styleStoreArray, effectStyle };
 };

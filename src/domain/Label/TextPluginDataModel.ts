@@ -29,6 +29,7 @@ import {
 	LocalizationTranslationDTO,
 } from '@/model/types';
 import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
+import { parseXmlToFlatStructure } from '@/utils/xml2';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -150,7 +151,7 @@ export const getLocalizationKeyData = async (
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (0.5초)
 
 	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
-		console.log(`캐시된 데이터 반환: ${cacheKey}`);
+		console.log(`cache hit: ${cacheKey}`);
 		return cachedItem.data;
 	}
 
@@ -241,7 +242,7 @@ export const getTargetTranslations = async (id: string, date?: number) => {
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
 	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
-		console.log(`캐시된 번역 데이터 반환: ${cacheKey}`);
+		console.log(`cache hit: ${cacheKey}`);
 		return cachedItem.data;
 	}
 
@@ -333,16 +334,19 @@ export const addTranslation = async (node: TextNode) => {
 	}
 
 	const styleData = getAllStyleRanges(node);
-	const { xmlString, styleStoreArray } = await styleToXml(
+	const { xmlString, styleStoreArray, effectStyle } = await styleToXml(
 		toNumber(nodeData.domainId),
 		node.characters,
 		styleData,
 		'id'
 	);
 
+	console.log('🚀 ~ addTranslation ~ effectStyle:', styleStoreArray, effectStyle);
+
 	// 대부분의 시스템에서 \n는 공백으로 처리되기 때문에 시각적으로 보이지 않음
 	// 따라서 시각적으로 보이게 하기 위해 br로 처리하는게 합리적이게 보임
 	const brString = xmlString.replace(/\n/g, '<br/>');
+	console.log('🚀 ~ addTranslation ~ 업로드 전에 처리 필요 : ', brString);
 
 	try {
 		const translations = await fetchDB('/localization/translations', {
@@ -356,7 +360,6 @@ export const addTranslation = async (node: TextNode) => {
 		if (!translations) {
 			return;
 		}
-		console.log('🚀 ~ addTranslation ~ result:', translations);
 		if (translations.status === 200) {
 			const data = (await translations.json()) as LocalizationTranslationDTO;
 			node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
@@ -372,23 +375,28 @@ export const addTranslation = async (node: TextNode) => {
 				notify('오리진 값이 등록되지 않았을 확률이 큼', 'error');
 			}
 		}
-	} catch (error) {
-		console.log('🚀 ~ addTranslation ~ error:', error);
-	}
+	} catch (error) {}
+
+	const flatItems = await parseXmlToFlatStructure(brString);
+	console.log('🚀 ~ addTranslation ~ flatItems:', flatItems);
 
 	for (const style of styleStoreArray) {
-		console.log('🚀 ~ addTranslation ~ style:', style);
-		const result = await fetchDB('/resources/mapping', {
-			method: 'POST',
-			body: JSON.stringify({
-				resourceId: style.id,
-				keyId: nodeData.localizationKey,
-			}),
-		});
-		if (!result) {
-			notify('Failed to set resource mapping ' + style.id, 'error');
-			continue;
-		}
+		// 매핑 로직이 변경 됨
+		// key , action,type
+		// const result = await fetchDB('/localization/actions', {
+		// 	method: 'POST',
+		// 	body: JSON.stringify({
+		// 		keyId: nodeData.localizationKey,
+		// 		action: 'default',
+		// 		fromEnum: 'a', // Changed to string since from_enum is TEXT type
+		// 		styleResourceId: style.id,
+		// 		effectResourceId: style.id,
+		// 	}),
+		// });
+		// if (!result) {
+		// 	notify('Failed to set resource mapping ' + style.id, 'error');
+		// 	continue;
+		// }
 	}
 };
 

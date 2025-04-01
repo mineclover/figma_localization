@@ -41,14 +41,17 @@ const ProcessBar = () => {
 							completed={process_status}
 							height="12px"
 							width="100%"
-							labelSize="12px"
+							labelSize="10px"
 							customLabel={`${process_status} / ${process_end}`}
 							labelAlignment="center"
 							bgColor={'var(--figma-color-bg-brand)'}
 							baseBgColor={'var(--figma-color-bg-secondary)'}
-							labelColor={'var(--figma-color-bg)'}
+							labelColor={'var(--figma-color-text)'}
 							margin="2px"
 							maxCompleted={process_end}
+							customLabelStyles={{
+								whiteSpace: 'nowrap',
+							}}
 						/>
 						<IconButton
 							onClick={() => {

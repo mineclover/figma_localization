@@ -159,14 +159,16 @@ export async function testFlatStructureToXmlConversion(testXml: string) {
 
 		// 2. 평탄화 구조를 다시 XML로 변환
 		const regeneratedXml = convertFlatStructureToXml(flatItems);
+
 		console.log('다시 변환된 XML:');
 		console.log(regeneratedXml);
 		console.log('\n-----------------------------------\n');
 
+		console.log('🚀 ~ testFlatStructureToXmlConversion ~ flatItems:', flatItems);
 		// 3. 부분 구조 변환 테스트
 		// 첫 번째 child 태그와 그 하위 태그만 변환
-		const partialXml = convertPartialFlatStructureToXml(flatItems, 'parent/child');
-		console.log('첫 번째 child 부분 구조 변환:');
+		const partialXml = convertPartialFlatStructureToXml(flatItems, 'a');
+		console.log('첫 번째 a 태그 부분 구조 변환:');
 		console.log(partialXml);
 		console.log('\n-----------------------------------\n');
 

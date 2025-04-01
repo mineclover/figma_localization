@@ -58,13 +58,6 @@ type CurrentMetadata = {
 };
 
 const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, domainValid }: CurrentMetadata) => {
-	console.log('🚀 ~ MetadataBlock ~ { nodeId, name, localizationKey, originalLocalizeId, domainValid }:', {
-		nodeId,
-		name,
-		localizationKey,
-		originalLocalizeId,
-		domainValid,
-	});
 	return (
 		<div className={styles.metadataContainer}>
 			<VerticalSpace space="extraSmall" />
@@ -173,7 +166,6 @@ export const StyleXml = ({
 }) => {
 	const { xmlString, styleStoreArray: styleValues, effectStyle } = resource.read();
 
-	console.log('🚀 ~ effectStyle:', effectStyle);
 	// br로 할지 br로 할지 결정되지 않음
 	// 안정적인 건 br긴 함
 	const brString = xmlString.replace(/\n/g, '<br/>');
@@ -235,8 +227,6 @@ const StylePage = () => {
 
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);
-	console.log('🚀 ~ StylePage ~ styleData:', styleData);
-
 	const focusUpdateCount = useSignal(focusUpdateCountSignal);
 	const domainSetting = useSignal(domainSettingSignal);
 

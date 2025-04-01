@@ -689,7 +689,6 @@ export const setAllStyleRanges = async ({
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(rangeFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
-		console.log('🚀 ~ key:', key, style);
 		if (style == null) {
 			continue;
 		}
@@ -703,7 +702,6 @@ export const setAllStyleRanges = async ({
 			}
 		} catch (error) {
 			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode;
-			console.log('🚀 ~ error targetNode:', targetNode);
 			if (targetNode) {
 				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 				if (setRange) {
@@ -730,7 +728,6 @@ export const setAllStyleRanges = async ({
 
 	for (const key of Object.keys(functionMap)) {
 		const style = styles[key as keyof ResourceDTO];
-		console.log('🚀 ~  functionMap style:', key, ' : ', style);
 		if (style == null) {
 			continue;
 		}
@@ -742,11 +739,22 @@ export const setAllStyleRanges = async ({
 
 	for (const key of Object.keys(effectFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
-		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		// ;
 		if (style == null) {
 			continue;
 		}
-		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+
+		// 인스턴스인 경우 constraints 속성을 변경하지 않음
+		if (key === 'constraints' && textNode.parent && textNode.parent.type === 'INSTANCE') {
+			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.');
+			continue;
+		}
+
+		try {
+			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+		} catch (error) {
+			console.error(`속성 설정 중 오류 발생: ${key}`, error);
+		}
 	}
 };
 
@@ -760,11 +768,22 @@ export const setResetStyle = async ({
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(effectFunctionMap)) {
 		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData];
-		// console.log('🚀 effectFunctionMap  ~ style:', key, ' : ', style);
+		// ;
 		if (style == null) {
 			continue;
 		}
-		textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+
+		// 인스턴스인 경우 constraints 속성을 변경하지 않음
+		if (key === 'constraints' && textNode.parent && textNode.parent.type === 'INSTANCE') {
+			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.');
+			continue;
+		}
+
+		try {
+			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+		} catch (error) {
+			console.error(`속성 설정 중 오류 발생: ${key}`, error);
+		}
 	}
 	for (const key of Object.keys(rangeFunctionMap)) {
 		const style = defaultRangeData[key as keyof typeof defaultRangeData];
@@ -832,8 +851,6 @@ export function getAllStyleRanges(textNode: TextNode): {
 		fillStyleId: getFillStyleIdRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
 	};
-	console.log('🚀 ~ getAllStyleRanges ~ styleData: AllStyleRanges.textNode:', textNode, Object.values(textNode));
-
 	const singleBoundVariables = textNode.boundVariables as Record<string, VariableAlias>;
 
 	const effectStyleData = {

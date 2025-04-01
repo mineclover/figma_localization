@@ -15,7 +15,6 @@ export const getPageLockOpen = () => {
 
 export const setPageLockOpen = async (lock: boolean) => {
 	const page = figma.currentPage;
-	console.log('🚀 ~ setPageLockOpen ~ lock:', lock);
 	page.setPluginData(PAGE_LOCK_KEY, JSON.stringify(lock));
 	const currentNode = page.selection[0];
 	const cursorPosition = await getCursorPosition(currentNode);

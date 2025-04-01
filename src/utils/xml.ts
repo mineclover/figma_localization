@@ -30,14 +30,11 @@ export const parseXML = (xml: string) => {
 
 /** 재귀 호출 방식으로 파싱하도록 변경함 */
 export const parseTextBlock = (block: ParseTextBlock) => {
-	console.log('🚀 ~ parseTextBlock ~ block:', block);
-
 	const keys = Object.keys(block);
 
 	const result = keys
 		.map((key): string => {
 			const target = block[key];
-			console.log('🚀 ~ .map ~ key:', key, typeof key, target);
 			if (key === '#text' && typeof target === 'string') {
 				return target;
 			}
@@ -55,7 +52,7 @@ export const parseTextBlock = (block: ParseTextBlock) => {
 };
 
 // export const parseTextBlock = (block: ParseTextBlock) => {
-// 	console.log('🚀 ~ parseTextBlock ~ block:', block);
+
 // 	const key = Object.keys(block)[0];
 // 	const target = block[key];
 // 	const value = target[0];

@@ -169,9 +169,7 @@ export const StyleXml = ({
 	// br로 할지 br로 할지 결정되지 않음
 	// 안정적인 건 br긴 함
 	const brString = xmlString.replace(/\n/g, '<br/>');
-
 	const styleTagMode = useSignal(styleTagModeSignal);
-
 	const currentPointer = useSignal(currentPointerSignal);
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
 
@@ -211,6 +209,13 @@ export const StyleXml = ({
 					</div>
 				)}
 			</div>
+			{/* <ResourceProvider fetchFn={} >
+					{(resource) => (
+						<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
+						
+						</Suspense>
+					)}
+				</ResourceProvider> */}
 			{styleValues.map((item) => {
 				return <StyleItem key={item.hashId + item.name} {...item} />;
 			})}

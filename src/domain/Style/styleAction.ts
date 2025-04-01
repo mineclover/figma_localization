@@ -245,6 +245,8 @@ interface StyleResourceCacheItem {
 
 export const styleResourceCache: Record<string, StyleResourceCacheItem> = {};
 
+export const effectResourceCache: Record<string, Omit<StyleSync, 'ranges'>> = {};
+
 export const styleToXml = async (
 	domainId: number | string,
 	originCharacters: string,
@@ -264,28 +266,34 @@ export const styleToXml = async (
 	const effectData = styleData.effectStyleData;
 	const hashId = createStyleHashId(effectData);
 
-	const effectResource = await clientFetchDB('/resources', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			styleValue: JSON.stringify(effectData),
-			hashValue: hashId,
-			styleType: 'effect',
-		}),
-	});
+	let effectStyle = {} as Omit<StyleSync, 'ranges'>;
 
-	const responseResult = (await effectResource.json()) as ResourceDTO;
+	if (effectResourceCache[hashId]) {
+		effectStyle = effectResourceCache[hashId];
+	} else {
+		const effectResource = await clientFetchDB('/resources', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				styleValue: JSON.stringify(effectData),
+				hashValue: hashId,
+				styleType: 'effect',
+			}),
+		});
 
-	const effectStyle: Omit<StyleSync, 'ranges'> = {
-		hashId: responseResult.hash_value,
-		name: responseResult.style_name,
-		id: responseResult.resource_id.toString(),
-		alias: responseResult.alias,
-		style: responseResult.style_value,
-	};
+		const responseResult = (await effectResource.json()) as ResourceDTO;
 
+		effectStyle = {
+			hashId: responseResult.hash_value,
+			name: responseResult.style_name,
+			id: responseResult.resource_id.toString(),
+			alias: responseResult.alias,
+			style: responseResult.style_value,
+		};
+		effectResourceCache[hashId] = effectStyle;
+	}
 	const styleStore: Record<string, StyleSync> = {};
 
 	for (const style of exportStyleGroups) {

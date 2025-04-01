@@ -290,7 +290,7 @@ export function convertFlatStructureToXml(flatItems: XmlFlatStructure): string {
 
 	// 계층 구조 재구성을 위한 맵
 	const nodeMap = new Map<string, any>();
-	let rootNode: any = null;
+	const rootNodes: any[] = [];
 
 	// 먼저 모든 노드 생성
 	flatItems.forEach((item) => {
@@ -299,13 +299,14 @@ export function convertFlatStructureToXml(flatItems: XmlFlatStructure): string {
 			attributes: item.attributes || {},
 			children: [],
 			text: item.text || null,
+			order: item.order, // 원본 순서 보존
 		};
 
-		nodeMap.set(item.path, node);
+		nodeMap.set(`${item.path}_${item.order}`, node); // 경로와 순서로 고유키 생성
 
 		// 루트 노드 저장
 		if (!item.path.includes('/')) {
-			rootNode = node;
+			rootNodes.push(node);
 		}
 	});
 
@@ -313,19 +314,33 @@ export function convertFlatStructureToXml(flatItems: XmlFlatStructure): string {
 	flatItems.forEach((item) => {
 		if (item.path.includes('/')) {
 			const pathParts = item.path.split('/');
-			pathParts.pop(); // 현재 노드 이름 제거
+			const currentTagName = pathParts.pop(); // 현재 노드 이름 제거
 			const parentPath = pathParts.join('/');
-			const parentNode = nodeMap.get(parentPath);
-			const currentNode = nodeMap.get(item.path);
 
-			if (parentNode && currentNode) {
-				parentNode.children.push(currentNode);
+			// 부모의 고유 키를 찾기
+			const parentNodeEntries = Array.from(nodeMap.entries())
+				.filter(([key, _]) => key.startsWith(`${parentPath}_`))
+				.sort(([_, nodeA], [__, nodeB]) => nodeA.order - nodeB.order);
+
+			// 가장 가까운 상위 부모 찾기 (현재 노드보다 앞에 있는 가장 마지막 부모)
+			const closestParentEntry = parentNodeEntries.filter(([_, node]) => node.order < item.order).pop();
+
+			if (closestParentEntry) {
+				const parentNode = closestParentEntry[1];
+				const currentNode = nodeMap.get(`${item.path}_${item.order}`);
+
+				if (parentNode && currentNode) {
+					parentNode.children.push(currentNode);
+				}
 			}
 		}
 	});
 
-	// 계층 구조를 XML 문자열로 변환
-	return nodeToXmlString(rootNode);
+	// 모든 루트 노드를 XML 문자열로 변환하여 연결
+	return rootNodes
+		.sort((a, b) => a.order - b.order) // 원본 순서대로 정렬
+		.map((node) => nodeToXmlString(node))
+		.join('');
 }
 
 /**

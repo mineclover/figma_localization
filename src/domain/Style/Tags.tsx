@@ -3,8 +3,14 @@ import { ActionType } from '../System/ActionResourceDTO';
 import useFp from '@/hooks/useFp';
 import { parseXmlToFlatStructure } from '@/utils/xml2';
 import { XmlFlatNode } from '@/utils/types';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { LocalizationKeyAction } from '@/model/types';
+import { Dropdown, DropdownOption } from '@create-figma-plugin/ui';
+import { StatusByCode } from '../System/identifier';
+import { TargetedEvent } from 'preact/compat';
+import styles from './StylePage.module.css';
+import { signal } from '@preact/signals-core';
+import { useSignal } from '@/hooks/useSignal';
 
 type Props = {
 	localizationKey: string;
@@ -65,9 +71,81 @@ const serverCurry = (key: string, action: ActionType) => {
 	};
 };
 
-const TagsSort = async (list: Record<string, string>) => {
-	console.log('🚀 ~ sort ~ s:', list);
-	return '';
+/** 선택된 대상은 제거 */
+const divideItemsBySelection = (list: string[], selected: string[]) => {
+	return list.filter((item) => !selected.includes(item));
+};
+
+/** 값이 "" 인 애들은 제거 */
+const extractSelectedItems = (object: Record<string, string>) => {
+	const selectObject = Object.entries(object).filter(([key, value]) => value !== '');
+	return Object.fromEntries(selectObject);
+};
+
+export const tagsSignal = signal<Record<string, string>>({});
+export const setTags = (list: Record<string, string>) => {
+	tagsSignal.value = list;
+};
+
+const TagsSort = ({ list }: { list: Record<string, string> }) => {
+	console.log('🚀 ~ TagsSort ~ list:', list);
+	const tags = useSignal<Record<string, string>>(tagsSignal);
+	// const [tags, setTags] = useState<Record<string, string>>({});
+	console.log('🚀 ~ TagsSort ~ tags:', tags);
+
+	useEffect(() => {
+		setTags(list);
+	}, [list]);
+
+	const handleChange = (targetKey: string) => (event: TargetedEvent<HTMLInputElement, Event>) => {
+		const next = event.currentTarget.value;
+
+		const nextObject = { ...tags };
+
+		if (next !== '') {
+			for (const [key, value] of Object.entries(tags)) {
+				if (value === next) {
+					nextObject[key] = '';
+				}
+			}
+		}
+
+		setTags({
+			...nextObject,
+			[targetKey]: event.currentTarget.value,
+		});
+	};
+	const value = Object.entries(tags);
+	const items = extractSelectedItems(tags);
+	const selected = Object.values(items);
+	const divideItems = divideItemsBySelection(Object.keys(StatusByCode), selected);
+	const selectedOptions: Array<DropdownOption> = selected
+		.sort()
+		.reverse()
+		.map((key) => ({
+			value: key,
+		}));
+	const divideOptions: Array<DropdownOption> = divideItems
+		.sort()
+		.reverse()
+		.map((key) => ({
+			value: key,
+		}));
+
+	const options: Array<DropdownOption> = [...divideOptions, { header: 'selected' }, ...selectedOptions];
+
+	return (
+		<div className={styles.table}>
+			{value.map(([key, value]) => {
+				return (
+					<label className={styles.row}>
+						<span className={styles.label}>{key}</span>
+						<Dropdown onChange={handleChange(key)} options={[{ value: '' }, ...options]} value={value} />
+					</label>
+				);
+			})}
+		</div>
+	);
 };
 
 // 이전에 진행 된 것 : 인식 > 리소스 등록 > 텍스트 추출 > xml 전달 > 인터페이스 표시
@@ -87,18 +165,10 @@ const Tags = ({ localizationKey, xmlString, action }: Props) => {
 	}, [localizationKey, action]);
 
 	const value = allFulfilled ? (results['fn3'] ?? {}) : {};
+	console.log('🚀 ~ Tags ~ value:', value);
 
-	return (
-		<div>
-			{Object.entries(value).map(([key, value]) => {
-				return (
-					<div>
-						{key} : {value}
-					</div>
-				);
-			})}
-		</div>
-	);
+	if (!allFulfilled) return <div>Loading...</div>;
+	return <TagsSort key={allFulfilled} list={value} />;
 };
 
 export default Tags;

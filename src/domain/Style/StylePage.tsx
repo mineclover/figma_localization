@@ -1,7 +1,7 @@
 import { modalAlert } from '@/components/alert';
 
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { languageCodesSignal, StyleData, styleDataSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 
@@ -10,6 +10,7 @@ import {
 	Bold,
 	Button,
 	Container,
+	Dropdown,
 	IconButton,
 	IconLockLocked16,
 	IconTarget16,
@@ -42,13 +43,15 @@ import { isXmlCheck } from '@/utils/xml';
 import { localizationKeySignal } from '@/model/signal';
 import { StyleSync, StyleHashSegment } from '@/model/types';
 import { ErrorBoundary, ResourceProvider } from './suspense';
-import { Suspense } from 'preact/compat';
+import { Suspense, TargetedEvent } from 'preact/compat';
 import { styleResourceCache, styleToXml, xmlToStyle } from './styleAction';
 import { safeJsonParse } from '../utils/getStore';
 import { clc } from '@/components/modal/utils';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
-import Tags from './Tags';
+import Tags, { tagsSignal } from './Tags';
+import { replaceTagNames } from '@/utils/xml2';
+import { actionTypes } from '../System/ActionResourceDTO';
 
 type CurrentMetadata = {
 	nodeId?: string;
@@ -59,6 +62,17 @@ type CurrentMetadata = {
 };
 
 const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, domainValid }: CurrentMetadata) => {
+	const [value, setValue] = useState<string>('');
+	const options = Object.entries(actionTypes).map(([key, value]) => ({ value: value }));
+
+	const handleChange = (event: TargetedEvent<HTMLInputElement, Event>) => {
+		console.log('🚀 ~ handleChange ~ handleChange:', '이 로컬라이제이션 키에 대한 위치 지정');
+		// 위치 저장
+		// 액션 값 저장
+		//
+		setValue(event.currentTarget.value);
+	};
+
 	return (
 		<div className={styles.metadataContainer}>
 			<VerticalSpace space="extraSmall" />
@@ -76,6 +90,12 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				</IconButton>
 			</div>
 			<div className={styles.labelRow}>
+				<Dropdown
+					onChange={handleChange}
+					options={[{ value: '' }, ...options]}
+					value={value}
+					className={styles.action}
+				/>
 				<Text>선택 된 텍스트 : {nodeId}</Text>
 				<IconButton
 					onClick={() => {
@@ -103,55 +123,6 @@ const parseSame = (style: string, serverStyle: string) => {
 
 const textStylesName = ['default', 'first', 'second', 'third', 'fourth', 'fifth'];
 
-const StyleItem = ({ style, hashId, name, id, ranges, ...props }: StyleSync) => {
-	// const isSame = parseSame(JSON.stringify(style), data?.style_value ?? '');
-
-	// 상위 노드에서 처리하므로 NotNull
-	const domainSetting = useSignal(domainSettingSignal)!;
-	const [styleValue, setStyleValue] = useState<string>(name ?? '');
-
-	return (
-		<div className={styles.styleContainer}>
-			<Text>
-				name : {name} / id: {id}
-			</Text>
-
-			<div className={styles.rowContainer}>
-				<Textbox
-					value={styleValue}
-					placeholder="style name here..."
-					onChange={(e) => setStyleValue(e.currentTarget.value)}
-				/>
-				<button
-					className={clc(styles.normalButton, styles.buttonOverride)}
-					onClick={async () => {
-						const fetchDB = clientFetchDBCurry(domainSetting.domainId);
-						const result = await fetchDB(('/resources/' + id) as '/resources/{id}', {
-							method: 'PUT',
-							body: JSON.stringify({
-								styleName: styleValue,
-							}),
-						});
-						const resultData = await result.json();
-
-						delete styleResourceCache[hashId];
-						if (resultData) {
-							modalAlert('수정 완료');
-							setTimeout(() => {
-								focusUpdateCountSignal.value = focusUpdateCountSignal.value + 1;
-							}, 300);
-						} else {
-							modalAlert('수정 실패');
-						}
-					}}
-				>
-					save
-				</button>
-			</div>
-		</div>
-	);
-};
-
 export const StyleXml = ({
 	resource,
 	focusUpdateCount,
@@ -174,13 +145,29 @@ export const StyleXml = ({
 	const currentPointer = useSignal(currentPointerSignal);
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
 
-	console.log('🚀 ~ currentPointer:', currentPointer);
+	const [resultXml, setResultXml] = useState<string>(brString);
+	const tags = useSignal<Record<string, string>>(tagsSignal);
+
+	const changeXml = async () => {
+		let result = brString;
+		for (const [key, value] of Object.entries(tags)) {
+			if (value !== '') {
+				result = await replaceTagNames(result, key, value);
+			}
+		}
+		setResultXml(result);
+	};
+
+	useEffect(() => {
+		changeXml();
+	}, [brString, tags]);
+
 	return (
 		<div>
 			<VerticalSpace space="small" />
 			<Text>{currentPointer?.data.localizationKey}: 피그마 저장 결과 미리보기:</Text>
 			<VerticalSpace space="small" />
-			<TextboxMultiline value={brString} placeholder="XML 출력" />
+			<TextboxMultiline value={resultXml} placeholder="XML 출력" />
 			<VerticalSpace space="small" />
 			<div className={styles.rowContainer}>
 				<Toggle
@@ -196,6 +183,7 @@ export const StyleXml = ({
 				</Toggle>
 
 				<VerticalSpace space="small" />
+				{/* 공백 */}
 				<span className={styles.span}></span>
 				{isKeySetting ? (
 					<Button
@@ -220,9 +208,6 @@ export const StyleXml = ({
 					)}
 				</ResourceProvider> */}
 			<Tags localizationKey={currentPointer?.data.localizationKey ?? ''} xmlString={brString} action={'default'} />
-			{styleValues.map((item) => {
-				return <StyleItem key={item.hashId + item.name} {...item} />;
-			})}
 		</div>
 	);
 };

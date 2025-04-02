@@ -13,6 +13,8 @@ describe('XML 태그 변환 테스트', () => {
   <c>태그 내용 6</c>
 	<a>헬로우</a>`;
 
+	const xmlText4 = `<a>태그 내용 1</a><br/><b>태그 내용 5</b><br/><a>태그 내용 2</a><br/><c>태그 내용 6</c><br/><a>헬로우</a>`;
+
 	const normalizeXml = (xml: string) => xml.trim().replace(/\s+/g, ' ');
 
 	describe('toggleATagAndText', () => {
@@ -33,6 +35,19 @@ describe('XML 태그 변환 테스트', () => {
 			expect(normalized).toContain('태그 내용 2');
 			expect(normalized).toContain('<b>태그 내용 5</b>');
 			expect(normalized).toContain('<c>태그 내용 6</c>');
+		});
+
+		it('일반 텍스트를 a 태그로 변환하고 br 태그를 추가해야 함', async () => {
+			const result = await toggleATagAndText(xmlText2, { addBrTags: true });
+			const normalized = normalizeXml(result);
+			expect(normalized).toBe(normalizeXml(xmlText4));
+
+			// 세부 검증
+			expect(result).toMatch(/<a>태그 내용 1<\/a><br\/>/);
+			expect(result).toMatch(/<b>태그 내용 5<\/b><br\/>/);
+			expect(result).toMatch(/<a>태그 내용 2<\/a><br\/>/);
+			expect(result).toMatch(/<c>태그 내용 6<\/c><br\/>/);
+			expect(result).toMatch(/<a>헬로우<\/a>/);
 		});
 
 		it('b와 c 태그는 변경되지 않아야 함', async () => {

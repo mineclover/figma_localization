@@ -31,14 +31,20 @@ const xmlText = `<a>태그 내용 1</a>
   <c>태그 내용 6</c>`;
 
 const xmlText2 = `태그 내용 1
-	<b>태그 내용 5</b>
-  <c>태그 내용 6</c>
-	헬로우`;
+<b>태그 내용 5</b>
+
+태그 내용 2
+<c>태그 내용 6</c>
+
+헬로우`;
 
 const xmlText3 = `<a>태그 내용 1</a>
-	<b>태그 내용 5</b>
-  <c>태그 내용 6</c>
-	<a>태그 내용 1</a>`;
+<b>태그 내용 5</b>
+<a>태그 내용 2</a>
+<c>태그 내용 6</c>
+<a>헬로우</a>`;
+
+const xmlText4 = `<a>태그 내용 1</a><br/><b>태그 내용 5</b><br/><a>태그 내용 2</a><br/><c>태그 내용 6</c><br/><a>헬로우</a>`;
 
 export async function runExample() {
 	try {
@@ -167,16 +173,36 @@ export async function testToggleATagAndText() {
 		console.log(result2);
 		console.log('\n-----------------------------------\n');
 
+		// xmlText2 -> xmlText4 변환 테스트 (br 태그 추가)
+		const result3 = await toggleATagAndText(xmlText2, { addBrTags: true });
+		console.log('xmlText2 -> xmlText4 변환 결과 (br 태그 추가):');
+		console.log(result3);
+		console.log('\n-----------------------------------\n');
+
 		// 변환 결과 검증
 		const expectedXmlText3 = xmlText3.trim().replace(/\s+/g, ' ');
 		const expectedXmlText2 = xmlText2.trim().replace(/\s+/g, ' ');
+		const expectedXmlText4 = xmlText4.trim().replace(/\s+/g, ' ');
 
 		const normalizedResult1 = result1.trim().replace(/\s+/g, ' ');
 		const normalizedResult2 = result2.trim().replace(/\s+/g, ' ');
+		const normalizedResult3 = result3.trim().replace(/\s+/g, ' ');
 
 		console.log('검증 결과:');
 		console.log('xmlText2 -> xmlText3 변환 성공:', normalizedResult1 === expectedXmlText3);
-		console.log('xmlText3 -> xmlText2 변환 성공:', normalizedResult2 === expectedXmlText2);
+		console.log(
+			'xmlText3 -> xmlText2 변환 성공:',
+			normalizedResult2 === expectedXmlText2,
+			normalizedResult2,
+			expectedXmlText2
+		);
+		console.log('xmlText2 -> xmlText4 변환 성공:', normalizedResult3 === expectedXmlText4);
+
+		// br 태그 검증
+		console.log('\nbr 태그 검증:');
+		const hasBrTags = result3.match(/<br\/>/g)?.length === 4;
+		console.log('br 태그 개수가 올바름:', hasBrTags);
+		console.log('마지막 태그가 br이 아님:', !result3.trim().endsWith('<br/>'));
 	} catch (error) {
 		console.error('XML 변환 테스트 중 오류 발생:', error);
 	}

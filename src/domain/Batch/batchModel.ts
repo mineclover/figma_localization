@@ -179,6 +179,7 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 
 /** 기준 설정이 약간 모호한 부분 */
 export const onSetNodeLocalizationKeyBatch = () => {
+	// 하나의 로컬라이제이션 키를 대표해서 등록하는 코드
 	on(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, async (data: { domainId: string; keyId: string; ids: string[] }) => {
 		if (data.ids.length === 0) {
 			return;

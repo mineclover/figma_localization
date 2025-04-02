@@ -7,7 +7,6 @@ import {
 	Bold,
 	Button,
 	Code,
-	Container,
 	Divider,
 	Dropdown,
 	IconAdjust32,
@@ -56,6 +55,7 @@ import { selectedKeySignal } from '@/model/signal';
 import { NonNullableComponentTypeExtract } from 'types/utilType';
 import { keyConventionRegex } from '@/utils/textTools';
 import { currentPointerSignal } from '@/model/signal';
+import { TargetedEvent } from 'preact/compat';
 
 const selectStyle = (selected: boolean) => {
 	if (selected) {
@@ -152,7 +152,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 								onClick={() => {
 									pageNodeZoomAction(item);
 								}}
-								onContextMenu={(e) => {
+								onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 									e.preventDefault(); // 기본 우클릭 메뉴 방지
 									// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
 									if (selectIds.includes(item)) {
@@ -633,7 +633,7 @@ function BatchPage() {
 										onClick={() => {
 											pageNodeZoomAction(item);
 										}}
-										onContextMenu={(e) => {
+										onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 											e.preventDefault(); // 기본 우클릭 메뉴 방지
 											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
 											if (selectIds.includes(item)) {

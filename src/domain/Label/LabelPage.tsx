@@ -45,7 +45,7 @@ const isTemporary = (data: LocalizationKey | null) => {
 
 	return !data.is_temporary;
 };
-
+// 지금 안쓰는 컴포넌트임
 /**
  * 입력 값에 섹션 명을 붙여준다
  * @param input 입력 값

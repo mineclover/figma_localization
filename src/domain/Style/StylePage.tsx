@@ -174,23 +174,7 @@ export const StyleXml = ({
 			<VerticalSpace space="small" />
 			<TextboxMultiline value={resultXml} placeholder="XML 출력" />
 			<VerticalSpace space="small" />
-			<div className={styles.rowContainer}>
-				<Toggle
-					value={styleTagMode === 'id'}
-					onChange={() => {
-						styleTagModeSignal.value = styleTagMode === 'id' ? 'name' : 'id';
-					}}
-				>
-					<Text>
-						아이디 표시
-						<Muted> *off 시 이름 표시</Muted>
-					</Text>
-				</Toggle>
 
-				<VerticalSpace space="small" />
-				{/* 공백 */}
-				<span className={styles.span}></span>
-			</div>
 			{/* 조회도 해야하고 변환도 해야하고 */}
 			{/* <ResourceProvider fetchFn={} >
 					{(resource) => (
@@ -222,13 +206,17 @@ export const StyleXml = ({
 						});
 
 						const data2 = await fetchData2.json();
+
+						const body = {
+							key_id: currentPointer?.data.localizationKey,
+							action: action,
+							mappings: tags,
+						};
+						console.log('🚀 ~ onClick={ ~ body:', body);
+
 						const fetchData = await fetchClient('/localization/actions/bulk', {
 							method: 'POST',
-							body: JSON.stringify({
-								key_id: currentPointer?.data.localizationKey,
-								action: action,
-								mappings: tags,
-							}),
+							body: JSON.stringify(body),
 						});
 						const data = await fetchData.json();
 						modalAlert(

@@ -5,7 +5,7 @@ import { parseXmlToFlatStructure } from '@/utils/xml2';
 import { XmlFlatNode } from '@/utils/types';
 import { useEffect, useState } from 'preact/hooks';
 import { LocalizationKeyAction } from '@/model/types';
-import { Dropdown, DropdownOption } from '@create-figma-plugin/ui';
+import { Dropdown, DropdownOption, IconCheck16 } from '@create-figma-plugin/ui';
 import { StatusByCode } from '../System/identifier';
 import { TargetedEvent } from 'preact/compat';
 import styles from './StylePage.module.css';
@@ -98,7 +98,8 @@ export const setTags = (list: Record<string, string>) => {
 	tagsSignal.value = list;
 };
 
-const TagsSort = ({ list }: { list: Record<string, string> }) => {
+const TagsSort = ({ list, inputTags }: { list: Record<string, string>; inputTags: Set<string> }) => {
+	console.log('🚀 ~ TagsSort ~ list:', list);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 	// const [tags, setTags] = useState<Record<string, string>>({});
 	useEffect(() => {
@@ -123,7 +124,8 @@ const TagsSort = ({ list }: { list: Record<string, string> }) => {
 			[targetKey]: event.currentTarget.value,
 		});
 	};
-	const value = Object.entries(tags);
+	const esValues = Object.entries(tags);
+	console.log('🚀 ~ TagsSort ~ esValues:', esValues);
 	const items = extractSelectedItems(tags);
 	const selected = Object.values(items);
 	const divideItems = divideItemsBySelection(Object.keys(StatusByCode), selected);
@@ -144,9 +146,12 @@ const TagsSort = ({ list }: { list: Record<string, string> }) => {
 
 	return (
 		<div className={styles.table}>
-			{value.map(([key, value]) => {
+			{esValues.map(([key, value]) => {
+				const isInput = inputTags.has(key);
+
 				return (
 					<label className={styles.row}>
+						<div className={styles.icon}>{isInput && <IconCheck16 />}</div>
 						<span className={styles.label}>{key}</span>
 						<Dropdown onChange={handleChange(key)} options={[{ value: '' }, ...options]} value={value} />
 					</label>
@@ -172,9 +177,10 @@ const Tags = ({ localizationKey, xmlString, action }: Props) => {
 		reset();
 	}, [localizationKey, action]);
 
-	const value = allFulfilled ? (results['fn3'] ?? {}) : {};
+	const value = allFulfilled ? (results['fn4'] ?? {}) : {};
+	const inputTags = allFulfilled ? (results['fn2'] ?? new Set<string>()) : new Set<string>();
 	if (!allFulfilled) return <div>Loading...</div>;
-	return <TagsSort key={allFulfilled} list={value} />;
+	return <TagsSort key={allFulfilled} list={value} inputTags={inputTags} />;
 };
 
 export default Tags;

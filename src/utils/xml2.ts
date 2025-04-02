@@ -382,33 +382,60 @@ function nodeToXmlString(node: any): string {
 	return xml;
 }
 
-/** process_name
- * 평탄화된 XML 구조에서 특정 경로의 노드만 선택하여 XML로 변환합니다.
- * 문자열로 반환 되기 때문에 순서 값이 없어짐
- * @param {Array<any>} flatItems - 평탄화된 XML 구조 배열
- * @param {string} startPath - 시작 경로 (이 경로와 그 하위 경로만 포함)
- * @returns {string} XML 문자열
+/**
+ * 태그가 없는 텍스트를 a 태그로 감싸고, a 태그는 태그 없는 텍스트로 변환합니다.
+ * @param {string} xmlString - 처리할 XML 문자열
+ * @returns {Promise<string>} 변환된 XML 문자열
  */
-export function convertPartialFlatStructureToXml(flatItems: Array<any>, startPath: string): string {
-	// 지정된 경로와 그 하위 경로만 필터링
-	const filteredItems = flatItems.filter((item) => item.path === startPath || item.path.startsWith(`${startPath}/`));
+export function toggleATagAndText(xmlString: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const handler = new DomHandler((error, dom) => {
+			if (error) {
+				reject(error);
+				return;
+			}
 
-	if (filteredItems.length === 0) {
-		return '';
-	}
+			// 최상위 텍스트 노드들을 a 태그로 변환하고 a 태그는 텍스트로 변환
+			const result = dom.map((node: any) => {
+				if (node.type === 'text') {
+					const trimmedText = node.data.trim();
+					if (trimmedText !== '') {
+						// 텍스트 노드를 a 태그로 변환
+						return {
+							type: 'tag',
+							name: 'a',
+							attribs: {},
+							children: [{ type: 'text', data: trimmedText }],
+						};
+					}
+					return node;
+				} else if (node.type === 'tag') {
+					if (node.name === 'a') {
+						// a 태그를 텍스트 노드로 변환
+						const textContent = domutils.getText(node).trim();
+						return { type: 'text', data: textContent };
+					}
+					// 다른 태그는 그대로 유지
+					return node;
+				}
+				return node;
+			});
 
-	// 필터링된 항목들의 path를 조정 (startPath를 새 루트로 만듦)
-	const adjustedItems = filteredItems.map((item) => {
-		const newItem = { ...item };
-		if (item.path === startPath) {
-			// 시작 노드는 새 루트가 됨
-			newItem.path = item.tagName;
-		} else {
-			// 하위 경로 조정
-			newItem.path = item.path.substring(startPath.length + 1);
-		}
-		return newItem;
+			// 변환된 DOM을 XML 문자열로 변환
+			const transformedXml = render(result, {
+				xmlMode: true,
+				decodeEntities: false,
+			});
+
+			resolve(transformedXml);
+		});
+
+		const parser = new Parser(handler, {
+			xmlMode: true,
+			decodeEntities: false,
+		});
+
+		parser.write(xmlString);
+		parser.end();
 	});
-
-	return convertFlatStructureToXml(adjustedItems);
 }

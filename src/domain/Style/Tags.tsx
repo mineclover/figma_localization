@@ -11,6 +11,7 @@ import { TargetedEvent } from 'preact/compat';
 import styles from './StylePage.module.css';
 import { signal } from '@preact/signals-core';
 import { useSignal } from '@/hooks/useSignal';
+import { clientFetchDBCurry } from '../utils/fetchDB';
 
 type Props = {
 	localizationKey: string;
@@ -40,12 +41,14 @@ const serverCurry = (key: string, action: ActionType) => {
 	) {
 		console.log(this);
 
-		const result = await fetch(
-			['http://localhost:6543/localization/actions?key_id=', key, '&action=', action].join(''),
+		const fetchClient = clientFetchDBCurry('1');
+		const result = await fetchClient(
+			['/localization/actions?key_id=', key, '&action=', action].join('') as '/localization/actions',
 			{
 				method: 'GET',
 			}
 		);
+
 		console.log('🚀 ~ serverCurry ~ result:', result);
 		const data = (await result.json()) as LocalizationKeyAction[];
 		console.log('🚀 ~ serverCurry ~ data:', data);
@@ -159,6 +162,7 @@ const Tags = ({ localizationKey, xmlString, action }: Props) => {
 		fn2: targetKeyParse,
 		fn3: serverCurry(localizationKey, action),
 	});
+	console.log('🚀 ~ Tags ~ results:', results);
 
 	useEffect(() => {
 		reset();

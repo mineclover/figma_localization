@@ -51,7 +51,7 @@ import { removeLeadingSymbols } from '@/utils/textTools';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
 import Tags, { tagsSignal } from './Tags';
 import { replaceTagNames } from '@/utils/xml2';
-import { actionTypes } from '../System/ActionResourceDTO';
+import { ActionType, actionTypes } from '../System/ActionResourceDTO';
 
 type CurrentMetadata = {
 	nodeId?: string;
@@ -61,9 +61,9 @@ type CurrentMetadata = {
 	domainValid: boolean;
 };
 
-export const actionSignal = signal<string>('');
+export const actionSignal = signal<ActionType>('default');
 
-export const setActionSignal = (value: string) => {
+export const setActionSignal = (value: ActionType) => {
 	actionSignal.value = value;
 };
 
@@ -76,7 +76,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 		// 위치 저장
 		// 액션 값 저장
 		//
-		setActionSignal(event.currentTarget.value);
+		setActionSignal(event.currentTarget.value as ActionType);
 	};
 
 	return (
@@ -191,28 +191,6 @@ export const StyleXml = ({
 				<VerticalSpace space="small" />
 				{/* 공백 */}
 				<span className={styles.span}></span>
-				{isKeySetting ? (
-					<Button
-						onClick={async () => {
-							emit(SET_NODE_ACTION.REQUEST_KEY, {
-								localizationKey: currentPointer?.data.localizationKey,
-								action: action,
-								domainId: currentPointer?.data.domainId,
-								ignore: currentPointer?.data.ignore,
-								modifier: currentPointer?.data.modifier,
-							});
-
-							// 키, 액션, xml 로 저장
-							// 키, 액션, 태그 이름, a,b 로 저장
-						}}
-					>
-						Save
-					</Button>
-				) : (
-					<div className={styles.padding}>
-						<Bold>로컬라이제이션 키 없음</Bold>
-					</div>
-				)}
 			</div>
 			{/* 조회도 해야하고 변환도 해야하고 */}
 			{/* <ResourceProvider fetchFn={} >
@@ -222,7 +200,58 @@ export const StyleXml = ({
 						</Suspense>
 					)}
 				</ResourceProvider> */}
-			<Tags localizationKey={currentPointer?.data.localizationKey ?? ''} xmlString={brString} action={'default'} />
+			<Tags localizationKey={currentPointer?.data.localizationKey ?? ''} xmlString={brString} action={action} />
+
+			{isKeySetting ? (
+				<Button
+					onClick={async () => {
+						// 메타데이터 저장
+						emit(SET_NODE_ACTION.REQUEST_KEY, {
+							localizationKey: currentPointer?.data.localizationKey,
+							action: action,
+							domainId: currentPointer?.data.domainId,
+						});
+						const fetchClient = clientFetchDBCurry(currentPointer?.data.domainId);
+
+						const fetchData2 = await fetchClient('/localization/translations', {
+							method: 'PUT',
+							body: JSON.stringify({
+								keyId: currentPointer?.data.localizationKey,
+								language: 'origin',
+								translation: resultXml,
+							}),
+						});
+
+						const data2 = await fetchData2.json();
+						console.log('🚀 ~ fetchData2:', data2);
+
+						const fetchData = await fetchClient('/localization/actions/bulk', {
+							method: 'POST',
+							body: JSON.stringify({
+								key_id: currentPointer?.data.localizationKey,
+								action: action,
+								mappings: tags,
+							}),
+						});
+						const data = await fetchData.json();
+						modalAlert(
+							<div>
+								<Text>{data.success ? '성공' : '실패'}</Text>
+								<Text>{data.message}</Text>
+							</div>
+						);
+
+						// 키, 액션, xml 로 저장
+						// 키, 액션, 태그 이름, a,b 로 저장
+					}}
+				>
+					Save
+				</Button>
+			) : (
+				<div className={styles.padding}>
+					<Bold>로컬라이제이션 키 없음</Bold>
+				</div>
+			)}
 		</div>
 	);
 };

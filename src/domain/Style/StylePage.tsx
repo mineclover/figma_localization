@@ -25,7 +25,7 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui';
 
-import { DOWNLOAD_STYLE, SET_NODE_RESET_KEY, SET_PAGE_LOCK_OPEN, SET_STYLE } from '../constant';
+import { DOWNLOAD_STYLE, SET_NODE_ACTION, SET_NODE_RESET_KEY, SET_PAGE_LOCK_OPEN, SET_STYLE } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 
 import { styleTagModeSignal } from '@/model/signal';
@@ -61,8 +61,14 @@ type CurrentMetadata = {
 	domainValid: boolean;
 };
 
+export const actionSignal = signal<string>('');
+
+export const setActionSignal = (value: string) => {
+	actionSignal.value = value;
+};
+
 const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, domainValid }: CurrentMetadata) => {
-	const [value, setValue] = useState<string>('');
+	const action = useSignal(actionSignal);
 	const options = Object.entries(actionTypes).map(([key, value]) => ({ value: value }));
 
 	const handleChange = (event: TargetedEvent<HTMLInputElement, Event>) => {
@@ -70,7 +76,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 		// 위치 저장
 		// 액션 값 저장
 		//
-		setValue(event.currentTarget.value);
+		setActionSignal(event.currentTarget.value);
 	};
 
 	return (
@@ -93,7 +99,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				<Dropdown
 					onChange={handleChange}
 					options={[{ value: '' }, ...options]}
-					value={value}
+					value={action}
 					className={styles.action}
 				/>
 				<Text>선택 된 텍스트 : {nodeId}</Text>
@@ -144,7 +150,7 @@ export const StyleXml = ({
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
-
+	const action = useSignal(actionSignal);
 	const [resultXml, setResultXml] = useState<string>(brString);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 
@@ -187,8 +193,17 @@ export const StyleXml = ({
 				<span className={styles.span}></span>
 				{isKeySetting ? (
 					<Button
-						onClick={() => {
-							emit(SET_STYLE.REQUEST_KEY);
+						onClick={async () => {
+							emit(SET_NODE_ACTION.REQUEST_KEY, {
+								localizationKey: currentPointer?.data.localizationKey,
+								action: action,
+								domainId: currentPointer?.data.domainId,
+								ignore: currentPointer?.data.ignore,
+								modifier: currentPointer?.data.modifier,
+							});
+
+							// 키, 액션, xml 로 저장
+							// 키, 액션, 태그 이름, a,b 로 저장
 						}}
 					>
 						Save
@@ -228,13 +243,14 @@ const StylePage = () => {
 	// const pageLock = currentPointer?.pageLock ?? false;
 
 	const targetArray = ['origin', ...languageCodes];
-	const isStyle = currentPointer && currentPointer.data.originalLocalizeId !== '';
+	const action = useSignal(actionSignal);
+	const isStyle = currentPointer;
 
 	const currentMetadata = {
 		nodeId: currentPointer?.nodeId,
 		name: currentPointer?.nodeName ? removeLeadingSymbols(currentPointer?.nodeName) : '',
 		localizationKey: currentPointer?.data.localizationKey,
-		originalLocalizeId: currentPointer?.data.originalLocalizeId,
+
 		domainValid: currentPointer?.data.domainId == domainSetting?.domainId,
 	};
 

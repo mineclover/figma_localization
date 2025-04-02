@@ -1,4 +1,4 @@
-import { CurrentCursorType } from '@/model/types';
+import { CurrentCursorType, NodeData } from '@/model/types';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_CURSOR_POSITION,
@@ -6,6 +6,7 @@ import {
 	GET_STYLE_DATA,
 	NODE_STORE_KEY,
 	PAGE_LOCK_KEY,
+	SET_NODE_ACTION,
 	SET_PROJECT_ID,
 	STORE_KEY,
 } from '../constant';
@@ -67,7 +68,7 @@ export const sectionNameParser = (text: string) => {
 	return null;
 };
 
-export const getCursorPosition = async (node: BaseNode) => {
+export const getCursorPosition = (node: BaseNode) => {
 	if (node && node.type === 'TEXT') {
 		// 첫번째 섹션
 		// const result = FilePathNodeSearch(node);
@@ -119,5 +120,32 @@ export const onGetCursorPositionResponse = () => {
 	emit(GET_CURSOR_POSITION.REQUEST_KEY);
 	return on(GET_CURSOR_POSITION.RESPONSE_KEY, (cursorPosition: CurrentCursorType) => {
 		currentPointerSignal.value = cursorPosition;
+	});
+};
+
+export const onSetNodeAction = () => {
+	on(SET_NODE_ACTION.REQUEST_KEY, (data: NodeData) => {
+		console.log('🚀 ~ on ~ data:', data);
+		const node = figma.currentPage.selection[0];
+
+		for (const [key, value] of Object.entries(data)) {
+			// 널이 아닐 때만 설정
+
+			if (key === 'localizationKey' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, value);
+			} else if (key === 'location' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.LOCATION, value);
+			} else if (key === 'domainId' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, value);
+			} else if (key === 'ignore' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.IGNORE, value);
+			} else if (key === 'action' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.ACTION, value);
+			} else if (key === 'modifier' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.MODIFIER, value);
+			}
+		}
+		const result = getCursorPosition(node);
+		emit(GET_CURSOR_POSITION.RESPONSE_KEY, result);
 	});
 };

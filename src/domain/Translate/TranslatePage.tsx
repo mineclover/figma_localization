@@ -59,11 +59,9 @@ const TranslateItem = ({
 	updated_at,
 	domainId,
 	updateAction,
-	selectedId,
 }: LocalizationTranslation & {
 	domainId: number;
 	updateAction: () => Promise<any> | undefined;
-	selectedId: string | undefined;
 }) => {
 	const [translation, setTranslation] = useState(text);
 
@@ -73,7 +71,7 @@ const TranslateItem = ({
 
 	const clientFetchDB = clientFetchDBCurry(domainId);
 
-	const isSelect = localization_id != null && selectedId === localization_id.toString();
+	const isSelect = localization_id != null;
 
 	return (
 		<div className={clc(styles.translateItem, isSelect && styles.translateBorder)}>
@@ -268,7 +266,6 @@ const TranslatePage = () => {
 								key_id={localizationKeyValue.key_id}
 								domainId={domainSetting.domainId}
 								updateAction={updateAction}
-								selectedId={currentPointer?.data.originalLocalizeId}
 							/>
 						);
 					})}

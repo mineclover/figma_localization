@@ -369,38 +369,59 @@ export const onDownloadStyle = () => {
 	});
 };
 
+// 이거 자체가 불필요 하다
 export const onSetStyle = () => {
-	on(SET_STYLE.REQUEST_KEY, async () => {
-		const xNode = figma.currentPage.selection[0];
-		const domainSetting = getDomainSetting();
+	// 세이브 대상이 이해되야 함
+	// 현재 상태로 스타일을 저장해라 임
+	// 스타일 데이터는 현재 노드에 저장되어 있음
+	// 결국 저장될 대상은 label xml 임
+	// 저장한다는 건, 스타일 결정에 필요한 로컬라이제이션 키와 액션 값을 노드에 넣는 것임
+	// 도메인 키를 받아서 쓸 수 있지만 확장성을 고려할 땐 데이터를 선형적으로 관리하는게 좋음
+	// 여기서 선형적이라 함은, 데이터 흐름의 일원화를 말함..
+	//
+	on(
+		SET_STYLE.REQUEST_KEY,
+		async ({
+			key,
+			action,
 
-		if (domainSetting == null) {
-			notify('Failed to get domain id', 'error');
-			return;
-		}
+			modifier,
+		}: {
+			// domain: string;
+			key: string;
+			action: string;
 
-		if (xNode == null) {
-			notify('Failed to get node', 'error');
-			return;
-		}
-		// originalLocalizeId 조회 또는 등록
-		// searchTranslationCode
-		if (xNode.type !== 'TEXT') {
-			notify('Failed to get node', 'error');
-			return;
-		}
-		// setNodeData(xNode, {
-		// 	domainId: domainSetting.domainId.toString(),
-		// })
-		const result = await addTranslation(xNode);
-		if (result == null) {
-			return;
-		}
+			/** 어떻게 수집할 것인지 결정되지 않음 */
+			modifier?: string;
+		}) => {
+			const xNode = figma.currentPage.selection[0];
 
-		// 업로드는 업데이트 안해도 되지 않나 해서 뺌
-		// 한 개 업데이트
-		// await TargetNodeStyleUpdate(xNode, result.key_id.toString(), 'origin', Date.now());
-		// 같은 키 업데이트
-		// await reloadOriginalLocalizationName(xNode);
-	});
+			const domainSetting = getDomainSetting();
+
+			if (domainSetting == null) {
+				notify('Failed to get domain id', 'error');
+				return;
+			}
+
+			if (xNode == null) {
+				notify('Failed to get node', 'error');
+				return;
+			}
+			// originalLocalizeId 조회 또는 등록
+			// searchTranslationCode
+			if (xNode.type !== 'TEXT') {
+				notify('Failed to get node', 'error');
+				return;
+			}
+			// setNodeData(xNode, {
+			// 	domainId: domainSetting.domainId.toString(),
+			// })
+
+			// 업로드는 업데이트 안해도 되지 않나 해서 뺌
+			// 한 개 업데이트
+			// await TargetNodeStyleUpdate(xNode, result.key_id.toString(), 'origin', Date.now());
+			// 같은 키 업데이트
+			// await reloadOriginalLocalizationName(xNode);
+		}
+	);
 };

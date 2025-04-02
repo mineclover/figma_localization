@@ -98,6 +98,8 @@ export const onSetNodeResetKey = () => {
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '');
 		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, '');
 		node.setPluginData(NODE_STORE_KEY.LOCATION, '');
+		node.setPluginData(NODE_STORE_KEY.ACTION, '');
+		node.setPluginData(NODE_STORE_KEY.MODIFIER, '');
 		node.autoRename = true;
 	});
 };
@@ -303,14 +305,14 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 		})
 		.map((node) => {
 			const nodeData = getNodeData(node);
-			if (nodeData.originalLocalizeId != null && nodeData.originalLocalizeId !== '') {
-				let temp = targetOrigin.get(nodeData.originalLocalizeId);
-				if (temp == null) {
-					temp = new Set<TextNode>();
-				}
+			// if (nodeData.originalLocalizeId != null && nodeData.originalLocalizeId !== '') {
+			// 	let temp = targetOrigin.get(nodeData.originalLocalizeId);
+			// 	if (temp == null) {
+			// 		temp = new Set<TextNode>();
+			// 	}
 
-				targetOrigin.set(nodeData.originalLocalizeId, temp.add(node));
-			}
+			// 	targetOrigin.set(nodeData.originalLocalizeId, temp.add(node));
+			// }
 			return {
 				node: node,
 				data: nodeData,
@@ -325,6 +327,15 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 	}
 };
 
+/** 이거 자체가 문제가 있음
+ * 스타일 데이터를 처리 할 때 리소스 키를 등록하고
+ * 키에 매칭되는 label 데이터를 등록하고
+ * 라벨을 포함해서 xml 을 만듬
+ * 그 xml을 origin에 등록하는데
+ * 라벨에 매칭되는 이펙트 , 스타일 데이터는 인터페이스로 유저가 결정함
+ * xml 등록, 프론트에서 해도 되고
+ * 라벨 매칭도 프론트에서 가능
+ */
 export const addTranslation = async (node: TextNode) => {
 	const nodeData = getNodeData(node);
 
@@ -450,16 +461,13 @@ export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString());
 	}
 
-	if (data.originalLocalizeId != null) {
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.originalLocalizeId.toString());
-	}
-
 	if (data.ignore != null) {
 		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString());
 	}
 };
 
 /**
+ * 지금 안씀
  * 로컬라이제이션 텍스트 등록 과정
  * 플러그인 데이터 생성 */
 export const onTargetSetNodeLocation = () => {
@@ -506,7 +514,7 @@ export const onTargetSetNodeLocation = () => {
 		node.name = generateLocalizationName(originTextResult);
 
 		// 두번 눌렀을 때 처리 어떻게 할지 정해야 됨
-		await addTranslation(node);
+		// await addTranslation(node);
 
 		/** 업데이트 반영 코드 */
 		await allRefresh(node);
@@ -542,15 +550,19 @@ export const onNodeReload = () => {
 /** 플러그인 데이터 조회 */
 export const getNodeData = (node: BaseNode): NodeData => {
 	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
-	const originalLocalizeId = node.getPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID);
+
 	const domainId = node.getPluginData(NODE_STORE_KEY.DOMAIN_ID);
 	const ignore = node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true';
+	const action = node.getPluginData(NODE_STORE_KEY.ACTION);
+	const modifier = node.getPluginData(NODE_STORE_KEY.MODIFIER);
 
 	return {
 		localizationKey,
-		originalLocalizeId,
+
 		domainId: domainId || '',
 		ignore: ignore || false,
+		action,
+		modifier,
 	};
 };
 

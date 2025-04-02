@@ -9,9 +9,11 @@ export interface TranslationKeyEventTypes {
 // 노드 데이터 타입
 export interface NodeData {
 	localizationKey: string;
-	originalLocalizeId: string;
+
 	domainId?: string;
 	ignore?: boolean;
+	action?: string;
+	modifier?: string;
 }
 
 // 캐시 시스템 구현을 위한 타입

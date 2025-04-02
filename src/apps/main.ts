@@ -8,7 +8,7 @@ import {
 	onSetDomainSetting,
 	onSetLanguageCodes,
 } from '@/domain/Setting/SettingModel';
-import { onGetProjectId, onSetProjectId } from '@/domain/Label/LabelModel';
+import { onGetProjectId, onSetNodeAction, onSetProjectId } from '@/domain/Label/LabelModel';
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges';
 import { onGetCursorPosition } from '@/model/on/GET_CURSOR_POSITION';
 import { onGetLocalizationKeyData } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
@@ -76,7 +76,7 @@ export default function () {
 	pageNodeZoom_Adapter();
 	pageSelectIds_Adapter();
 	onCurrentSectionSelected();
-
+	onSetNodeAction();
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
 	onStyleChange();
 	onGetStyleData();

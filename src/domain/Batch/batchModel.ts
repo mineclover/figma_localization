@@ -205,7 +205,6 @@ export const onSetNodeLocalizationKeyBatch = () => {
 				setNodeData(node, {
 					domainId: data.domainId,
 					localizationKey: data.keyId,
-					originalLocalizeId: result.localization_id.toString(),
 				});
 			}
 		}
@@ -230,7 +229,6 @@ export const onUpdateNodeLocalizationKeyBatch = () => {
 					setNodeData(node, {
 						domainId: data.domainId,
 						localizationKey: data.keyId,
-						originalLocalizeId: data.originId,
 					});
 				}
 			}

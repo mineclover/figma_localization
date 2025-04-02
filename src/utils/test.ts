@@ -110,7 +110,6 @@ export async function testFlatStructureToXmlConversion(testXml: string) {
 		console.log(regeneratedXml);
 		console.log('\n-----------------------------------\n');
 
-		console.log('🚀 ~ testFlatStructureToXmlConversion ~ flatItems:', flatItems);
 		// 3. 부분 구조 변환 테스트
 		// 첫 번째 child 태그와 그 하위 태그만 변환
 

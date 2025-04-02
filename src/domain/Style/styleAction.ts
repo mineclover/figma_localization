@@ -360,23 +360,17 @@ export const styleToXml = async (
 	// xml 을 먼저 가져오고 스타일을 가져오게 되면 스타일이 없을 수 있음
 	// key, action 으로 조회 할 때 , xml에 있고 스타일이 없을 수 있다는 말
 	//
-	console.log('🚀 ~ styleToXml ~ xmlString:', xmlString, styleStoreArray, effectStyle);
-
 	const map = {
 		'1:2': 'a',
 		'1:3': 'b',
 	};
 	const brString = xmlString.replace(/\n/g, '<br/>');
 	const flatItems = await parseXmlToFlatStructure(brString);
-	console.log('🚀 ~ flatItems:', flatItems);
-
 	let temp = brString;
 
 	for (const [key, value] of Object.entries(map)) {
 		temp = await replaceTagNames(temp, key, value);
 	}
-
-	console.log('🚀 ~ styleToXml ~ temp:', temp);
 
 	return { xmlString, styleStoreArray, effectStyle };
 };

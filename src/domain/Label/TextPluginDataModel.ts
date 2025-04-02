@@ -352,13 +352,9 @@ export const addTranslation = async (node: TextNode) => {
 		'id'
 	);
 
-	console.log('🚀 ~ addTranslation ~ effectStyle:', styleStoreArray, effectStyle);
-
 	// 대부분의 시스템에서 \n는 공백으로 처리되기 때문에 시각적으로 보이지 않음
 	// 따라서 시각적으로 보이게 하기 위해 br로 처리하는게 합리적이게 보임
 	const brString = xmlString.replace(/\n/g, '<br/>');
-	console.log('🚀 ~ addTranslation ~ 업로드 전에 처리 필요 : ', brString);
-
 	try {
 		const translations = await fetchDB('/localization/translations', {
 			method: 'PUT',
@@ -389,8 +385,6 @@ export const addTranslation = async (node: TextNode) => {
 	} catch (error) {}
 
 	const flatItems = await parseXmlToFlatStructure(brString);
-	console.log('🚀 ~ addTranslation ~ flatItems:', flatItems);
-
 	for (const style of styleStoreArray) {
 		// 매핑 로직이 변경 됨
 		// key , action,type

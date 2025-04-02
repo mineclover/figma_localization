@@ -72,7 +72,6 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 	const options = Object.entries(actionTypes).map(([key, value]) => ({ value: value }));
 
 	const handleChange = (event: TargetedEvent<HTMLInputElement, Event>) => {
-		console.log('🚀 ~ handleChange ~ handleChange:', '이 로컬라이제이션 키에 대한 위치 지정');
 		// 위치 저장
 		// 액션 값 저장
 		//
@@ -223,8 +222,6 @@ export const StyleXml = ({
 						});
 
 						const data2 = await fetchData2.json();
-						console.log('🚀 ~ fetchData2:', data2);
-
 						const fetchData = await fetchClient('/localization/actions/bulk', {
 							method: 'POST',
 							body: JSON.stringify({

@@ -12,6 +12,8 @@ import styles from './StylePage.module.css';
 import { signal } from '@preact/signals-core';
 import { useSignal } from '@/hooks/useSignal';
 import { clientFetchDBCurry } from '../utils/fetchDB';
+import { createCachedFetch } from '@/utils/cacheStore';
+import { paths } from 'types/i18n';
 
 type Props = {
 	localizationKey: string;
@@ -30,6 +32,9 @@ const targetKeyParse = async (flatItems: XmlFlatNode[]) => {
 	return new Set(targetKey.map((item) => item.tagName));
 };
 
+const fetchClient = clientFetchDBCurry('1');
+const cachedFetch = createCachedFetch<paths>(fetchClient, { ttl: 1000 }); // 1초 캐시
+
 // userId 필요하긴 한데 일단 넣지 않음
 const serverCurry = (key: string, action: ActionType) => {
 	return async function serverKeyParse(
@@ -41,39 +46,42 @@ const serverCurry = (key: string, action: ActionType) => {
 	) {
 		console.log(this);
 
-		const fetchClient = clientFetchDBCurry('1');
-		const result = await fetchClient(
-			['/localization/actions?key_id=', key, '&action=', action].join('') as '/localization/actions',
-			{
-				method: 'GET',
-			}
-		);
+		const url = `/localization/actions?key_id=${key}&action=${action}` as '/localization/actions';
+		const result = await cachedFetch(url, {
+			method: 'GET',
+		});
 
-		console.log('🚀 ~ serverCurry ~ result:', result);
 		const data = (await result.json()) as LocalizationKeyAction[];
-		console.log('🚀 ~ serverCurry ~ data:', data);
 
-		const keyMap: Record<string, string> = {};
-
-		for (const item of list) {
-			if (item !== '') {
-				keyMap[item] = '';
-			}
-		}
-		const output = data.reduce((acc, item, index) => {
-			console.log('🚀 ~ output ~ index:', index);
-
-			const effectKey = item.effect_resource_id;
-			const styleKey = item.style_resource_id;
-			const normalKey = [effectKey, styleKey].join(':');
-			acc[normalKey] = item.from_enum;
-			return acc;
-		}, keyMap);
-
-		return output;
+		return data;
 	};
 };
 
+async function diff(
+	this: {
+		fn2: Awaited<ReturnType<typeof targetKeyParse>>;
+		fn3: Awaited<ReturnType<typeof serverCurry>>;
+	},
+	data: LocalizationKeyAction[]
+) {
+	const keyMap: Record<string, string> = {};
+	const list = this.fn2;
+
+	for (const item of list) {
+		if (item !== '') {
+			keyMap[item] = '';
+		}
+	}
+	const output = data.reduce((acc, item, index) => {
+		const effectKey = item.effect_resource_id;
+		const styleKey = item.style_resource_id;
+		const normalKey = [effectKey, styleKey].join(':');
+		acc[normalKey] = item.from_enum;
+		return acc;
+	}, keyMap);
+
+	return output;
+}
 /** 선택된 대상은 제거 */
 const divideItemsBySelection = (list: string[], selected: string[]) => {
 	return list.filter((item) => !selected.includes(item));
@@ -91,11 +99,8 @@ export const setTags = (list: Record<string, string>) => {
 };
 
 const TagsSort = ({ list }: { list: Record<string, string> }) => {
-	console.log('🚀 ~ TagsSort ~ list:', list);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 	// const [tags, setTags] = useState<Record<string, string>>({});
-	console.log('🚀 ~ TagsSort ~ tags:', tags);
-
 	useEffect(() => {
 		setTags(list);
 	}, [list]);
@@ -156,21 +161,18 @@ const TagsSort = ({ list }: { list: Record<string, string> }) => {
 // 겹칠 경우 대체 , 겹치지 않을 경우 인터페이스에 표시
 //
 const Tags = ({ localizationKey, xmlString, action }: Props) => {
-	console.log(`🚀 ~ Tags ~ { key, xmlString, action }:`, { localizationKey, xmlString, action });
 	const { state, results, reset, allFulfilled } = useFp(xmlString, {
 		fn1: xmlParse,
 		fn2: targetKeyParse,
 		fn3: serverCurry(localizationKey, action),
+		fn4: diff,
 	});
 	console.log('🚀 ~ Tags ~ results:', results);
-
 	useEffect(() => {
 		reset();
 	}, [localizationKey, action]);
 
 	const value = allFulfilled ? (results['fn3'] ?? {}) : {};
-	console.log('🚀 ~ Tags ~ value:', value);
-
 	if (!allFulfilled) return <div>Loading...</div>;
 	return <TagsSort key={allFulfilled} list={value} />;
 };

@@ -125,11 +125,9 @@ export const onGetCursorPositionResponse = () => {
 
 export const onSetNodeAction = () => {
 	on(SET_NODE_ACTION.REQUEST_KEY, (data: NodeData) => {
-		console.log('🚀 ~ on ~ data:', data);
 		const node = figma.currentPage.selection[0];
 
 		for (const [key, value] of Object.entries(data)) {
-			console.log('🚀 ~ on ~  [key, value]:', [key, value]);
 			// 널이 아닐 때만 설정
 
 			if (key === 'localizationKey' && value != null) {

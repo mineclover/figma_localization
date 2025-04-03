@@ -864,7 +864,7 @@ export function getAllStyleRanges(textNode: TextNode): {
 		blendMode: textNode.blendMode,
 		textAlignHorizontal: textNode.textAlignHorizontal,
 		textAlignVertical: textNode.textAlignVertical,
-		textAutoResize: textNode.textAutoResize,
+		// textAutoResize: textNode.textAutoResize,
 		textTruncation: textNode.textTruncation,
 		maxLines: textNode.maxLines,
 		targetAspectRatio: textNode.targetAspectRatio,
@@ -884,15 +884,15 @@ export function getAllStyleRanges(textNode: TextNode): {
 		layoutSizingVertical: textNode.layoutSizingVertical,
 		leadingTrim: textNode.leadingTrim,
 		rotation: textNode.rotation,
-		locked: textNode.locked,
-		visible: textNode.visible,
+		// locked: textNode.locked,
+		// visible: textNode.visible,
 		// 위치 값
 		// absoluteBoundingBox: textNode.absoluteBoundingBox,
 		// 추가된 누락 속성들
-		minWidth: textNode.minWidth,
-		maxWidth: textNode.maxWidth,
-		minHeight: textNode.minHeight,
-		maxHeight: textNode.maxHeight,
+		// minWidth: textNode.minWidth,
+		// maxWidth: textNode.maxWidth,
+		// minHeight: textNode.minHeight,
+		// maxHeight: textNode.maxHeight,
 		boundVariables: singleBoundVariables,
 	} as const;
 
@@ -969,7 +969,7 @@ const effectFunctionMap = {
 	// 텍스트 정렬 관련
 	textAlignHorizontal: 'textAlignHorizontal',
 	textAlignVertical: 'textAlignVertical',
-	textAutoResize: 'textAutoResize',
+	// textAutoResize: 'textAutoResize',
 	textTruncation: 'textTruncation',
 	maxLines: 'maxLines',
 
@@ -984,10 +984,10 @@ const effectFunctionMap = {
 	layoutSizingVertical: 'layoutSizingVertical',
 
 	// 크기 제한 관련
-	minWidth: 'minWidth',
-	maxWidth: 'maxWidth',
-	minHeight: 'minHeight',
-	maxHeight: 'maxHeight',
+	// minWidth: 'minWidth',
+	// maxWidth: 'maxWidth',
+	// minHeight: 'minHeight',
+	// maxHeight: 'maxHeight',
 
 	// 기타 설정
 
@@ -995,8 +995,8 @@ const effectFunctionMap = {
 	hangingList: 'hangingList',
 	leadingTrim: 'leadingTrim',
 	rotation: 'rotation',
-	locked: 'locked',
-	visible: 'visible',
+	// locked: 'locked',
+	// visible: 'visible',
 	isMask: 'isMask',
 	maskType: 'maskType',
 } as const;
@@ -1012,7 +1012,7 @@ export const defaultEffectStyleData = {
 	blendMode: 'PASS_THROUGH',
 	textAlignHorizontal: 'CENTER',
 	textAlignVertical: 'CENTER',
-	textAutoResize: 'WIDTH_AND_HEIGHT',
+	// textAutoResize: 'WIDTH_AND_HEIGHT',
 	textTruncation: 'DISABLED',
 	maxLines: null,
 
@@ -1034,12 +1034,12 @@ export const defaultEffectStyleData = {
 	layoutSizingVertical: 'FIXED',
 	leadingTrim: 'NONE',
 	rotation: 0,
-	locked: false,
-	visible: true,
-	minWidth: null,
-	maxWidth: null,
-	minHeight: null,
-	maxHeight: null,
+	// locked: false,
+	// visible: true,
+	// minWidth: null,
+	// maxWidth: null,
+	// minHeight: null,
+	// maxHeight: null,
 } as const;
 
 export const defaultRangeData = {

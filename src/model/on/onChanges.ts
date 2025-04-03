@@ -34,9 +34,6 @@ export const onNodeSelectionChange = () => {
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
 	});
 };
-interface StyleChangeEvent {
-	styleChanges: StyleChange[];
-}
 
 /**
  * 선택 영역에서 텍스트 변경 감지
@@ -47,7 +44,7 @@ const textStyleChangeEvent = async (event: NodeChangeEvent) => {
 		.filter((eventData) => {
 			if (eventData.type === 'PROPERTY_CHANGE') {
 				return eventData.properties.some((eventName) => {
-					return !['x', 'y', 'relativeTransform'].includes(eventName);
+					return !['x', 'y', 'relativeTransform', 'height', 'width'].includes(eventName);
 				});
 			}
 		})

@@ -61,21 +61,16 @@ type CurrentMetadata = {
 	domainValid: boolean;
 };
 
-export const actionSignal = signal<ActionType>('default');
-
-export const setActionSignal = (value: ActionType) => {
-	actionSignal.value = value;
-};
-
 const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, domainValid }: CurrentMetadata) => {
-	const action = useSignal(actionSignal);
+	const currentPointer = useSignal(currentPointerSignal);
+	const action = currentPointer?.data.action ?? 'default';
 	const options = Object.entries(actionTypes).map(([key, value]) => ({ value: value }));
 
 	const handleChange = (event: TargetedEvent<HTMLInputElement, Event>) => {
-		// 위치 저장
-		// 액션 값 저장
-		//
-		setActionSignal(event.currentTarget.value as ActionType);
+		const next = event.currentTarget.value as ActionType;
+		emit(SET_NODE_ACTION.REQUEST_KEY, {
+			action: next,
+		});
 	};
 
 	return (
@@ -149,7 +144,7 @@ export const StyleXml = ({
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
-	const action = useSignal(actionSignal);
+	const action = currentPointer?.data.action ?? 'default';
 	const [resultXml, setResultXml] = useState<string>(brString);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 
@@ -188,7 +183,11 @@ export const StyleXml = ({
 						</Suspense>
 					)}
 				</ResourceProvider> */}
-			<Tags localizationKey={currentPointer?.data.localizationKey ?? ''} xmlString={brString} action={action} />
+			<Tags
+				localizationKey={currentPointer?.data.localizationKey ?? ''}
+				xmlString={brString}
+				action={currentPointer?.data.action ?? 'default'}
+			/>
 
 			{isKeySetting ? (
 				<Button
@@ -262,7 +261,7 @@ const StylePage = () => {
 	// const pageLock = currentPointer?.pageLock ?? false;
 
 	const targetArray = ['origin', ...languageCodes];
-	const action = useSignal(actionSignal);
+	const action = currentPointer?.data.action ?? 'default';
 	const isStyle = currentPointer;
 
 	const currentMetadata = {

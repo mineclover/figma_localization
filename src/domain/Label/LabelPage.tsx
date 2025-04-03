@@ -11,7 +11,7 @@ import {
 	SET_NODE_RESET_KEY,
 } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
-import { onGetCursorPositionResponse, sectionNameParser } from './LabelModel';
+import { sectionNameParser } from './LabelModel';
 import { currentPointerSignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { CurrentCursorType } from '@/model/types';

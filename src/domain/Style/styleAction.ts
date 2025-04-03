@@ -25,36 +25,6 @@ const innerTextExtract = (text: any): string => {
 	return text[0]['#text'];
 };
 
-// 캐시 맵
-const resourceMap = new Map<string, ParsedResourceDTO>();
-
-const resourceRequest = async (key: string) => {
-	const cache = resourceMap.get(key);
-
-	const onlineStyle = await fetchDB(('/resources/' + key) as '/resources/{id}', {
-		method: 'GET',
-	});
-
-	if (onlineStyle == null) {
-		notify('Failed to get resource by key', 'error');
-		return false;
-	}
-
-	const data = (await onlineStyle.json()) as ResourceDTO;
-	if (data == null) {
-		notify('Failed to get resource by key', 'error');
-		return false;
-	}
-
-	const styleValue = data.style_value ?? {};
-	resourceMap.set(key, {
-		...data,
-		style_value: styleValue,
-	});
-
-	return true;
-};
-
 /**
  * target node 스타일을 로컬라이제이션 키 기준으로 업데이트
  * 요청은 date 값으로 캐싱함

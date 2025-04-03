@@ -1,3 +1,4 @@
+import { ActionType } from '@/domain/System/ActionResourceDTO';
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
 
 // 번역 관련 이벤트 타입
@@ -12,7 +13,7 @@ export interface NodeData {
 
 	domainId?: string;
 	ignore?: boolean;
-	action?: string;
+	action?: ActionType;
 	modifier?: string;
 }
 

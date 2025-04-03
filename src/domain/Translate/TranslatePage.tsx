@@ -35,7 +35,7 @@ import {
 	SET_VARIABLE_DATA,
 } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
-import { onGetCursorPositionResponse, onSetProjectIdResponse } from '../Label/LabelModel';
+import { onSetProjectIdResponse } from '../Label/LabelModel';
 import { projectIdSignal } from '@/model/signal';
 import { currentPointerSignal } from '@/model/signal';
 import { localizationTranslationMapping } from '../Label/TextPluginDataModel';

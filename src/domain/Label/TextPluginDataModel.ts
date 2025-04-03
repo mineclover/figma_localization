@@ -30,6 +30,7 @@ import {
 } from '@/model/types';
 import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
 import { parseXmlToFlatStructure } from '@/utils/xml2';
+import { ActionType } from '../System/ActionResourceDTO';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	return {
@@ -548,7 +549,7 @@ export const getNodeData = (node: BaseNode): NodeData => {
 
 	const domainId = node.getPluginData(NODE_STORE_KEY.DOMAIN_ID);
 	const ignore = node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true';
-	const action = node.getPluginData(NODE_STORE_KEY.ACTION);
+	const action = node.getPluginData(NODE_STORE_KEY.ACTION) as ActionType | '';
 	const modifier = node.getPluginData(NODE_STORE_KEY.MODIFIER);
 
 	return {
@@ -556,7 +557,7 @@ export const getNodeData = (node: BaseNode): NodeData => {
 
 		domainId: domainId || '',
 		ignore: ignore || false,
-		action,
+		action: action === '' ? 'default' : action,
 		modifier,
 	};
 };

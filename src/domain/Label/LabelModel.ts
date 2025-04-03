@@ -106,23 +106,6 @@ export const getCursorPosition = (node: BaseNode) => {
 	}
 };
 
-/** Main */
-export const onGetCursorPosition = () => {
-	on(GET_CURSOR_POSITION.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0];
-		const cursorPosition = await getCursorPosition(node);
-		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
-	});
-};
-
-/** UI */
-export const onGetCursorPositionResponse = () => {
-	emit(GET_CURSOR_POSITION.REQUEST_KEY);
-	return on(GET_CURSOR_POSITION.RESPONSE_KEY, (cursorPosition: CurrentCursorType) => {
-		currentPointerSignal.value = cursorPosition;
-	});
-};
-
 export const onSetNodeAction = () => {
 	on(SET_NODE_ACTION.REQUEST_KEY, (data: NodeData) => {
 		const node = figma.currentPage.selection[0];

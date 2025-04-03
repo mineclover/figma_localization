@@ -5,6 +5,7 @@ import { DomainSettingType } from './types';
 import { CurrentNode } from './types';
 import { CurrentCursorType } from './types';
 import { signal } from '@preact/signals-core';
+import { ActionType } from '@/domain/System/ActionResourceDTO';
 
 /**
  * 번역 키 관련 상태를 저장하는 시그널

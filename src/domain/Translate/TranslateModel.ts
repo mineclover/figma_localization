@@ -22,6 +22,7 @@ import { FilePathNodeSearch } from '@/figmaPluginUtils';
 import { currentSectionSignal, variableDataSignal } from '@/model/signal';
 import { TargetNodeStyleUpdate } from '../Style/styleAction';
 import { processReceiver } from '../System/process';
+import { CacheStore } from '@/utils/cacheStore';
 
 export const onCurrentSectionSelectedResponse = () => {
 	emit(CURRENT_SECTION_SELECTED.REQUEST_KEY);
@@ -66,50 +67,64 @@ export const onCurrentSectionSelected = () => {
 	});
 };
 
-// 캐시 아이템 인터페이스 정의 (TextPluginDataModel.ts와 동일한 구조 사용)
-interface CacheItem<T> {
-	timestamp: number;
-	data: T;
+interface TranslationResponse {
+	success: boolean;
+	data?: LocalizationTranslationDTO;
+	error?: string;
 }
 
-// 번역 코드 검색 결과를 위한 캐시 맵
-const translationCodeCache = new Map<string, CacheItem<LocalizationTranslationDTO>>();
+// 번역 코드 검색 결과를 위한 캐시 저장소
+const translationCodeCache = new CacheStore<TranslationResponse>({ ttl: 5000 });
 
 // 키와 언어 코드로 번역 데이터 조회해서 1개 받음
 export const searchTranslationCode = async (key: string, code: string, date?: number) => {
 	const apiPath = '/localization/translations/search?keyId=' + key + '&language=' + code;
 	const cacheKey = apiPath;
-	const now = date || Date.now();
 	const cachedItem = translationCodeCache.get(cacheKey);
 
-	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
-
-	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 5000) {
+	if (cachedItem) {
 		console.log(`캐시된 번역 코드 데이터 반환: ${cacheKey}`);
 		return cachedItem.data;
 	}
 
-	const result = await fetchDB(
-		('/localization/translations/search?keyId=' + key + '&language=' + code) as '/localization/translations/search',
-		{
-			method: 'GET',
+	try {
+		const result = await fetchDB(
+			('/localization/translations/search?keyId=' + key + '&language=' + code) as '/localization/translations/search',
+			{
+				method: 'GET',
+			}
+		);
+
+		if (!result || result.status !== 200) {
+			const response: TranslationResponse = {
+				success: false,
+				error: '번역 데이터를 가져오는데 실패했습니다.',
+			};
+			translationCodeCache.set(cacheKey, response);
+			console.log('실패한 번역 코드 데이터 캐싱됨');
+			return undefined;
 		}
-	);
 
-	if (!result || result.status !== 200) {
-		return;
+		const data = (await result.json()) as LocalizationTranslationDTO;
+		const response: TranslationResponse = {
+			success: true,
+			data: data,
+		};
+
+		// 결과 캐싱
+		translationCodeCache.set(cacheKey, response);
+		console.log('번역 코드 데이터 캐싱 갱신 됨');
+
+		return data;
+	} catch (error) {
+		const response: TranslationResponse = {
+			success: false,
+			error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.',
+		};
+		translationCodeCache.set(cacheKey, response);
+		console.log('에러가 발생한 번역 코드 데이터 캐싱됨');
+		return undefined;
 	}
-
-	const data = (await result.json()) as LocalizationTranslationDTO;
-
-	// 결과 캐싱
-	translationCodeCache.set(cacheKey, {
-		timestamp: now,
-		data: data,
-	});
-	console.log('번역 코드 데이터 캐싱 갱신 됨');
-
-	return data;
 };
 
 /** 영역 내에 있는 모든 텍스트 노드의 로컬라이제이션 키를 찾아서 변경 */

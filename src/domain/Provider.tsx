@@ -1,12 +1,14 @@
 import { ComponentChildren, Fragment, h } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 import ClientModalProvider from '@/components/modal/Modal';
-import { onGetCursorPositionResponse, onSetProjectIdResponse } from './Label/LabelModel';
+
 import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
 import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel';
 import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 import { onProcessResponse } from './System/process';
+import { onGetCursorPositionResponse } from '@/model/on/GET_CURSOR_POSITION';
+import { onSetProjectIdResponse } from './Label/LabelModel';
 
 /**
  * duplex 전용 어댑터

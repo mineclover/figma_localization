@@ -80,11 +80,11 @@ export const searchTranslationCode = async (key: string, code: string, date?: nu
 	const apiPath = '/localization/translations/search?keyId=' + key + '&language=' + code;
 	const cacheKey = apiPath;
 	const now = date || Date.now();
-
 	const cachedItem = translationCodeCache.get(cacheKey);
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
-	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
+
+	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 5000) {
 		console.log(`캐시된 번역 코드 데이터 반환: ${cacheKey}`);
 		return cachedItem.data;
 	}

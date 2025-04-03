@@ -7,7 +7,10 @@ import { clientFetchDBCurry } from '../utils/fetchDB';
 export const fetchClient = clientFetchDBCurry();
 export const cachedFetch = createCachedFetch<paths>(fetchClient, { ttl: 1000 }); // 1초 캐시
 // userId 필요하긴 한데 일단 넣지 않음
-export const keyActionFetchCurry = (key: string, action: ActionType) => {
+export const keyActionFetchCurry = (key: string, action: ActionType | '') => {
+	if (action == null || action === '') {
+		action = 'default';
+	}
 	return async () => {
 		const url = `/localization/actions?key_id=${key}&action=${action}` as '/localization/actions';
 		const result = await cachedFetch(url, {

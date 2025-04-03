@@ -25,9 +25,9 @@ function Plugin() {
 		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize);
 	}
 
-	useEffect(() => {
-		runExample();
-	}, []);
+	// useEffect(() => {
+	// 	runExample();
+	// }, []);
 
 	useWindowResize(onWindowResize, {
 		maxHeight: 1080,

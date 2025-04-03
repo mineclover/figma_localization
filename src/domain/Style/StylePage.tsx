@@ -50,7 +50,7 @@ import { clc } from '@/components/modal/utils';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
 import Tags, { tagsSignal } from './Tags';
-import { replaceTagNames } from '@/utils/xml2';
+import { replaceTagNames, unwrapTag, wrapTextWithTag } from '@/utils/xml2';
 import { ActionType, actionTypes } from '../System/ActionResourceDTO';
 
 type CurrentMetadata = {
@@ -160,7 +160,12 @@ export const StyleXml = ({
 				result = await replaceTagNames(result, key, value);
 			}
 		}
-		setResultXml(result);
+		const result1 = await unwrapTag(result);
+		const result2 = await wrapTextWithTag(result1);
+
+		console.log('🚀 ~ 무결성 검사 : ', result === result2);
+
+		setResultXml(result1);
 	};
 
 	useEffect(() => {

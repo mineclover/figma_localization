@@ -454,7 +454,7 @@ export function wrapTextWithTag(
 }
 
 /**
- * 지정된 태그를 일반 텍스트로 변환합니다.
+ * 지정된 태그를 일반 텍스트로 변환합니다. a > text
  * @param {string} xmlString - 처리할 XML 문자열
  * @param {string} tagName - 변환할 태그 이름 (기본값: 'a')
  * @returns {Promise<string>} 변환된 XML 문자열

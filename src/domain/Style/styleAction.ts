@@ -14,7 +14,7 @@ import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
 import { searchTranslationCode } from '../Translate/TranslateModel';
 import { getPageLockOpen } from '../System/lock';
-import { convertTag, parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2';
+import { convertTag, parseXmlToFlatStructure, replaceTagNames, wrapTextWithTag } from '@/utils/xml2';
 import { ActionType } from '../System/ActionResourceDTO';
 import { keyActionFetchCurry, labelKeyMapping } from './actionFetch';
 
@@ -93,13 +93,17 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		notify('60 Failed to get localization data', 'error');
 		return;
 	}
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ targetText:', targetText);
 
 	// 데이터 처리를 이름 얻기 위해서 로컬 키 얻어서 이름을 얻어오냐
 	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
 	// node.name = generateLocalizationName(targetText.text);
 
+	/** a태그 활성화 */
+	const wrapText = await wrapTextWithTag(targetText.text);
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ wrapText:', wrapText);
 	/** {변수}를 패턴으로 파싱 */
-	const { variables } = parseLocalizationVariables(targetText.text);
+	const { variables } = parseLocalizationVariables(wrapText);
 
 	/** 변수에 해당하는 값을 플러그인 데이터에서 조회 */
 	const variablesKey = Object.values(variables).reduce(
@@ -116,7 +120,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		{} as Record<string, string>
 	);
 
-	const fullText = applyLocalization(targetText.text, variablesKey);
+	const fullText = applyLocalization(wrapText, variablesKey);
 
 	const action = (node.getPluginData(NODE_STORE_KEY.ACTION) ?? 'default') as ActionType;
 
@@ -125,11 +129,19 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	 */
 	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, localizationKey, action);
 
+	console.log(`🚀 ~ TargetNodeStyleUpdate ~ { xmlString, styleStoreArray, effectStyle, rowText }:`, {
+		xmlString,
+		styleStoreArray,
+		effectStyle,
+		rowText,
+	});
+
 	const tempPosition = {
 		x: node.x,
 		y: node.y,
 	};
 
+	// 수정하려면 처리 해야함
 	await textFontLoad(node);
 	node.characters = rowText;
 	await setResetStyle({
@@ -218,13 +230,22 @@ export const xmlToStyle = async (xml: string, localizationKey: number | string, 
 			};
 		}
 
-		const value = item.text;
-		rowText += value;
+		console.log('🚀 ~ xmlToStyle ~ item:', item);
 
-		const length = typeof value === 'string' ? value.length : 0;
+		let value = '';
+		let length = 0;
+		if (item.tagName === 'br') {
+			rowText += '\n';
+			length = 1;
+		} else {
+			value = item.text ?? '';
+			rowText += value;
+			length = value.length;
+		}
+		console.log('🚀 ~ xmlToStyle ~ length:', value, length);
 		end = start + length;
 
-		if (!['br'].includes(key2)) {
+		if (!['br'].includes(key)) {
 			const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
 				method: 'GET',
 			});

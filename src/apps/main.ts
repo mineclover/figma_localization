@@ -80,7 +80,7 @@ export default function () {
 	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
 	onStyleChange();
 	onGetStyleData();
-	runExample();
+	// runExample();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

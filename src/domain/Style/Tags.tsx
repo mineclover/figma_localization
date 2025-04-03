@@ -145,7 +145,6 @@ const Tags = ({ localizationKey, xmlString, action }: Props) => {
 		fn3: keyActionFetchCurry(localizationKey, action),
 		fn4: diff,
 	});
-	console.log('🚀 ~ Tags ~ results:', results);
 	useEffect(() => {
 		reset();
 	}, [localizationKey, action]);

@@ -14,7 +14,7 @@ export const keyActionFetchCurry = (key: string, action: ActionType) => {
 			method: 'GET',
 		});
 
-		const data = (await result.json()) as LocalizationKeyAction[];
+		const data = result as LocalizationKeyAction[];
 
 		return data;
 	};

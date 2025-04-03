@@ -14,7 +14,7 @@ import { getFigmaRootStore, safeJsonParse } from '../utils/getStore';
 import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools';
 import { searchTranslationCode } from '../Translate/TranslateModel';
 import { getPageLockOpen } from '../System/lock';
-import { parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2';
+import { convertTag, parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2';
 import { ActionType } from '../System/ActionResourceDTO';
 import { keyActionFetchCurry, labelKeyMapping } from './actionFetch';
 
@@ -177,9 +177,6 @@ const labelToResource = async (localizationKey: string, action: ActionType) => {
 
 /** 이거 클라이언트용임 */
 export const xmlToStyle = async (xml: string, localizationKey: number | string, action: ActionType) => {
-	const flatData = await parseXmlToFlatStructure(xml);
-	console.log('🚀 ~ xmlToStyle ~ flatData:', flatData);
-
 	const clientFetchDB = clientFetchDBCurry();
 	const styleStore: Record<string, StyleSync> = {};
 
@@ -193,62 +190,70 @@ export const xmlToStyle = async (xml: string, localizationKey: number | string, 
 	// xml 캐그에서 순서 맞춰서 스타일 처리
 
 	const mapping = await labelToResource(localizationKey.toString(), action);
-	console.log('🚀 ~ xmlToStyle ~ mapping:', mapping);
+
+	// 클라이언트에서도 스타일을 받아야하나?
+
+	let tempXml = xml;
+
+	for (const [key, value] of Object.entries(mapping)) {
+		tempXml = await convertTag(tempXml, key, value);
+	}
+
+	const flatData = await parseXmlToFlatStructure(tempXml);
 
 	for (const item of flatData) {
-		const key = Object.keys(item)[0];
+		const key = item.tagName;
 		const [effectKey, key2] = key.split(':');
 		if (Object.keys(effectStyle).length === 0) {
-			// const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
-			// 	method: 'GET',
-			// });
-			// const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
-			// effectStyle = {
-			// 	hashId: EffectResourceResult.hash_value,
-			// 	name: EffectResourceResult.style_name,
-			// 	id: EffectResourceResult.resource_id.toString(),
-			// 	alias: EffectResourceResult.alias,
-			// 	style: EffectResourceResult.style_value ?? {},
-			// };
+			const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
+				method: 'GET',
+			});
+			const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
+			effectStyle = {
+				hashId: EffectResourceResult.hash_value,
+				name: EffectResourceResult.style_name,
+				id: EffectResourceResult.resource_id.toString(),
+				alias: EffectResourceResult.alias,
+				style: EffectResourceResult.style_value ?? {},
+			};
 		}
 
-		// const value = parseTextBlock(item);
-		// rowText += value;
+		const value = item.text;
+		rowText += value;
 
-		// const length = typeof value === 'string' ? value.length : 0;
+		const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
 
-		if (!['br', '#text'].includes(key2)) {
-			// const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
-			// 	method: 'GET',
-			// });
-			// if (onlineStyle.status === 200) {
-			// 	const responseResult = (await onlineStyle.json()) as ResourceDTO;
-			// 	if (responseResult) {
-			// 		const newHashId = responseResult.hash_value;
-			// 		const before = styleStore[newHashId];
-			// 		const ranges = before?.ranges ?? [];
-			// 		const newId = responseResult.resource_id.toString();
-			// 		const newAlias = responseResult.alias;
-			// 		const newName = responseResult.style_name;
-			// 		const newStyle = responseResult.style_value ?? {};
-			// 		const newRanges = {
-			// 			start,
-			// 			end,
-			// 			text: value,
-			// 		};
-			// 		const store = {
-			// 			hashId: newHashId,
-			// 			name: newName,
-			// 			id: newId,
-			// 			alias: newAlias,
-			// 			style: newStyle,
-			// 			ranges: [...ranges, newRanges],
-			// 		};
-			// 		styleStore[newHashId] = store;
-			// 	}
-			// }
-		} else {
+		if (!['br'].includes(key2)) {
+			const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
+				method: 'GET',
+			});
+			if (onlineStyle.status === 200) {
+				const responseResult = (await onlineStyle.json()) as ResourceDTO;
+				if (responseResult) {
+					const newHashId = responseResult.hash_value;
+					const before = styleStore[newHashId];
+					const ranges = before?.ranges ?? [];
+					const newId = responseResult.resource_id.toString();
+					const newAlias = responseResult.alias;
+					const newName = responseResult.style_name;
+					const newStyle = responseResult.style_value ?? {};
+					const newRanges = {
+						start,
+						end,
+						text: value,
+					};
+					const store = {
+						hashId: newHashId,
+						name: newName,
+						id: newId,
+						alias: newAlias,
+						style: newStyle,
+						ranges: [...ranges, newRanges],
+					};
+					styleStore[newHashId] = store as StyleSync;
+				}
+			}
 		}
 		start = end;
 	}

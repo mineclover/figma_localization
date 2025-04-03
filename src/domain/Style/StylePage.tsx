@@ -49,7 +49,7 @@ import { safeJsonParse } from '../utils/getStore';
 import { clc } from '@/components/modal/utils';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
-import Tags, { tagsSignal } from './Tags';
+import Tags, { extractSelectedItems, tagsSignal } from './Tags';
 import { replaceTagNames, unwrapTag, wrapTextWithTag } from '@/utils/xml2';
 import { ActionType, actionTypes } from '../System/ActionResourceDTO';
 
@@ -96,7 +96,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 					value={action}
 					className={styles.action}
 				/>
-				<Text>선택 된 텍스트 : {nodeId}</Text>
+				<Text>텍스트 ID : {nodeId}</Text>
 				<IconButton
 					onClick={() => {
 						if (nodeId) {
@@ -210,11 +210,13 @@ export const StyleXml = ({
 						});
 
 						const data2 = await fetchData2.json();
+						console.log('🚀 ~ 업로드 됨', data2);
+						const selected = extractSelectedItems(tags);
 
 						const body = {
 							key_id: currentPointer?.data.localizationKey,
 							action: action,
-							mappings: tags,
+							mappings: selected,
 						};
 						console.log('🚀 ~ onClick={ ~ body:', body);
 

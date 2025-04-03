@@ -61,7 +61,7 @@ const divideItemsBySelection = (list: string[], selected: string[]) => {
 };
 
 /** 값이 "" 인 애들은 제거 */
-const extractSelectedItems = (object: Record<string, string>) => {
+export const extractSelectedItems = (object: Record<string, string>) => {
 	const selectObject = Object.entries(object).filter(([key, value]) => value !== '');
 	return Object.fromEntries(selectObject);
 };

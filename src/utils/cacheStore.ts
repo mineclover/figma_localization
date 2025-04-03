@@ -63,21 +63,21 @@ type FetchLike<P = any> = {
 };
 
 // 캐시된 fetch 함수를 생성하는 유틸리티
-export const createCachedFetch = <P = any>(fetchFn: FetchLike<P>, config?: CacheConfig) => {
-	const cacheStore = new CacheStore<Response>(config);
+export const createCachedFetch = <P = any, T = any>(fetchFn: FetchLike<P>, config?: CacheConfig) => {
+	const cacheStore = new CacheStore<T>(config);
 
-	return async <V extends keyof P>(input: V, init?: RequestInit): Promise<Response> => {
+	return async <V extends keyof P>(input: V, init?: RequestInit): Promise<T> => {
 		const cacheKey = input.toString();
 
-		const cachedResponse = cacheStore.get(cacheKey);
-		if (cachedResponse) {
-			return cachedResponse.clone();
+		const cachedData = cacheStore.get(cacheKey);
+		if (cachedData) {
+			return cachedData;
 		}
 
 		const response = await fetchFn(input, init);
-		const clonedResponse = response.clone();
-		cacheStore.set(cacheKey, clonedResponse);
+		const data = (await response.json()) as T;
+		cacheStore.set(cacheKey, data);
 
-		return response;
+		return data;
 	};
 };

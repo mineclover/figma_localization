@@ -6,7 +6,9 @@ import {
 	parseXmlToHierarchy,
 	parseXmlToFlatStructure,
 	convertFlatStructureToXml,
-	toggleATagAndText,
+	wrapTextWithTag,
+	unwrapTag,
+	convertTag,
 } from './xml2';
 
 // 테스트용 XML 문자열
@@ -160,22 +162,28 @@ export async function testToggleATagAndText() {
 		console.log(xmlText2);
 		console.log('\n-----------------------------------\n');
 
-		// xmlText2 -> xmlText3 변환 테스트
-		const result1 = await toggleATagAndText(xmlText2);
-		console.log('xmlText2 -> xmlText3 변환 결과:');
+		// xmlText2 -> xmlText3 변환 테스트 (텍스트를 a 태그로 감싸기)
+		const result1 = await wrapTextWithTag(xmlText2);
+		console.log('xmlText2 -> xmlText3 변환 결과 (텍스트를 a 태그로 감싸기):');
 		console.log(result1);
 		console.log('\n-----------------------------------\n');
 
-		// xmlText3 -> xmlText2 변환 테스트
-		const result2 = await toggleATagAndText(xmlText3);
-		console.log('xmlText3 -> xmlText2 변환 결과:');
+		// xmlText3 -> xmlText2 변환 테스트 (a 태그를 텍스트로 변환)
+		const result2 = await unwrapTag(xmlText3);
+		console.log('xmlText3 -> xmlText2 변환 결과 (a 태그를 텍스트로 변환):');
 		console.log(result2);
 		console.log('\n-----------------------------------\n');
 
 		// xmlText2 -> xmlText4 변환 테스트 (br 태그 추가)
-		const result3 = await toggleATagAndText(xmlText2, { addBrTags: true });
+		const result3 = await wrapTextWithTag(xmlText2, 'a', { addBrTags: true });
 		console.log('xmlText2 -> xmlText4 변환 결과 (br 태그 추가):');
 		console.log(result3);
+		console.log('\n-----------------------------------\n');
+
+		// a 태그를 b 태그로 변환 테스트
+		const result4 = await convertTag(xmlText3, 'a', 'b');
+		console.log('a 태그를 b 태그로 변환 결과:');
+		console.log(result4);
 		console.log('\n-----------------------------------\n');
 
 		// 변환 결과 검증
@@ -189,12 +197,7 @@ export async function testToggleATagAndText() {
 
 		console.log('검증 결과:');
 		console.log('xmlText2 -> xmlText3 변환 성공:', normalizedResult1 === expectedXmlText3);
-		console.log(
-			'xmlText3 -> xmlText2 변환 성공:',
-			normalizedResult2 === expectedXmlText2,
-			normalizedResult2,
-			expectedXmlText2
-		);
+		console.log('xmlText3 -> xmlText2 변환 성공:', normalizedResult2 === expectedXmlText2);
 		console.log('xmlText2 -> xmlText4 변환 성공:', normalizedResult3 === expectedXmlText4);
 
 		// br 태그 검증
@@ -202,6 +205,10 @@ export async function testToggleATagAndText() {
 		const hasBrTags = result3.match(/<br\/>/g)?.length === 4;
 		console.log('br 태그 개수가 올바름:', hasBrTags);
 		console.log('마지막 태그가 br이 아님:', !result3.trim().endsWith('<br/>'));
+
+		// 태그 변환 검증
+		console.log('\n태그 변환 검증:');
+		console.log('a 태그가 b 태그로 변환됨:', !result4.includes('<a>') && result4.includes('<b>'));
 	} catch (error) {
 		console.error('XML 변환 테스트 중 오류 발생:', error);
 	}

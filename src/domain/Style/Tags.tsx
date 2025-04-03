@@ -11,9 +11,7 @@ import { TargetedEvent } from 'preact/compat';
 import styles from './StylePage.module.css';
 import { signal } from '@preact/signals-core';
 import { useSignal } from '@/hooks/useSignal';
-import { clientFetchDBCurry } from '../utils/fetchDB';
-import { createCachedFetch } from '@/utils/cacheStore';
-import { paths } from 'types/i18n';
+import { keyActionFetchCurry } from './actionFetch';
 
 type Props = {
 	localizationKey: string;
@@ -21,46 +19,21 @@ type Props = {
 	action: ActionType;
 };
 
-const xmlParse = async (xmlString: string) => {
+export const xmlParse = async (xmlString: string) => {
 	const flatItems = await parseXmlToFlatStructure(xmlString);
 	return flatItems;
 };
 
-const targetKeyParse = async (flatItems: XmlFlatNode[]) => {
+export const targetKeyParse = async (flatItems: XmlFlatNode[]) => {
 	const targetKey = flatItems.filter((item) => item.tagName !== 'br');
 
 	return new Set(targetKey.map((item) => item.tagName));
 };
 
-const fetchClient = clientFetchDBCurry('1');
-const cachedFetch = createCachedFetch<paths>(fetchClient, { ttl: 1000 }); // 1초 캐시
-
-// userId 필요하긴 한데 일단 넣지 않음
-const serverCurry = (key: string, action: ActionType) => {
-	return async function serverKeyParse(
-		this: {
-			fn1: Awaited<ReturnType<typeof xmlParse>>;
-			fn2: Awaited<ReturnType<typeof targetKeyParse>>;
-		},
-		list: Set<string>
-	) {
-		console.log(this);
-
-		const url = `/localization/actions?key_id=${key}&action=${action}` as '/localization/actions';
-		const result = await cachedFetch(url, {
-			method: 'GET',
-		});
-
-		const data = (await result.json()) as LocalizationKeyAction[];
-
-		return data;
-	};
-};
-
 async function diff(
 	this: {
 		fn2: Awaited<ReturnType<typeof targetKeyParse>>;
-		fn3: Awaited<ReturnType<typeof serverCurry>>;
+		fn3: Awaited<ReturnType<typeof keyActionFetchCurry>>;
 	},
 	data: LocalizationKeyAction[]
 ) {
@@ -169,7 +142,7 @@ const Tags = ({ localizationKey, xmlString, action }: Props) => {
 	const { state, results, reset, allFulfilled } = useFp(xmlString, {
 		fn1: xmlParse,
 		fn2: targetKeyParse,
-		fn3: serverCurry(localizationKey, action),
+		fn3: keyActionFetchCurry(localizationKey, action),
 		fn4: diff,
 	});
 	console.log('🚀 ~ Tags ~ results:', results);

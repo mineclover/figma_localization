@@ -383,13 +383,18 @@ function nodeToXmlString(node: any): string {
 }
 
 /**
- * 태그가 없는 텍스트를 a 태그로 감싸고, a 태그는 태그 없는 텍스트로 변환합니다.
+ * 일반 텍스트를 지정된 태그로 감쌉니다.
  * @param {string} xmlString - 처리할 XML 문자열
+ * @param {string} tagName - 감쌀 태그 이름 (기본값: 'a')
  * @param {Object} options - 변환 옵션
  * @param {boolean} options.addBrTags - 각 태그 뒤에 br 태그를 추가할지 여부
  * @returns {Promise<string>} 변환된 XML 문자열
  */
-export function toggleATagAndText(xmlString: string, options: { addBrTags?: boolean } = {}): Promise<string> {
+export function wrapTextWithTag(
+	xmlString: string,
+	tagName: string = 'a',
+	options: { addBrTags?: boolean } = {}
+): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
@@ -397,15 +402,14 @@ export function toggleATagAndText(xmlString: string, options: { addBrTags?: bool
 				return;
 			}
 
-			// 최상위 텍스트 노드들을 a 태그로 변환하고 a 태그는 텍스트로 변환
-			const result = dom.map((node: any, index: number) => {
+			// 텍스트 노드를 지정된 태그로 변환
+			const result = dom.map((node: any) => {
 				if (node.type === 'text') {
 					const trimmedText = node.data.trim();
 					if (trimmedText !== '') {
-						// 텍스트 노드를 a 태그로 변환
 						return {
 							type: 'tag',
-							name: 'a',
+							name: tagName,
 							attribs: {},
 							children: [{ type: 'text', data: trimmedText }],
 						};
@@ -413,18 +417,6 @@ export function toggleATagAndText(xmlString: string, options: { addBrTags?: bool
 					// 줄바꿈만 유지하고 다른 공백은 제거
 					const hasNewline = /\n/.test(node.data);
 					return hasNewline ? { type: 'text', data: '\n' } : null;
-				} else if (node.type === 'tag') {
-					if (node.name === 'a') {
-						// a 태그를 텍스트 노드로 변환
-						const textContent = domutils.textContent(node).trim();
-						// 이전 노드가 줄바꿈을 포함하는지 확인
-						const prevNode = dom[index - 1];
-						const hasNewlineBefore = prevNode?.type === 'text' && /\n/.test(prevNode.data);
-
-						return { type: 'text', data: hasNewlineBefore ? '\n' + textContent : textContent };
-					}
-					// 다른 태그는 그대로 유지
-					return node;
 				}
 				return node;
 			});
@@ -449,30 +441,63 @@ export function toggleATagAndText(xmlString: string, options: { addBrTags?: bool
 					}
 				});
 
-				// 변환된 DOM을 XML 문자열로 변환
-				const transformedXml = render(resultWithBr, {
-					xmlMode: true,
-					decodeEntities: false,
-				});
-
-				resolve(transformedXml);
+				resolve(render(resultWithBr, { xmlMode: true, decodeEntities: false }));
 			} else {
-				// 변환된 DOM을 XML 문자열로 변환
-				const transformedXml = render(filteredResult, {
-					xmlMode: true,
-					decodeEntities: false,
-				});
-
-				resolve(transformedXml);
+				resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }));
 			}
 		});
 
-		const parser = new Parser(handler, {
-			xmlMode: true,
-			decodeEntities: false,
-		});
-
+		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
 		parser.write(xmlString);
 		parser.end();
 	});
+}
+
+/**
+ * 지정된 태그를 일반 텍스트로 변환합니다.
+ * @param {string} xmlString - 처리할 XML 문자열
+ * @param {string} tagName - 변환할 태그 이름 (기본값: 'a')
+ * @returns {Promise<string>} 변환된 XML 문자열
+ */
+export function unwrapTag(xmlString: string, tagName: string = 'a'): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const handler = new DomHandler((error, dom) => {
+			if (error) {
+				reject(error);
+				return;
+			}
+
+			// 지정된 태그를 텍스트로 변환
+			const result = dom.map((node: any, index: number) => {
+				if (node.type === 'tag' && node.name === tagName) {
+					const textContent = domutils.textContent(node).trim();
+					// 이전 노드가 줄바꿈을 포함하는지 확인
+					const prevNode = dom[index - 1];
+					const hasNewlineBefore = prevNode?.type === 'text' && /\n/.test(prevNode.data);
+
+					return { type: 'text', data: hasNewlineBefore ? '\n' + textContent : textContent };
+				}
+				return node;
+			});
+
+			// null 노드 제거
+			const filteredResult = result.filter((node: any) => node !== null);
+			resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }));
+		});
+
+		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
+		parser.write(xmlString);
+		parser.end();
+	});
+}
+
+/**
+ * 특정 태그를 다른 태그로 변환합니다.
+ * @param {string} xmlString - 처리할 XML 문자열
+ * @param {string} fromTag - 변환할 태그 이름
+ * @param {string} toTag - 새로운 태그 이름
+ * @returns {Promise<string>} 변환된 XML 문자열
+ */
+export function convertTag(xmlString: string, fromTag: string, toTag: string): Promise<string> {
+	return replaceTagNames(xmlString, fromTag, toTag);
 }

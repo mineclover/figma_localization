@@ -23,11 +23,15 @@ export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) =>
 export const clientFetchDBCurry =
 	(domainId?: number | string) =>
 	<V extends keyof paths>(url: V, options?: RequestInit) => {
+		const headers = {
+			'Content-Type': 'application/json',
+		} as Record<string, string>;
+		if (domainId) {
+			headers['X-Domain-Id'] = domainId.toString();
+		}
+
 		return fetch(baseURL + url, {
 			...options,
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Domain-Id': domainId?.toString() ?? '',
-			},
+			headers,
 		});
 	};

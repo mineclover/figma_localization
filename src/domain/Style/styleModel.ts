@@ -346,6 +346,7 @@ export const groupAllSegmentsByStyle = (
 export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
 	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey, lang }: { localizationKey: string; lang: string }) => {
+		console.log(`🚀 ~ on ~ { localizationKey, lang }::`, { localizationKey, lang });
 		const xNode = figma.currentPage.selection[0];
 		const domainSetting = getDomainSetting();
 

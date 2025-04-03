@@ -3,7 +3,7 @@ import { textFontLoad, setAllStyleRanges, setResetStyle } from '@/figmaPluginUti
 import { ResourceDTO, ParsedResourceDTO, StyleSync } from '@/model/types';
 import { parseXML, parseTextBlock2, parseTextBlock } from '@/utils/xml';
 
-import { DOWNLOAD_STYLE, VARIABLE_PREFIX } from '../constant';
+import { DOWNLOAD_STYLE, NODE_STORE_KEY, VARIABLE_PREFIX } from '../constant';
 import { getLocalizationKeyData, generateLocalizationName, getTargetTranslations } from '../Label/TextPluginDataModel';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB } from '../utils/fetchDB';
@@ -15,6 +15,8 @@ import { applyLocalization, parseLocalizationVariables } from '@/utils/textTools
 import { searchTranslationCode } from '../Translate/TranslateModel';
 import { getPageLockOpen } from '../System/lock';
 import { parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2';
+import { ActionType } from '../System/ActionResourceDTO';
+import { keyActionFetchCurry, labelKeyMapping } from './actionFetch';
 
 const innerTextExtract = (text: any): string => {
 	if (typeof text === 'string') {
@@ -62,6 +64,7 @@ const resourceRequest = async (key: string) => {
  * @returns
  */
 export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: string, code: string, date: number) => {
+	console.log('🚀 ~ TargetNodeStyleUpdate ~ node:', node);
 	const xNodeId = node.id;
 	const domainSetting = getDomainSetting();
 
@@ -95,7 +98,10 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
 	// node.name = generateLocalizationName(targetText.text);
 
+	/** {변수}를 패턴으로 파싱 */
 	const { variables } = parseLocalizationVariables(targetText.text);
+
+	/** 변수에 해당하는 값을 플러그인 데이터에서 조회 */
 	const variablesKey = Object.values(variables).reduce(
 		(acc, item) => {
 			const name = item.name.toUpperCase();
@@ -112,11 +118,12 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	const fullText = applyLocalization(targetText.text, variablesKey);
 
+	const action = (node.getPluginData(NODE_STORE_KEY.ACTION) ?? 'default') as ActionType;
+
 	/**
 	 * 등록된 번역 값
 	 */
-
-	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, domainSetting.domainId);
+	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, localizationKey, action);
 
 	const tempPosition = {
 		x: node.x,
@@ -159,74 +166,88 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	// 여기서 변수 처리?
 };
 
+const labelToResource = async (localizationKey: string, action: ActionType) => {
+	/** 요청 데이터 */
+	const data = await keyActionFetchCurry(localizationKey, action)();
+
+	/** 레이블 맵핑 */
+	const mapping = labelKeyMapping(data);
+	return mapping;
+};
+
 /** 이거 클라이언트용임 */
-export const xmlToStyle = async (xml: string, domainId: number | string) => {
-	const parsedData = parseXML(xml);
-	const clientFetchDB = clientFetchDBCurry(domainId);
+export const xmlToStyle = async (xml: string, localizationKey: number | string, action: ActionType) => {
+	const flatData = await parseXmlToFlatStructure(xml);
+	console.log('🚀 ~ xmlToStyle ~ flatData:', flatData);
+
+	const clientFetchDB = clientFetchDBCurry();
 	const styleStore: Record<string, StyleSync> = {};
 
 	let start = 0;
 	let end = 0;
 
 	let effectStyle = {} as Omit<StyleSync, 'ranges'>;
-
 	let rowText = '';
 
-	for (const item of parsedData) {
+	// 리소스 태그 구분하지 않고 일단 긁은다음 , 1,2,3,4,5 ~
+	// xml 캐그에서 순서 맞춰서 스타일 처리
+
+	const mapping = await labelToResource(localizationKey.toString(), action);
+	console.log('🚀 ~ xmlToStyle ~ mapping:', mapping);
+
+	for (const item of flatData) {
 		const key = Object.keys(item)[0];
 		const [effectKey, key2] = key.split(':');
 		if (Object.keys(effectStyle).length === 0) {
-			const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
-				method: 'GET',
-			});
-			const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
-
-			effectStyle = {
-				hashId: EffectResourceResult.hash_value,
-				name: EffectResourceResult.style_name,
-				id: EffectResourceResult.resource_id.toString(),
-				alias: EffectResourceResult.alias,
-				style: EffectResourceResult.style_value ?? {},
-			};
+			// const EffectResource = await clientFetchDB(('/resources/' + effectKey) as '/resources/{id}', {
+			// 	method: 'GET',
+			// });
+			// const EffectResourceResult = (await EffectResource.json()) as ResourceDTO;
+			// effectStyle = {
+			// 	hashId: EffectResourceResult.hash_value,
+			// 	name: EffectResourceResult.style_name,
+			// 	id: EffectResourceResult.resource_id.toString(),
+			// 	alias: EffectResourceResult.alias,
+			// 	style: EffectResourceResult.style_value ?? {},
+			// };
 		}
 
-		const value = parseTextBlock(item);
-		rowText += value;
+		// const value = parseTextBlock(item);
+		// rowText += value;
 
-		const length = typeof value === 'string' ? value.length : 0;
+		// const length = typeof value === 'string' ? value.length : 0;
 		end = start + length;
 
 		if (!['br', '#text'].includes(key2)) {
-			const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
-				method: 'GET',
-			});
-
-			if (onlineStyle.status === 200) {
-				const responseResult = (await onlineStyle.json()) as ResourceDTO;
-				if (responseResult) {
-					const newHashId = responseResult.hash_value;
-					const before = styleStore[newHashId];
-					const ranges = before?.ranges ?? [];
-					const newId = responseResult.resource_id.toString();
-					const newAlias = responseResult.alias;
-					const newName = responseResult.style_name;
-					const newStyle = responseResult.style_value ?? {};
-					const newRanges = {
-						start,
-						end,
-						text: value,
-					};
-					const store = {
-						hashId: newHashId,
-						name: newName,
-						id: newId,
-						alias: newAlias,
-						style: newStyle,
-						ranges: [...ranges, newRanges],
-					};
-					styleStore[newHashId] = store;
-				}
-			}
+			// const onlineStyle = await clientFetchDB(('/resources/' + key2) as '/resources/{id}', {
+			// 	method: 'GET',
+			// });
+			// if (onlineStyle.status === 200) {
+			// 	const responseResult = (await onlineStyle.json()) as ResourceDTO;
+			// 	if (responseResult) {
+			// 		const newHashId = responseResult.hash_value;
+			// 		const before = styleStore[newHashId];
+			// 		const ranges = before?.ranges ?? [];
+			// 		const newId = responseResult.resource_id.toString();
+			// 		const newAlias = responseResult.alias;
+			// 		const newName = responseResult.style_name;
+			// 		const newStyle = responseResult.style_value ?? {};
+			// 		const newRanges = {
+			// 			start,
+			// 			end,
+			// 			text: value,
+			// 		};
+			// 		const store = {
+			// 			hashId: newHashId,
+			// 			name: newName,
+			// 			id: newId,
+			// 			alias: newAlias,
+			// 			style: newStyle,
+			// 			ranges: [...ranges, newRanges],
+			// 		};
+			// 		styleStore[newHashId] = store;
+			// 	}
+			// }
 		} else {
 		}
 		start = end;

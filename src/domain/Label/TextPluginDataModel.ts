@@ -161,6 +161,7 @@ export const getLocalizationKeyData = async (
 	const result = await fetchDB(apiPath as '/localization/keys/id/{id}', {
 		method: 'GET',
 	});
+	console.log('🚀 ~ result:', result);
 
 	if (!result || result.status === 500) {
 		return null;

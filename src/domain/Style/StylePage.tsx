@@ -325,7 +325,8 @@ const StylePage = () => {
 							mode: 'id' | 'name';
 						}) => {
 							if (isXmlCheck(characters)) {
-								return xmlToStyle(characters, domainId);
+								console.log('🚀 ~ fetchFn={ ~ characters:', characters);
+								return xmlToStyle(characters, currentPointer.data.localizationKey, action);
 							} else {
 								return styleToXml(domainId, characters, StyleDataArr, mode);
 							}

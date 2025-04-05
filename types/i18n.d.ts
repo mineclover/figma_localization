@@ -538,6 +538,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/localization/keys/names-by-ids': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** ID 배열로 키 이름 목록 조회 */
+		post: operations['GetKeyNamesByIds'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/localization/actions': {
 		parameters: {
 			query?: never;
@@ -1708,14 +1725,18 @@ export interface components {
 			/** Format: double */
 			effectResourceId: number;
 		};
-		LocalizationKeyActionBulkDTO: {
-			actions: components['schemas']['LocalizationKeyActionDTO'][];
-		};
 		/**
 		 * @description action : select 는 동의어
 		 * @enum {string}
 		 */
 		ActionType: 'default' | 'hover' | 'active' | 'disabled' | 'loading' | 'error' | 'visited' | 'readonly';
+		LocalizationKeyActionBulkDTO: {
+			key_id: string;
+			action: components['schemas']['ActionType'];
+			mappings: {
+				[key: string]: string;
+			};
+		};
 		Localization: {
 			/** Format: double */
 			localization_id: number;
@@ -2724,6 +2745,34 @@ export interface operations {
 				};
 				content: {
 					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyNamesByIds: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': {
+					ids: string[];
+				};
+			};
+		};
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						[key: string]: string;
+					};
 				};
 			};
 		};

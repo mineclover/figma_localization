@@ -14,10 +14,11 @@ import { isDirectSignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import StylePage from '@/domain/Style/StylePage';
 import BatchPage from '@/domain/Batch/BatchPage';
+import SimplePage from '@/domain/Batch2/SimplePage';
 import LogsPage from '@/domain/Logs/LogsPage';
 import { runExample } from '@/utils/test';
 
-const nav = ['Keys', 'Section ToC', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs'];
+const nav = ['Keys', 'Section', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs'];
 
 function Plugin() {
 	const isBatch = useSignal(isDirectSignal);
@@ -55,6 +56,10 @@ function Plugin() {
 			value: nav[0],
 		},
 		{
+			children: <SimplePage />,
+			value: nav[1],
+		},
+		{
 			children: <StylePage />,
 			value: nav[5],
 		},
@@ -76,7 +81,7 @@ function Plugin() {
 		//   value: nav[2],
 		// },
 	] as const;
-	const [value, setValue] = useState<string>(nav[5]);
+	const [value, setValue] = useState<string>(nav[1]);
 
 	return (
 		<AppProvider>

@@ -6,6 +6,7 @@ import { CurrentNode } from './types';
 import { CurrentCursorType } from './types';
 import { signal } from '@preact/signals-core';
 import { ActionType } from '@/domain/System/ActionResourceDTO';
+import { MetaData } from '@/domain/Search/searchStore';
 
 /**
  * 번역 키 관련 상태를 저장하는 시그널
@@ -13,7 +14,8 @@ import { ActionType } from '@/domain/System/ActionResourceDTO';
 export const localizationKeySignal = signal<LocalizationKey | null>(null);
 
 /** 배치 처리 시 피그마 노드의 패턴 매칭 데이터 */
-export const patternMatchDataSignal = signal<SearchNodeData[]>([]);
+// export const patternMatchDataSignal = signal<SearchNodeData[]>([]);
+export const patternMatchDataSignal = signal<MetaData[]>([]);
 
 /** 배치 처리를 위한 선택된 아이디 배열 */
 export const selectIdsSignal = signal<string[]>([]);

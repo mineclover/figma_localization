@@ -31,7 +31,7 @@ import {
 	onSetNodeIgnore,
 	onSetNodeLocalizationKeyBatch,
 	onUpdateNodeLocalizationKeyBatch,
-} from '@/domain/Batch/batchModel';
+} from '@/domain/Batch2/batchModel';
 import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel';
 import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
@@ -59,6 +59,7 @@ export default function () {
 
 	onSetLanguageCode();
 	onPatternMatch();
+
 	onSetNodeLocalizationKeyBatch();
 	onUpdateNodeStoreBatchKey();
 	onUpdateNodeLocalizationKeyBatch();

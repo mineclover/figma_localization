@@ -33,53 +33,21 @@ import {
 import { notify } from '@/figmaPluginUtils';
 import { patternMatchDataSignal } from '@/model/signal';
 import { SearchNodeData, PatternMatchData, GroupOption, ViewOption } from '@/model/types';
+import { MetaData, searchStore } from '../Search/searchStore';
 
 export const onPatternMatch = () => {
 	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
 		// 일단 선택된 섹션 관리
 		figma.skipInvisibleInstanceChildren = true;
 
-		if (targetID) {
-			const selection = await figma.getNodeByIdAsync(targetID);
+		const dataArr = await searchStore.search(targetID);
+		emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
+	});
+};
 
-			if (selection == null || selection.type !== 'SECTION') {
-				return;
-			}
-			const nodeArr = selection.findAllWithCriteria({
-				types: ['TEXT'],
-			});
-			const dataArr = nodeArr.map((node) => {
-				return {
-					id: node.id,
-					name: node.name,
-					ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
-					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
-					text: node.characters,
-					parentName: node.parent?.name ?? '',
-				} as SearchNodeData;
-			});
-			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
-		} else {
-			const selection = figma.currentPage;
-
-			if (selection == null || selection.type !== 'PAGE') {
-				return;
-			}
-			const nodeArr = selection.findAllWithCriteria({
-				types: ['TEXT'],
-			});
-			const dataArr = nodeArr.map((node) => {
-				return {
-					id: node.id,
-					name: node.name,
-					ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
-					localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
-					text: node.characters,
-					parentName: node.parent?.name ?? '',
-				} as SearchNodeData;
-			});
-			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
-		}
+export const onPatternMatchResponse = () => {
+	return on(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, (dataArr: MetaData[]) => {
+		patternMatchDataSignal.value = dataArr;
 	});
 };
 

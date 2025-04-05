@@ -38,7 +38,7 @@ import {
 	SET_NODE_LOCALIZATION_KEY_BATCH,
 	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
 } from '../constant';
-import { groupByPattern, onPatternMatchResponse } from './batchModel';
+import { groupByPattern } from './batchModel';
 import { GroupOption, ViewOption } from '@/model/types';
 import { PatternMatchData, SearchNodeData } from '@/model/types';
 import { patternMatchDataSignal, selectIdsSignal, selectTargetSignal } from '@/model/signal';
@@ -421,7 +421,7 @@ function BatchPage() {
 	const patternMatchData = useSignal(patternMatchDataSignal);
 
 	const { filteredDataLength, patternMatchData: allPatternData } = groupByPattern(
-		patternMatchData,
+		patternMatchData as unknown as SearchNodeData[],
 		viewOption,
 		groupOption
 	);
@@ -510,9 +510,6 @@ function BatchPage() {
 			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, section.id);
 		}
 	}, [section]);
-	useEffect(() => {
-		onPatternMatchResponse();
-	}, []);
 
 	if (domainSetting?.domainId == null) {
 		return <div>도메인 설정이 없습니다.</div>;

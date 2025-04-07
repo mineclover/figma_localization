@@ -1,5 +1,5 @@
 import { Bold, Button, IconBooleanSmall24, IconButton, IconCloseSmall24 } from '@create-figma-plugin/ui';
-import { h } from 'preact';
+import { Fragment, h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
 import { GET_PATTERN_MATCH_KEY } from '../constant';
@@ -155,106 +155,125 @@ function SimpleSelect() {
 
 	const keyIds = Array.from(keyLayer.keys());
 
+	// 페이지는 생략
+	const allSectionIdsArray = Array.from(allSectionIds).filter((item) => item !== currentPointer?.pageId);
+
 	return (
 		<div className={styles.root}>
 			{/* 제외 리스트 */}
-			<Bold>Section</Bold>
-			<div className={styles.container}>
-				{Array.from(allSectionIds)
-					// 페이지는 생략
-					.filter((item) => item !== currentPointer?.pageId)
-					.sort((a, b) => {
-						return a.localeCompare(b);
-					})
-					.map((item) => {
-						const selected = ignoreSectionIds.includes(item);
-						return (
-							<button
-								className={clc(
-									styles.ignoreButton,
-									!selected && styles.active,
-									currentSection?.id === item && styles.currentSection
-								)}
-								onClick={() => {
-									pageNodeZoomAction(item, false);
-								}}
-								onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-									e.preventDefault(); // 기본 우클릭 메뉴 방지
-									if (ignoreSectionIds.includes(item)) {
-										ignoreSectionIdsSignal.value = ignoreSectionIds.filter((id) => id !== item);
-									} else {
-										ignoreSectionIdsSignal.value = [...ignoreSectionIds, item];
-									}
-								}}
-							>
-								{item}
-							</button>
-						);
-					})}
-			</div>
-			<Bold>Keys</Bold>
 
-			{/* 키 있는 매칭 리스트 */}
-			<div className={styles.container}>
-				{keyGroup.map((item) => {
-					const selected = selectItems.includes(item.id);
-					const keyMatch = selectKey === item.localizationKey;
-					const current = currentId === item.id;
-					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-				})}
-			</div>
+			{allSectionIdsArray.length > 0 && (
+				<Fragment>
+					<Bold>Section</Bold>
+					<div className={styles.container}>
+						{allSectionIdsArray
+							.sort((a, b) => {
+								return a.localeCompare(b);
+							})
+							.map((item) => {
+								const selected = ignoreSectionIds.includes(item);
+								return (
+									<button
+										className={clc(
+											styles.ignoreButton,
+											!selected && styles.active,
+											currentSection?.id === item && styles.currentSection
+										)}
+										onClick={() => {
+											pageNodeZoomAction(item, false);
+										}}
+										onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
+											e.preventDefault(); // 기본 우클릭 메뉴 방지
+											if (ignoreSectionIds.includes(item)) {
+												ignoreSectionIdsSignal.value = ignoreSectionIds.filter((id) => id !== item);
+											} else {
+												ignoreSectionIdsSignal.value = [...ignoreSectionIds, item];
+											}
+										}}
+									>
+										{item}
+									</button>
+								);
+							})}
+					</div>
+				</Fragment>
+			)}
 
-			{/* 키 리스트 */}
-			<KeyIds keyIds={keyIds} selectKey={selectKey} />
+			{keyIds.length > 0 && (
+				<Fragment>
+					<Bold>Keys</Bold>
+					{/* 키 있는 매칭 리스트 */}
+					<div className={styles.container}>
+						{keyGroup.map((item) => {
+							const selected = selectItems.includes(item.id);
+							const keyMatch = selectKey === item.localizationKey;
+							const current = currentId === item.id;
+							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
+						})}
+					</div>
 
-			<div className={styles.row}>
-				<Bold>Other</Bold>
+					{/* 키 리스트 */}
+					<KeyIds keyIds={keyIds} selectKey={selectKey} />
+				</Fragment>
+			)}
 
-				<IconButton
-					onClick={() => {
-						const otherIds = otherGroup.map((item) => item.id);
-						if (otherIds.some((item) => selectItems.includes(item))) {
-							// 있으면 제거 없으면 추가
-							selectIdsSignal.value = selectItems.filter((item) => !otherIds.includes(item));
-						} else {
-							// 없으면 추가
-							selectIdsSignal.value = [...selectItems, ...otherIds];
-						}
-					}}
-				>
-					<IconBooleanSmall24 />
-				</IconButton>
-			</div>
+			{otherGroup.length > 0 && (
+				<Fragment>
+					<div className={styles.row}>
+						<Bold>Other</Bold>
 
-			{/* 키 없는 매칭 리스트 */}
-			<div className={styles.container}>
-				{otherGroup.map((item) => {
-					const selected = selectItems.includes(item.id);
-					const keyMatch = selectKey === item.localizationKey;
-					const current = currentId === item.id;
-					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-				})}
-			</div>
-			<div className={styles.row}>
-				<Bold>Selected</Bold>
-				<IconButton
-					onClick={() => {
-						selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
-					}}
-				>
-					<IconCloseSmall24 />
-				</IconButton>
-			</div>
+						<IconButton
+							onClick={() => {
+								const otherIds = otherGroup.map((item) => item.id);
+								if (otherIds.some((item) => selectItems.includes(item))) {
+									// 있으면 제거 없으면 추가
+									selectIdsSignal.value = selectItems.filter((item) => !otherIds.includes(item));
+								} else {
+									// 없으면 추가
+									selectIdsSignal.value = [...selectItems, ...otherIds];
+								}
+							}}
+						>
+							<IconBooleanSmall24 />
+						</IconButton>
+					</div>
 
-			{/* 키 없는 매칭 리스트 */}
-			<div className={styles.container}>
-				{missingData.map((item) => {
-					const selected = selectItems.includes(item.id);
-					const keyMatch = selectKey === item.localizationKey;
-					const current = currentId === item.id;
-					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-				})}
-			</div>
+					{/* 키 없는 매칭 리스트 */}
+					<div className={styles.container}>
+						{otherGroup.map((item) => {
+							const selected = selectItems.includes(item.id);
+							const keyMatch = selectKey === item.localizationKey;
+							const current = currentId === item.id;
+							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
+						})}
+					</div>
+				</Fragment>
+			)}
+
+			{missingData.length > 0 && (
+				<Fragment>
+					<div className={styles.row}>
+						<Bold>Selected</Bold>
+						<IconButton
+							onClick={() => {
+								selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
+							}}
+						>
+							<IconCloseSmall24 />
+						</IconButton>
+					</div>
+
+					{/* 키 없는 매칭 리스트 */}
+					<div className={styles.container}>
+						{missingData.map((item) => {
+							const selected = selectItems.includes(item.id);
+							const keyMatch = selectKey === item.localizationKey;
+							const current = currentId === item.id;
+							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
+						})}
+					</div>
+				</Fragment>
+			)}
 		</div>
 	);
 }

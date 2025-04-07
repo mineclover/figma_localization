@@ -32,6 +32,7 @@ export type MetaData = {
 	ignore: boolean;
 	localizationKey: string;
 	text: string;
+	parentName?: string;
 	x: number;
 	y: number;
 	width: number;
@@ -51,6 +52,7 @@ const nodeMetaData = (node: TextNode) => {
 		ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
 		localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
 		text: node.characters,
+		parentName: node.parent?.name,
 		...metric,
 	} as MetaData;
 };

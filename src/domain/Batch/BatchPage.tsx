@@ -56,6 +56,7 @@ import { keyConventionRegex } from '@/utils/textTools';
 import { currentPointerSignal } from '@/model/signal';
 import { TargetedEvent } from 'preact/compat';
 import SimpleSelect from './SimpleSelect';
+import { getTimeAgo } from '@/utils/time';
 
 const selectStyle = (selected: boolean) => {
 	if (selected) {
@@ -67,13 +68,6 @@ const selectStyle = (selected: boolean) => {
 	return {
 		secondary: true,
 	};
-};
-
-const selectCurrentGroup = (selectTarget: CurrentNode, patternMatchDataGroup: PatternMatchData[]) => {
-	const currentGroup = patternMatchDataGroup.find((item) => item.ids.includes(selectTarget.id));
-	if (currentGroup) {
-		return currentGroup.ids;
-	}
 };
 
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
@@ -193,8 +187,6 @@ const SearchSection = ({
 	setSearchValue,
 	openOption,
 	setOpenOption,
-	selectMode,
-	setSelectMode,
 
 	groupOption,
 	setGroupOption,
@@ -211,8 +203,6 @@ const SearchSection = ({
 	setSearchValue: Dispatch<StateUpdater<string>>;
 	openOption: boolean;
 	setOpenOption: Dispatch<StateUpdater<boolean>>;
-	selectMode: boolean;
-	setSelectMode: Dispatch<StateUpdater<boolean>>;
 
 	groupOption: GroupOption;
 	setGroupOption: Dispatch<StateUpdater<GroupOption>>;
@@ -341,14 +331,6 @@ function BatchPage() {
 	// const hasSelectedKey = typeof selectedKeyData === 'object';
 	const hasSelectedKey = selectedKey !== null;
 
-	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
-	const [selectMode, setSelectMode] = useState<boolean>(false);
-	/** 선택 목표 섹션 */
-
-	const setSelectTarget = (target: CurrentNode | null) => {
-		selectTargetSignal.value = target;
-	};
-
 	/** 숨김 대상을 포함할 것인가 */
 	const [allView, setAllView] = useState<boolean>(true);
 
@@ -440,8 +422,6 @@ function BatchPage() {
 					setSearchValue={setSearchValue}
 					openOption={openOption}
 					setOpenOption={setOpenOption}
-					selectMode={selectMode}
-					setSelectMode={setSelectMode}
 					groupOption={groupOption}
 					setGroupOption={setGroupOption}
 					viewOption={viewOption}
@@ -471,6 +451,14 @@ function BatchPage() {
 			setHasMessage(false);
 		}
 	}, [hasMessage, loading]);
+
+	const [updateTime, setUpdateTime] = useState<Date>(new Date());
+
+	const updateTimeString = getTimeAgo(updateTime);
+
+	useEffect(() => {
+		setUpdateTime(new Date());
+	}, [patternMatchData]);
 
 	if (domainSetting?.domainId == null) {
 		return <div>도메인 설정이 없습니다.</div>;
@@ -546,13 +534,16 @@ function BatchPage() {
 					</div>
 					<div className={styles.row}>
 						<Muted>선택 된 키 : {selectIds.length}</Muted>
-						<IconButton
-							onClick={() => {
-								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
-							}}
-						>
-							<IconSwapSmall24 />
-						</IconButton>
+						<div className={styles.row}>
+							<Muted>{updateTimeString}</Muted>
+							<IconButton
+								onClick={() => {
+									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+								}}
+							>
+								<IconSwapSmall24 />
+							</IconButton>
+						</div>
 					</div>
 
 					<SimpleSelect />

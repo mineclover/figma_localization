@@ -31,7 +31,7 @@ import {
 	onSetNodeIgnore,
 	onSetNodeLocalizationKeyBatch,
 	onUpdateNodeLocalizationKeyBatch,
-} from '@/domain/Batch2/batchModel';
+} from '@/domain/Batch/batchModel';
 import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel';
 import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';

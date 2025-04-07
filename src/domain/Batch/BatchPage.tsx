@@ -1,7 +1,7 @@
 import { useSignal } from '@/hooks/useSignal';
 import { Fragment, h } from 'preact';
 import { CurrentNode } from '@/model/types';
-import { currentSectionSignal } from '@/model/signal';
+import { currentSectionSignal, inputKeySignal } from '@/model/signal';
 import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import {
 	Bold,
@@ -56,6 +56,7 @@ import { NonNullableComponentTypeExtract } from 'types/utilType';
 import { keyConventionRegex } from '@/utils/textTools';
 import { currentPointerSignal } from '@/model/signal';
 import { TargetedEvent } from 'preact/compat';
+import SimpleSelect from './SimpleSelect';
 
 const selectStyle = (selected: boolean) => {
 	if (selected) {
@@ -368,10 +369,12 @@ function BatchPage() {
 
 	const selectTarget = useSignal(selectTargetSignal);
 	const currentPointer = useSignal(currentPointerSignal);
+	const selectedKey = useSignal(selectedKeySignal);
 
 	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
 
-	const hasSelectedKey = typeof selectedKeyData === 'object';
+	// const hasSelectedKey = typeof selectedKeyData === 'object';
+	const hasSelectedKey = selectedKey !== null;
 
 	/** 선택 모드 (켜져있는 상태에서만 섹션 업데이트 받음) */
 	const [selectMode, setSelectMode] = useState<boolean>(false);
@@ -409,7 +412,7 @@ function BatchPage() {
 	});
 
 	/** 입력한 키 값 */
-	const [localizationKey, setLocalizationKey] = useState<string>('');
+	const localizationKey = useSignal(inputKeySignal);
 
 	/** 옵션 열기 */
 	const [openOption, setOpenOption] = useState<boolean>(false);
@@ -497,7 +500,8 @@ function BatchPage() {
 			if (data) {
 				modalAlert('"' + data.name + '" 으로 추가 완료');
 			} else if (error) {
-				modalAlert(error.details);
+				console.log('🚀 ~ useEffect ~ error:', error);
+				modalAlert(error.message);
 			}
 			setHasMessage(false);
 		}
@@ -507,7 +511,7 @@ function BatchPage() {
 		if (section && selectMode) {
 			setSelectTarget(section);
 			setSelectMode(false);
-			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, section.id);
+			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 		}
 	}, [section]);
 
@@ -524,10 +528,10 @@ function BatchPage() {
 						<Textbox
 							disabled={hasSelectedKey}
 							placeholder="새로운 키 값 입력"
-							value={hasSelectedKey ? selectedKeyData?.name : localizationKey}
+							value={hasSelectedKey && selectedKeyData ? selectedKeyData?.name : localizationKey}
 							onChange={(e) => {
 								const next = keyConventionRegex(e.currentTarget.value);
-								setLocalizationKey(next);
+								inputKeySignal.value = next;
 								setSearch(next);
 								setTabValue('Search');
 							}}
@@ -536,14 +540,15 @@ function BatchPage() {
 							onClick={() => {
 								setSearch('');
 								selectedKeySignal.value = null;
-								setLocalizationKey('');
+
+								inputKeySignal.value = '';
 							}}
 						>
 							<IconCross32 />
 						</IconButton>
 						<Button
 							onClick={async () => {
-								if (hasSelectedKey) {
+								if (hasSelectedKey && selectedKeyData) {
 									// 변경할 키가 있으면 바로 일괄 변경 로직
 									const isOriginNull = selectedKeyData.origin_value == null || selectedKeyData.origin_value === '';
 
@@ -582,40 +587,8 @@ function BatchPage() {
 							{/* {hasSelectedKey ?   '변경' : '추가'} */}
 						</Button>
 					</div>
-					<div className={styles.rowContainer}>
-						<Text>변경 대상 : {selectIds.length} 개</Text>
-						<Button
-							onClick={() => {
-								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
-								const currentGroup = selectCurrentGroup(
-									{
-										id: currentPointer?.nodeId ?? '',
-										name: currentPointer?.nodeName ?? '',
-									},
-									allPatternData
-								);
-
-								if (currentGroup) {
-									selectIdsSignal.value = currentGroup;
-									emit('PAGE_SELECT_IDS', { ids: currentGroup });
-								}
-							}}
-						>
-							패턴 다중 선택
-						</Button>
-						<label className={styles.label}>
-							<Text>대표 노드 {currentPointer?.nodeId}</Text>
-							<IconButton
-								onClick={() => {
-									if (currentPointer?.nodeId) {
-										pageNodeZoomAction(currentPointer.nodeId);
-									}
-								}}
-							>
-								<IconTarget32></IconTarget32>
-							</IconButton>
-						</label>
-					</div>
+					<Muted>선택 된 키 : {selectIds.length}</Muted>
+					<SimpleSelect />
 
 					{missingLink.length > 0 && (
 						<div className={styles.miniColumn}>

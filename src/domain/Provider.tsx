@@ -9,6 +9,7 @@ import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 import { onProcessResponse } from './System/process';
 import { onGetCursorPositionResponse } from '@/model/on/GET_CURSOR_POSITION';
 import { onSetProjectIdResponse } from './Label/LabelModel';
+import { onPatternMatchResponse } from './Batch/batchModel';
 
 /**
  * duplex 전용 어댑터
@@ -31,6 +32,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onGetStyleDataResponse(),
 			onGetVariableDataResponse(),
 			onProcessResponse(),
+			onPatternMatchResponse(),
 		];
 
 		return () => {

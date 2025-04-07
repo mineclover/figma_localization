@@ -1,15 +1,22 @@
-import { Button } from '@create-figma-plugin/ui';
+import { Bold, Button, IconButton, IconCross32 } from '@create-figma-plugin/ui';
 import { h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
 import { GET_PATTERN_MATCH_KEY } from '../constant';
-import { currentPointerSignal, currentSectionSignal, patternMatchDataSignal, selectedKeySignal } from '@/model/signal';
+import {
+	currentPointerSignal,
+	currentSectionSignal,
+	inputKeySignal,
+	patternMatchDataSignal,
+	selectedKeySignal,
+	selectIdsSignal,
+} from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { SearchArea, useSearch } from '../Label/LabelSearch';
 import { useEffect, useState } from 'preact/hooks';
 import { onPatternMatchResponse } from './batchModel';
 import { signal } from '@preact/signals-core';
-import styles from './batch.module.css';
+import styles from './SimpleSelect.module.css';
 import { clc } from '@/components/modal/utils';
 import { TargetedEvent } from 'preact/compat';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
@@ -31,7 +38,11 @@ const Test = ({ id, selected, keyMatch, current }: Props) => {
 			}}
 			onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 				e.preventDefault(); // 기본 우클릭 메뉴 방지
-				selectIdsSignal.value = [...selectIdsSignal.value, id];
+				if (selectIdsSignal.value.includes(id)) {
+					selectIdsSignal.value = selectIdsSignal.value.filter((item) => item !== id);
+				} else {
+					selectIdsSignal.value = [...selectIdsSignal.value, id];
+				}
 			}}
 			className={clc(styles.outline, current && styles.current)}
 		>
@@ -40,7 +51,6 @@ const Test = ({ id, selected, keyMatch, current }: Props) => {
 	);
 };
 
-const selectIdsSignal = signal<string[]>([]);
 const selectKeySignal = signal<string>('');
 const selectTextSignal = signal<string>('');
 
@@ -59,7 +69,7 @@ const updateKeyIds = async (keyIds: string[]) => {
 	});
 
 	const newKeyNames = (await data.json()) as Record<string, string>;
-	console.log('🚀 ~ updateKeyIds ~ newKeyNames:', newKeyNames);
+
 	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
 };
 
@@ -70,7 +80,6 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 	const keyName = keyIds.map((id) => {
 		return [id, keyNameStore[id]];
 	});
-	console.log('🚀 ~ keyName ~ keyName:', keyName);
 
 	useEffect(() => {
 		const nullKeyIds = keyName.filter((item) => item[1] == null).map((item) => item[0]);
@@ -87,9 +96,10 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 						className={clc(styles.keyId, selectKey === id && styles.keyMatch)}
 						onClick={() => {
 							selectedKeySignal.value = id;
+							inputKeySignal.value = name;
 						}}
 					>
-						{id} : {name}
+						#{id} : {name}
 					</button>
 				);
 			})}
@@ -99,29 +109,22 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 
-function SimplePage() {
-	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
-
+function SimpleSelect() {
 	const currentPointer = useSignal(currentPointerSignal);
-	console.log('🚀 ~ SimplePage ~ currentPointer:', currentPointer);
 	const currentSection = useSignal(currentSectionSignal);
-	console.log('🚀 ~ SimplePage ~ currentSection:', currentSection);
 	const selectItems = useSignal(selectIdsSignal);
-	console.log('🚀 ~ SimplePage ~ selectItems:', selectItems);
 
 	const selectKey = useSignal(selectedKeySignal);
-	console.log('🚀 ~ SimplePage ~ selectKey:', selectKey);
 
 	const patternMatchData = useSignal(patternMatchDataSignal);
-	console.log('🚀 ~ SimplePage ~ patternMatchData:', patternMatchData);
-
 	const ignoreSectionIds = useSignal(ignoreSectionIdsSignal);
-
 	const characters = currentPointer?.characters;
 	const textFilter = patternMatchData.filter((item) => {
 		if (ignoreSectionIds.includes(item.root)) return false;
 		return item.text === characters;
 	});
+	const missingLinks = selectItems.filter((item) => !textFilter.some((text) => text.id === item));
+	const missingData = patternMatchData.filter((item) => missingLinks.includes(item.id));
 	const currentId = currentPointer?.nodeId;
 	const sectionIds = textFilter.map((item) => item.root);
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
@@ -152,20 +155,10 @@ function SimplePage() {
 
 	const keyIds = Array.from(keyLayer.keys());
 
-	// 매칭 옵션?
-	// 그루핑 타겟?
-	// 선택 된 대상을 어떻게 시각화할 것인가
-	// 등록된 키의 이름 조회
-	// 각 키를 순서대로 정렬
-	// 리스트 상에서 텍스트가 달라도 기존에 선택되있으면 보여지게 구성 : other
-
-	// 섹션 타겟으로 조회 가능
-	useEffect(() => {
-		emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-		onPatternMatchResponse();
-	}, []);
 	return (
-		<div>
+		<div className={styles.root}>
+			{/* 제외 리스트 */}
+			<Bold>Section</Bold>
 			<div className={styles.container}>
 				{Array.from(allSectionIds)
 					// 페이지는 생략
@@ -177,7 +170,11 @@ function SimplePage() {
 						const selected = ignoreSectionIds.includes(item);
 						return (
 							<button
-								className={clc(styles.ignoreButton, !selected && styles.active)}
+								className={clc(
+									styles.ignoreButton,
+									!selected && styles.active,
+									currentSection?.id === item && styles.currentSection
+								)}
 								onClick={() => {
 									pageNodeZoomAction(item, false);
 								}}
@@ -195,6 +192,19 @@ function SimplePage() {
 						);
 					})}
 			</div>
+
+			<div className={styles.row}>
+				<Bold>Keys</Bold>
+				<IconButton
+					onClick={() => {
+						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
+					}}
+				>
+					<IconCross32 />
+				</IconButton>
+			</div>
+
+			{/* 키 있는 매칭 리스트 */}
 			<div className={styles.container}>
 				{keyGroup.map((item) => {
 					const selected = selectItems.includes(item.id);
@@ -203,8 +213,11 @@ function SimplePage() {
 					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
 				})}
 			</div>
-			<KeyIds keyIds={keyIds} selectKey={selectKey} />
 
+			{/* 키 리스트 */}
+			<KeyIds keyIds={keyIds} selectKey={selectKey} />
+			<Bold>Other</Bold>
+			{/* 키 없는 매칭 리스트 */}
 			<div className={styles.container}>
 				{otherGroup.map((item) => {
 					const selected = selectItems.includes(item.id);
@@ -213,33 +226,27 @@ function SimplePage() {
 					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
 				})}
 			</div>
-			<Button
-				onClick={() => {
-					searchStore.setStore('test', {
-						id: 'hello',
-					} as BaseNode);
-				}}
-			>
-				save
-			</Button>
-			<Button
-				onClick={() => {
-					searchStore.clear();
-				}}
-			>
-				clear
-			</Button>
-			<Button
-				onClick={async () => {
-					// 섹션
-					emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-				}}
-			>
-				load
-			</Button>
+			<div className={styles.row}>
+				<Bold>Selected</Bold>
+				<IconButton
+					onClick={() => {
+						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
+					}}
+				>
+					<IconCross32 />
+				</IconButton>
+			</div>
 
-			<SearchArea search={search} setSearch={setSearch} data={searchResult ?? []} />
+			{/* 키 없는 매칭 리스트 */}
+			<div className={styles.container}>
+				{missingData.map((item) => {
+					const selected = selectItems.includes(item.id);
+					const keyMatch = selectKey === item.localizationKey;
+					const current = currentId === item.id;
+					return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
+				})}
+			</div>
 		</div>
 	);
 }
-export default SimplePage;
+export default SimpleSelect;

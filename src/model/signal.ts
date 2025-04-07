@@ -35,8 +35,10 @@ export const currentPointerSignal = signal<CurrentCursorType | null>(null);
 /** 프로젝트 아이디 */
 export const projectIdSignal = signal<string>('');
 
-/** 선택된 키 */
+/** 선택된 섹션 키 */
 export const selectedKeySignal = signal<string | null>(null);
+/** 입력된 키 값 */
+export const inputKeySignal = signal<string>('');
 
 /** 즉시 처리 여부 */
 export const isDirectSignal = signal<boolean>(false);

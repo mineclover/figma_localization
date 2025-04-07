@@ -1,3 +1,9 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
 .outline {
 	background-color: transparent;
 	padding: 2px;
@@ -7,8 +13,8 @@
 
 .inline {
 	background-color: var(--figma-color-bg);
-	width: 20px;
-	height: 20px;
+	width: 18px;
+	height: 18px;
 	border: 3px solid var(--figma-color-border);
 	border-radius: 6px;
 	&:hover {
@@ -96,3 +102,20 @@
 	}
 }
 /* 제외 리스트에 있는데 섹션 리스트에 없는 대상 */
+.currentSection {
+	background-color: var(--figma-color-bg-warning);
+
+	&:hover {
+		background-color: var(--figma-color-bg-warning-hover);
+	}
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+
+	gap: 8px;
+	align-items: center;
+	width: 100%;
+	justify-content: space-between;
+}

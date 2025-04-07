@@ -446,8 +446,8 @@ export function wrapTextWithTag(
 				resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }));
 			}
 		});
-
 		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
+
 		parser.write(xmlString);
 		parser.end();
 	});
@@ -486,7 +486,8 @@ export function unwrapTag(xmlString: string, tagName: string = 'a'): Promise<str
 		});
 
 		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
-		parser.write(xmlString);
+		const brString = xmlString.replace(/<br\/>/g, '\n');
+		parser.write(brString);
 		parser.end();
 	});
 }

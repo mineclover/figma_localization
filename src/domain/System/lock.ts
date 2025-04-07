@@ -1,4 +1,4 @@
-import { GET_CURSOR_POSITION, PAGE_LOCK_KEY, SET_PAGE_LOCK_OPEN } from '../constant';
+import { CLIENT_STORE_KEY, GET_CURSOR_POSITION, PAGE_LOCK_KEY, SET_PAGE_LOCK_OPEN } from '../constant';
 import { getCursorPosition } from '../Label/LabelModel';
 
 import { emit, on } from '@create-figma-plugin/utilities';
@@ -15,9 +15,13 @@ export const getPageLockOpen = () => {
 
 export const setPageLockOpen = async (lock: boolean) => {
 	const page = figma.currentPage;
-	page.setPluginData(PAGE_LOCK_KEY, JSON.stringify(lock));
+	const userHash = await figma.clientStorage.getAsync(CLIENT_STORE_KEY.USER_HASH);
+	if (userHash && userHash === 'elwkdlsj') {
+		page.setPluginData(PAGE_LOCK_KEY, JSON.stringify(lock));
+	}
+	// current 에 lock 값이 같이 있는 걸로 암
 	const currentNode = page.selection[0];
-	const cursorPosition = await getCursorPosition(currentNode);
+	const cursorPosition = getCursorPosition(currentNode);
 	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
 };
 

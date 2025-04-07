@@ -20,7 +20,6 @@ import { useEffect, useState } from 'preact/hooks';
 import { LocalizationKeyDTO } from '@/model/types';
 import { currentPointerSignal, isDirectSignal, isTravelSignal, selectedKeySignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
-import { onGetDomainSettingResponse } from '../Setting/SettingModel';
 import { domainSettingSignal } from '@/model/signal';
 import styles from './LabelPage.module.css';
 import { clc } from '@/components/modal/utils';

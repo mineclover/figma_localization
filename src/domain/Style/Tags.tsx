@@ -72,7 +72,6 @@ export const setTags = (list: Record<string, string>) => {
 };
 
 const TagsSort = ({ list, inputTags }: { list: Record<string, string>; inputTags: Set<string> }) => {
-	console.log('🚀 ~ TagsSort ~ list:', list);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 	// const [tags, setTags] = useState<Record<string, string>>({});
 	useEffect(() => {
@@ -98,7 +97,7 @@ const TagsSort = ({ list, inputTags }: { list: Record<string, string>; inputTags
 		});
 	};
 	const esValues = Object.entries(tags);
-	console.log('🚀 ~ TagsSort ~ esValues:', esValues);
+
 	const items = extractSelectedItems(tags);
 	const selected = Object.values(items);
 	const divideItems = divideItemsBySelection(Object.keys(StatusByCode), selected);

@@ -3,7 +3,7 @@ import { useLayoutEffect } from 'preact/hooks';
 import ClientModalProvider from '@/components/modal/Modal';
 
 import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
-import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './Setting/SettingModel';
+import { onGetDomainSettingResponse, onGetLanguageCodesResponse, onGetUserHashResponse } from './Setting/SettingModel';
 import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel';
 import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 import { onProcessResponse } from './System/process';
@@ -33,6 +33,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onGetVariableDataResponse(),
 			onProcessResponse(),
 			onPatternMatchResponse(),
+			onGetUserHashResponse(),
 		];
 
 		return () => {

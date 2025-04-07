@@ -1,7 +1,16 @@
 import { emit, on } from '@create-figma-plugin/utilities';
-import { SET_DOMAIN_PAIR, GET_DOMAIN_PAIR, STORE_KEY, GET_LANGUAGE_CODES, SET_LANGUAGE_CODES } from '../constant';
+import {
+	SET_DOMAIN_PAIR,
+	GET_DOMAIN_PAIR,
+	STORE_KEY,
+	GET_LANGUAGE_CODES,
+	SET_LANGUAGE_CODES,
+	SET_USER_HASH_PAIR,
+	CLIENT_STORE_KEY,
+	GET_USER_HASH_PAIR,
+} from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
-import { domainSettingSignal, languageCodesSignal } from '@/model/signal';
+import { domainSettingSignal, languageCodesSignal, userHashSignal } from '@/model/signal';
 import { DomainSettingType } from '@/model/types';
 
 export const getDomainSetting = () => {
@@ -62,3 +71,24 @@ export const onSetLanguageCodes = () => {
 
 // 따로 관리
 // language_codes: string[]
+
+export const onSetUserHash = () => {
+	on(SET_USER_HASH_PAIR.REQUEST_KEY, async (userHash: string) => {
+		const result = await figma.clientStorage.setAsync(CLIENT_STORE_KEY.USER_HASH, userHash);
+		emit(GET_USER_HASH_PAIR.RESPONSE_KEY, userHash);
+	});
+};
+
+export const onGetUserHash = () => {
+	on(GET_USER_HASH_PAIR.REQUEST_KEY, async () => {
+		const userHash = await figma.clientStorage.getAsync(CLIENT_STORE_KEY.USER_HASH);
+		emit(GET_USER_HASH_PAIR.RESPONSE_KEY, userHash);
+	});
+};
+
+export const onGetUserHashResponse = () => {
+	emit(GET_USER_HASH_PAIR.REQUEST_KEY);
+	return on(GET_USER_HASH_PAIR.RESPONSE_KEY, (userHash: string) => {
+		userHashSignal.value = userHash;
+	});
+};

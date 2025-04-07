@@ -5,7 +5,7 @@ import { ComponentChildren, Fragment, h } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { components } from 'types/i18n';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './SettingModel';
-import { languageCodesSignal } from '@/model/signal';
+import { languageCodesSignal, userHashSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 import DomainSelect from './DomainSelect';
 import { useSignal } from '@/hooks/useSignal';
@@ -23,7 +23,13 @@ import {
 	VerticalSpace,
 } from '@create-figma-plugin/ui';
 import styles from './domainSelect.module.css';
-import { GET_PROJECT_ID, SET_LANGUAGE_CODES, SET_PROJECT_ID } from '../constant';
+import {
+	GET_PROJECT_ID,
+	GET_USER_HASH_PAIR,
+	SET_LANGUAGE_CODES,
+	SET_PROJECT_ID,
+	SET_USER_HASH_PAIR,
+} from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
 import { onSetProjectIdResponse } from '../Label/LabelModel';
 import { projectIdSignal } from '@/model/signal';
@@ -66,7 +72,7 @@ function SettingPage() {
 
 	const projectId = useSignal(projectIdSignal);
 	const domainSetting = useSignal(domainSettingSignal);
-
+	const userHash = useSignal(userHashSignal);
 	const languageCodes = useSignal(languageCodesSignal);
 	const [domainName, setDomainName] = useState('');
 
@@ -218,6 +224,32 @@ function SettingPage() {
 					}}
 					onBlur={(e) => {
 						emit(GET_PROJECT_ID.REQUEST_KEY);
+					}}
+				/>
+			</div>
+
+			<VerticalSpace space="extraSmall" />
+			<div className={styles.container}>
+				<div className={styles.domainContainer}>
+					<Bold>User Hash</Bold>
+				</div>
+				<Text>식별 키 (CMS에서 받을 수 있을지도)</Text>
+				<Textbox
+					placeholder={'user hash'}
+					value={userHash ?? ''}
+					onChange={(e) => {
+						userHashSignal.value = e.currentTarget.value;
+					}}
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') {
+							const userHashValue = e.currentTarget.value;
+							if (userHashValue) {
+								emit(SET_USER_HASH_PAIR.REQUEST_KEY, userHashValue);
+							}
+						}
+					}}
+					onBlur={(e) => {
+						emit(GET_USER_HASH_PAIR.REQUEST_KEY);
 					}}
 				/>
 			</div>

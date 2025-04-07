@@ -66,3 +66,7 @@ export type StyleData = {
 
 export const styleDataSignal = signal<StyleData | null>(null);
 export const variableDataSignal = signal<Record<string, string>>({});
+
+export const userHashSignal = signal<string | null>(null);
+// elwkdlsj
+// 디자이너라 씀

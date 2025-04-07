@@ -5,8 +5,11 @@ import { nodeZoom_Adapter, pageNodeZoom_Adapter, pageSelectIds_Adapter } from '@
 import {
 	onGetDomainSetting,
 	onGetLanguageCodes,
+	onGetUserHash,
+	onGetUserHashResponse,
 	onSetDomainSetting,
 	onSetLanguageCodes,
+	onSetUserHash,
 } from '@/domain/Setting/SettingModel';
 import { onGetProjectId, onSetNodeAction, onSetProjectId } from '@/domain/Label/LabelModel';
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges';
@@ -82,6 +85,8 @@ export default function () {
 	onStyleChange();
 	onGetStyleData();
 	// runExample();
+	onGetUserHash();
+	onSetUserHash();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

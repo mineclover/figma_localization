@@ -337,11 +337,11 @@ function BatchPage() {
 	/** 그루핑 옵션 */
 	const [groupOption, setGroupOption] = useState<GroupOption>({
 		/** 키 값을 그루핑 파라미터로 사용 */
-		localizationKey: true,
+		localizationKey: false,
 		/** 부모 이름을 그루핑 파라미터로 사용 */
-		parentName: true,
+		parentName: false,
 		/** 이름을 그루핑 파라미터로 사용 */
-		name: true,
+		name: false,
 		/** 텍스트를 그루핑 파라미터로 사용 */
 		text: true,
 	});

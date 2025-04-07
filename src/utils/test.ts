@@ -48,6 +48,9 @@ const xmlText3 = `<a>태그 내용 1</a>
 
 const xmlText4 = `<a>태그 내용 1</a><br/><b>태그 내용 5</b><br/><a>태그 내용 2</a><br/><c>태그 내용 6</c><br/><a>헬로우</a>`;
 
+const xmlText5 = `<a>태그 내용 1<br/>태그 내용 2</a>`;
+const xmlText6 = `<a>태그 내용 1</a><br/><a>태그 내용 2</a>`;
+
 export async function runExample() {
 	try {
 		// 예제 1: 단순히 모든 'a' 태그를 'b' 태그로 변경

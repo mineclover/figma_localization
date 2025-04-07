@@ -107,7 +107,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				</IconButton>
 			</div>
 
-			{domainValid ? null : <Text className={styles.dangerText}>도메인이 다름</Text>}
+			{domainValid ? null : <Text className={styles.dangerText}>도메인이 다르거나 없음</Text>}
 		</div>
 	);
 };
@@ -158,8 +158,9 @@ export const StyleXml = ({
 		const result2 = await wrapTextWithTag(result1);
 
 		console.log('🚀 ~ 무결성 검사 : ', result === result2);
+		const brString2 = result1.replace(/\n/g, '<br/>');
 
-		setResultXml(result1);
+		setResultXml(brString2);
 	};
 
 	useEffect(() => {
@@ -252,6 +253,7 @@ const StylePage = () => {
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
 	const currentPointer = useSignal(currentPointerSignal);
+	console.log('🚀 ~ currentPointer:', currentPointer?.pageLock);
 
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);

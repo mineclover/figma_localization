@@ -135,13 +135,13 @@ export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
 	ids: string[];
 };
 export type GroupOption = {
-	localizationKey: true;
+	localizationKey: boolean;
 	/** 부모 이름을 그루핑 파라미터로 사용 */
-	parentName: true;
+	parentName: boolean;
 	/** 이름을 그루핑 파라미터로 사용 */
-	name: true;
+	name: boolean;
 	/** 텍스트를 그루핑 파라미터로 사용 */
-	text: true;
+	text: boolean;
 };
 export type ViewOption = {
 	/** 숨김 대상을 표시 */

@@ -261,24 +261,7 @@ const SearchSection = ({
 						<IconAdjustSmall24></IconAdjustSmall24>
 					</IconToggleButton>
 				</div>
-				<div className={styles.row}>
-					<IconToggleButton
-						value={selectMode}
-						onClick={() => {
-							setSelectMode(true);
-						}}
-					>
-						<IconPrototyping24 />
-					</IconToggleButton>
 
-					<IconButton
-						onClick={() => {
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
-						}}
-					>
-						<IconSwapSmall24 />
-					</IconButton>
-				</div>
 				{openOption && (
 					<div className={styles.rowLeft}>
 						<div className={styles.miniColumn}>
@@ -561,7 +544,17 @@ function BatchPage() {
 							{/* {hasSelectedKey ?   '변경' : '추가'} */}
 						</Button>
 					</div>
-					<Muted>선택 된 키 : {selectIds.length}</Muted>
+					<div className={styles.row}>
+						<Muted>선택 된 키 : {selectIds.length}</Muted>
+						<IconButton
+							onClick={() => {
+								emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+							}}
+						>
+							<IconSwapSmall24 />
+						</IconButton>
+					</div>
+
 					<SimpleSelect />
 
 					{missingLink.length > 0 && (

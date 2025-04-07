@@ -1,4 +1,4 @@
-import { Bold, Button, IconButton, IconCloseSmall24 } from '@create-figma-plugin/ui';
+import { Bold, Button, IconBooleanSmall24, IconButton, IconCloseSmall24 } from '@create-figma-plugin/ui';
 import { h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
@@ -192,17 +192,7 @@ function SimpleSelect() {
 						);
 					})}
 			</div>
-
-			<div className={styles.row}>
-				<Bold>Keys</Bold>
-				<IconButton
-					onClick={() => {
-						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
-					}}
-				>
-					<IconCloseSmall24 />
-				</IconButton>
-			</div>
+			<Bold>Keys</Bold>
 
 			{/* 키 있는 매칭 리스트 */}
 			<div className={styles.container}>
@@ -216,7 +206,26 @@ function SimpleSelect() {
 
 			{/* 키 리스트 */}
 			<KeyIds keyIds={keyIds} selectKey={selectKey} />
-			<Bold>Other</Bold>
+
+			<div className={styles.row}>
+				<Bold>Other</Bold>
+
+				<IconButton
+					onClick={() => {
+						const otherIds = otherGroup.map((item) => item.id);
+						if (otherIds.some((item) => selectItems.includes(item))) {
+							// 있으면 제거 없으면 추가
+							selectIdsSignal.value = selectItems.filter((item) => !otherIds.includes(item));
+						} else {
+							// 없으면 추가
+							selectIdsSignal.value = [...selectItems, ...otherIds];
+						}
+					}}
+				>
+					<IconBooleanSmall24 />
+				</IconButton>
+			</div>
+
 			{/* 키 없는 매칭 리스트 */}
 			<div className={styles.container}>
 				{otherGroup.map((item) => {
@@ -230,7 +239,7 @@ function SimpleSelect() {
 				<Bold>Selected</Bold>
 				<IconButton
 					onClick={() => {
-						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
+						selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
 					}}
 				>
 					<IconCloseSmall24 />

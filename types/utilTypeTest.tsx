@@ -1,38 +1,34 @@
-import { h } from "preact";
+import { h } from 'preact';
 import {
-  Button,
-  Columns,
-  Container,
-  Muted,
-  render,
-  Text,
-  TextboxNumeric,
-  VerticalSpace,
-  Code,
-  TextboxMultiline,
-  IconPlus32,
-  IconTarget32
-} from "@create-figma-plugin/ui";
-import {
-  ExtractProps,
-  NonNullableComponentTypeExtract,
-  SingleExtractProps
-} from "./utilType";
+	Button,
+	Columns,
+	Container,
+	Muted,
+	render,
+	Text,
+	TextboxNumeric,
+	VerticalSpace,
+	Code,
+	TextboxMultiline,
+	IconPlusSmall24,
+	IconPrototyping24,
+} from '@create-figma-plugin/ui';
+import { ExtractProps, NonNullableComponentTypeExtract, SingleExtractProps } from './utilType';
 
 type Props = {
-  hello: string;
+	hello: string;
 };
 
 function UtilTypeTest({ hello }: Props) {
-  return <div>{hello}</div>;
+	return <div>{hello}</div>;
 }
 
 const JSXGroups = {
-  a: UtilTypeTest
+	a: UtilTypeTest,
 };
 
-type JSX_A = ExtractProps<typeof JSXGroups, "a">;
+type JSX_A = ExtractProps<typeof JSXGroups, 'a'>;
 
-type JSX_B = NonNullableComponentTypeExtract<(typeof JSXGroups)["a"], "hello">;
+type JSX_B = NonNullableComponentTypeExtract<(typeof JSXGroups)['a'], 'hello'>;
 
 export default UtilTypeTest;

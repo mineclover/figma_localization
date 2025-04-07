@@ -18,14 +18,14 @@ import { CurrentCursorType } from '@/model/types';
 import {
 	Button,
 	Checkbox,
-	IconLayerFrameCoverArt16,
+	IconFrameSmall24,
 	Stack,
 	Textbox,
 	Text,
 	IconButton,
 	IconLockLocked16,
 	IconLockUnlocked16,
-	IconStarFilled16,
+	IconStar16,
 } from '@create-figma-plugin/ui';
 import styles from './LabelPage.module.css';
 import { PutLocalizationKeyType } from './TextPluginDataModel';
@@ -83,7 +83,7 @@ function LabelPage() {
 	return (
 		<div className={styles.container}>
 			<div className={styles.sectionRow}>
-				<IconLayerFrameCoverArt16></IconLayerFrameCoverArt16>
+				<IconFrameSmall24></IconFrameSmall24>
 				<span className={styles.sectionTitle}>{currentSection?.name}</span>
 
 				{currentPointer?.data.localizationKey ? (
@@ -163,7 +163,7 @@ function LabelPage() {
 						setAliasHover(false);
 					}}
 				>
-					<IconStarFilled16 />
+					<IconStar16 />
 					{aliasHover && (
 						<div className={styles.descriptionTag}>
 							<Text>별칭</Text>

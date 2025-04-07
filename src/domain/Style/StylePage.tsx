@@ -13,9 +13,8 @@ import {
 	Dropdown,
 	IconButton,
 	IconLockLocked16,
-	IconTarget16,
-	IconTarget32,
-	IconTrash32,
+	IconPrototyping24,
+	IconTrash24,
 	Muted,
 	Stack,
 	Text,
@@ -86,7 +85,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 						}
 					}}
 				>
-					<IconTrash32 />
+					<IconTrash24 />
 				</IconButton>
 			</div>
 			<div className={styles.labelRow}>
@@ -104,7 +103,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 						}
 					}}
 				>
-					<IconTarget16></IconTarget16>
+					<IconPrototyping24></IconPrototyping24>
 				</IconButton>
 			</div>
 

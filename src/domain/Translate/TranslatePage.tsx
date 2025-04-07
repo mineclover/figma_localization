@@ -15,8 +15,8 @@ import {
 	Container,
 	Divider,
 	IconButton,
-	IconSwap32,
-	IconTrash32,
+	IconSwapSmall24,
+	IconTrash24,
 	Stack,
 	Text,
 	Textbox,
@@ -233,14 +233,14 @@ const TranslatePage = () => {
 							emit(GET_VARIABLE_DATA.REQUEST_KEY);
 						}}
 					>
-						<IconSwap32 />
+						<IconSwapSmall24 />
 					</IconButton>
 					<IconButton
 						onClick={() => {
 							emit(CLEAR_VARIABLE_DATA.REQUEST_KEY);
 						}}
 					>
-						<IconTrash32 />
+						<IconTrash24 />
 					</IconButton>
 				</div>
 

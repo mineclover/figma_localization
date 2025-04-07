@@ -3,7 +3,7 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { h, Fragment } from 'preact';
 import { Process, processSignal } from './process';
 import styles from './Process.module.css';
-import { Bold, Text, IconLockLocked16, IconLockUnlocked16, IconButton, IconTrash32 } from '@create-figma-plugin/ui';
+import { Bold, Text, IconLockLocked16, IconLockUnlocked16, IconButton, IconTrash24 } from '@create-figma-plugin/ui';
 
 import { currentPointerSignal } from '@/model/signal';
 
@@ -59,7 +59,7 @@ const ProcessBar = () => {
 								processSignal.value = { ...processStore };
 							}}
 						>
-							<IconTrash32 />
+							<IconTrash24 />
 						</IconButton>
 					</div>
 				);

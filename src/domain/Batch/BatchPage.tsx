@@ -9,17 +9,16 @@ import {
 	Code,
 	Divider,
 	Dropdown,
-	IconAdjust32,
+	IconAdjustSmall24,
 	IconButton,
-	IconChevronDown16,
-	IconChevronUp16,
-	IconCross32,
-	IconSwap32,
-	IconTarget16,
-	IconTarget32,
+	IconChevronDown24,
+	IconChevronUp24,
+	IconCloseSmall24,
+	IconSwapSmall24,
+	IconPrototyping24,
 	IconToggleButton,
-	IconVisibilityHidden16,
-	IconVisibilityVisible16,
+	IconHiddenSmall24,
+	IconVisible16,
 	Muted,
 	SearchTextbox,
 	Stack,
@@ -96,7 +95,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
 						}}
 					>
-						{ignore ? <IconVisibilityHidden16 /> : <IconVisibilityVisible16 />}
+						{ignore ? <IconHiddenSmall24 /> : <IconVisible16 />}
 					</IconButton>
 					<Text align="left" className={styles.width}>
 						<Code>text: {text}</Code>
@@ -116,7 +115,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							}
 						}}
 					>
-						{hasAnyId ? <IconCross32 /> : ids.length.toString()}
+						{hasAnyId ? <IconCloseSmall24 /> : ids.length.toString()}
 					</IconButton>
 				</div>
 				<div className={styles.row}>
@@ -128,7 +127,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							setIsExtended(!isExtended);
 						}}
 					>
-						{isExtended ? <IconChevronUp16 /> : <IconChevronDown16 />}
+						{isExtended ? <IconChevronUp24 /> : <IconChevronDown24 />}
 					</IconButton>
 				</div>
 			</div>
@@ -259,7 +258,7 @@ const SearchSection = ({
 							setOpenOption(!openOption);
 						}}
 					>
-						<IconAdjust32></IconAdjust32>
+						<IconAdjustSmall24></IconAdjustSmall24>
 					</IconToggleButton>
 				</div>
 				<div className={styles.row}>
@@ -269,32 +268,15 @@ const SearchSection = ({
 							setSelectMode(true);
 						}}
 					>
-						<IconTarget16 />
+						<IconPrototyping24 />
 					</IconToggleButton>
-					<button
-						className={styles.textButton}
-						onClick={() => {
-							if (selectTarget?.id) {
-								emit('PAGE_NODE_ZOOM', { nodeId: selectTarget?.id });
-							}
-						}}
-					>
-						{selectTarget?.name ?? '섹션 선택되지 않음'}
-					</button>
-					<IconButton
-						onClick={() => {
-							setSelectTarget(null);
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-						}}
-					>
-						<IconCross32 />
-					</IconButton>
+
 					<IconButton
 						onClick={() => {
 							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
 						}}
 					>
-						<IconSwap32 />
+						<IconSwapSmall24 />
 					</IconButton>
 				</div>
 				{openOption && (
@@ -507,14 +489,6 @@ function BatchPage() {
 		}
 	}, [hasMessage, loading]);
 
-	useEffect(() => {
-		if (section && selectMode) {
-			setSelectTarget(section);
-			setSelectMode(false);
-			emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-		}
-	}, [section]);
-
 	if (domainSetting?.domainId == null) {
 		return <div>도메인 설정이 없습니다.</div>;
 	}
@@ -544,7 +518,7 @@ function BatchPage() {
 								inputKeySignal.value = '';
 							}}
 						>
-							<IconCross32 />
+							<IconCloseSmall24 />
 						</IconButton>
 						<Button
 							onClick={async () => {

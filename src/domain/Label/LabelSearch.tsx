@@ -3,8 +3,8 @@ import {
 	IconButton,
 	Textbox,
 	Text,
-	IconChevronDown16,
-	IconChevronUp16,
+	IconChevronDown24,
+	IconChevronUp24,
 	IconPlus24,
 	IconStar16,
 	IconLockUnlocked16,
@@ -79,7 +79,7 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 					<Bold>key : {name}</Bold>
 				</NullDisableText>
 				<IconButton onClick={() => setIsOpen(!isOpen)}>
-					{isOpen ? <IconChevronUp16 /> : <IconChevronDown16 />}
+					{isOpen ? <IconChevronUp24 /> : <IconChevronDown24 />}
 				</IconButton>
 				{/* <IconButton
 					// className={styles.searchResultSubmitButton}

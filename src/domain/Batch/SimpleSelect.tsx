@@ -1,4 +1,4 @@
-import { Bold, Button, IconButton, IconCross32 } from '@create-figma-plugin/ui';
+import { Bold, Button, IconButton, IconCloseSmall24 } from '@create-figma-plugin/ui';
 import { h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
@@ -200,7 +200,7 @@ function SimpleSelect() {
 						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
 					}}
 				>
-					<IconCross32 />
+					<IconCloseSmall24 />
 				</IconButton>
 			</div>
 
@@ -233,7 +233,7 @@ function SimpleSelect() {
 						selectIdsSignal.value = selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
 					}}
 				>
-					<IconCross32 />
+					<IconCloseSmall24 />
 				</IconButton>
 			</div>
 

@@ -14,9 +14,9 @@ import {
 	Button,
 	Container,
 	IconButton,
-	IconCross32,
-	IconPlus32,
-	IconSwap32,
+	IconCloseSmall24,
+	IconPlusSmall24,
+	IconSwapSmall24,
 	Stack,
 	Text,
 	Textbox,
@@ -99,7 +99,7 @@ function SettingPage() {
 							});
 						}}
 					>
-						<IconSwap32 />
+						<IconSwapSmall24 />
 					</IconButton>
 				</div>
 				{data?.map((domain) => (
@@ -146,7 +146,7 @@ function SettingPage() {
 							}
 						}}
 					>
-						<IconPlus32 />
+						<IconPlusSmall24 />
 					</IconButton>
 				</div>
 			</div>
@@ -188,7 +188,7 @@ function SettingPage() {
 							languageCodesSignal.value = [...languageCodesSignal.value, ''];
 						}}
 					>
-						<IconPlus32 />
+						<IconPlusSmall24 />
 					</IconButton>
 				</div>
 			</div>

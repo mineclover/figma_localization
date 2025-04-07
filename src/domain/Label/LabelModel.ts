@@ -11,7 +11,7 @@ import {
 	STORE_KEY,
 } from '../constant';
 
-import { FilePathNodeSearch, notify } from '@/figmaPluginUtils';
+import { FilePathNodeSearch, notify, SectionSearch } from '@/figmaPluginUtils';
 import { getNodeData } from './TextPluginDataModel';
 import { fetchDB } from '../utils/fetchDB';
 import { ERROR_CODE } from '../errorCode';

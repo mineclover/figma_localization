@@ -97,6 +97,8 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 	);
 };
 
+export const ignoreSectionIdsSignal = signal<string[]>([]);
+
 function SimplePage() {
 	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
 
@@ -113,9 +115,17 @@ function SimplePage() {
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	console.log('🚀 ~ SimplePage ~ patternMatchData:', patternMatchData);
 
+	const ignoreSectionIds = useSignal(ignoreSectionIdsSignal);
+
 	const characters = currentPointer?.characters;
-	const textFilter = patternMatchData.filter((item) => item.text === characters);
+	const textFilter = patternMatchData.filter((item) => {
+		if (ignoreSectionIds.includes(item.root)) return false;
+		return item.text === characters;
+	});
 	const currentId = currentPointer?.nodeId;
+	const sectionIds = textFilter.map((item) => item.root);
+	/** 제어할 수 있게 해야해서 합쳐야 함 */
+	const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
 
 	/** 키 여부로 분리 */
 	const [otherGroup, keyGroup] = textFilter.reduce(
@@ -156,6 +166,35 @@ function SimplePage() {
 	}, []);
 	return (
 		<div>
+			<div className={styles.container}>
+				{Array.from(allSectionIds)
+					// 페이지는 생략
+					.filter((item) => item !== currentPointer?.pageId)
+					.sort((a, b) => {
+						return a.localeCompare(b);
+					})
+					.map((item) => {
+						const selected = ignoreSectionIds.includes(item);
+						return (
+							<button
+								className={clc(styles.ignoreButton, !selected && styles.active)}
+								onClick={() => {
+									pageNodeZoomAction(item, false);
+								}}
+								onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
+									e.preventDefault(); // 기본 우클릭 메뉴 방지
+									if (ignoreSectionIds.includes(item)) {
+										ignoreSectionIdsSignal.value = ignoreSectionIds.filter((id) => id !== item);
+									} else {
+										ignoreSectionIdsSignal.value = [...ignoreSectionIds, item];
+									}
+								}}
+							>
+								{item}
+							</button>
+						);
+					})}
+			</div>
 			<div className={styles.container}>
 				{keyGroup.map((item) => {
 					const selected = selectItems.includes(item.id);

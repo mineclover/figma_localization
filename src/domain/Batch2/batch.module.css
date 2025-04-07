@@ -54,7 +54,7 @@
 	background-color: #f24822; */
 	border-color: var(--figma-color-bg-danger);
 	&:hover {
-		border-color: var(--figma-color-border-danger-hover);
+		border-color: var(--figma-color-border-danger);
 	}
 }
 
@@ -75,3 +75,24 @@
 		border-color: var(--figma-color-border-warning);
 	}
 }
+
+.ignoreButton {
+	padding: 4px 12px;
+	background-color: var(--figma-color-bg);
+	border-radius: 6px;
+
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+		outline: 1px solid var(--figma-color-border);
+	}
+
+	color: var(--figma-color-text);
+}
+
+.active {
+	background-color: var(--figma-color-bg-brand);
+	&:hover {
+		background-color: var(--figma-color-bg-brand-hover);
+	}
+}
+/* 제외 리스트에 있는데 섹션 리스트에 없는 대상 */

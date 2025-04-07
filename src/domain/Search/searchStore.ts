@@ -1,5 +1,6 @@
 import { CurrentCursorType, NodeData, SearchNodeData } from '@/model/types';
 import { NODE_STORE_KEY } from '../constant';
+import { SectionSearch } from '@/figmaPluginUtils';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -27,6 +28,7 @@ export type MetaData = {
 	id: string;
 	/** 빼려했는데 검색할 때 필요해서 남겨둠 */
 	name: string;
+	root: string;
 	ignore: boolean;
 	localizationKey: string;
 	text: string;
@@ -38,10 +40,14 @@ export type MetaData = {
 
 const nodeMetaData = (node: TextNode) => {
 	const metric = nodeMetric(node);
+	const root = SectionSearch(node);
+	// 섹션 있으면 처리 없으면 처리 안함
+	const rootId = root.section?.id == null ? root.page.id : root.section.id;
 
 	return {
 		id: node.id,
 		name: node.name,
+		root: rootId,
 		ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
 		localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
 		text: node.characters,

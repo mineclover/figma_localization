@@ -27,6 +27,31 @@ export const FileMetaSearch = (
 };
 
 /**
+ * 컴포넌트 최상단 페이지, 세션 찾기 없으면 undefined
+ * @param node
+ * @param section
+ * @returns
+ */
+export const SectionSearch = (
+	node: BaseNode,
+	section?: SectionNode,
+	page?: PageNode
+): { page: PageNode; section?: SectionNode } => {
+	const parent = node.parent;
+
+	if (parent && parent?.type !== 'DOCUMENT') {
+		if (parent.type === 'SECTION') {
+			return SectionSearch(parent, parent);
+		} else {
+			return SectionSearch(parent, section, page ?? figma.currentPage);
+		}
+	} else if (node.type === 'PAGE') {
+		return { page: page ?? figma.currentPage, section };
+	}
+	return { page: page ?? figma.currentPage, section };
+};
+
+/**
  * 선택된 노드 상위에 path 역할을 수행할 수 있는 이름을 전체 조회
  * @param node
  * @param section
@@ -84,7 +109,6 @@ export const FilePathNodeSearch = (node: BaseNode, pathNode: BaseNode[] = []): B
 };
 
 import { Prettify } from '../../types/utilType';
-import { FigmaNodeType, FigmaNodeTypeMapping } from './FigmaNodes';
 
 export const notify = (message: string, closeLabel: string, timeout = 2000) => {
 	const NotificationHandler = figma.notify(message, {

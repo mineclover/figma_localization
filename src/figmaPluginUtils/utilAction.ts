@@ -5,6 +5,6 @@ export const nodeZoomAction = (pageId: string, nodeId: string) => {
 	emit<NodeZoomHandler>('NODE_ZOOM', { pageId, nodeId });
 };
 
-export const pageNodeZoomAction = (nodeId: string) => {
-	emit<PageNodeZoomHandler>('PAGE_NODE_ZOOM', { nodeId });
+export const pageNodeZoomAction = (nodeId: string, select: boolean = true) => {
+	emit<PageNodeZoomHandler>('PAGE_NODE_ZOOM', { nodeId, select });
 };

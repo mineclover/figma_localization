@@ -26,12 +26,17 @@ export const nodeZoom_Adapter = () => {
 
 /** 특정 값으로 노드 줌 */
 export const pageNodeZoom_Adapter = () => {
-	on<PageNodeZoomHandler>('PAGE_NODE_ZOOM', async ({ nodeId }) => {
+	on<PageNodeZoomHandler>('PAGE_NODE_ZOOM', async ({ nodeId, select }) => {
 		const node = (await figma.getNodeByIdAsync(nodeId)) as SceneNode;
 		if (node) {
 			// 노드로 화면 줌
-			figma.currentPage.selection = [node];
-			figma.viewport.scrollAndZoomIntoView([node]);
+
+			if (select) {
+				figma.currentPage.selection = [node];
+				figma.viewport.scrollAndZoomIntoView([node]);
+			} else {
+				figma.viewport.scrollAndZoomIntoView([node]);
+			}
 		}
 	});
 };

@@ -17,7 +17,7 @@ export interface NodeZoomHandler extends EventHandler {
 
 export interface PageNodeZoomHandler extends EventHandler {
 	name: 'PAGE_NODE_ZOOM';
-	handler: ({ nodeId }: { nodeId: string }) => void;
+	handler: ({ nodeId, select }: { nodeId: string; select?: boolean }) => void;
 }
 
 export interface PageSelectIdsHandler extends EventHandler {

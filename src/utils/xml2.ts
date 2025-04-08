@@ -202,6 +202,21 @@ function flattenDom(
 		return;
 	}
 
+	// 처리를 외부로 빼면 문제 생김
+	if (dom.type === 'text') {
+		const item: XmlFlatNode = {
+			path: path,
+			tagName: path,
+			depth: depth,
+			order: result.length,
+			siblingIndex: siblingIndex,
+			attributes: {},
+			text: dom.data.trim(),
+		};
+
+		result.push(item);
+	}
+
 	if (dom.type === 'tag') {
 		const currentPath = path ? `${path}/${dom.name}` : dom.name;
 
@@ -214,27 +229,11 @@ function flattenDom(
 			attributes: dom.attribs || {},
 		};
 
-		// 텍스트 컨텐츠 추출
-		const textContent = dom.children
-			.filter((child: ChildNode) => child.type === 'text')
-			.map((child: ChildNode) => {
-				if (child.type === 'text') {
-					return child.data.trim();
-				}
-				return '';
-			})
-			.filter((text: string) => text !== '')
-			.join(' ');
-
-		if (textContent) {
-			item.text = textContent;
-		}
-
 		result.push(item);
 
 		// 자식 요소 처리
-		const tagChildren = dom.children.filter((child: ChildNode) => child.type === 'tag');
-		tagChildren.forEach((child: ChildNode, index: number) => {
+
+		dom.children.forEach((child: ChildNode, index: number) => {
 			flattenDom(child, currentPath, result, depth + 1, index);
 		});
 	}

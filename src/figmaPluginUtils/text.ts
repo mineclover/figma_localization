@@ -639,6 +639,7 @@ const boundVariablesMap = {
 	paragraphIndent: 'paragraphIndent',
 } as const;
 const functionMap = {
+	// range에서 설정하긴 하는데 동작이 다름
 	textStyleId: 'setTextStyleIdAsync',
 	fillStyleId: 'setFillStyleIdAsync',
 	effectStyleId: 'setEffectStyleIdAsync',
@@ -678,7 +679,14 @@ export const setAllStyleRanges = async ({
 	// 	fillStyleId: textNode.setRangeFillStyleIdAsync,
 	// }
 
+	// textStyleId를 Range 로 부여하는 거랑, 전체에 적용하는게, 적용 범위가 다르다
+
 	// 스타일데이터 내에서의 boundVariables 가 유효한게 맞음
+	console.log('🚀 ~ 	textNode, sstyleData,range,	xNodeId,:', textNode, styleData, range, xNodeId);
+
+	if (range.start === range.end) {
+		return;
+	}
 	const { boundVariables, effectStyleData, styleData: tempStyleData } = styleData;
 
 	const styles = {
@@ -705,7 +713,11 @@ export const setAllStyleRanges = async ({
 			if (targetNode) {
 				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
 				if (setRange) {
-					targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](range.start, range.end, style as never);
+					await targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](
+						range.start,
+						range.end,
+						style as never
+					);
 				}
 			}
 		}
@@ -736,7 +748,7 @@ export const setAllStyleRanges = async ({
 			await textNode[functionMap[key as keyof typeof functionMap]](style);
 		}
 	}
-
+	console.log('🚀 ~ textNode:', textNode);
 	for (const key of Object.keys(effectFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
 		// ;
@@ -871,7 +883,7 @@ export function getAllStyleRanges(textNode: TextNode): {
 		annotations: textNode.annotations,
 		hangingPunctuation: textNode.hangingPunctuation,
 		hangingList: textNode.hangingList,
-		constraints: textNode.constraints,
+		// constraints: textNode.constraints,
 		reactions: textNode.reactions,
 		isMask: textNode.isMask,
 		maskType: textNode.maskType,
@@ -879,11 +891,11 @@ export function getAllStyleRanges(textNode: TextNode): {
 		effectStyleId: textNode.effectStyleId,
 		layoutAlign: textNode.layoutAlign,
 		layoutGrow: textNode.layoutGrow,
-		layoutPositioning: textNode.layoutPositioning,
+		// layoutPositioning: textNode.layoutPositioning,
 		layoutSizingHorizontal: textNode.layoutSizingHorizontal,
 		layoutSizingVertical: textNode.layoutSizingVertical,
 		leadingTrim: textNode.leadingTrim,
-		rotation: textNode.rotation,
+		// rotation: textNode.rotation,
 		// locked: textNode.locked,
 		// visible: textNode.visible,
 		// 위치 값
@@ -976,10 +988,10 @@ const effectFunctionMap = {
 	// 레이아웃 관련
 	// 기존 사이즈를 기반으로 레이아웃 적용됨
 	// targetAspectRatio: 'targetAspectRatio',
-	constraints: 'constraints',
+	// constraints: 'constraints',
 	layoutAlign: 'layoutAlign',
 	layoutGrow: 'layoutGrow',
-	layoutPositioning: 'layoutPositioning',
+	// layoutPositioning: 'layoutPositioning',
 	layoutSizingHorizontal: 'layoutSizingHorizontal',
 	layoutSizingVertical: 'layoutSizingVertical',
 
@@ -994,7 +1006,7 @@ const effectFunctionMap = {
 	hangingPunctuation: 'hangingPunctuation',
 	hangingList: 'hangingList',
 	leadingTrim: 'leadingTrim',
-	rotation: 'rotation',
+	// rotation: 'rotation',
 	// locked: 'locked',
 	// visible: 'visible',
 	isMask: 'isMask',
@@ -1029,11 +1041,11 @@ export const defaultEffectStyleData = {
 
 	layoutAlign: 'INHERIT',
 	layoutGrow: 0,
-	layoutPositioning: 'AUTO',
+	// layoutPositioning: 'AUTO',
 	layoutSizingHorizontal: 'FIXED',
 	layoutSizingVertical: 'FIXED',
 	leadingTrim: 'NONE',
-	rotation: 0,
+	// rotation: 0,
 	// locked: false,
 	// visible: true,
 	// minWidth: null,
@@ -1086,5 +1098,5 @@ export const defaultRangeData = {
 	paragraphSpacing: 0,
 	indentation: 0,
 	fillStyleId: '',
-	textStyleId: '',
+	// textStyleId: '',
 };

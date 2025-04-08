@@ -34,7 +34,6 @@ const innerTextExtract = (text: any): string => {
  * @returns
  */
 export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: string, code: string, date: number) => {
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ node:', node);
 	const xNodeId = node.id;
 	const domainSetting = getDomainSetting();
 
@@ -63,7 +62,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		notify('60 Failed to get localization data', 'error');
 		return;
 	}
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ targetText:', targetText);
 
 	// 데이터 처리를 이름 얻기 위해서 로컬 키 얻어서 이름을 얻어오냐
 	// 아니면 로컬 키에 소유 번역 키 정보를 같이 담아서 처리 하냐
@@ -71,7 +69,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 	/** a태그 활성화 */
 	const wrapText = await wrapTextWithTag(targetText.text);
-	console.log('🚀 ~ TargetNodeStyleUpdate ~ wrapText:', wrapText);
 	/** {변수}를 패턴으로 파싱 */
 	const { variables } = parseLocalizationVariables(wrapText);
 
@@ -98,7 +95,6 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	 * 등록된 번역 값
 	 */
 	const { xmlString, styleStoreArray, effectStyle, rowText } = await xmlToStyle(fullText, localizationKey, action);
-
 	console.log(`🚀 ~ TargetNodeStyleUpdate ~ { xmlString, styleStoreArray, effectStyle, rowText }:`, {
 		xmlString,
 		styleStoreArray,

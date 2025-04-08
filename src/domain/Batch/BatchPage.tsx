@@ -469,6 +469,25 @@ function BatchPage() {
 			<div className={styles.top}>
 				<div className={styles.container}>
 					<div className={styles.row}>
+						<Muted className={styles.noWrapSecondary}>선택 된 키 : {selectIds.length}</Muted>
+
+						<div className={styles.row}>
+							<Muted className={styles.noWrapSecondary}>{updateTimeString}</Muted>
+							<IconButton
+								onClick={() => {
+									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+								}}
+							>
+								<IconSwapSmall24 />
+							</IconButton>
+						</div>
+					</div>
+
+					<SimpleSelect />
+					<span className={clc(styles.text, currentPointer?.characters == null && styles.dangerText)}>
+						{currentPointer?.characters ?? 'Text 선택 안됨'}
+					</span>
+					<div className={styles.row}>
 						<Bold>Key : </Bold>
 						<Textbox
 							disabled={hasSelectedKey}
@@ -532,52 +551,6 @@ function BatchPage() {
 							{/* {hasSelectedKey ?   '변경' : '추가'} */}
 						</Button>
 					</div>
-					<div className={styles.row}>
-						<Muted>선택 된 키 : {selectIds.length}</Muted>
-						<div className={styles.row}>
-							<Muted>{updateTimeString}</Muted>
-							<IconButton
-								onClick={() => {
-									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
-								}}
-							>
-								<IconSwapSmall24 />
-							</IconButton>
-						</div>
-					</div>
-
-					<SimpleSelect />
-
-					{missingLink.length > 0 && (
-						<div className={styles.miniColumn}>
-							<Bold>섹션 외 대상</Bold>
-							{missingLink.map((item) => {
-								const selected = selectIds.includes(item);
-
-								return (
-									<Button
-										danger
-										{...selectStyle(selected)}
-										onClick={() => {
-											pageNodeZoomAction(item);
-										}}
-										onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-											e.preventDefault(); // 기본 우클릭 메뉴 방지
-											// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
-											if (selectIds.includes(item)) {
-												// 제거하고
-												selectIdsSignal.value = selectIds.filter((id) => id !== item);
-											} else {
-												selectIdsSignal.value = [...selectIds, item];
-											}
-										}}
-									>
-										{item}
-									</Button>
-								);
-							})}
-						</div>
-					)}
 				</div>
 				<Divider />
 			</div>

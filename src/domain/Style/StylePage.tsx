@@ -89,13 +89,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				</IconButton>
 			</div>
 			<div className={styles.labelRow}>
-				<Dropdown
-					onChange={handleChange}
-					options={[{ value: '' }, ...options]}
-					value={action}
-					className={styles.action}
-				/>
-				<Text>텍스트 ID : {nodeId}</Text>
+				n<Text>텍스트 ID : {nodeId}</Text>
 				<IconButton
 					onClick={() => {
 						if (nodeId) {

@@ -1,4 +1,13 @@
-import { Bold, Button, IconBooleanSmall24, IconButton, IconCloseSmall24 } from '@create-figma-plugin/ui';
+import {
+	Bold,
+	Button,
+	Divider,
+	IconBooleanSmall24,
+	IconButton,
+	IconCloseSmall24,
+	Muted,
+	VerticalSpace,
+} from '@create-figma-plugin/ui';
 import { Fragment, h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
@@ -164,7 +173,7 @@ function SimpleSelect() {
 
 			{allSectionIdsArray.length > 0 && (
 				<Fragment>
-					<Bold>Section</Bold>
+					<Muted>Section</Muted>
 					<div className={styles.container}>
 						{allSectionIdsArray
 							.sort((a, b) => {
@@ -201,7 +210,7 @@ function SimpleSelect() {
 
 			{keyIds.length > 0 && (
 				<Fragment>
-					<Bold>Keys</Bold>
+					<Muted>Keys</Muted>
 					{/* 키 있는 매칭 리스트 */}
 					<div className={styles.container}>
 						{keyGroup.map((item) => {
@@ -216,11 +225,10 @@ function SimpleSelect() {
 					<KeyIds keyIds={keyIds} selectKey={selectKey} />
 				</Fragment>
 			)}
-
 			{otherGroup.length > 0 && (
 				<Fragment>
 					<div className={styles.row}>
-						<Bold>Other</Bold>
+						<Muted>Other</Muted>
 
 						<IconButton
 							onClick={() => {
@@ -249,11 +257,10 @@ function SimpleSelect() {
 					</div>
 				</Fragment>
 			)}
-
 			{missingData.length > 0 && (
 				<Fragment>
 					<div className={styles.row}>
-						<Bold>Selected</Bold>
+						<Muted>Selected</Muted>
 						<IconButton
 							onClick={() => {
 								selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));

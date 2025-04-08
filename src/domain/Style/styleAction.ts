@@ -101,6 +101,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 		effectStyle,
 		rowText,
 	});
+	// styleStoreArray 에서 공통 스타일 추출해야하는 걸로 보임
 
 	const tempPosition = {
 		x: node.x,
@@ -274,7 +275,7 @@ export const styleToXml = async (
 	const segments = createStyleSegments(characters, styleData.styleData);
 	const boundVariables = createStyleSegments(characters, styleData.boundVariables);
 	const allStyleGroups = groupAllSegmentsByStyle(characters, segments, boundVariables);
-	const exportStyleGroups = allStyleGroups.exportStyleGroups;
+	const { exportStyleGroups, defaultStyle } = allStyleGroups;
 
 	const effectData = styleData.effectStyleData;
 	const hashId = createStyleHashId(effectData);

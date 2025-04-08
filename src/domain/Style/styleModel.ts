@@ -24,6 +24,7 @@ import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';
 import { TargetNodeStyleUpdate } from './styleAction';
+import { downloadStatus } from '@/model/on/onChanges';
 
 const range = (start: number, end: number) => {
 	return Array.from({ length: end - start }, (_, i) => start + i);
@@ -346,27 +347,31 @@ export const groupAllSegmentsByStyle = (
 export const onDownloadStyle = () => {
 	// on(DOWNLOAD_STYLE.REQUEST_KEY, async () => {
 	on(DOWNLOAD_STYLE.REQUEST_KEY, async ({ localizationKey, lang }: { localizationKey: string; lang: string }) => {
-		console.log(`🚀 ~ on ~ { localizationKey, lang }::`, { localizationKey, lang });
+		downloadStatus.downloading = true;
 		const xNode = figma.currentPage.selection[0];
 		const domainSetting = getDomainSetting();
 
 		if (domainSetting == null) {
 			notify('Failed to get domain id', 'error');
+			downloadStatus.downloading = false;
 			return;
 		}
 
 		if (xNode == null) {
 			notify('Failed to get node', 'error');
+			downloadStatus.downloading = false;
 			return;
 		}
 		// originalLocalizeId 조회 또는 등록
 		// searchTranslationCode
 		if (xNode.type !== 'TEXT') {
 			notify('Failed to get node', 'error');
+			downloadStatus.downloading = false;
 			return;
 		}
 		// 디자인된 버전의 텍스트로 변경
 		await TargetNodeStyleUpdate(xNode, localizationKey, lang, Date.now());
+		downloadStatus.downloading = false;
 	});
 };
 

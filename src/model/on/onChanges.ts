@@ -11,8 +11,15 @@ import { processTextNodeLocalization } from '../../domain/Label/TextPluginDataMo
 import { newGetStyleData } from './GET_STYLE_DATA';
 
 export let tempNode = '';
+export let downloadStatus = {
+	downloading: false,
+	date: new Date(),
+};
 
 const refreshNode = async (node: SceneNode) => {
+	if (downloadStatus.downloading) {
+		return;
+	}
 	tempNode = node.id;
 	const cursorPosition = await getCursorPosition(node);
 	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);

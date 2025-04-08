@@ -66,6 +66,24 @@
 	}
 }
 
+.noWrapSecondary {
+	flex-shrink: 0;
+	white-space: nowrap;
+	color: var(--figma-color-text-secondary);
+}
+
+.dangerText {
+	color: var(--figma-color-text-danger);
+}
+
+.text {
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: bold;
+}
+
 .rowLeft {
 	display: flex;
 	flex-direction: row;
@@ -123,6 +141,7 @@
 	flex-grow: 1;
 }
 .noWrap {
+	flex-shrink: 0;
 	white-space: nowrap;
 }
 

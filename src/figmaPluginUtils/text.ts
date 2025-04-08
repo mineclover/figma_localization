@@ -682,7 +682,6 @@ export const setAllStyleRanges = async ({
 	// textStyleId를 Range 로 부여하는 거랑, 전체에 적용하는게, 적용 범위가 다르다
 
 	// 스타일데이터 내에서의 boundVariables 가 유효한게 맞음
-	console.log('🚀 ~ 	textNode, sstyleData,range,	xNodeId,:', textNode, styleData, range, xNodeId);
 
 	if (range.start === range.end) {
 		return;
@@ -738,17 +737,6 @@ export const setAllStyleRanges = async ({
 		}
 	}
 
-	for (const key of Object.keys(functionMap)) {
-		const style = styles[key as keyof ResourceDTO];
-		if (style == null) {
-			continue;
-		}
-		const setRange = textNode[functionMap[key as keyof typeof functionMap]] as Function;
-		if (setRange) {
-			await textNode[functionMap[key as keyof typeof functionMap]](style);
-		}
-	}
-	console.log('🚀 ~ textNode:', textNode);
 	for (const key of Object.keys(effectFunctionMap)) {
 		const style = styles[key as keyof ResourceDTO];
 		// ;
@@ -767,6 +755,16 @@ export const setAllStyleRanges = async ({
 		} catch (error) {
 			console.error(`속성 설정 중 오류 발생: ${key}`, error);
 		}
+	}
+
+	// 노드에 스타일 적용
+	for (const key of Object.keys(functionMap)) {
+		const style = styles[key as keyof ResourceDTO];
+		if (style == null) {
+			continue;
+		}
+
+		await textNode[functionMap[key as keyof typeof functionMap]](style);
 	}
 };
 

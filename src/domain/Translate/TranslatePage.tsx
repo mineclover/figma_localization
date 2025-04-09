@@ -88,24 +88,26 @@ const TranslateItem = ({
 					setTranslation(nextText);
 				}}
 			/>
-			<button
-				className={styles.translateRight}
-				onClick={async () => {
-					await clientFetchDB('/localization/translations', {
-						method: 'PUT',
-						body: JSON.stringify({
-							keyId: key_id.toString(),
-							language: language_code,
-							translation: translation,
-						}),
-					});
-					emit(RELOAD_NODE.REQUEST_KEY);
-					updateAction();
-				}}
-			>
-				<Text className={styles.smallText}>no. {version ?? 'NaN'}</Text>
-				<Bold>Save</Bold>
-			</button>
+			{language_code !== 'origin' && (
+				<button
+					className={styles.translateRight}
+					onClick={async () => {
+						await clientFetchDB('/localization/translations', {
+							method: 'PUT',
+							body: JSON.stringify({
+								keyId: key_id.toString(),
+								language: language_code,
+								translation: translation,
+							}),
+						});
+						emit(RELOAD_NODE.REQUEST_KEY);
+						updateAction();
+					}}
+				>
+					<Text className={styles.smallText}>no. {version ?? 'NaN'}</Text>
+					<Bold>Save</Bold>
+				</button>
+			)}
 		</div>
 	);
 };

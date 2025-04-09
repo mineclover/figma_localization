@@ -376,8 +376,6 @@ function BatchPage() {
 		groupOption
 	);
 
-	const missingLink = selectIds.filter((id) => !patternMatchData.some((item) => item.id === id));
-
 	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>();
 
 	// const textList = Array.from(matchDataSet.values()).sort()

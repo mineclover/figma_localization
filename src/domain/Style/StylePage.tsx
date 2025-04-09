@@ -51,6 +51,7 @@ import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
 import Tags, { extractSelectedItems, tagsSignal } from './Tags';
 import { replaceTagNames, unwrapTag, wrapTextWithTag } from '@/utils/xml2';
 import { ActionType, actionTypes } from '../System/ActionResourceDTO';
+import TranslateLine from '../Translate/TranslateLine';
 
 type CurrentMetadata = {
 	nodeId?: string;
@@ -76,7 +77,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 		<div className={styles.metadataContainer}>
 			<VerticalSpace space="extraSmall" />
 			<div className={styles.labelRow}>
-				<Text>{name}</Text>
+				<Text>NAME: {name}</Text>
 				<Muted>#{localizationKey}</Muted>
 				<IconButton
 					onClick={() => {
@@ -89,7 +90,7 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				</IconButton>
 			</div>
 			<div className={styles.labelRow}>
-				n<Text>텍스트 ID : {nodeId}</Text>
+				<Text>ID: {nodeId}</Text>
 				<IconButton
 					onClick={() => {
 						if (nodeId) {
@@ -164,7 +165,11 @@ export const StyleXml = ({
 	return (
 		<div>
 			<VerticalSpace space="small" />
-			<Text>{currentPointer?.data.localizationKey}: 피그마 저장 결과 미리보기:</Text>
+
+			<div className={styles.searchResultTop}>
+				<Text>피그마 저장 결과 미리보기:</Text>
+				<TranslateLine characters={resultXml}></TranslateLine>
+			</div>
 			<VerticalSpace space="small" />
 			<TextboxMultiline value={resultXml} placeholder="XML 출력" />
 			<VerticalSpace space="small" />

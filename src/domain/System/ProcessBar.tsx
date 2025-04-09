@@ -3,15 +3,26 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { h, Fragment } from 'preact';
 import { Process, processSignal } from './process';
 import styles from './Process.module.css';
-import { Bold, Text, IconLockLocked16, IconLockUnlocked16, IconButton, IconTrash24 } from '@create-figma-plugin/ui';
+import {
+	Bold,
+	Text,
+	IconLockLocked16,
+	IconLockUnlocked16,
+	IconButton,
+	IconTrash24,
+	Button,
+} from '@create-figma-plugin/ui';
 
-import { currentPointerSignal } from '@/model/signal';
+import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal';
+import { emit } from '@create-figma-plugin/utilities';
 
 const ProcessBar = () => {
 	const processStore = useSignal(processSignal);
 
 	const keys = Object.keys(processStore);
 	const currentPointer = useSignal(currentPointerSignal);
+	const patternMatchData = useSignal(patternMatchDataSignal);
+	console.log('🚀 ~ ProcessBar ~ patternMatchData:', patternMatchData);
 
 	const isPageLock = currentPointer?.pageLock ?? false;
 
@@ -22,6 +33,7 @@ const ProcessBar = () => {
 
 	return (
 		<div className={styles.container}>
+			<Button onClick={() => {}}>활성화</Button>
 			<div className={styles.row}>
 				<Text>번역 미리보기 가능 여부 : {isPageLock ? '불가능' : '가능'}</Text>
 				{isPageLock ? <IconLockLocked16 /> : <IconLockUnlocked16 />}

@@ -59,7 +59,7 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 	/** 클라에서 받는 로컬라이제이션 키로 번역 값들 조회 */
 	const targetText = await searchTranslationCode(localizationKey, code, date);
 	if (targetText == null) {
-		notify('60 Failed to get localization data', 'error');
+		notify('해당 언어에 단어 없음', 'ok');
 		return;
 	}
 

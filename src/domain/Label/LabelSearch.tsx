@@ -18,7 +18,13 @@ import {
 import { Fragment, h } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { LocalizationKeyDTO } from '@/model/types';
-import { currentPointerSignal, isDirectSignal, isTravelSignal, selectedKeySignal } from '@/model/signal';
+import {
+	currentPointerSignal,
+	isDirectSignal,
+	isTravelSignal,
+	selectedKeyDataSignal,
+	selectedKeySignal,
+} from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { domainSettingSignal } from '@/model/signal';
 import styles from './LabelPage.module.css';
@@ -51,7 +57,17 @@ const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
 	return <IconStar16 />;
 };
 
-const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, origin_value }: LocalizationKeyDTO) => {
+const SearchResultItem = ({
+	key_id,
+	name,
+	section_name,
+	alias,
+	is_temporary,
+	origin_value,
+	searchHandler,
+}: LocalizationKeyDTO & {
+	searchHandler: (key: string) => void;
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -61,7 +77,10 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 				selectedKeySignal.value === key_id.toString() && styles.searchResultItemSelected
 			)}
 			key={key_id}
-			onClick={() => (selectedKeySignal.value = key_id.toString())}
+			onClick={() => {
+				selectedKeySignal.value = key_id.toString();
+				searchHandler(name);
+			}}
 		>
 			<div className={styles.searchResultTop}>
 				<NullDisableText className={styles.searchResultName} placeholder="원본 값 없음">
@@ -93,12 +112,14 @@ const SearchResultItem = ({ key_id, name, section_name, alias, is_temporary, ori
 
 export const SearchArea = ({
 	search,
-	setSearch,
+
 	data,
+	searchHandler,
 }: {
 	search: string;
-	setSearch: (search: string) => void;
+
 	data: LocalizationKeyDTO[];
+	searchHandler: (key: string) => void;
 }) => {
 	return (
 		<Fragment>
@@ -108,12 +129,14 @@ export const SearchArea = ({
 				placeholder="Search..."
 				value={search}
 				onChange={(e) => {
-					setSearch(e.currentTarget.value);
+					searchHandler(e.currentTarget.value);
 					// setSearch(keyConventionRegex(e.currentTarget.value))
 				}}
 			></SearchTextbox>
 			<VerticalSpace space="extraSmall"></VerticalSpace>
-			<div className={styles.searchResult}>{data?.map((item) => <SearchResultItem {...item} />)}</div>
+			<div className={styles.searchResult}>
+				{data?.map((item) => <SearchResultItem {...item} searchHandler={searchHandler} />)}
+			</div>
 		</Fragment>
 	);
 };
@@ -124,7 +147,12 @@ export const useSearch = () => {
 	const domainSetting = useSignal(domainSettingSignal);
 	const selectedKey = useSignal(selectedKeySignal);
 
-	const selectedKeyData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'));
+	useEffect(() => {
+		const tempData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'));
+		if (tempData) {
+			selectedKeyDataSignal.value = tempData;
+		}
+	}, [data]);
 
 	useEffect(() => {
 		if (loading) {
@@ -151,7 +179,7 @@ export const useSearch = () => {
 		};
 	}, [search]);
 
-	return { search, setSearch, selectedKeyData, data, loading, error, fetchData };
+	return { search, setSearch, data, loading, error, fetchData };
 };
 
 /** search bar */
@@ -164,6 +192,9 @@ function LabelSearch() {
 
 	const currentPointer = useSignal(currentPointerSignal);
 	const selectedKey = useSignal(selectedKeySignal);
+	const searchHandler = (key: string) => {
+		setSearch(key);
+	};
 
 	// 즉시 적용 기능
 	useEffect(() => {
@@ -184,7 +215,7 @@ function LabelSearch() {
 				<VerticalSpace space="extraSmall"></VerticalSpace>
 				<Text>검색 창에서 선택된 상태로 피그마 텍스트 클릭 시 반영</Text>
 			</Toggle>
-			<SearchArea search={search} setSearch={setSearch} data={data ?? []} />
+			<SearchArea search={search} data={data ?? []} searchHandler={searchHandler} />
 		</Fragment>
 	);
 }

@@ -83,8 +83,19 @@ const updateKeyIds = async (keyIds: string[]) => {
 };
 
 /** 키 아이디 만 가져가게 할 건가... 전체 선택 되게 할 건가 */
-const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | null }) => {
+const KeyIds = ({
+	keyIds,
+	selectKey,
+	searchHandler,
+}: {
+	keyIds: string[];
+	selectKey: string | null;
+	searchHandler: (key: string) => void;
+}) => {
 	const keyNameStore = useSignal(KeyIdNameSignal);
+	const patternMatchData = useSignal(patternMatchDataSignal);
+
+	const selectIds = useSignal(selectIdsSignal);
 
 	const keyName = keyIds.map((id) => {
 		return [id, keyNameStore[id]];
@@ -100,12 +111,28 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 	return (
 		<div className={styles.keyIds}>
 			{keyName.map(([id, name]) => {
+				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
 				return (
 					<button
 						className={clc(styles.keyId, selectKey === id && styles.keyMatch)}
 						onClick={() => {
-							selectedKeySignal.value = id;
-							inputKeySignal.value = name;
+							if (selectedKeySignal.value === id) {
+								selectedKeySignal.value = null;
+								searchHandler('');
+							} else {
+								selectedKeySignal.value = id;
+								searchHandler(name);
+							}
+						}}
+						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
+							e.preventDefault(); // 기본 우클릭 메뉴 방지
+							if (selectIds.some((item) => list.includes(item))) {
+								const newList = new Set(selectIds.filter((item) => !list.includes(item)));
+								selectIdsSignal.value = Array.from(newList);
+							} else {
+								const newList = new Set([...selectIds, ...list]);
+								selectIdsSignal.value = Array.from(newList);
+							}
 						}}
 					>
 						#{id} : {name}
@@ -118,7 +145,7 @@ const KeyIds = ({ keyIds, selectKey }: { keyIds: string[]; selectKey: string | n
 
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 
-function SimpleSelect() {
+function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void }) {
 	const currentPointer = useSignal(currentPointerSignal);
 	const currentSection = useSignal(currentSectionSignal);
 	const selectItems = useSignal(selectIdsSignal);
@@ -222,7 +249,7 @@ function SimpleSelect() {
 					</div>
 
 					{/* 키 리스트 */}
-					<KeyIds keyIds={keyIds} selectKey={selectKey} />
+					<KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} />
 				</Fragment>
 			)}
 			{otherGroup.length > 0 && (

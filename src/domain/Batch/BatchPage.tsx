@@ -1,7 +1,7 @@
 import { useSignal } from '@/hooks/useSignal';
 import { Fragment, h } from 'preact';
 import { CurrentNode } from '@/model/types';
-import { currentSectionSignal, inputKeySignal } from '@/model/signal';
+import { currentSectionSignal, inputKeySignal, selectedKeyDataSignal } from '@/model/signal';
 import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import {
 	Bold,
@@ -40,7 +40,7 @@ import {
 import { groupByPattern } from './batchModel';
 import { GroupOption, ViewOption } from '@/model/types';
 import { PatternMatchData, SearchNodeData } from '@/model/types';
-import { patternMatchDataSignal, selectIdsSignal, selectTargetSignal } from '@/model/signal';
+import { patternMatchDataSignal, selectIdsSignal } from '@/model/signal';
 import styles from './batch.module.css';
 import { clc } from '@/components/modal/utils';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
@@ -72,7 +72,6 @@ const selectStyle = (selected: boolean) => {
 
 export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
 	const [isExtended, setIsExtended] = useState<boolean>(false);
-	const selectTarget = useSignal(selectTargetSignal);
 
 	const selectIds = useSignal(selectIdsSignal);
 	const hasAnyId = ids.some((id) => selectIds.includes(id));
@@ -86,7 +85,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 								ignore: !ignore,
 								ids: ids,
 							});
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 						}}
 					>
 						{ignore ? <IconHiddenSmall24 /> : <IconVisible16 />}
@@ -213,11 +212,6 @@ const SearchSection = ({
 	patternMatchDataGroup: PatternMatchData[];
 	filteredDataLength: number;
 }) => {
-	const selectTarget = useSignal(selectTargetSignal);
-	const setSelectTarget = (target: CurrentNode | null) => {
-		selectTargetSignal.value = target;
-	};
-
 	return (
 		<Fragment>
 			<Stack space="extraSmall">
@@ -322,11 +316,10 @@ function BatchPage() {
 	const selectIds = useSignal(selectIdsSignal);
 	const domainSetting = useSignal(domainSettingSignal);
 
-	const selectTarget = useSignal(selectTargetSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	const selectedKey = useSignal(selectedKeySignal);
-
-	const { data: searchResult, search, setSearch, selectedKeyData } = useSearch();
+	const selectedKeyData = useSignal(selectedKeyDataSignal);
+	const { data: searchResult, search, setSearch } = useSearch();
 
 	// const hasSelectedKey = typeof selectedKeyData === 'object';
 	const hasSelectedKey = selectedKey !== null;
@@ -410,6 +403,12 @@ function BatchPage() {
 		const newValue = event.currentTarget.value;
 		setTabValue(newValue);
 	}
+	const searchHandler = (key: string) => {
+		inputKeySignal.value = key;
+		setSearch(key);
+		setTabValue('Search');
+	};
+
 	const options: Array<TabsOption> = [
 		{
 			children: (
@@ -433,7 +432,7 @@ function BatchPage() {
 			value: nav[0],
 		},
 		{
-			children: <SearchArea search={search} setSearch={setSearch} data={searchResult ?? []} />,
+			children: <SearchArea search={search} data={searchResult ?? []} searchHandler={searchHandler} />,
 			value: nav[1],
 		},
 	] as const;
@@ -473,7 +472,7 @@ function BatchPage() {
 							<Muted className={styles.noWrapSecondary}>{updateTimeString}</Muted>
 							<IconButton
 								onClick={() => {
-									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, selectTarget?.id);
+									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 								}}
 							>
 								<IconSwapSmall24 />
@@ -481,7 +480,7 @@ function BatchPage() {
 						</div>
 					</div>
 
-					<SimpleSelect />
+					<SimpleSelect searchHandler={searchHandler} />
 					<span className={clc(styles.text, currentPointer?.characters == null && styles.dangerText)}>
 						{currentPointer?.characters ?? 'Text 선택 안됨'}
 					</span>
@@ -493,16 +492,14 @@ function BatchPage() {
 							value={hasSelectedKey && selectedKeyData ? selectedKeyData?.name : localizationKey}
 							onChange={(e) => {
 								const next = keyConventionRegex(e.currentTarget.value);
-								inputKeySignal.value = next;
-								setSearch(next);
-								setTabValue('Search');
+
+								searchHandler(next);
 							}}
 						></Textbox>
 						<IconButton
 							onClick={() => {
 								setSearch('');
 								selectedKeySignal.value = null;
-
 								inputKeySignal.value = '';
 							}}
 						>
@@ -510,9 +507,10 @@ function BatchPage() {
 						</IconButton>
 						<Button
 							onClick={async () => {
-								if (hasSelectedKey && selectedKeyData) {
+								if (hasSelectedKey) {
 									// 변경할 키가 있으면 바로 일괄 변경 로직
-									const isOriginNull = selectedKeyData.origin_value == null || selectedKeyData.origin_value === '';
+									console.log('🚀 ~ onClick ~ selectedKeyData:', data, selectedKeyData);
+									const isOriginNull = selectedKeyData?.origin_value == null || selectedKeyData.origin_value === '';
 
 									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
 										domainId: selectedKeyData?.domain_id,
@@ -520,6 +518,7 @@ function BatchPage() {
 										originId: isOriginNull ? null : selectedKeyData?.origin_id,
 										ids: selectIds,
 									});
+									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 								} else {
 									// 변경할 키가 없으면 추가하고
 									const result = await fetchData('/localization/keys', {
@@ -540,6 +539,7 @@ function BatchPage() {
 											keyId: result.data.key_id,
 											ids: selectIds,
 										});
+										emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 									}
 								}
 							}}

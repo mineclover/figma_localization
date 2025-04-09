@@ -23,7 +23,6 @@ const ProcessBar = () => {
 	const keys = Object.keys(processStore);
 	const currentPointer = useSignal(currentPointerSignal);
 	const patternMatchData = useSignal(patternMatchDataSignal);
-	console.log('🚀 ~ ProcessBar ~ patternMatchData:', patternMatchData);
 
 	const isPageLock = currentPointer?.pageLock ?? false;
 

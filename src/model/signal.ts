@@ -1,5 +1,5 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
-import { SearchNodeData, StyleSync } from './types';
+import { LocalizationKeyDTO, SearchNodeData, StyleSync } from './types';
 import { LocalizationKey } from './types';
 import { DomainSettingType } from './types';
 import { CurrentNode } from './types';
@@ -25,7 +25,6 @@ export const selectIdsSignal = signal<string[]>([]);
  * 선택된 섹션 타겟
  * 선택 로직에 의해 선택 된 것으로
  */
-export const selectTargetSignal = signal<CurrentNode | null>(null);
 /** 현재 커서가 있는 섹션 ( 실시간 감지 ) */
 export const currentSectionSignal = signal<CurrentNode | null>(null);
 
@@ -37,6 +36,7 @@ export const projectIdSignal = signal<string>('');
 
 /** 선택된 섹션 키 */
 export const selectedKeySignal = signal<string | null>(null);
+export const selectedKeyDataSignal = signal<LocalizationKeyDTO | null>(null);
 /** 입력된 키 값 */
 export const inputKeySignal = signal<string>('');
 

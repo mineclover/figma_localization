@@ -40,6 +40,7 @@ import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE';
 import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
 import { onSetPageLockOpen } from '@/domain/System/lock';
 import { runExample } from '@/utils/test';
+import { onRender } from '@/domain/Search/visualModel';
 
 export default function () {
 	// 세팅
@@ -87,6 +88,7 @@ export default function () {
 	// runExample();
 	onGetUserHash();
 	onSetUserHash();
+	onRender();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

@@ -15,6 +15,7 @@ import {
 
 import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal';
 import { emit } from '@create-figma-plugin/utilities';
+import { RENDER_PAIR } from '../Search/visualModel';
 
 const ProcessBar = () => {
 	const processStore = useSignal(processSignal);
@@ -33,7 +34,13 @@ const ProcessBar = () => {
 
 	return (
 		<div className={styles.container}>
-			<Button onClick={() => {}}>활성화</Button>
+			<Button
+				onClick={() => {
+					emit(RENDER_PAIR.RENDER_REQUEST);
+				}}
+			>
+				활성화
+			</Button>
 			<div className={styles.row}>
 				<Text>번역 미리보기 가능 여부 : {isPageLock ? '불가능' : '가능'}</Text>
 				{isPageLock ? <IconLockLocked16 /> : <IconLockUnlocked16 />}

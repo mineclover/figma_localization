@@ -69,7 +69,9 @@ class SearchStore {
 	}
 
 	setStore(key: string, node: BaseNode) {
-		this.store.set(key, nodeMetaData(node as TextNode));
+		const meta = nodeMetaData(node as TextNode);
+		this.store.set(key, meta);
+		return meta;
 	}
 
 	refresh() {
@@ -90,7 +92,7 @@ class SearchStore {
 			console.log('🚀 ~ SearchStore ~ search ~ targetArea:', targetArea);
 
 			if (targetArea == null) {
-				return;
+				return [];
 			}
 			const areaId = targetArea.id;
 			if (targetArea.type === 'SECTION' || targetArea.type === 'PAGE' || targetArea.type === 'COMPONENT_SET') {
@@ -111,7 +113,7 @@ class SearchStore {
 
 			const keys = this.sectionStore.get(areaId);
 			if (keys == null) {
-				return;
+				return [];
 			}
 			const nodes = [];
 			for (const key of keys) {
@@ -149,11 +151,11 @@ class SearchStore {
 		if (this.isFigma()) {
 			const node = await figma.getNodeByIdAsync(key);
 			if (node) {
-				this.setStore(key, node);
+				return this.setStore(key, node);
 			} else {
 				this.store.delete(key);
 			}
-			return node;
+			return;
 		} else {
 			throw new Error('figma is not defined');
 		}

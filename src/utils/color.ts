@@ -9,7 +9,8 @@ export function generatePastelColors(text: string[], startHue: number = 0) {
 	uniqueChars.forEach((char, index) => {
 		// HSL 값 계산 (시작 색상에 오프셋 추가)
 		const hue = (startHue + index * hueStep) % 360;
-		const saturation = 70; // 파스텔톤을 위한 적절한 채도
+		const saturation = 100; // 파스텔톤을 위한 적절한 채도
+		// const lightness = 85; // 높은 명도로 파스텔톤 구현
 		const lightness = 85; // 높은 명도로 파스텔톤 구현
 
 		// HSL을 HEX로 변환

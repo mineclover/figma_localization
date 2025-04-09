@@ -6,6 +6,12 @@ export const RENDER_PAIR = {
 	RENDER_REQUEST: 'RENDER_REQUEST',
 	RENDER_RESPONSE: 'RENDER_RESPONSE',
 };
+
+export const DISABLE_RENDER_PAIR = {
+	DISABLE_RENDER_REQUEST: 'DISABLE_RENDER_REQUEST',
+	DISABLE_RENDER_RESPONSE: 'DISABLE_RENDER_RESPONSE',
+};
+
 export const BACKGROUND_SYMBOL = {
 	background: 'IS_BACKGROUND',
 	idStore: 'BACKGROUND_ID_STORE',
@@ -110,10 +116,20 @@ const textOverlay = (
 	const rgba = hexToRGBA(color);
 	const paint = figma.util.solidPaint(rgba);
 	node.fills = [paint];
-	node.name = '#' + localizationKey + '/' + id;
+	node.name = '#' + localizationKey;
 	node.setPluginData(BACKGROUND_SYMBOL.background, 'true');
 	frame.appendChild(node);
 	node.setPluginData(BACKGROUND_SYMBOL.idStore, id);
+	// node.blendMode = 'OVERLAY';
+	node.blendMode = 'HARD_LIGHT';
+
+	node.strokes = [figma.util.solidPaint({ r: 0, g: 0, b: 0 })];
+	node.strokeWeight = 1;
+	node.strokeMiterLimit = 10;
+	node.strokeJoin = 'ROUND';
+	node.strokeCap = 'ROUND';
+	node.strokeAlign = 'CENTER';
+	node.dashPattern = [2, 4];
 
 	node.x = x - rootX - padding;
 	node.y = y - rootY - padding;
@@ -137,17 +153,35 @@ export const onRender = () => {
 		frame.x = x;
 		frame.y = y;
 		frame.resize(width, height);
-		const paint = figma.util.solidPaint({ r: 1, g: 1, b: 1, a: 0.4 });
+		const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 0.4 });
+
 		frame.fills = [paint];
 
 		frame.opacity = 0.7;
 		frame.locked = true;
 		frame.name = '##overlay';
 		frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
-		figma.viewport.scrollAndZoomIntoView([frame]);
 
-		hasKey.forEach((item) => {
-			textOverlay(item, optionColorMap, frame, { x, y });
+		hasKey.forEach((item, index) => {
+			// 시작 대상 포커스 해도 됨
+
+			const node = textOverlay(item, optionColorMap, frame, { x, y });
+			// if (0 === index) {
+			// 	figma.currentPage.selection = [node];
+			// 	figma.viewport.scrollAndZoomIntoView([node]);
+			// }
+			// 마지막 대상 포커스 ?
+			if (hasKey.length - 1 === index) {
+				figma.currentPage.selection = [node];
+				figma.viewport.scrollAndZoomIntoView([node]);
+			}
 		});
+	});
+};
+
+export const onDisableRender = () => {
+	on(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST, async () => {
+		const frame = getBackgroundFrame();
+		frame.remove();
 	});
 };

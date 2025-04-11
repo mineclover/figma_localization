@@ -83,8 +83,17 @@ const keySplit = (data: MetaData[]) => {
 		}
 	);
 	return {
+		/**
+		 * 키 있는 데이터
+		 */
 		hasKey: hasKey.hasKey,
+		/**
+		 * 키 없는 데이터
+		 */
 		nullKey: hasKey.nullKey,
+		/**
+		 * 키 목록
+		 */
 		keys: Array.from(hasKey.keys),
 	};
 };
@@ -112,7 +121,8 @@ const textOverlay = (
 	const node = figma.createFrame();
 
 	node.resize(width + padding * 2, height + padding * 2);
-	const color = colorMap[localizationKey];
+	const color = colorMap[localizationKey] ?? '#ffffff';
+
 	const rgba = hexToRGBA(color);
 	const paint = figma.util.solidPaint(rgba);
 	node.fills = [paint];
@@ -143,6 +153,7 @@ export const onRender = () => {
 
 		const frame = getBackgroundFrame();
 		const nodes = await searchStore.search();
+		// 전체 스토어 초기화
 		clearBackground(frame, nodes);
 
 		const { hasKey, nullKey, keys } = keySplit(nodes);
@@ -175,6 +186,9 @@ export const onRender = () => {
 				figma.currentPage.selection = [node];
 				figma.viewport.scrollAndZoomIntoView([node]);
 			}
+		});
+		nullKey.forEach((item) => {
+			const node = textOverlay(item, optionColorMap, frame, { x, y });
 		});
 	});
 };

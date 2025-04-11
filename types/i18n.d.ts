@@ -1635,12 +1635,14 @@ export interface components {
 			style_value: unknown;
 		};
 		CreateResourceDTO: {
-			styleValue: string;
+			styleValue: unknown;
 			hashValue: string;
 			styleType: string;
 		};
 		UpdateResourceDTO: {
 			styleName?: string;
+			styleValue?: unknown;
+			styleType?: string;
 			alias?: string;
 			isDeleted?: boolean;
 		};

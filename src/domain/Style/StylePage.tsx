@@ -107,16 +107,6 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 	);
 };
 
-const parseSame = (style: string, serverStyle: string) => {
-	if (!style || !serverStyle) return false;
-
-	const styleValue = safeJsonParse(style);
-	const styleValue2 = safeJsonParse(serverStyle);
-	return deepEqual(styleValue, styleValue2);
-};
-
-const textStylesName = ['default', 'first', 'second', 'third', 'fourth', 'fifth'];
-
 export const StyleXml = ({
 	resource,
 	focusUpdateCount,

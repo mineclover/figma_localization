@@ -291,7 +291,7 @@ export const styleToXml = async (
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				styleValue: JSON.stringify(effectData),
+				styleValue: effectData,
 				hashValue: hashId,
 				styleType: 'effect',
 			}),
@@ -334,7 +334,7 @@ export const styleToXml = async (
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				styleValue: JSON.stringify(style.style),
+				styleValue: style.style,
 				hashValue: style.hashId,
 				styleType: 'style',
 			}),

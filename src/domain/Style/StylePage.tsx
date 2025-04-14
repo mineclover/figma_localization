@@ -32,7 +32,7 @@ import { currentPointerSignal } from '@/model/signal';
 
 import { clientFetchDBCurry } from '../utils/fetchDB';
 
-import styles from '../Label/LabelPage.module.css';
+import styles from './LabelPage.module.css';
 
 import { signal } from '@preact/signals-core';
 

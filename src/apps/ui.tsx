@@ -18,7 +18,7 @@ import SimpleSelect from '@/domain/Batch/SimpleSelect';
 import LogsPage from '@/domain/Logs/LogsPage';
 import { runExample } from '@/utils/test';
 
-const nav = ['Keys', 'Section', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs'];
+const nav = ['Keys', 'Section', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs', 'Label'];
 
 function Plugin() {
 	const isBatch = useSignal(isDirectSignal);
@@ -47,10 +47,10 @@ function Plugin() {
 	}
 
 	const options: Array<TabsOption> = [
-		// {
-		// 	children: <LabelPage />,
-		// 	value: nav[0],
-		// },
+		{
+			children: <LabelPage />,
+			value: nav[9],
+		},
 		{
 			children: <BatchPage />,
 			value: nav[0],

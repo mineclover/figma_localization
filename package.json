@@ -44,7 +44,7 @@
 			"figma",
 			"dev"
 		],
-		"id": "11111",
+		"id": "111112",
 		"capabilities": [
 			"inspect"
 		],
@@ -58,7 +58,7 @@
 				"https://jsonplaceholder.typicode.com"
 			]
 		},
-		"name": "Document System",
+		"name": "Document System2",
 		"main": "src/apps/main.ts",
 		"ui": "src/apps/ui.tsx"
 	}

@@ -13,7 +13,7 @@ import {
 import toNumber from 'strnum';
 
 import { notify } from '@/figmaPluginUtils';
-import { getCursorPosition } from './LabelModel';
+import { getCursorPosition, sectionNameParser } from './LabelModel';
 import { fetchDB } from '../utils/fetchDB';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
@@ -650,4 +650,21 @@ export const onUpdateNodeStoreBatchKey = () => {
 
 		await reloadOriginalLocalizationName(node);
 	});
+};
+// 지금 안쓰는 컴포넌트임
+/**
+ * 입력 값에 섹션 명을 붙여준다
+ * @param input 입력 값
+ * @param sectionName 기준 섹션 명
+ * @returns
+ */
+export const enforcePrefix = (input: string, sectionName: string): string => {
+	const sectionPrefix = sectionNameParser(sectionName) ?? '';
+	const finalPrefix = sectionPrefix;
+	// const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
+	if (finalPrefix === '') {
+		return input;
+	}
+
+	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input;
 };

@@ -27,7 +27,7 @@ import {
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { domainSettingSignal } from '@/model/signal';
-import styles from './LabelPage.module.css';
+import styles from '../Style/LabelPage.module.css';
 import { clc } from '@/components/modal/utils';
 import { UPDATE_NODE_STORE_KEY } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';

@@ -1,6 +1,9 @@
-import { on } from '@create-figma-plugin/utilities';
+import { emit, on } from '@create-figma-plugin/utilities';
 import { MetaData, searchStore } from './searchStore';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
+
+import { NODE_STORE_KEY, STORE_KEY } from '../constant';
+import { modeStateSignal } from '@/model/signal';
 
 export const RENDER_PAIR = {
 	RENDER_REQUEST: 'RENDER_REQUEST',
@@ -185,7 +188,8 @@ export const onRender = () => {
 		const backgroundSize = getBackgroundSize(ignoreIds);
 
 		const frame = getBackgroundFrame();
-		const nodes = await searchStore.search();
+		const nodes = await searchStore.search(ignoreIds);
+		console.log('🚀 ~ on ~ nodes:', nodes);
 		// 전체 스토어 초기화
 		clearBackground(frame, nodes);
 
@@ -230,5 +234,110 @@ export const onDisableRender = () => {
 	on(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST, async () => {
 		const frame = getBackgroundFrame();
 		frame.remove();
+	});
+};
+
+const IGNORE_COLOR = '#777777';
+
+/**
+ * 앞에 _ 가 있거나 무시 상태가 있는지 확인
+ * @param sectionNode
+ * @returns
+ */
+const sectionIgnoreCheck = (sectionNode: SectionNode) => {
+	const ignoreState = sectionNode.getPluginData(NODE_STORE_KEY.IGNORE) === 'true';
+	const ignoreName = sectionNode.name.startsWith('_');
+
+	const some = ignoreState || ignoreName;
+
+	if (some) {
+		return true;
+	}
+	return false;
+};
+
+export const addSectionIgnore = (sectionNode: SectionNode) => {
+	sectionNode.setPluginData(NODE_STORE_KEY.IGNORE, 'true');
+	sectionNode.name = '_' + sectionNode.name;
+};
+
+export const removeSectionIgnore = (sectionNode: SectionNode) => {
+	sectionNode.setPluginData(NODE_STORE_KEY.IGNORE, '');
+	sectionNode.name = sectionNode.name.replace(/^_*/, '');
+};
+
+export const sectionIgnoreToggle = (sectionNode: SectionNode) => {
+	if (sectionIgnoreCheck(sectionNode)) {
+		removeSectionIgnore(sectionNode);
+	} else {
+		addSectionIgnore(sectionNode);
+	}
+};
+
+export const NULL_STATE = '';
+const ignoreSectionAll = () => {
+	const arr = figma.currentPage.children.filter((node) => {
+		if (node.type === 'SECTION') {
+			return sectionIgnoreCheck(node);
+		}
+		return false;
+	});
+	return arr.map((item) => item.id);
+};
+
+/** 상태 전달 */
+export const onSelectModeMain = () => {
+	on(RENDER_TRIGGER.SECTION_SELECT, async () => {
+		figma.currentPage.selection = [];
+		const allIgnores = ignoreSectionAll();
+		console.log('🚀 ~ on ~ allIgnores:', allIgnores);
+
+		figma.currentPage.setPluginData(STORE_KEY.SELECT_MODE, RENDER_MODE_STATE.SECTION_SELECT);
+		emit(RENDER_TRIGGER.SECTION_SELECT, RENDER_MODE_STATE.SECTION_SELECT);
+	});
+	on(RENDER_TRIGGER.MULTI_KEY_SELECT, async () => {
+		figma.currentPage.selection = [];
+		figma.currentPage.setPluginData(STORE_KEY.SELECT_MODE, RENDER_MODE_STATE.MULTI_KEY_SELECT);
+		emit(RENDER_TRIGGER.MULTI_KEY_SELECT, RENDER_MODE_STATE.MULTI_KEY_SELECT);
+	});
+	on(RENDER_TRIGGER.BASE_KEY_SELECT, async () => {
+		figma.currentPage.selection = [];
+		figma.currentPage.setPluginData(STORE_KEY.SELECT_MODE, RENDER_MODE_STATE.BASE_KEY_SELECT);
+		emit(RENDER_TRIGGER.BASE_KEY_SELECT, RENDER_MODE_STATE.BASE_KEY_SELECT);
+	});
+	on(RENDER_TRIGGER.SAVE_ACCEPT, async () => {
+		figma.currentPage.selection = [];
+		figma.currentPage.setPluginData(STORE_KEY.SELECT_MODE, NULL_STATE);
+		emit(RENDER_TRIGGER.SAVE_ACCEPT, NULL_STATE);
+	});
+};
+
+/** 상태 전달  */
+export const onSaveAccept = () => {
+	emit(RENDER_TRIGGER.SAVE_ACCEPT, NULL_STATE);
+	return on(RENDER_TRIGGER.SAVE_ACCEPT, async () => {
+		console.log('🚀 ~ onSaveAccept ~ onSaveAccept:', NULL_STATE);
+		modeStateSignal.value = NULL_STATE;
+	});
+};
+
+export const onSectionSelect = () => {
+	return on(RENDER_TRIGGER.SECTION_SELECT, async () => {
+		console.log('🚀 ~ onSectionSelect ~ onSectionSelect:', RENDER_MODE_STATE.SECTION_SELECT);
+		modeStateSignal.value = RENDER_MODE_STATE.SECTION_SELECT;
+	});
+};
+
+export const onMultiKeySelect = () => {
+	return on(RENDER_TRIGGER.MULTI_KEY_SELECT, async () => {
+		console.log('🚀 ~ onMultiKeySelect ~ onMultiKeySelect:', RENDER_MODE_STATE.MULTI_KEY_SELECT);
+		modeStateSignal.value = RENDER_MODE_STATE.MULTI_KEY_SELECT;
+	});
+};
+
+export const onBaseKeySelect = () => {
+	return on(RENDER_TRIGGER.BASE_KEY_SELECT, async () => {
+		console.log('🚀 ~ onBaseKeySelect ~ onBaseKeySelect:', RENDER_MODE_STATE.BASE_KEY_SELECT);
+		modeStateSignal.value = RENDER_MODE_STATE.BASE_KEY_SELECT;
 	});
 };

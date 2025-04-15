@@ -3,9 +3,9 @@ export const baseURL = 'http://localhost:6543';
 export const STORE_KEY = {
 	DOMAIN: 'STORE_DOMAIN',
 	LANGUAGE_CODES: 'STORE_LANGUAGE_CODES',
-	CURSOR: 'STORE_CURSOR',
 	PROJECT_ID: 'STORE_PROJECT_ID',
 	PRESET: 'STORE_PRESET',
+	SELECT_MODE: 'STORE_SELECT_MODE',
 };
 
 // TextPluginData

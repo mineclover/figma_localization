@@ -7,6 +7,7 @@ import { CurrentCursorType } from './types';
 import { signal } from '@preact/signals-core';
 import { ActionType } from '@/domain/System/ActionResourceDTO';
 import { MetaData } from '@/domain/Search/searchStore';
+import { NULL_STATE } from '@/domain/Search/visualModel';
 
 /**
  * 번역 키 관련 상태를 저장하는 시그널
@@ -94,3 +95,4 @@ export const sectionSelectModeSignal = signal<boolean>(true);
 
 /** 무시할 섹션 아이디 목록 */
 export const ignoreSectionIdsSignal = signal<string[]>([]);
+export const modeStateSignal = signal(NULL_STATE);

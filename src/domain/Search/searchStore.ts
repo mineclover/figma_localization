@@ -85,46 +85,58 @@ class SearchStore {
 		}
 	}
 
-	async search(targetAreaId?: string) {
+	async search(ignoreSectionIds: string[] = []) {
+		const nodes: MetaData[] = [];
 		if (this.isFigma()) {
 			// 일단 갱신
-			const targetArea = targetAreaId ? await figma.getNodeByIdAsync(targetAreaId) : figma.currentPage;
-			console.log('🚀 ~ SearchStore ~ search ~ targetArea:', targetArea);
 
-			if (targetArea == null) {
-				return [];
-			}
-			const areaId = targetArea.id;
-			if (targetArea.type === 'SECTION' || targetArea.type === 'PAGE' || targetArea.type === 'COMPONENT_SET') {
-				let sectionStore = this.sectionStore.get(areaId);
-				if (sectionStore == null) {
-					sectionStore = new Set<string>();
-					this.sectionStore.set(areaId, sectionStore);
-				}
-				const nodes = targetArea.findAllWithCriteria({
-					types: ['TEXT'],
-				});
-				sectionStore.clear();
-				nodes.forEach((node) => {
-					this.setStore(node.id, node);
-					sectionStore.add(node.id);
-				});
-			}
+			/**  */
+			const targetAreas = figma.currentPage.children
+				.filter((child) => !ignoreSectionIds.includes(child.id))
+				.filter((item) => item.type === 'SECTION');
 
-			const keys = this.sectionStore.get(areaId);
-			if (keys == null) {
-				return [];
+			if (targetAreas.length === 0) {
+				return nodes;
 			}
-			const nodes = [];
-			for (const key of keys) {
-				const node = await this.get(key);
-				if (node != null) {
-					nodes.push(node);
+			// 섹션들에서 조회
+
+			for (const targetArea of targetAreas) {
+				const areaId = targetArea.id;
+				if (targetArea.type === 'SECTION') {
+					let sectionStore = this.sectionStore.get(areaId);
+					if (sectionStore == null) {
+						sectionStore = new Set<string>();
+						this.sectionStore.set(areaId, sectionStore);
+					}
+					const nodes = targetArea.findAllWithCriteria({
+						types: ['TEXT'],
+					});
+					sectionStore.clear();
+					nodes.forEach((node) => {
+						this.setStore(node.id, node);
+						sectionStore.add(node.id);
+					});
 				}
+
+				// 섹션 아이디로 스토어에서 얻어보고 없으면 빈 배열 반환
+				const keys = this.sectionStore.get(areaId);
+				//스토어에서 얻어보고 없으면 빈 배열 반환
+				if (keys == null) {
+					continue;
+					// 없으면 다음 섹션으로 넘어감
+				}
+
+				for (const key of keys) {
+					const node = await this.get(key);
+					if (node != null) {
+						nodes.push(node);
+					}
+				}
+				continue;
 			}
 			return nodes;
 		} else {
-			return [];
+			return nodes;
 		}
 	}
 

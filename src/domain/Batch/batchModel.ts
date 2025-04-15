@@ -39,8 +39,10 @@ export const onPatternMatch = () => {
 	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
 		// 일단 선택된 섹션 관리
 		figma.skipInvisibleInstanceChildren = true;
-
-		const dataArr = await searchStore.search(targetID);
+		const sections = figma.currentPage.children
+			.filter((item) => item.type === 'SECTION')
+			.filter((item) => item.id !== targetID);
+		const dataArr = await searchStore.search(sections.map((item) => item.id));
 		emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
 	});
 };

@@ -18,7 +18,8 @@ import { useState } from 'preact/hooks';
 import { selectedPresetNameSignal, editPresetSignal, presetStoreSignal } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../Search/visualModel';
+import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER } from '../Search/visualModel';
+import { modeStateSignal } from '@/model/signal';
 
 const Preset = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -62,15 +63,23 @@ const Preset = () => {
 function LabelPage() {
 	const preset = useSignal(editPresetSignal);
 	const presetStore = useSignal(presetStoreSignal);
+	const modeState = useSignal(modeStateSignal);
 	const presetNames = Object.keys(presetStore);
 
 	return (
 		<div className={styles.container}>
 			<Preset />
+			<span>{modeState}</span>
 
 			<div className={styles.row}>
-				<Bold>섹션 선택</Bold>
-				<p>섹션들</p>
+				<Button
+					onClick={() => {
+						emit(RENDER_TRIGGER.SECTION_SELECT);
+					}}
+				>
+					제외할 섹션 선택
+				</Button>
+				<p>선택 섹션들은 수정 대상에서 제외됩니다.(전체 선택 시 제외)</p>
 			</div>
 			<div className={styles.row}>
 				<p>조회 후</p>

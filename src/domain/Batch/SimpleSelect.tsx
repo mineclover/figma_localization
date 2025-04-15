@@ -60,9 +60,6 @@ const Test = ({ id, selected, keyMatch, current }: Props) => {
 	);
 };
 
-const selectKeySignal = signal<string>('');
-const selectTextSignal = signal<string>('');
-
 const KeyIdNameSignal = signal<Record<string, string>>({});
 
 const clientFetch = clientFetchDBCurry();

@@ -1,0 +1,51 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 2px;
+	margin-top: 2px;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	[class^='_textbox'] {
+		flex-grow: 1;
+	}
+}
+
+.wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.up {
+	transform: rotate(180deg);
+}
+
+.iconButton {
+	border-radius: 4px;
+	background-color: var(--figma-color-bg);
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-pressed);
+	}
+}
+
+.item {
+	padding: 4px 8px;
+	text-align: left;
+	border-bottom: 1px solid var(--figma-color-border);
+	background-color: var(--figma-color-bg);
+	&:hover {
+		background-color: var(--figma-color-bg-hover);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-pressed);
+	}
+}

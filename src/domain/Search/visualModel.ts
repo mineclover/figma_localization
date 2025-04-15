@@ -17,9 +17,40 @@ export const BACKGROUND_SYMBOL = {
 	idStore: 'BACKGROUND_ID_STORE',
 };
 
-export const getBackgroundSize = () => {
-	const nodes = figma.currentPage.children;
+export const RENDER_MODE_STATE = {
+	/**
+	 * 선택 된 걸로 오버라이드 개념만 있어서 없어도 될 듯하긴 하지만?
+	 * 선택 시 바로바로 활성화 시켜주는 용도로 쓰려면 있는게 좋을지도?
+	 */
+	SECTION_SELECT: 'SECTION_SELECT_MODE',
+	/**
+	 * 멀티 키 선택 시 일관적이게 선택되는 모드
+	 */
+	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_MODE',
+	/**
+	 * 베이스 키 선택 시 하나만 선택 되게 하는 모드
+	 */
+	BASE_KEY_SELECT: 'BASE_KEY_SELECT_MODE',
+};
+
+/** 각 트리거는 다른 모드들을 비활성화하고 단일 대상을 활성화 하는데 사용된다 */
+export const RENDER_TRIGGER = {
+	SECTION_SELECT: 'SECTION_SELECT_ACCEPT',
+	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_ACCEPT',
+	BASE_KEY_SELECT: 'BASE_KEY_SELECT_ACCEPT',
+	SAVE_ACCEPT: 'SAVE_ACCEPT',
+};
+
+// 데이터 전송은 비활성화 시 발생
+// 인터렉션은 활성화 중에 발생
+// 일단 인터렉션으로 데이터 변경을 전파하고 그 데이터가 클라이언트에 가고 그 데이터가 서버로 가는 것까지가 플로우
+// 충분한 정보가 메인 프로세스에도 있으면 전파하지 않고 내부에서 서버로 보낸 후 해당 내용들을 전파 후 클라에도 업데이트
+// 선택한 섹션 아이디는 뭐고, 액션은 뭐고, 로컬라이제이션 키는 뭐고, 위치 값은 뭐고, 스타일 키에 매핑되는 이름은 뭐고
+
+export const getBackgroundSize = (ignoreIds: string[] = []) => {
+	const filterNodes = figma.currentPage.children;
 	const padding = 100;
+	const nodes = filterNodes.filter((node) => !ignoreIds.includes(node.id));
 
 	const minmax = nodes.reduce(
 		(acc, node) => {
@@ -56,9 +87,11 @@ const getBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
-			if (node.getPluginData(BACKGROUND_SYMBOL.background) === 'true') {
-				return node as FrameNode;
-			}
+			// 일단 이름만 맞아도 되게 하자
+			// if (node.getPluginData(BACKGROUND_SYMBOL.background) === 'true') {
+			// 	return node as FrameNode;
+			// }
+			return node as FrameNode;
 		}
 	}
 	return figma.createFrame();
@@ -148,8 +181,8 @@ const textOverlay = (
 };
 
 export const onRender = () => {
-	on(RENDER_PAIR.RENDER_REQUEST, async () => {
-		const backgroundSize = getBackgroundSize();
+	on(RENDER_PAIR.RENDER_REQUEST, async (ignoreIds: string[] = []) => {
+		const backgroundSize = getBackgroundSize(ignoreIds);
 
 		const frame = getBackgroundFrame();
 		const nodes = await searchStore.search();

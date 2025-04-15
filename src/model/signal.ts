@@ -1,5 +1,5 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
-import { LocalizationKeyDTO, SearchNodeData, StyleSync } from './types';
+import { LocalizationKeyDTO, Preset, PresetStore, SearchNodeData, StyleSync } from './types';
 import { LocalizationKey } from './types';
 import { DomainSettingType } from './types';
 import { CurrentNode } from './types';
@@ -28,7 +28,7 @@ export const selectIdsSignal = signal<string[]>([]);
 /** 현재 커서가 있는 섹션 ( 실시간 감지 ) */
 export const currentSectionSignal = signal<CurrentNode | null>(null);
 
-/** 현재 포인터의 노드 데이터 */
+/** 현재 포인터의 노드 데이터 ( 실시간 감지 ) */
 export const currentPointerSignal = signal<CurrentCursorType | null>(null);
 
 /** 프로젝트 아이디 */
@@ -70,3 +70,27 @@ export const variableDataSignal = signal<Record<string, string>>({});
 export const userHashSignal = signal<string | null>(null);
 // elwkdlsj
 // 디자이너라 씀
+
+// ================================================
+// 프리셋 관련
+// ================================================
+
+export const defaultPreset: Preset = {
+	name: '',
+	figmaSectionIds: [],
+	baseNodeId: '',
+	serverSectionId: '',
+};
+
+/** 선택 원본 프리셋 이름 */
+export const selectedPresetNameSignal = signal<string>('');
+/** 수정할 프리셋 데이터 */
+export const editPresetSignal = signal<Preset>(defaultPreset);
+/** 프리셋 원본 저장소 */
+export const presetStoreSignal = signal<PresetStore>({});
+
+/** 섹션 선택 모드 */
+export const sectionSelectModeSignal = signal<boolean>(true);
+
+/** 무시할 섹션 아이디 목록 */
+export const ignoreSectionIdsSignal = signal<string[]>([]);

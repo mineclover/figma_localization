@@ -294,3 +294,16 @@ export interface LocalizationKeyAction {
 
 	effect_value: string;
 }
+
+export type Preset = {
+	/** 저장될 프리셋 이름 */
+	name: string;
+	/** 피그마 섹션 아이디 */
+	figmaSectionIds: string[];
+	/** 서버 섹션 아이디 */
+	serverSectionId?: string;
+	/** 베이스 노드 아이디 ( 서버에서 받아야 됨 ) */
+	baseNodeId?: string;
+};
+
+export type PresetStore = Record<Preset['name'], Preset>;

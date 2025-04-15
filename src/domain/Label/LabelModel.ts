@@ -1,12 +1,14 @@
-import { CurrentCursorType, NodeData } from '@/model/types';
+import { CurrentCursorType, NodeData, Preset, PresetStore } from '@/model/types';
 import { emit, on } from '@create-figma-plugin/utilities';
 import {
 	GET_CURSOR_POSITION,
+	GET_PRESET,
 	GET_PROJECT_ID,
 	GET_STYLE_DATA,
 	NODE_STORE_KEY,
 	PAGE_LOCK_KEY,
 	SET_NODE_ACTION,
+	SET_PRESET,
 	SET_PROJECT_ID,
 	STORE_KEY,
 } from '../constant';
@@ -17,6 +19,7 @@ import { fetchDB } from '../utils/fetchDB';
 import { ERROR_CODE } from '../errorCode';
 import { removeLeadingSymbols } from '@/utils/textTools';
 import { currentPointerSignal, projectIdSignal } from '@/model/signal';
+import { safeJsonParse } from '../utils/getStore';
 
 export const getProjectId = () => {
 	const fileKey = figma.fileKey;
@@ -129,5 +132,28 @@ export const onSetNodeAction = () => {
 		}
 		const result = getCursorPosition(node);
 		emit(GET_CURSOR_POSITION.RESPONSE_KEY, result);
+	});
+};
+
+export const onSetPreset = () => {
+	on(SET_PRESET.REQUEST_KEY, (oldName: string, preset: Preset) => {
+		const name = preset.name.trim() === '' ? 'recent' : preset.name;
+		const presetStore = safeJsonParse<PresetStore>(figma.root.getPluginData(STORE_KEY.PRESET)) ?? {};
+		// 이전 값 삭제
+		delete presetStore[oldName];
+		// 새로운 값 추가 ( 오버라이드도 됨 )
+		presetStore[name] = preset;
+		// 저장
+		figma.root.setPluginData(STORE_KEY.PRESET, JSON.stringify(presetStore));
+	});
+};
+
+export const onGetPreset = () => {
+	on(GET_PRESET.REQUEST_KEY, () => {
+		const preset = figma.root.getPluginData(STORE_KEY.PRESET);
+		if (preset) {
+			const presetData = safeJsonParse<PresetStore>(preset);
+			emit(GET_PRESET.RESPONSE_KEY, presetData);
+		}
 	});
 };

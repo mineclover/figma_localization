@@ -4,13 +4,16 @@ import {
 	GET_LOCALIZATION_KEY_VALUE,
 	CURRENT_SECTION_SELECTED,
 	GET_STYLE_DATA,
+	STORE_KEY,
+	NODE_STORE_KEY,
 } from '../../domain/constant';
 import { getCurrentSectionSelected } from '../../domain/Translate/TranslateModel';
 import { getCursorPosition } from '../../domain/Label/LabelModel';
 import { processTextNodeLocalization } from '../../domain/Label/TextPluginDataModel';
 import { newGetStyleData } from './GET_STYLE_DATA';
-import { BACKGROUND_SYMBOL, ignoreSectionAll } from '@/domain/Search/visualModel';
+import { BACKGROUND_SYMBOL, ignoreSectionAll, overRayRender } from '@/domain/Search/visualModel';
 import { nodeMetaData, searchStore } from '@/domain/Search/searchStore';
+import { read } from 'fs';
 
 export let tempNode = '';
 export let downloadStatus = {
@@ -43,6 +46,13 @@ export const overlayFrameInfo = (node: SceneNode) => {
 	return null;
 };
 
+let tempStore = {
+	localizationKey: '',
+	baseNodeId: '',
+} as {
+	localizationKey: string;
+	baseNodeId: string;
+};
 export const onNodeSelectionChange = () => {
 	figma.on('selectionchange', async () => {
 		const nodes = figma.currentPage.selection;
@@ -79,14 +89,37 @@ export const onNodeSelectionChange = () => {
 
 							const pointer = textNodes.filter((node) => filteredTextNodes.includes(node.id));
 							figma.currentPage.selection = pointer;
+							tempStore.localizationKey = metaData.localizationKey;
+							tempStore.baseNodeId = metaData.baseNodeId ?? '';
 						}
 					}
 				}
 			}
-		}
-		if (nodes.length > 1) {
+		} else if (nodes.length > 1) {
 			const frames = nodes.filter((node) => isOverlayFrame(node));
-			frames;
+			const nextPointer = [];
+
+			for (const node of frames) {
+				const isOverlay = isOverlayFrame(node);
+				// 선택 대상이 있고 오버레이 프레임임
+				if (isOverlay) {
+					// 오버레이 프레임 정보 가져옴
+					const id = overlayFrameInfo(node);
+					if (id) {
+						// 오버레이 프레임 정보로 텍스트 노드 선택함
+						const textNode = (await figma.getNodeByIdAsync(id)) as TextNode;
+						textNode.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, tempStore.localizationKey);
+						textNode.setPluginData(NODE_STORE_KEY.LOCATION, tempStore.baseNodeId);
+						nextPointer.push(textNode);
+					}
+				}
+			}
+
+			if (nextPointer.length > 0) {
+				overRayRender();
+				const currentSelection = figma.currentPage.selection;
+				figma.currentPage.selection = [...currentSelection, ...nextPointer];
+			}
 		}
 
 		const node = nodes[0];

@@ -382,49 +382,44 @@ const baseNodeHighlight = (data: MetaData, backgroundNode: FrameNode) => {
 		}
 	}
 };
+const getRandomNumber = () => {
+	return Math.floor(Math.random() * 360) + 1;
+};
+
+export const overRayRender = async () => {
+	const ignoreIds = ignoreSectionAll().map((node) => node.id);
+	const backgroundSize = getBackgroundSize(ignoreIds);
+
+	const frame = initBackgroundFrame();
+
+	const { hasKey, nullKey, keys } = await autoKeyMapping(ignoreIds);
+
+	const optionColorMap = generatePastelColors(keys, getRandomNumber());
+
+	const { x, y, width, height } = backgroundSize;
+	frame.x = x;
+	frame.y = y;
+	frame.resize(width, height);
+	const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 0.4 });
+
+	frame.fills = [paint];
+
+	frame.opacity = 0.7;
+	// frame.locked = true;
+	frame.name = '##overlay';
+	frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
+
+	hasKey.forEach((item, index) => {
+		// 시작 대상 포커스 해도 됨
+		const node = lzTextOverlay(item, optionColorMap, frame, { x, y });
+	});
+	for (const item of hasKey) {
+		baseNodeHighlight(item, frame);
+	}
+};
 
 export const onRender = () => {
-	on(RENDER_PAIR.RENDER_REQUEST, async () => {
-		const ignoreIds = ignoreSectionAll().map((node) => node.id);
-		const backgroundSize = getBackgroundSize(ignoreIds);
-
-		const frame = initBackgroundFrame();
-
-		const { hasKey, nullKey, keys } = await autoKeyMapping(ignoreIds);
-		console.log('🚀 ~ on ~ hasKey:', hasKey);
-
-		const optionColorMap = generatePastelColors(keys, 40);
-
-		const { x, y, width, height } = backgroundSize;
-		frame.x = x;
-		frame.y = y;
-		frame.resize(width, height);
-		const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 0.4 });
-
-		frame.fills = [paint];
-
-		frame.opacity = 0.7;
-		// frame.locked = true;
-		frame.name = '##overlay';
-		frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
-
-		hasKey.forEach((item, index) => {
-			// 시작 대상 포커스 해도 됨
-			const node = lzTextOverlay(item, optionColorMap, frame, { x, y });
-			// if (0 === index) {
-			// 	figma.currentPage.selection = [node];
-			// 	figma.viewport.scrollAndZoomIntoView([node]);
-			// }
-			// 마지막 대상 포커스 ?
-			if (hasKey.length - 1 === index) {
-				figma.currentPage.selection = [node];
-				figma.viewport.scrollAndZoomIntoView([node]);
-			}
-		});
-		for (const item of hasKey) {
-			baseNodeHighlight(item, frame);
-		}
-	});
+	on(RENDER_PAIR.RENDER_REQUEST, overRayRender);
 };
 
 export const onDisableRender = () => {

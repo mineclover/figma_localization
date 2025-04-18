@@ -8,7 +8,7 @@ import { isValidHexColor, convertNamedColorToHexColor } from '@create-figma-plug
  */
 export function generatePastelColors(text: string[], startHue: number = 0, lightness: number = 85) {
 	const uniqueChars = [...new Set(text)];
-	const hueStep = 32;
+	const hueStep = 207;
 	// const hueStep = 360 / uniqueChars.length;
 
 	const colorMap: Record<string, string> = {};

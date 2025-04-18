@@ -35,3 +35,14 @@ export const clientFetchDBCurry =
 			headers,
 		});
 	};
+
+export const pureFetch = <V extends keyof paths>(url: V, options?: RequestInit) => {
+	const headers = {
+		'Content-Type': 'application/json',
+	} as Record<string, string>;
+
+	return fetch(baseURL + url, {
+		...options,
+		headers,
+	});
+};

@@ -28,6 +28,7 @@ import {
 	Textbox,
 	Toggle,
 	VerticalSpace,
+	IconEyeSmall24,
 } from '@create-figma-plugin/ui';
 import { emit } from '@create-figma-plugin/utilities';
 import {
@@ -88,7 +89,7 @@ export const SearchResult = ({ ignore, name, text, parentName, localizationKey, 
 							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 						}}
 					>
-						{ignore ? <IconHiddenSmall24 /> : <IconVisible16 />}
+						{ignore ? <IconHiddenSmall24 /> : <IconEyeSmall24></IconEyeSmall24>}
 					</IconButton>
 					<Text align="left" className={styles.width}>
 						<Code>text: {text}</Code>
@@ -534,11 +535,15 @@ function BatchPage() {
 									});
 
 									if (result.data) {
-										emit(SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
-											domainId: result.data.domain_id,
-											keyId: result.data.key_id,
-											ids: selectIds,
-										});
+										emit(
+											SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
+											{
+												domainId: result.data.domain_id,
+												keyId: result.data.key_id,
+												ids: selectIds,
+											},
+											currentPointer?.nodeId
+										);
 										emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
 									}
 								}

@@ -460,6 +460,10 @@ export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 	if (data.ignore != null) {
 		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString());
 	}
+
+	if (data.baseNodeId != null) {
+		node.setPluginData(NODE_STORE_KEY.LOCATION, data.baseNodeId.toString());
+	}
 };
 
 /**

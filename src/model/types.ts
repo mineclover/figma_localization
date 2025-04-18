@@ -10,7 +10,7 @@ export interface TranslationKeyEventTypes {
 // 노드 데이터 타입
 export interface NodeData {
 	localizationKey: string;
-
+	baseNodeId?: string;
 	domainId?: string;
 	ignore?: boolean;
 	action?: ActionType;

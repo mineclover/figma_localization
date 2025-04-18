@@ -11,6 +11,7 @@ export const STORE_KEY = {
 // TextPluginData
 
 export const NODE_STORE_KEY = {
+	/** baseNodeId 로 써도 될듯? 이라고.... */
 	LOCATION: 'NODE_LOCATION',
 	LOCALIZATION_KEY: 'NODE_LOCALIZATION_KEY',
 	ORIGINAL_LOCALIZE_ID: 'NODE_ORIGINAL_LOCALIZE_ID',

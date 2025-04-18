@@ -33,13 +33,14 @@ export type MetaData = {
 	localizationKey: string;
 	text: string;
 	parentName?: string;
+	baseNodeId?: string;
 	x: number;
 	y: number;
 	width: number;
 	height: number;
 };
 
-const nodeMetaData = (node: TextNode) => {
+export const nodeMetaData = (node: TextNode) => {
 	const metric = nodeMetric(node);
 	const root = SectionSearch(node);
 	// 섹션 있으면 처리 없으면 처리 안함
@@ -51,6 +52,7 @@ const nodeMetaData = (node: TextNode) => {
 		root: rootId,
 		ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
 		localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
+		baseNodeId: node.getPluginData(NODE_STORE_KEY.LOCATION),
 		text: node.characters,
 		parentName: node.parent?.name,
 		...metric,
@@ -60,8 +62,9 @@ const nodeMetaData = (node: TextNode) => {
 /** figma 클라이언트 */
 class SearchStore {
 	store: Map<string, MetaData>;
-	sectionStore: Map<string, Set<string>>;
 	// 조회 기준 데이터 저장 목적
+	sectionStore: Map<string, Set<string>>;
+	// 키 저장 목적임
 
 	constructor() {
 		this.store = new Map<string, MetaData>();
@@ -82,6 +85,30 @@ class SearchStore {
 			nodes.forEach((node) => {
 				this.setStore(node.id, node);
 			});
+		}
+	}
+
+	partialRefresh(input: string) {
+		if (this.isFigma()) {
+			const nodes = figma.currentPage.findAllWithCriteria({
+				types: ['TEXT'],
+				pluginData: {
+					keys: [NODE_STORE_KEY.LOCALIZATION_KEY],
+				},
+			});
+
+			nodes.forEach((node) => {
+				this.setStore(node.id, node);
+			});
+			const result = nodes.filter((node) => {
+				const key = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
+				if (key === input) {
+					return true;
+				}
+				return false;
+			});
+
+			return result;
 		}
 	}
 
@@ -139,8 +166,6 @@ class SearchStore {
 			return nodes;
 		}
 	}
-
-	// 기본 계층
 
 	async get(key: string) {
 		const node = this.store.get(key);

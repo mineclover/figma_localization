@@ -1,8 +1,15 @@
 import { isValidHexColor, convertNamedColorToHexColor } from '@create-figma-plugin/utilities';
 
-export function generatePastelColors(text: string[], startHue: number = 0) {
+/**
+ *
+ * @param text
+ * @param startHue  색조
+ * @returns
+ */
+export function generatePastelColors(text: string[], startHue: number = 0, lightness: number = 85) {
 	const uniqueChars = [...new Set(text)];
-	const hueStep = 360 / uniqueChars.length;
+	const hueStep = 32;
+	// const hueStep = 360 / uniqueChars.length;
 
 	const colorMap: Record<string, string> = {};
 
@@ -11,7 +18,6 @@ export function generatePastelColors(text: string[], startHue: number = 0) {
 		const hue = (startHue + index * hueStep) % 360;
 		const saturation = 100; // 파스텔톤을 위한 적절한 채도
 		// const lightness = 85; // 높은 명도로 파스텔톤 구현
-		const lightness = 85; // 높은 명도로 파스텔톤 구현
 
 		// HSL을 HEX로 변환
 		const color = hslToHex(hue, saturation, lightness);

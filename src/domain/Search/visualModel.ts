@@ -11,7 +11,7 @@ import { safeJsonParse } from '../utils/getStore';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB';
 import { generateRandomText2 } from '@/utils/textTools';
-import { baseIsAllNode } from '../Batch/batchModel';
+import { baseIsAllNode, idsBaseAll } from '../Batch/batchModel';
 
 export const RENDER_PAIR = {
 	RENDER_REQUEST: 'RENDER_REQUEST',
@@ -106,6 +106,16 @@ export const getBackgroundSize = (ignoreIds: string[] = []) => {
 };
 
 const getBackgroundFrame = () => {
+	const nodes = figma.currentPage.children;
+	for (const node of nodes) {
+		if (node.name === '##overlay') {
+			// 일단 이름만 맞아도 되게 하자
+			return node as FrameNode;
+		}
+	}
+};
+
+const initBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
@@ -308,14 +318,68 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 		// 누구를 기준으로 할거냐
 		// 키만 등록하고 스타일 등록은 미루는 것도 방법임
 		// 즉 베이스 노드를 일단 클리어하자는 얘긴데.. 지금 이 코드는 nullKey 에 대한 처리로 시작하고 있어서 baseNode를 잡는게 합리적이다고 생각되긴 함
-		// 근데 그 베이스 노드가 기준 노드고, 로컬라이제이션, 키, 액션 단위에서 한 개라고 가정되어있기 때문에
-		//
+		// 애초에 키가 없음 만약 baseNode를 잡고 싶으면
+		// 근데 그 베이스 노드가 기준 노드고, 로컬라이제이션, 키, 액션 단위에서 한 개라고 가정되어있기 때문에 일단
+		// baseNode 를 시각적으로 인지시킨 후 이에 대해 자동 생성 ok 일 때 자동 생성하는 로직으로 진행
 
-		await baseIsAllNode({
-			domainId: String(domain.domainId),
-			keyId: key,
-			ids: nodes.map((node) => node.id),
-		});
+		const baseNode = nodes[0].id;
+
+		await idsBaseAll(
+			{
+				domainId: String(domain.domainId),
+				keyId: key,
+				ids: nodes.map((node) => node.id),
+			},
+			baseNode
+		);
+	}
+};
+
+const autoKeyMapping = async (ignoreIds: string[], count: number = 0) => {
+	const nodes = await searchStore.search(ignoreIds);
+
+	// 전체 스토어 초기화하지 않음 > getBackgroundFrame 에서 없애고 시작하기 때문
+	// clearBackground(frame, nodes);
+
+	const { hasKey, nullKey, keys } = localizationKeySplit(nodes);
+	const textMap = textSorter(nullKey);
+	const textMapId = (await textKeyRegister(textMap)) ?? {};
+
+	await textOriginRegister(textMapId);
+
+	if (nullKey.length > 0 && count < 4) {
+		console.log('🚀 ~ autoKeyMapping ~ count:', count);
+		return autoKeyMapping(ignoreIds, count + 1);
+	}
+
+	return {
+		keys,
+		hasKey,
+		nullKey,
+	};
+};
+
+const baseNodeHighlight = (data: MetaData, backgroundNode: FrameNode) => {
+	const { id, baseNodeId, localizationKey } = data;
+	if (id !== baseNodeId) {
+		return;
+	}
+	const redSolid = figma.util.solidPaint({ r: 1, g: 0, b: 0 });
+
+	if (backgroundNode) {
+		const array = backgroundNode.children;
+
+		for (const node of array) {
+			if (node.type === 'FRAME' && node.name === `#${localizationKey}`) {
+				const currentId = node.getPluginData(BACKGROUND_SYMBOL.idStore);
+
+				if (currentId === id) {
+					node.dashPattern = [0];
+					node.strokeWeight = 3;
+					node.strokes = [redSolid];
+				}
+			}
+		}
 	}
 };
 
@@ -324,24 +388,12 @@ export const onRender = () => {
 		const ignoreIds = ignoreSectionAll().map((node) => node.id);
 		const backgroundSize = getBackgroundSize(ignoreIds);
 
-		const frame = getBackgroundFrame();
-		const nodes = await searchStore.search(ignoreIds);
-		console.log('🚀 ~ on ~ nodes:', nodes);
+		const frame = initBackgroundFrame();
 
-		// 전체 스토어 초기화하지 않음 > getBackgroundFrame 에서 없애고 시작하기 때문
-		// clearBackground(frame, nodes);
+		const { hasKey, nullKey, keys } = await autoKeyMapping(ignoreIds);
+		console.log('🚀 ~ on ~ hasKey:', hasKey);
 
-		const { hasKey, nullKey, keys } = localizationKeySplit(nodes);
-		const textMap = textSorter(nullKey);
-		const textMapId = (await textKeyRegister(textMap)) ?? {};
-
-		// 키 등록 후 모든 노드에 키 등록 (baseNode 어디 갔음)
-		await textOriginRegister(textMapId);
-		const textKeys = Object.keys(textMapId);
-
-		// const textColorMap = generatePastelColors(textKeys, 0, 40);
-
-		const optionColorMap = generatePastelColors([...keys, ...textKeys], 40);
+		const optionColorMap = generatePastelColors(keys, 40);
 
 		const { x, y, width, height } = backgroundSize;
 		frame.x = x;
@@ -369,15 +421,15 @@ export const onRender = () => {
 				figma.viewport.scrollAndZoomIntoView([node]);
 			}
 		});
-		nullKey.forEach((item) => {
-			const node = textMatchOverlay(item, optionColorMap, frame, { x, y });
-		});
+		for (const item of hasKey) {
+			baseNodeHighlight(item, frame);
+		}
 	});
 };
 
 export const onDisableRender = () => {
 	on(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST, async () => {
-		const frame = getBackgroundFrame();
+		const frame = initBackgroundFrame();
 		frame.remove();
 	});
 };

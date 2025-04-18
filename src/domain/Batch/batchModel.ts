@@ -142,6 +142,36 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 	};
 };
 
+export const idsBaseAll = async (data: { domainId: string; keyId: string; ids: string[] }, baseNodeId?: string) => {
+	if (data.ids.length === 0) {
+		return;
+	}
+	// originalLocalizeId 조회 또는 등록
+	// searchTranslationCode
+	const xNode = baseNodeId ? await figma.getNodeByIdAsync(baseNodeId) : null;
+
+	// 기준 노드가 있으면 기준 노드 설정
+	if (xNode) {
+		setNodeData(xNode, {
+			domainId: data.domainId,
+			localizationKey: data.keyId,
+			baseNodeId: baseNodeId,
+		});
+	}
+
+	// 기준 노드가 없으면 모든 노드 설정
+	for (const id of data.ids) {
+		const node = await figma.getNodeByIdAsync(id);
+		if (node) {
+			setNodeData(node, {
+				domainId: data.domainId,
+				localizationKey: data.keyId,
+				baseNodeId: baseNodeId,
+			});
+		}
+	}
+};
+
 /**
  * 기준 설정이 약간 모호한 부분
  * 기준 키로 모든 스타일이 변경되고 오리진도 등록됨 (addTranslation)

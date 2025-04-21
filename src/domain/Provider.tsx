@@ -10,7 +10,14 @@ import { onProcessResponse } from './System/process';
 import { onGetCursorPositionResponse } from '@/model/on/GET_CURSOR_POSITION';
 import { onSetProjectIdResponse } from './Label/LabelModel';
 import { onPatternMatchResponse } from './Batch/batchModel';
-import { onSaveAccept, onSectionSelect, onMultiKeySelect, onBaseKeySelect } from './Search/visualModel';
+import {
+	onSaveAccept,
+	onSectionSelect,
+	onMultiKeySelect,
+	onBaseKeySelect,
+	onAutoSelectStyleUI,
+	onAutoSelectUI,
+} from './Search/visualModel';
 
 /**
  * duplex 전용 어댑터
@@ -39,6 +46,8 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onMultiKeySelect(),
 			onBaseKeySelect(),
 			onSaveAccept(),
+			onAutoSelectUI(),
+			onAutoSelectStyleUI(),
 		];
 
 		return () => {

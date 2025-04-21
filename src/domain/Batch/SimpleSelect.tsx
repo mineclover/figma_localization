@@ -146,7 +146,6 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 	const currentPointer = useSignal(currentPointerSignal);
 	const currentSection = useSignal(currentSectionSignal);
 	const selectItems = useSignal(selectIdsSignal);
-
 	const selectKey = useSignal(selectedKeySignal);
 
 	const patternMatchData = useSignal(patternMatchDataSignal);

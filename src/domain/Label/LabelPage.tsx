@@ -17,10 +17,16 @@ import {
 import { clc } from '@/components/modal/utils';
 import { useState } from 'preact/hooks';
 
-import { selectedPresetNameSignal, editPresetSignal, presetStoreSignal } from '@/model/signal';
+import {
+	selectedPresetNameSignal,
+	editPresetSignal,
+	presetStoreSignal,
+	autoCurrentNodesSignal,
+	autoCurrentNodeStyleSignal,
+} from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION } from '../Search/visualModel';
+import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION } from '../constant';
 import { modeStateSignal } from '@/model/signal';
 
 const Preset = () => {
@@ -68,6 +74,10 @@ function LabelPage() {
 	const presetStore = useSignal(presetStoreSignal);
 	const modeState = useSignal(modeStateSignal);
 	const presetNames = Object.keys(presetStore);
+	const a = useSignal(autoCurrentNodesSignal);
+	console.log('🚀 ~ LabelPage ~ a:', a);
+	const b = useSignal(autoCurrentNodeStyleSignal);
+	console.log('🚀 ~ LabelPage ~ b:', b);
 
 	return (
 		<div className={styles.container}>

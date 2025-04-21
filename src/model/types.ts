@@ -241,7 +241,6 @@ export type CurrentCursorType = {
 	 * 표시 생략해도 됨
 	 */
 	projectId: string;
-
 	pageName: string;
 	pageId: string;
 	nodeName: string;

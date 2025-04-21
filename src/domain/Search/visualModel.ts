@@ -2,8 +2,19 @@ import { emit, on } from '@create-figma-plugin/utilities';
 import { MetaData, searchStore } from './searchStore';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
 
-import { NODE_STORE_KEY, STORE_KEY } from '../constant';
-import { modeStateSignal } from '@/model/signal';
+import {
+	AUTO_SELECT_NODE_EMIT,
+	AUTO_SELECT_STYLE_EMIT,
+	BACKGROUND_SYMBOL,
+	DISABLE_RENDER_PAIR,
+	NODE_STORE_KEY,
+	RENDER_MODE_STATE,
+	RENDER_PAIR,
+	RENDER_TRIGGER,
+	SAVE_ACTION,
+	STORE_KEY,
+} from '../constant';
+import { autoCurrentNodesSignal, autoCurrentNodeStyleSignal, modeStateSignal, StyleData } from '@/model/signal';
 import { ActionType } from '../System/ActionResourceDTO';
 import { getNodeData } from '../Label/TextPluginDataModel';
 import { LocalizationKeyDTO, Preset, PresetStore } from '@/model/types';
@@ -12,56 +23,7 @@ import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB';
 import { generateRandomText2 } from '@/utils/textTools';
 import { baseIsAllNode, idsBaseAll } from '../Batch/batchModel';
-
-export const RENDER_PAIR = {
-	RENDER_REQUEST: 'RENDER_REQUEST',
-	RENDER_RESPONSE: 'RENDER_RESPONSE',
-};
-
-export const DISABLE_RENDER_PAIR = {
-	DISABLE_RENDER_REQUEST: 'DISABLE_RENDER_REQUEST',
-	DISABLE_RENDER_RESPONSE: 'DISABLE_RENDER_RESPONSE',
-};
-
-export const BACKGROUND_SYMBOL = {
-	background: 'IS_BACKGROUND',
-	idStore: 'BACKGROUND_ID_STORE',
-};
-
-export const RENDER_MODE_STATE = {
-	/**
-	 * 선택 된 걸로 오버라이드 개념만 있어서 없어도 될 듯하긴 하지만?
-	 * 선택 시 바로바로 활성화 시켜주는 용도로 쓰려면 있는게 좋을지도?
-	 */
-	SECTION_SELECT: 'SECTION_SELECT_MODE',
-	/**
-	 * 멀티 키 선택 시 일관적이게 선택되는 모드
-	 */
-	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_MODE',
-	/**
-	 * 베이스 키 선택 시 하나만 선택 되게 하는 모드
-	 */
-	BASE_KEY_SELECT: 'BASE_KEY_SELECT_MODE',
-};
-
-/** 각 트리거는 다른 모드들을 비활성화하고 단일 대상을 활성화 하는데 사용된다 */
-export const RENDER_TRIGGER = {
-	SECTION_SELECT: 'SECTION_SELECT_ACCEPT',
-	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_ACCEPT',
-	BASE_KEY_SELECT: 'BASE_KEY_SELECT_ACCEPT',
-	SAVE_ACCEPT: 'SAVE_ACCEPT',
-	SAVE_ACTION: 'SAVE_ACTION',
-};
-
-/** 저장 액션 안하면 취소임 */
-export const SAVE_ACTION = {
-	/** 삽입 */
-	INSERT: 'INSERT',
-	/** 합집합 */
-	UNION: 'UNION',
-	/** 차집합 */
-	SUBTRACT: 'SUBTRACT',
-} as const;
+import { newGetStyleData } from '@/model/on/GET_STYLE_DATA';
 
 // 데이터 전송은 비활성화 시 발생
 // 인터렉션은 활성화 중에 발생
@@ -69,6 +31,49 @@ export const SAVE_ACTION = {
 // 충분한 정보가 메인 프로세스에도 있으면 전파하지 않고 내부에서 서버로 보낸 후 해당 내용들을 전파 후 클라에도 업데이트
 // 선택한 섹션 아이디는 뭐고, 액션은 뭐고, 로컬라이제이션 키는 뭐고, 위치 값은 뭐고, 스타일 키에 매핑되는 이름은 뭐고
 
+export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
+	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, nodes);
+
+	const style = nodes.map((node) => node.baseNodeId);
+	const styleSet = new Set(style);
+	styleSet.delete(undefined);
+	//@ts-ignore
+	styleSet.delete(null);
+
+	if (styleSet.size === 1) {
+		const baseNodeId = styleSet.values().next().value!;
+		// const style = await newGetStyleData(baseNodeId);
+		// 스타일을 무조건 빼야할까? 안빼도 될 거 같은데
+		// 대표 노드가 1개 또는 그 이상인게 식별되면 스타일이 별로 중요하지 않을 것 같다는 말임
+
+		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, baseNodeId);
+	} else if (styleSet.size > 1) {
+		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'mixed');
+	} else {
+		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'none');
+	}
+};
+
+const nullSelectEmit = () => {
+	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, []);
+	emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'none');
+};
+
+export const onAutoSelectUI = () => {
+	return on(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, (nodes: MetaData[]) => {
+		autoCurrentNodesSignal.value = nodes;
+	});
+};
+export const onAutoSelectStyleUI = () => {
+	return on(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, (style: string | 'mixed' | 'none') => {
+		autoCurrentNodeStyleSignal.value = style;
+	});
+};
+
+/**
+ * 배경 프레임 크기 계산
+ * 랜더링 사이즈 얻으려고 해당 함수 사용
+ */
 export const getBackgroundSize = (ignoreIds: string[] = []) => {
 	const filterNodes = figma.currentPage.children;
 	const padding = 100;
@@ -105,16 +110,21 @@ export const getBackgroundSize = (ignoreIds: string[] = []) => {
 	};
 };
 
+/** 배경 프레임 조회 */
 const getBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
-			// 일단 이름만 맞아도 되게 하자
 			return node as FrameNode;
 		}
 	}
+	return figma.createFrame();
 };
 
+/**
+ * 배경 프레임 초기화 그냥 삭제하고 새로 만들어서 반환
+ * 내부 프레임 없애야해서
+ */
 const initBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
@@ -128,7 +138,7 @@ const initBackgroundFrame = () => {
 	}
 	return figma.createFrame();
 };
-/** 텍스트 기준으로 정렬 */
+/** 내용 기준으로 모으기 */
 const textSorter = (data: MetaData[]) => {
 	return data.reduce(
 		(acc, node) => {
@@ -142,6 +152,7 @@ const textSorter = (data: MetaData[]) => {
 	);
 };
 
+/** 로컬라이제이션 키 존재 여부 기준으로 모으기 */
 const localizationKeySplit = (data: MetaData[]) => {
 	const hasKey = data.reduce(
 		(acc, node) => {
@@ -176,6 +187,9 @@ const localizationKeySplit = (data: MetaData[]) => {
 	};
 };
 
+/** 배경 프레임 초기화
+ * 인데 지금 안씀 , getBackgroundFrame 를 쓰지 않기 때문
+ *  */
 const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	const nodes = frame.children;
 	const idStore = data.map((item) => item.id);
@@ -186,6 +200,10 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	}
 };
 
+/**
+ * 로컬라이제이션 택스트 오버레이
+ * 키 기준으로컬러 부여 된 map 값에서 색상 얻어서 오버레이
+ */
 const lzTextOverlay = (
 	data: MetaData,
 	colorMap: Record<string, string>,
@@ -225,6 +243,9 @@ const lzTextOverlay = (
 	return node;
 };
 
+/** 랜덤 로컬라이제이션 키 생성
+ * 중복 뜨면 해결을 위해 4번 시도
+ */
 export const randomLocalizationKeyGenerator = async (
 	domainId: string | number,
 	count: number = 0
@@ -249,6 +270,9 @@ export const randomLocalizationKeyGenerator = async (
 	return randomLocalizationKeyGenerator(domainId, count + 1);
 };
 
+/** null key에 대한 오버레이 처리를 위해 존재했었음
+ * null 없어질 때까지 매핑하는 로직으로 변경되서 이제 안씀
+ */
 const textMatchOverlay = (
 	data: MetaData,
 	colorMap: Record<string, string>,
@@ -288,7 +312,7 @@ const textMatchOverlay = (
 	return node;
 };
 
-/** 텍스트 기준으로 키 생성 */
+/** 텍스트 기준으로 키 생성 및 등록 */
 export const textKeyRegister = async (data: Record<string, MetaData[]>) => {
 	const domain = getDomainSetting();
 
@@ -335,6 +359,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 	}
 };
 
+/** 반복해서 매핑하면서 nullKey를 완전히 제거 */
 const autoKeyMapping = async (ignoreIds: string[], count: number = 0) => {
 	const nodes = await searchStore.search(ignoreIds);
 
@@ -359,6 +384,7 @@ const autoKeyMapping = async (ignoreIds: string[], count: number = 0) => {
 	};
 };
 
+/** 베이스 노드 표시 하이라이트 */
 const baseNodeHighlight = (data: MetaData, backgroundNode: FrameNode) => {
 	const { id, baseNodeId, localizationKey } = data;
 	if (id !== baseNodeId) {
@@ -382,15 +408,19 @@ const baseNodeHighlight = (data: MetaData, backgroundNode: FrameNode) => {
 		}
 	}
 };
+/** 회전을 위한 랜덤 회전 */
 const getRandomNumber = () => {
 	return Math.floor(Math.random() * 360) + 1;
 };
 
+/** 오버레이 트리거가 들어올 때 실행될 렌더링 로직 */
 export const overRayRender = async () => {
 	const ignoreIds = ignoreSectionAll().map((node) => node.id);
 	const backgroundSize = getBackgroundSize(ignoreIds);
 
-	const frame = initBackgroundFrame();
+	// 지우고 다시 생성하는거 너무 비효율적임
+	// const frame = initBackgroundFrame();
+	const frame = getBackgroundFrame();
 
 	const { hasKey, nullKey, keys } = await autoKeyMapping(ignoreIds);
 
@@ -416,12 +446,15 @@ export const overRayRender = async () => {
 	for (const item of hasKey) {
 		baseNodeHighlight(item, frame);
 	}
+	return hasKey;
 };
 
+/** 트리거 */
 export const onRender = () => {
 	on(RENDER_PAIR.RENDER_REQUEST, overRayRender);
 };
 
+/** 제거 */
 export const onDisableRender = () => {
 	on(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST, async () => {
 		const frame = initBackgroundFrame();
@@ -454,6 +487,7 @@ const sectionIgnoreCheck = (sectionNode: SectionNode) => {
 // 시각적인 직관성을 제공해줄 수 있는 건 맞음 그런데 그걸 언제 복원 시킬건지
 
 export const NULL_STATE = '';
+/** 제외할 섹션 모두 가져오기 */
 export const ignoreSectionAll = () => {
 	const nodes = figma.currentPage.children.filter((node) => {
 		if (node.type === 'SECTION') {
@@ -464,6 +498,7 @@ export const ignoreSectionAll = () => {
 	return nodes;
 };
 
+/** 제외할 섹션 모두 선택 후 스크롤 및 줌 */
 const ignoreSectionAllSelect = () => {
 	const nodes = ignoreSectionAll();
 	figma.currentPage.selection = nodes;
@@ -471,6 +506,7 @@ const ignoreSectionAllSelect = () => {
 	return nodes;
 };
 
+/** 제외 섹션에 대상 추가 */
 export const addSectionIgnore = (sectionNode: SectionNode) => {
 	sectionNode.setPluginData(NODE_STORE_KEY.IGNORE, 'true');
 	if (sectionIgnoreCheck(sectionNode)) {
@@ -492,6 +528,7 @@ export const removeSectionIgnore = (sectionNode: SectionNode) => {
 	sectionNode.fills = [fill];
 };
 
+/** 제외 섹션 토글 */
 export const sectionIgnoreToggle = (sectionNode: SectionNode) => {
 	if (sectionIgnoreCheck(sectionNode)) {
 		removeSectionIgnore(sectionNode);
@@ -500,7 +537,8 @@ export const sectionIgnoreToggle = (sectionNode: SectionNode) => {
 	}
 };
 
-export type OptionMetaData = {
+/** 프리셋 옵션 메타 데이터 */
+export type PresetMetaData = {
 	/**
 	 * 프리셋 이름
 	 */
@@ -548,7 +586,7 @@ const newPreset = (name: string, baseNodeId: string, serverSectionId: string) =>
 };
 
 /** section에 대한 액션 설정 */
-const setSectionAction = async (acceptAction: keyof typeof SAVE_ACTION, option: OptionMetaData) => {
+const setSectionAction = async (acceptAction: keyof typeof SAVE_ACTION, option: PresetMetaData) => {
 	// 섹션들이 선택될 거임
 	const selectedNodes = figma.currentPage.selection.filter((node) => node.type === 'SECTION');
 
@@ -617,7 +655,7 @@ export const onSelectModeMain = () => {
 		emit(RENDER_TRIGGER.BASE_KEY_SELECT, RENDER_MODE_STATE.BASE_KEY_SELECT);
 	});
 	// 대부분의 트리거는 모드 전환할 때 단일 키로 쓰는데
-	on(RENDER_TRIGGER.SAVE_ACCEPT, async (acceptAction: keyof typeof SAVE_ACTION, option: OptionMetaData) => {
+	on(RENDER_TRIGGER.SAVE_ACCEPT, async (acceptAction: keyof typeof SAVE_ACTION, option: PresetMetaData) => {
 		figma.currentPage.selection = [];
 		figma.currentPage.setPluginData(STORE_KEY.SELECT_MODE, NULL_STATE);
 		const mode = figma.currentPage.getPluginData(STORE_KEY.SELECT_MODE);
@@ -633,7 +671,7 @@ export const onSelectModeMain = () => {
 	});
 	// 저장 액션은 모드 전환할 때 써서 옵션이 좀 많음
 
-	on(RENDER_TRIGGER.SAVE_ACTION, async (acceptAction: keyof typeof SAVE_ACTION, option: OptionMetaData) => {
+	on(RENDER_TRIGGER.SAVE_ACTION, async (acceptAction: keyof typeof SAVE_ACTION, option: PresetMetaData) => {
 		console.log('🚀 ~ on ~ option:', option);
 		console.log('🚀 ~ on ~ acceptAction:', acceptAction);
 		const mode = figma.currentPage.getPluginData(STORE_KEY.SELECT_MODE);

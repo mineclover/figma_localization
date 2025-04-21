@@ -11,8 +11,9 @@ import { getCurrentSectionSelected } from '../../domain/Translate/TranslateModel
 import { getCursorPosition } from '../../domain/Label/LabelModel';
 import { processTextNodeLocalization } from '../../domain/Label/TextPluginDataModel';
 import { newGetStyleData } from './GET_STYLE_DATA';
-import { BACKGROUND_SYMBOL, ignoreSectionAll, overRayRender } from '@/domain/Search/visualModel';
-import { nodeMetaData, searchStore } from '@/domain/Search/searchStore';
+import { autoSelectNodeEmit, ignoreSectionAll, overRayRender } from '@/domain/Search/visualModel';
+import { BACKGROUND_SYMBOL } from '@/domain/constant';
+import { MetaData, nodeMetaData, searchStore } from '@/domain/Search/searchStore';
 import { read } from 'fs';
 
 export let tempNode = '';
@@ -46,21 +47,26 @@ export const overlayFrameInfo = (node: SceneNode) => {
 	return null;
 };
 
-let tempStore = {
+let selectCycleStore = {
 	localizationKey: '',
 	baseNodeId: '',
 } as {
 	localizationKey: string;
 	baseNodeId: string;
 };
+
 export const onNodeSelectionChange = () => {
+	/** 선택은 연속적으로 일어나고 그 사이에 노드 메타데이터 변경될 일이 없다 */
+	const cacheCheck = new Set<string>();
 	figma.on('selectionchange', async () => {
 		const nodes = figma.currentPage.selection;
 
 		// 선택 된 게 overlay 프레임 내에 있는 경우 선택을 조정한다
 		// 일단 선택 된 게 overlay 프레임 내에 있는 경우를 판단
+		console.log(1, new Date().toISOString());
 
 		if (nodes.length === 1) {
+			cacheCheck.clear();
 			const node = nodes[0];
 			const isOverlay = isOverlayFrame(node);
 			// 선택 대상이 한 개 인데 오버레이 프레임임
@@ -73,6 +79,7 @@ export const onNodeSelectionChange = () => {
 					// 같은 로컬라이제이션 키를 가진 텍스트 노드 조회함
 					const metaData = await searchStore.update(textNode.id);
 					// 조회했을 때 키가 있는지 확인하고 메타데이터 가져옴
+					console.log(2, new Date().toISOString());
 
 					if (metaData && metaData.localizationKey) {
 						// 파티션 키로 텍스트 노드 조회
@@ -89,28 +96,39 @@ export const onNodeSelectionChange = () => {
 
 							const pointer = textNodes.filter((node) => filteredTextNodes.includes(node.id));
 							figma.currentPage.selection = pointer;
-							tempStore.localizationKey = metaData.localizationKey;
-							tempStore.baseNodeId = metaData.baseNodeId ?? '';
+							const arr = pointer.map((node) => node.id);
+							arr.forEach((id) => cacheCheck.add(id));
+							selectCycleStore.localizationKey = metaData.localizationKey;
+							selectCycleStore.baseNodeId = metaData.baseNodeId ?? '';
 						}
 					}
 				}
 			}
+			/** 확장 선택 시 땅따먹기 처리 */
 		} else if (nodes.length > 1) {
-			const frames = nodes.filter((node) => isOverlayFrame(node));
+			/** 기존에 처리된 대상은 제외 */
+			const frames = nodes.filter((node) => {
+				if (cacheCheck.has(node.id)) {
+					return false;
+				}
+				return isOverlayFrame(node);
+			});
 			const nextPointer = [];
-
+			console.log(4, new Date().toISOString());
 			for (const node of frames) {
 				const isOverlay = isOverlayFrame(node);
-				// 선택 대상이 있고 오버레이 프레임임
+				// 선택 대상이 있고 오버레이 프레임
 				if (isOverlay) {
 					// 오버레이 프레임 정보 가져옴
 					const id = overlayFrameInfo(node);
 					if (id) {
-						// 오버레이 프레임 정보로 텍스트 노드 선택함
+						// 오버레이 프레임 정보로 텍스트 노드 선택하고 변환함
 						const textNode = (await figma.getNodeByIdAsync(id)) as TextNode;
-						textNode.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, tempStore.localizationKey);
-						textNode.setPluginData(NODE_STORE_KEY.LOCATION, tempStore.baseNodeId);
+						console.log(5, new Date().toISOString());
+						textNode.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, selectCycleStore.localizationKey);
+						textNode.setPluginData(NODE_STORE_KEY.LOCATION, selectCycleStore.baseNodeId);
 						nextPointer.push(textNode);
+						cacheCheck.add(textNode.id);
 					}
 				}
 			}
@@ -118,7 +136,20 @@ export const onNodeSelectionChange = () => {
 			if (nextPointer.length > 0) {
 				overRayRender();
 				const currentSelection = figma.currentPage.selection;
-				figma.currentPage.selection = [...currentSelection, ...nextPointer];
+
+				const arr = [...currentSelection, ...nextPointer];
+				figma.currentPage.selection = arr;
+
+				const hasKey: MetaData[] = [];
+
+				for (const node of arr) {
+					const metaData = await searchStore.get(node.id);
+					if (metaData) {
+						hasKey.push(metaData);
+					}
+				}
+				console.log(6, new Date().toISOString());
+				autoSelectNodeEmit(hasKey);
 			}
 		}
 

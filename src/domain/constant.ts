@@ -220,3 +220,61 @@ export const GET_PRESET = {
 	REQUEST_KEY: 'GET_PRESET_REQUEST',
 	RESPONSE_KEY: 'GET_PRESET_RESPONSE',
 };
+
+export const AUTO_SELECT_NODE_EMIT = {
+	RESPONSE_KEY: 'AUTO_SELECT_NODE_EMIT_RESPONSE',
+};
+
+export const AUTO_SELECT_STYLE_EMIT = {
+	RESPONSE_KEY: 'AUTO_SELECT_STYLE_EMIT_RESPONSE',
+};
+
+export const RENDER_PAIR = {
+	RENDER_REQUEST: 'RENDER_REQUEST',
+	RENDER_RESPONSE: 'RENDER_RESPONSE',
+};
+
+export const DISABLE_RENDER_PAIR = {
+	DISABLE_RENDER_REQUEST: 'DISABLE_RENDER_REQUEST',
+	DISABLE_RENDER_RESPONSE: 'DISABLE_RENDER_RESPONSE',
+};
+
+export const BACKGROUND_SYMBOL = {
+	background: 'IS_BACKGROUND',
+	idStore: 'BACKGROUND_ID_STORE',
+};
+
+export const RENDER_MODE_STATE = {
+	/**
+	 * 선택 된 걸로 오버라이드 개념만 있어서 없어도 될 듯하긴 하지만?
+	 * 선택 시 바로바로 활성화 시켜주는 용도로 쓰려면 있는게 좋을지도?
+	 */
+	SECTION_SELECT: 'SECTION_SELECT_MODE',
+	/**
+	 * 멀티 키 선택 시 일관적이게 선택되는 모드
+	 */
+	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_MODE',
+	/**
+	 * 베이스 키 선택 시 하나만 선택 되게 하는 모드
+	 */
+	BASE_KEY_SELECT: 'BASE_KEY_SELECT_MODE',
+};
+/** 각 트리거는 다른 모드들을 비활성화하고 단일 대상을 활성화 하는데 사용된다 */
+
+export const RENDER_TRIGGER = {
+	SECTION_SELECT: 'SECTION_SELECT_ACCEPT',
+	MULTI_KEY_SELECT: 'MULTI_KEY_SELECT_ACCEPT',
+	BASE_KEY_SELECT: 'BASE_KEY_SELECT_ACCEPT',
+	SAVE_ACCEPT: 'SAVE_ACCEPT',
+	SAVE_ACTION: 'SAVE_ACTION',
+};
+/** 저장 액션 안하면 취소임 */
+
+export const SAVE_ACTION = {
+	/** 삽입 */
+	INSERT: 'INSERT',
+	/** 합집합 */
+	UNION: 'UNION',
+	/** 차집합 */
+	SUBTRACT: 'SUBTRACT',
+} as const;

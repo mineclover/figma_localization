@@ -15,7 +15,7 @@ import {
 
 import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal';
 import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../Search/visualModel';
+import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../constant';
 
 const ProcessBar = () => {
 	const processStore = useSignal(processSignal);

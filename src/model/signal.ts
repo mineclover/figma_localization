@@ -29,8 +29,16 @@ export const selectIdsSignal = signal<string[]>([]);
 /** 현재 커서가 있는 섹션 ( 실시간 감지 ) */
 export const currentSectionSignal = signal<CurrentNode | null>(null);
 
-/** 현재 포인터의 노드 데이터 ( 실시간 감지 ) */
+/** old:  현재 포인터의 노드 데이터 1개 ( 실시간 감지 ) */
 export const currentPointerSignal = signal<CurrentCursorType | null>(null);
+
+/** 자동 선택 시 다중 선택된 노드 데이터 */
+export const autoCurrentNodesSignal = signal<MetaData[]>([]);
+
+/** 자동 선택 시 다중 선택된 노드 스타일 데이터
+ * 만약 baseNodeId가 다르면 mixed 반환할 계획
+ */
+export const autoCurrentNodeStyleSignal = signal<string | 'mixed' | 'none'>('none');
 
 /** 프로젝트 아이디 */
 export const projectIdSignal = signal<string>('');

@@ -115,7 +115,12 @@ const getBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
-			return node as FrameNode;
+			//
+			if (node.getPluginData(BACKGROUND_SYMBOL.background) === 'true') {
+				return node as FrameNode;
+			}
+			// 있는데 플러그인 데이터가 없으면 삭제
+			node.remove();
 		}
 	}
 	return figma.createFrame();
@@ -193,11 +198,26 @@ const localizationKeySplit = (data: MetaData[]) => {
 const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	const nodes = frame.children;
 	const idStore = data.map((item) => item.id);
-	const idSet = new Set(idStore);
-	const removeTarget = nodes.filter((node) => idSet.has(node.getPluginData(BACKGROUND_SYMBOL.idStore)));
+	const idSet = new Map<string, FrameNode>();
+	const { removeTarget, keepTarget } = nodes.reduce(
+		(acc, node) => {
+			const id = node.getPluginData(BACKGROUND_SYMBOL.idStore);
+			if (idSet.has(id)) {
+				acc.removeTarget.push(node as FrameNode);
+			} else {
+				acc.keepTarget.set(id, node as FrameNode);
+			}
+			return acc;
+		},
+		{
+			removeTarget: [] as FrameNode[],
+			keepTarget: new Map<string, FrameNode>(),
+		}
+	);
 	for (const node of removeTarget) {
 		node.remove();
 	}
+	return keepTarget;
 };
 
 /**
@@ -208,13 +228,14 @@ const lzTextOverlay = (
 	data: MetaData,
 	colorMap: Record<string, string>,
 	frame: FrameNode,
-	position: { x: number; y: number }
+	position: { x: number; y: number },
+	keepTarget: Map<string, FrameNode>
 ) => {
 	const padding = 10;
 	const { x: rootX, y: rootY } = position;
 
 	const { x, y, width, height, localizationKey, id } = data;
-	const node = figma.createFrame();
+	const node = keepTarget.get(id) ?? figma.createFrame();
 
 	node.resize(width + padding * 2, height + padding * 2);
 	const color = colorMap[localizationKey] ?? '#ffffff';
@@ -360,13 +381,15 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 };
 
 /** 반복해서 매핑하면서 nullKey를 완전히 제거 */
-const autoKeyMapping = async (ignoreIds: string[], count: number = 0) => {
-	const nodes = await searchStore.search(ignoreIds);
+const autoKeyMapping = async (ignoreIds: string[], frame: FrameNode, count: number = 0) => {
+	const { metadata, searchNodes } = await searchStore.search(ignoreIds);
 
 	// 전체 스토어 초기화하지 않음 > getBackgroundFrame 에서 없애고 시작하기 때문
-	// clearBackground(frame, nodes);
 
-	const { hasKey, nullKey, keys } = localizationKeySplit(nodes);
+	// 쓰려했는데... 생각해보면 텍스트노드와 프레임 노드의 발생 시점이 다름
+	const keepTarget = clearBackground(frame, metadata);
+
+	const { hasKey, nullKey, keys } = localizationKeySplit(metadata);
 	const textMap = textSorter(nullKey);
 	const textMapId = (await textKeyRegister(textMap)) ?? {};
 
@@ -374,13 +397,14 @@ const autoKeyMapping = async (ignoreIds: string[], count: number = 0) => {
 
 	if (nullKey.length > 0 && count < 4) {
 		console.log('🚀 ~ autoKeyMapping ~ count:', count);
-		return autoKeyMapping(ignoreIds, count + 1);
+		return autoKeyMapping(ignoreIds, frame, count + 1);
 	}
 
 	return {
 		keys,
 		hasKey,
 		nullKey,
+		keepTarget,
 	};
 };
 
@@ -421,8 +445,9 @@ export const overRayRender = async () => {
 	// 지우고 다시 생성하는거 너무 비효율적임
 	// const frame = initBackgroundFrame();
 	const frame = getBackgroundFrame();
-
-	const { hasKey, nullKey, keys } = await autoKeyMapping(ignoreIds);
+	frame.name = '##overlay';
+	frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
+	const { hasKey, nullKey, keys, keepTarget } = await autoKeyMapping(ignoreIds, frame);
 
 	const optionColorMap = generatePastelColors(keys, getRandomNumber());
 
@@ -431,17 +456,13 @@ export const overRayRender = async () => {
 	frame.y = y;
 	frame.resize(width, height);
 	const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 0.4 });
-
 	frame.fills = [paint];
-
 	frame.opacity = 0.7;
 	// frame.locked = true;
-	frame.name = '##overlay';
-	frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
 
 	hasKey.forEach((item, index) => {
 		// 시작 대상 포커스 해도 됨
-		const node = lzTextOverlay(item, optionColorMap, frame, { x, y });
+		const node = lzTextOverlay(item, optionColorMap, frame, { x, y }, keepTarget);
 	});
 	for (const item of hasKey) {
 		baseNodeHighlight(item, frame);

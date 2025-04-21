@@ -113,7 +113,8 @@ class SearchStore {
 	}
 
 	async search(ignoreSectionIds: string[] = []) {
-		const nodes: MetaData[] = [];
+		const metadata: MetaData[] = [];
+		const searchNodes: TextNode[] = [];
 		if (this.isFigma()) {
 			// 일단 갱신
 
@@ -123,7 +124,7 @@ class SearchStore {
 				.filter((item) => item.type === 'SECTION');
 
 			if (targetAreas.length === 0) {
-				return nodes;
+				return { metadata, searchNodes }; // []
 			}
 			// 섹션들에서 조회
 
@@ -142,6 +143,7 @@ class SearchStore {
 					nodes.forEach((node) => {
 						this.setStore(node.id, node);
 						sectionStore.add(node.id);
+						searchNodes.push(node);
 					});
 				}
 
@@ -156,14 +158,14 @@ class SearchStore {
 				for (const key of keys) {
 					const node = await this.get(key);
 					if (node != null) {
-						nodes.push(node);
+						metadata.push(node);
 					}
 				}
 				continue;
 			}
-			return nodes;
+			return { metadata, searchNodes };
 		} else {
-			return nodes;
+			return { metadata, searchNodes };
 		}
 	}
 

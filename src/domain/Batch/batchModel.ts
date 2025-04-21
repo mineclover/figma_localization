@@ -42,8 +42,8 @@ export const onPatternMatch = () => {
 		const ignoreSections = figma.currentPage.children
 			.filter((item) => item.type === 'SECTION')
 			.filter((item) => item.id === targetID);
-		const dataArr = await searchStore.search(ignoreSections.map((item) => item.id));
-		emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, dataArr);
+		const { metadata } = await searchStore.search(ignoreSections.map((item) => item.id));
+		emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, metadata);
 	});
 };
 

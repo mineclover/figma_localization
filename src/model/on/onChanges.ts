@@ -101,7 +101,12 @@ export const onNodeSelectionChange = () => {
 							console.log(4, new Date().toISOString());
 							const textNodeData = textNodes.map((node) => nodeMetaData(node));
 							// ignoreIds 에 포함되지 않는 노드만 선택하고 아이디 배열로 변환
-							const filteredTextNodesMeta = textNodeData.filter((node) => !ignoreIds.includes(node.root));
+							const filteredTextNodesMeta = textNodeData.filter((node) => {
+								if (isHideNode(node)) {
+									return false;
+								}
+								return !ignoreIds.includes(node.root);
+							});
 
 							const filteredTextNodes = filteredTextNodesMeta.map((node) => node.id);
 							const pointer = textNodes.filter((node) => filteredTextNodes.includes(node.id));
@@ -110,14 +115,17 @@ export const onNodeSelectionChange = () => {
 
 								figma.currentPage.selection = pointer;
 							}
-							// 돈으로 삼
+
 							const arr = pointer.map((node) => node.id);
-							// 캐시 잇이[읗
+							// 캐시 추가
 							arr.forEach((id) => cacheCheck.add(id));
 							selectCycleStore.localizationKey = metaData.localizationKey;
 							selectCycleStore.baseNodeId = metaData.baseNodeId ?? '';
 							console.log('🚀 ~ figma.on ~ 노드 병경 됨 selectCycleStore.baseNodeId :', selectCycleStore.baseNodeId);
+							// 만약 선택 값에 베이스 노드가 없으면 첫번째 노드를 베이스 노드로 변경
+
 							console.log(5, new Date().toISOString(), filteredTextNodesMeta);
+
 							await autoSelectNodeEmit(filteredTextNodesMeta);
 						}
 					}
@@ -134,7 +142,9 @@ export const onNodeSelectionChange = () => {
 			});
 			const nextPointer = [];
 			console.log(4, new Date().toISOString());
+			// frames 는 새로운 프레임 노드들임
 			for (const node of frames) {
+				let baseNodeId = '';
 				const isOverlay = isOverlayFrame(node);
 				// 선택 대상이 있고 오버레이 프레임
 				if (isOverlay) {
@@ -148,32 +158,39 @@ export const onNodeSelectionChange = () => {
 
 						// node가 baseNode 인지 확인
 						const isBaseNode = baseNodeCheck(textNode);
-						console.log('🚀 ~ figma.on ~ isBaseNode:', isBaseNode);
-						if (isBaseNode) {
-							console.log('🚀 ~ figma.on ~ isBaseNode:', textNode.id, selectCycleStore.baseNodeId);
-							await searchStore.rootChange(textNode.id, selectCycleStore.baseNodeId, true);
-						}
+						// 현재 새로 선택된 노드가 baseNode이니 selectCycleStore 노드로 변경한다는 의미
+						await searchStore.baseChange(textNode.id, selectCycleStore.baseNodeId);
+						baseNodeId = textNode.id;
 
 						nextPointer.push(textNode);
 						cacheCheck.add(textNode.id);
 					}
 				}
 			}
-
+			// 처리 된 노드가 있으면 오버레이 리렌더링
 			if (nextPointer.length > 0) {
 				await overRayRender();
 				const currentSelection = figma.currentPage.selection;
+				const arr = currentSelection.map((item) => item.id);
 
-				const arr = [...currentSelection, ...nextPointer];
+				if (!arr.includes(selectCycleStore.baseNodeId)) {
+					const temp = arr[0];
+					currentSelection.forEach((node) => {
+						if (node) {
+							node.setPluginData(NODE_STORE_KEY.LOCATION, temp);
+						}
+					});
+				}
+
+				const select = [...currentSelection, ...nextPointer];
+				// 선택 값 변경
 				if (!DEBUG_MODE) {
-					console.log('🚀 ~ figma.on ~ DEBUG_MODE:', DEBUG_MODE);
-
-					figma.currentPage.selection = arr;
+					figma.currentPage.selection = select;
 				}
 
 				const hasKey: MetaData[] = [];
 
-				for (const node of arr) {
+				for (const node of select) {
 					const metaData = await searchStore.get(node.id);
 					// 화면에 보이지 않는 노드는 무시하도록 구성
 					if (metaData && !isHideNode(metaData)) {

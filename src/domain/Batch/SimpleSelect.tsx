@@ -239,7 +239,9 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 						{keyGroup.map((item) => {
 							const selected = selectItems.includes(item.id);
 							const keyMatch = selectKey === item.localizationKey;
-							const current = currentId === item.id;
+
+							const current = item.baseNodeId === item.id;
+							// const current = currentId === item.id;
 							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
 						})}
 					</div>

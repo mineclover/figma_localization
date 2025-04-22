@@ -31,12 +31,12 @@ const nodeMetric = (node: TextNode, count: number = 0) => {
 	// 		height: renderBounds?.height ?? boundingBox?.height,
 	// 	};
 	// }
-	else if (count < 4) {
-		console.log('🚀 ~ nodeMetric ~ nodeRect:', node, count);
-		return nodeMetric(node, count + 1);
-	} else {
-		return;
-	}
+	// else if (count < 4) {
+	// 	console.log('🚀 ~ nodeMetric ~ nodeRect:', node, count);
+	// 	return nodeMetric(node, count + 1);
+	// } else {
+	// 	return;
+	// }
 };
 
 // metadata에 CurrentCursorType 다 넣고 최신화시키는 것에 대해 ..
@@ -60,9 +60,7 @@ export type MetaData = {
 
 export const nodeMetaData = (node: TextNode) => {
 	const metric = nodeMetric(node);
-	console.log('🚀 ~ nodeMetaData ~ metric:', node, metric);
 	if (metric?.width == null || metric?.height == null) {
-		console.log('🚀 ~ nodeMetaData ~ metric:', node, metric);
 	}
 	const root = SectionSearch(node);
 	// 섹션 있으면 처리 없으면 처리 안함
@@ -281,47 +279,43 @@ class SearchStore {
 	 * after 베이스 노드로 캐싱 store에 추가
 	 * baseNode는 특정 노드가 지목하는 대상임
 	 * remove 있으면 삭제하고 이동
-	 * @param before
-	 * @param after
+	 * @param before 이전 베이스 노드 ( baseNode에 있어야 함 )
+	 * @param after  새로운 베이스 노드 ( baseNode 내 세션에 있어야 함? )
 	 * @param remove
 	 */
-	async rootChange(before: string, after: string, remove: boolean = false) {
-		console.log(
-			'🚀 ~ 변경 함 SearchStore ~ rootChange ~ before: ' + before + ', after: ' + after + ', remove: ' + remove
-		);
+	async baseChange(before: string, after: string) {
 		let baseSet = this.baseNodeStore.get(before);
 
+		// 선택된 대상들을 어떻게 전달할 것인가
+		// 원래는 스토어로 찾아질 줄 알았음
+		// 그런데 스토어가 제대로 동작을 안함
+		// 난 변경된 대상이 baseNode 였으면 그 베이스 노드 쓰던 다른 노드들을 찾아서 변경해야 함
 		if (baseSet == null) {
 			baseSet = new Set<string>();
-			this.baseNodeStore.set(before, baseSet);
-			console.log(2);
+
+			console.log(2, '없으면 처리 안하는게 맞음');
+			return;
 		}
 		// remove 있으면 삭제하고 이동
-		if (remove) {
-			baseSet.delete(after);
-			console.log(3);
-		}
 
 		// 추가
 		baseSet.add(after);
-		console.log(baseSet);
+
 		// 이동
 		this.baseNodeStore.set(after, baseSet);
-
+		console.log('🚀 ~ SearchStore ~ baseChange ~ baseSet:', baseSet);
 		for (const afterNodeId of baseSet) {
 			const afterNode = await figma.getNodeByIdAsync(afterNodeId);
-			// 노드가 있으면 캐싱 store에 추가
+
 			if (afterNode) {
-				// 베이스 노드를
-				console.log(afterNode, '🚀 ~ SearchStore ~ rootChange ~ after:', after);
 				afterNode.setPluginData(NODE_STORE_KEY.LOCATION, after);
 
-				console.log('🚀 ~ 변경 적용 SearchStore ~ rootChange ~ afterNode:', afterNode);
-				// 캐싱 store에 변경 반영
+				// 캐싱 store에 변경 반영하고 node 메타데이터 추가
 				this.setStore(afterNode.id, afterNode);
 			}
-			console.log('🚀 ~ SearchStore ~ rootChange ~ afterNode:', nodeMetaData(afterNode as TextNode));
 		}
+		// 안쓰는 스토어 삭제
+
 		this.baseNodeStore.delete(before);
 	}
 }

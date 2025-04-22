@@ -8,16 +8,34 @@ import { SectionSearch } from '@/figmaPluginUtils';
  * absoluteBoundingBox : 컨테이너 사이즈
  */
 //
-const nodeMetric = (node: TextNode) => {
-	const nodeRect = node.absoluteRenderBounds;
-	if (nodeRect) {
-		const { width, height, x, y } = nodeRect;
+const nodeMetric = (node: TextNode, count: number = 0) => {
+	/** 화면에 보여지는 bounds */
+	const renderBounds = node.absoluteRenderBounds;
+	/** 화면 표시 상관 없이 보여지는 영역 */
+	// const boundingBox = node.absoluteBoundingBox;
+
+	if (renderBounds) {
 		return {
-			x,
-			y,
-			width,
-			height,
+			x: renderBounds.x,
+			y: renderBounds.y,
+			width: renderBounds.width,
+			height: renderBounds.height,
 		};
+	}
+
+	// if (renderBounds || boundingBox) {
+	// 	return {
+	// 		x: renderBounds?.x ?? boundingBox?.x,
+	// 		y: renderBounds?.y ?? boundingBox?.y,
+	// 		width: renderBounds?.width ?? boundingBox?.width,
+	// 		height: renderBounds?.height ?? boundingBox?.height,
+	// 	};
+	// }
+	else if (count < 4) {
+		console.log('🚀 ~ nodeMetric ~ nodeRect:', node, count);
+		return nodeMetric(node, count + 1);
+	} else {
+		return;
 	}
 };
 
@@ -42,6 +60,10 @@ export type MetaData = {
 
 export const nodeMetaData = (node: TextNode) => {
 	const metric = nodeMetric(node);
+	console.log('🚀 ~ nodeMetaData ~ metric:', node, metric);
+	if (metric?.width == null || metric?.height == null) {
+		console.log('🚀 ~ nodeMetaData ~ metric:', node, metric);
+	}
 	const root = SectionSearch(node);
 	// 섹션 있으면 처리 없으면 처리 안함
 	const rootId = root.section?.id == null ? root.page.id : root.section.id;
@@ -65,14 +87,24 @@ class SearchStore {
 	// 조회 기준 데이터 저장 목적
 	sectionStore: Map<string, Set<string>>;
 	// 키 저장 목적임
-
+	baseNodeStore: Map<string, Set<string>>;
 	constructor() {
 		this.store = new Map<string, MetaData>();
 		this.sectionStore = new Map<string, Set<string>>();
+		this.baseNodeStore = new Map<string, Set<string>>();
 	}
 
+	/**
+	 * 노드 저장
+	 * @param key 노드 id
+	 * @param node 노드
+	 * @returns 노드 메타 데이터
+	 */
 	setStore(key: string, node: BaseNode) {
 		const meta = nodeMetaData(node as TextNode);
+		if (meta.baseNodeId) {
+			this.setBaseNode(meta.baseNodeId, key);
+		}
 		this.store.set(key, meta);
 		return meta;
 	}
@@ -112,13 +144,20 @@ class SearchStore {
 		}
 	}
 
-	async search(ignoreSectionIds: string[] = []) {
+	/**
+	 * 일단 모든 최신 데이터를 조회
+	 * @param ignoreSectionIds
+	 * @returns
+	 */
+	async search(ignoreSectionIds: string[] = [], cacheCall: boolean = false) {
 		const metadata: MetaData[] = [];
 		const searchNodes: TextNode[] = [];
 		if (this.isFigma()) {
 			// 일단 갱신
 
-			/**  */
+			/**
+			 * 일단 항상 최신 데이터를 조회
+			 */
 			const targetAreas = figma.currentPage.children
 				.filter((child) => !ignoreSectionIds.includes(child.id))
 				.filter((item) => item.type === 'SECTION');
@@ -217,6 +256,73 @@ class SearchStore {
 
 	getAll() {
 		return this.store;
+	}
+
+	/**
+	 *
+	 * @param baseId 베이스 노드 id
+	 * @param nodeId 인스턴스 노드 id
+	 */
+	setBaseNode(baseId: string, nodeId: string) {
+		let baseSet = this.baseNodeStore.get(baseId);
+		if (baseSet == null) {
+			baseSet = new Set<string>();
+			this.baseNodeStore.set(baseId, baseSet);
+		}
+		baseSet.add(nodeId);
+	}
+
+	getBaseNode(baseId: string) {
+		return Array.from(this.baseNodeStore.get(baseId) ?? []);
+	}
+
+	/**
+	 * 기존 노드들 설정에서 before 베이스 노드를 캐싱함 store에서 삭제하고
+	 * after 베이스 노드로 캐싱 store에 추가
+	 * baseNode는 특정 노드가 지목하는 대상임
+	 * remove 있으면 삭제하고 이동
+	 * @param before
+	 * @param after
+	 * @param remove
+	 */
+	async rootChange(before: string, after: string, remove: boolean = false) {
+		console.log(
+			'🚀 ~ 변경 함 SearchStore ~ rootChange ~ before: ' + before + ', after: ' + after + ', remove: ' + remove
+		);
+		let baseSet = this.baseNodeStore.get(before);
+
+		if (baseSet == null) {
+			baseSet = new Set<string>();
+			this.baseNodeStore.set(before, baseSet);
+			console.log(2);
+		}
+		// remove 있으면 삭제하고 이동
+		if (remove) {
+			baseSet.delete(after);
+			console.log(3);
+		}
+
+		// 추가
+		baseSet.add(after);
+		console.log(baseSet);
+		// 이동
+		this.baseNodeStore.set(after, baseSet);
+
+		for (const afterNodeId of baseSet) {
+			const afterNode = await figma.getNodeByIdAsync(afterNodeId);
+			// 노드가 있으면 캐싱 store에 추가
+			if (afterNode) {
+				// 베이스 노드를
+				console.log(afterNode, '🚀 ~ SearchStore ~ rootChange ~ after:', after);
+				afterNode.setPluginData(NODE_STORE_KEY.LOCATION, after);
+
+				console.log('🚀 ~ 변경 적용 SearchStore ~ rootChange ~ afterNode:', afterNode);
+				// 캐싱 store에 변경 반영
+				this.setStore(afterNode.id, afterNode);
+			}
+			console.log('🚀 ~ SearchStore ~ rootChange ~ afterNode:', nodeMetaData(afterNode as TextNode));
+		}
+		this.baseNodeStore.delete(before);
 	}
 }
 

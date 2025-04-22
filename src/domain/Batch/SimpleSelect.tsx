@@ -43,7 +43,7 @@ const Test = ({ id, selected, keyMatch, current }: Props) => {
 	return (
 		<button
 			onClick={() => {
-				pageNodeZoomAction(id);
+				pageNodeZoomAction(id, false);
 			}}
 			onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 				e.preventDefault(); // 기본 우클릭 메뉴 방지
@@ -158,9 +158,9 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 	const missingLinks = selectItems.filter((item) => !textFilter.some((text) => text.id === item));
 	const missingData = patternMatchData.filter((item) => missingLinks.includes(item.id));
 	const currentId = currentPointer?.nodeId;
-	const sectionIds = textFilter.map((item) => item.root);
+	// const sectionIds = textFilter.map((item) => item.root);
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
-	const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
+	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
 
 	/** 키 여부로 분리 */
 	const [otherGroup, keyGroup] = textFilter.reduce(
@@ -188,13 +188,13 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 	const keyIds = Array.from(keyLayer.keys());
 
 	// 페이지는 생략
-	const allSectionIdsArray = Array.from(allSectionIds).filter((item) => item !== currentPointer?.pageId);
+	// const allSectionIdsArray = Array.from(allSectionIds).filter((item) => item !== currentPointer?.pageId);
 
 	return (
 		<div className={styles.root}>
 			{/* 제외 리스트 */}
 
-			{allSectionIdsArray.length > 0 && (
+			{/* {allSectionIdsArray.length > 0 && (
 				<Fragment>
 					<Muted>Section</Muted>
 					<div className={styles.container}>
@@ -229,7 +229,7 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 							})}
 					</div>
 				</Fragment>
-			)}
+			)} */}
 
 			{keyIds.length > 0 && (
 				<Fragment>

@@ -11,7 +11,14 @@ import { getCurrentSectionSelected } from '../../domain/Translate/TranslateModel
 import { getCursorPosition } from '../../domain/Label/LabelModel';
 import { processTextNodeLocalization } from '../../domain/Label/TextPluginDataModel';
 import { newGetStyleData } from './GET_STYLE_DATA';
-import { autoSelectNodeEmit, ignoreSectionAll, overRayRender } from '@/domain/Search/visualModel';
+import {
+	autoSelectNodeEmit,
+	baseNodeCheck,
+	ignoreSectionAll,
+	isHideNode,
+	nullSelectEmit,
+	overRayRender,
+} from '@/domain/Search/visualModel';
 import { BACKGROUND_SYMBOL } from '@/domain/constant';
 import { MetaData, nodeMetaData, searchStore } from '@/domain/Search/searchStore';
 import { read } from 'fs';
@@ -34,6 +41,8 @@ const refreshNode = async (node: SceneNode) => {
 	const styleData = await newGetStyleData(node.id);
 	emit(GET_STYLE_DATA.RESPONSE_KEY, styleData);
 };
+
+const DEBUG_MODE = false;
 
 export const isOverlayFrame = (node: SceneNode) => {
 	return node.parent?.name === '##overlay';
@@ -83,23 +92,33 @@ export const onNodeSelectionChange = () => {
 
 					if (metaData && metaData.localizationKey) {
 						// 파티션 키로 텍스트 노드 조회
+						console.log(3, new Date().toISOString());
 						const textNodes = searchStore.partialRefresh(metaData.localizationKey);
 
 						// 제외 영역
 						const ignoreIds = ignoreSectionAll().map((node) => node.id);
 						if (textNodes) {
+							console.log(4, new Date().toISOString());
 							const textNodeData = textNodes.map((node) => nodeMetaData(node));
 							// ignoreIds 에 포함되지 않는 노드만 선택하고 아이디 배열로 변환
-							const filteredTextNodes = textNodeData
-								.filter((node) => !ignoreIds.includes(node.root))
-								.map((node) => node.id);
+							const filteredTextNodesMeta = textNodeData.filter((node) => !ignoreIds.includes(node.root));
 
+							const filteredTextNodes = filteredTextNodesMeta.map((node) => node.id);
 							const pointer = textNodes.filter((node) => filteredTextNodes.includes(node.id));
-							figma.currentPage.selection = pointer;
+							if (!DEBUG_MODE) {
+								console.log('🚀 ~ figma.on ~ DEBUG_MODE:', DEBUG_MODE);
+
+								figma.currentPage.selection = pointer;
+							}
+							// 돈으로 삼
 							const arr = pointer.map((node) => node.id);
+							// 캐시 잇이[읗
 							arr.forEach((id) => cacheCheck.add(id));
 							selectCycleStore.localizationKey = metaData.localizationKey;
 							selectCycleStore.baseNodeId = metaData.baseNodeId ?? '';
+							console.log('🚀 ~ figma.on ~ 노드 병경 됨 selectCycleStore.baseNodeId :', selectCycleStore.baseNodeId);
+							console.log(5, new Date().toISOString(), filteredTextNodesMeta);
+							await autoSelectNodeEmit(filteredTextNodesMeta);
 						}
 					}
 				}
@@ -126,7 +145,15 @@ export const onNodeSelectionChange = () => {
 						const textNode = (await figma.getNodeByIdAsync(id)) as TextNode;
 						console.log(5, new Date().toISOString());
 						textNode.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, selectCycleStore.localizationKey);
-						textNode.setPluginData(NODE_STORE_KEY.LOCATION, selectCycleStore.baseNodeId);
+
+						// node가 baseNode 인지 확인
+						const isBaseNode = baseNodeCheck(textNode);
+						console.log('🚀 ~ figma.on ~ isBaseNode:', isBaseNode);
+						if (isBaseNode) {
+							console.log('🚀 ~ figma.on ~ isBaseNode:', textNode.id, selectCycleStore.baseNodeId);
+							await searchStore.rootChange(textNode.id, selectCycleStore.baseNodeId, true);
+						}
+
 						nextPointer.push(textNode);
 						cacheCheck.add(textNode.id);
 					}
@@ -134,23 +161,31 @@ export const onNodeSelectionChange = () => {
 			}
 
 			if (nextPointer.length > 0) {
-				overRayRender();
+				await overRayRender();
 				const currentSelection = figma.currentPage.selection;
 
 				const arr = [...currentSelection, ...nextPointer];
-				figma.currentPage.selection = arr;
+				if (!DEBUG_MODE) {
+					console.log('🚀 ~ figma.on ~ DEBUG_MODE:', DEBUG_MODE);
+
+					figma.currentPage.selection = arr;
+				}
 
 				const hasKey: MetaData[] = [];
 
 				for (const node of arr) {
 					const metaData = await searchStore.get(node.id);
-					if (metaData) {
+					// 화면에 보이지 않는 노드는 무시하도록 구성
+					if (metaData && !isHideNode(metaData)) {
 						hasKey.push(metaData);
 					}
 				}
 				console.log(6, new Date().toISOString());
-				autoSelectNodeEmit(hasKey);
+				await autoSelectNodeEmit(hasKey);
 			}
+			// next가 0이여서도 0인건 아님
+		} else {
+			nullSelectEmit();
 		}
 
 		const node = nodes[0];

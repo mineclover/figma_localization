@@ -23,11 +23,14 @@ import {
 	presetStoreSignal,
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
+	currentPointerSignal,
+	inputKeySignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
 import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION } from '../constant';
 import { modeStateSignal } from '@/model/signal';
+import SimpleSelect from '../Batch/SimpleSelect';
 
 const Preset = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -73,14 +76,21 @@ function LabelPage() {
 	const preset = useSignal(editPresetSignal);
 	const presetStore = useSignal(presetStoreSignal);
 	const modeState = useSignal(modeStateSignal);
+	const currentPointer = useSignal(currentPointerSignal);
+	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer);
 	const presetNames = Object.keys(presetStore);
-	const a = useSignal(autoCurrentNodesSignal);
-	console.log('🚀 ~ LabelPage ~ a:', a);
-	const b = useSignal(autoCurrentNodeStyleSignal);
-	console.log('🚀 ~ LabelPage ~ b:', b);
+	const autoCurrentNodes = useSignal(autoCurrentNodesSignal);
+	console.log('🚀 ~ LabelPage ~ autoCurrentNodes:', autoCurrentNodes);
+	const autoCurrentNodeStyle = useSignal(autoCurrentNodeStyleSignal);
+	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentNodeStyle);
+
+	const searchHandler = (key: string) => {
+		inputKeySignal.value = key;
+	};
 
 	return (
 		<div className={styles.container}>
+			<p>현재 페이지 아이디: {autoCurrentNodeStyle}</p>
 			<div className={styles.row}>
 				<IconButton
 					onClick={() => {
@@ -137,6 +147,7 @@ function LabelPage() {
 				</IconButton>
 			</div>
 			<Preset />
+			<SimpleSelect searchHandler={searchHandler} />
 			<span>{modeState}</span>
 
 			<div className={styles.row}>

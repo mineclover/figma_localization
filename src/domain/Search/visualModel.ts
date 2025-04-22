@@ -1,5 +1,5 @@
 import { emit, on } from '@create-figma-plugin/utilities';
-import { MetaData, searchStore } from './searchStore';
+import { MetaData, nodeMetaData, searchStore } from './searchStore';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
 
 import {
@@ -14,7 +14,13 @@ import {
 	SAVE_ACTION,
 	STORE_KEY,
 } from '../constant';
-import { autoCurrentNodesSignal, autoCurrentNodeStyleSignal, modeStateSignal, StyleData } from '@/model/signal';
+import {
+	autoCurrentNodesSignal,
+	autoCurrentNodeStyleSignal,
+	modeStateSignal,
+	selectIdsSignal,
+	StyleData,
+} from '@/model/signal';
 import { ActionType } from '../System/ActionResourceDTO';
 import { getNodeData } from '../Label/TextPluginDataModel';
 import { LocalizationKeyDTO, Preset, PresetStore } from '@/model/types';
@@ -32,6 +38,7 @@ import { newGetStyleData } from '@/model/on/GET_STYLE_DATA';
 // 선택한 섹션 아이디는 뭐고, 액션은 뭐고, 로컬라이제이션 키는 뭐고, 위치 값은 뭐고, 스타일 키에 매핑되는 이름은 뭐고
 
 export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
+	console.log('autoSelectNodeEmit 전송함');
 	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, nodes);
 
 	const style = nodes.map((node) => node.baseNodeId);
@@ -47,6 +54,7 @@ export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
 		// 대표 노드가 1개 또는 그 이상인게 식별되면 스타일이 별로 중요하지 않을 것 같다는 말임
 
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, baseNodeId);
+		console.log('🚀 ~ autoSelectNodeEmit ~ baseNodeId:', baseNodeId);
 	} else if (styleSet.size > 1) {
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'mixed');
 	} else {
@@ -54,13 +62,14 @@ export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
 	}
 };
 
-const nullSelectEmit = () => {
+export const nullSelectEmit = () => {
 	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, []);
 	emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'none');
 };
 
 export const onAutoSelectUI = () => {
 	return on(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, (nodes: MetaData[]) => {
+		selectIdsSignal.value = nodes.map((node) => node.id);
 		autoCurrentNodesSignal.value = nodes;
 	});
 };
@@ -69,6 +78,17 @@ export const onAutoSelectStyleUI = () => {
 		autoCurrentNodeStyleSignal.value = style;
 	});
 };
+
+export const baseNodeCheck = (node: TextNode) => {
+	const baseNodeId = node.getPluginData(NODE_STORE_KEY.LOCATION);
+	return baseNodeId === node.id;
+};
+
+/**
+ * 베이스 노드 전달
+ * @param node 사라질 노드
+ */
+export const baseNodeEmit = (node: TextNode) => {};
 
 /**
  * 배경 프레임 크기 계산
@@ -198,14 +218,14 @@ const localizationKeySplit = (data: MetaData[]) => {
 const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	const nodes = frame.children;
 	const idStore = data.map((item) => item.id);
-	const idSet = new Map<string, FrameNode>();
+	const idSet = new Set<string>(idStore);
 	const { removeTarget, keepTarget } = nodes.reduce(
 		(acc, node) => {
 			const id = node.getPluginData(BACKGROUND_SYMBOL.idStore);
 			if (idSet.has(id)) {
-				acc.removeTarget.push(node as FrameNode);
-			} else {
 				acc.keepTarget.set(id, node as FrameNode);
+			} else {
+				acc.removeTarget.push(node as FrameNode);
 			}
 			return acc;
 		},
@@ -234,10 +254,17 @@ const lzTextOverlay = (
 	const padding = 10;
 	const { x: rootX, y: rootY } = position;
 
+	// width, height 어디감0
 	const { x, y, width, height, localizationKey, id } = data;
+
 	const node = keepTarget.get(id) ?? figma.createFrame();
 
-	node.resize(width + padding * 2, height + padding * 2);
+	try {
+		node.resize(width + padding * 2, height + padding * 2);
+	} catch (error) {
+		// 실행 전에 걸러서 괜찮긴 한데 있긴 해야 함
+		console.log('🚀 ~ lzTextOverlay ~ error:', error, data);
+	}
 	const color = colorMap[localizationKey] ?? '#ffffff';
 
 	const rgba = hexToRGBA(color);
@@ -258,8 +285,12 @@ const lzTextOverlay = (
 	node.strokeAlign = 'CENTER';
 	node.dashPattern = [2, 4];
 
-	node.x = x - rootX - padding;
-	node.y = y - rootY - padding;
+	try {
+		node.x = x - rootX - padding;
+		node.y = y - rootY - padding;
+	} catch (error) {
+		console.log('🚀 ~ position 오류 lzTextOverlay ~ error:', error, data);
+	}
 
 	return node;
 };
@@ -409,32 +440,25 @@ const autoKeyMapping = async (ignoreIds: string[], frame: FrameNode, count: numb
 };
 
 /** 베이스 노드 표시 하이라이트 */
-const baseNodeHighlight = (data: MetaData, backgroundNode: FrameNode) => {
-	const { id, baseNodeId, localizationKey } = data;
-	if (id !== baseNodeId) {
-		return;
-	}
+const baseNodeHighlight = (data: MetaData, node: FrameNode) => {
 	const redSolid = figma.util.solidPaint({ r: 1, g: 0, b: 0 });
 
-	if (backgroundNode) {
-		const array = backgroundNode.children;
-
-		for (const node of array) {
-			if (node.type === 'FRAME' && node.name === `#${localizationKey}`) {
-				const currentId = node.getPluginData(BACKGROUND_SYMBOL.idStore);
-
-				if (currentId === id) {
-					node.dashPattern = [0];
-					node.strokeWeight = 3;
-					node.strokes = [redSolid];
-				}
-			}
-		}
+	if (node) {
+		node.dashPattern = [0];
+		node.strokeWeight = 3;
+		node.strokes = [redSolid];
 	}
 };
 /** 회전을 위한 랜덤 회전 */
 const getRandomNumber = () => {
 	return Math.floor(Math.random() * 360) + 1;
+};
+
+export const isHideNode = (node: MetaData) => {
+	if (node.x == null || node.y == null || node.width == null || node.height == null) {
+		return true;
+	}
+	return false;
 };
 
 /** 오버레이 트리거가 들어올 때 실행될 렌더링 로직 */
@@ -461,12 +485,19 @@ export const overRayRender = async () => {
 	// frame.locked = true;
 
 	hasKey.forEach((item, index) => {
+		const isBase = item.id === item.baseNodeId;
+
 		// 시작 대상 포커스 해도 됨
+		if (isHideNode(item)) {
+			// 설정 값이 없는 경우 무시 화면에 표시되지 않는 거임
+			return;
+		}
 		const node = lzTextOverlay(item, optionColorMap, frame, { x, y }, keepTarget);
+		if (isBase) {
+			baseNodeHighlight(item, node);
+		}
 	});
-	for (const item of hasKey) {
-		baseNodeHighlight(item, frame);
-	}
+
 	return hasKey;
 };
 

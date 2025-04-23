@@ -1,6 +1,12 @@
 import { isValidHexColor, convertNamedColorToHexColor } from '@create-figma-plugin/utilities';
 
+const isInPurpleRange = (hue: number): boolean => {
+	const MIN_PURPLE_HUE = 250;
+	const MAX_PURPLE_HUE = 300;
+	return hue >= MIN_PURPLE_HUE && hue <= MAX_PURPLE_HUE;
+};
 /**
+ *
  *
  * @param text
  * @param startHue  색조
@@ -15,7 +21,13 @@ export function generatePastelColors(text: string[], startHue: number = 0, light
 
 	uniqueChars.forEach((char, index) => {
 		// HSL 값 계산 (시작 색상에 오프셋 추가)
-		const hue = (startHue + index * hueStep) % 360;
+		let hue = (startHue + index * hueStep) % 360;
+
+		// 컴포넌트 인스턴스는 편집모드가 작동하지 않아서 추가함
+		if (isInPurpleRange(hue)) {
+			hue = hue + hueStep;
+		}
+
 		const saturation = 100; // 파스텔톤을 위한 적절한 채도
 		// const lightness = 85; // 높은 명도로 파스텔톤 구현
 

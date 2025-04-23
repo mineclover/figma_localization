@@ -151,161 +151,58 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	const ignoreSectionIds = useSignal(ignoreSectionIdsSignal);
 	const characters = currentPointer?.characters;
-	const textFilter = patternMatchData.filter((item) => {
-		if (ignoreSectionIds.includes(item.root)) return false;
-		return item.text === characters;
-	});
-	const missingLinks = selectItems.filter((item) => !textFilter.some((text) => text.id === item));
-	const missingData = patternMatchData.filter((item) => missingLinks.includes(item.id));
 	const currentId = currentPointer?.nodeId;
-	// const sectionIds = textFilter.map((item) => item.root);
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
 
-	/** 키 여부로 분리 */
-	const [otherGroup, keyGroup] = textFilter.reduce(
-		(acc, item) => {
-			if (item.localizationKey === '') {
-				acc[0].push(item);
-			} else {
-				acc[1].push(item);
-			}
-			return acc;
-		},
-		[[], []] as MetaData[][]
-	);
+	const selectNodes = patternMatchData.filter((item) => selectItems.includes(item.id));
+
+	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
 
 	/** 키 종류로 분리 */
-	const keyLayer = keyGroup.reduce((acc, item) => {
+	const keyLayer = selectNodes.reduce((acc, item) => {
 		if (acc.has(item.localizationKey)) {
-			acc.get(item.localizationKey)?.push(item.id);
+			acc.get(item.localizationKey)?.add(item.id);
 		} else {
-			acc.set(item.localizationKey, [item.id]);
+			acc.set(item.localizationKey, new Set([item.id]));
 		}
 		return acc;
-	}, new Map<string, string[]>());
+	}, new Map<string, Set<string>>());
+
+	const keyObject = patternMatchData.reduce((acc, item) => {
+		if (acc.has(item.localizationKey)) {
+			acc.get(item.localizationKey)?.add(item);
+		} else {
+			acc.set(item.localizationKey, new Set([item]));
+		}
+		return acc;
+	}, new Map<string, Set<MetaData>>());
 
 	const keyIds = Array.from(keyLayer.keys());
 
-	// 페이지는 생략
-	// const allSectionIdsArray = Array.from(allSectionIds).filter((item) => item !== currentPointer?.pageId);
-
 	return (
 		<div className={styles.root}>
-			{/* 제외 리스트 */}
+			{Array.from(selectKeys).map((key) => {
+				return (
+					<Fragment key={key}>
+						<Muted>#{key}</Muted>
+						{/* 키 있는 매칭 리스트 */}
+						<div className={styles.container}>
+							{Array.from(keyObject.get(key) ?? []).map((item) => {
+								const selected = selectItems.includes(item.id);
+								const keyMatch = selectKey === item.localizationKey;
 
-			{/* {allSectionIdsArray.length > 0 && (
-				<Fragment>
-					<Muted>Section</Muted>
-					<div className={styles.container}>
-						{allSectionIdsArray
-							.sort((a, b) => {
-								return a.localeCompare(b);
-							})
-							.map((item) => {
-								const selected = ignoreSectionIds.includes(item);
-								return (
-									<button
-										className={clc(
-											styles.ignoreButton,
-											!selected && styles.active,
-											currentSection?.id === item && styles.currentSection
-										)}
-										onClick={() => {
-											pageNodeZoomAction(item, false);
-										}}
-										onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-											e.preventDefault(); // 기본 우클릭 메뉴 방지
-											if (ignoreSectionIds.includes(item)) {
-												ignoreSectionIdsSignal.value = ignoreSectionIds.filter((id) => id !== item);
-											} else {
-												ignoreSectionIdsSignal.value = [...ignoreSectionIds, item];
-											}
-										}}
-									>
-										{item}
-									</button>
-								);
+								const current = item.baseNodeId === item.id;
+								// const current = currentId === item.id;
+								return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
 							})}
-					</div>
-				</Fragment>
-			)} */}
+						</div>
 
-			{keyIds.length > 0 && (
-				<Fragment>
-					<Muted>Keys</Muted>
-					{/* 키 있는 매칭 리스트 */}
-					<div className={styles.container}>
-						{keyGroup.map((item) => {
-							const selected = selectItems.includes(item.id);
-							const keyMatch = selectKey === item.localizationKey;
-
-							const current = item.baseNodeId === item.id;
-							// const current = currentId === item.id;
-							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-						})}
-					</div>
-
-					{/* 키 리스트 */}
-					<KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} />
-				</Fragment>
-			)}
-			{otherGroup.length > 0 && (
-				<Fragment>
-					<div className={styles.row}>
-						<Muted>Other</Muted>
-
-						<IconButton
-							onClick={() => {
-								const otherIds = otherGroup.map((item) => item.id);
-								if (otherIds.some((item) => selectItems.includes(item))) {
-									// 있으면 제거 없으면 추가
-									selectIdsSignal.value = selectItems.filter((item) => !otherIds.includes(item));
-								} else {
-									// 없으면 추가
-									selectIdsSignal.value = [...selectItems, ...otherIds];
-								}
-							}}
-						>
-							<IconBooleanSmall24 />
-						</IconButton>
-					</div>
-
-					{/* 키 없는 매칭 리스트 */}
-					<div className={styles.container}>
-						{otherGroup.map((item) => {
-							const selected = selectItems.includes(item.id);
-							const keyMatch = selectKey === item.localizationKey;
-							const current = currentId === item.id;
-							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-						})}
-					</div>
-				</Fragment>
-			)}
-			{missingData.length > 0 && (
-				<Fragment>
-					<div className={styles.row}>
-						<Muted>Selected</Muted>
-						<IconButton
-							onClick={() => {
-								selectIdsSignal.value = selectItems.filter((item) => !missingLinks.includes(item));
-							}}
-						>
-							<IconCloseSmall24 />
-						</IconButton>
-					</div>
-
-					{/* 키 없는 매칭 리스트 */}
-					<div className={styles.container}>
-						{missingData.map((item) => {
-							const selected = selectItems.includes(item.id);
-							const keyMatch = selectKey === item.localizationKey;
-							const current = currentId === item.id;
-							return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
-						})}
-					</div>
-				</Fragment>
-			)}
+						{/* 키 리스트 */}
+						<KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} />
+					</Fragment>
+				);
+			})}
 		</div>
 	);
 }

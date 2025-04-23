@@ -91,8 +91,6 @@ export const onNodeSelectionChange = () => {
 
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 			if (isOverlay) {
-				const backgroundFrame = getBackgroundFrame();
-
 				if (searchStore.textToFrameStore.size === 0) {
 					await overRayRender();
 				}
@@ -180,6 +178,10 @@ export const onNodeSelectionChange = () => {
 			// next가 0이여서도 0인건 아님
 		} else {
 			nullSelectEmit();
+			const backgroundFrame = getBackgroundFrame();
+			if (backgroundFrame) {
+				await overRayRender();
+			}
 		}
 
 		const node = nodes[0];

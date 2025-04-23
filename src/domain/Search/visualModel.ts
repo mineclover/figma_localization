@@ -263,21 +263,28 @@ const lzTextOverlay = (
 	colorMap: Record<string, string>,
 	backgroundFrame: FrameNode,
 	position: { x: number; y: number },
-	// 프레임 노드 목록
-	keepTarget: Map<string, FrameNode>
+
+	/**
+	 * ignoreIds로 영역 쪼개서 데이터 얻고 백그라운드 확인해서 기존에 데이터가 들어 있는
+	 * 프레임 노드 목록
+	 */
+	keepTarget: Map<string, FrameNode>,
+	optionOpacity: number = 1
 ) => {
 	const padding = 10;
 	const { x: rootX, y: rootY } = position;
 
 	// width, height 어디감0
+	// const { x, y, width, height, id ,localizationKey : oldLocalizationKey} = data;
 	const { x, y, width, height, id } = data;
 	// 프레임 노드 목록임 메타데이터는 컬러프레임을 알 수 없는 상태임
-
 	// id가 텍스트 아이디 인지 뭔 아이디인지
+
 	const node = keepTarget.get(id) ?? figma.createFrame();
 	const test = getFrameNodeMetaData(node as FrameNode);
-	console.log('🚀 ~ test:', test);
-	if (test) {
+	const isSelected = figma.currentPage.selection.some((item) => item.id === node.id);
+	const isSelected2 = figma.currentPage.selection.includes(node);
+	if (test && isSelected) {
 		data = test;
 	}
 	const { localizationKey } = data;
@@ -305,7 +312,7 @@ const lzTextOverlay = (
 	node.strokeCap = 'ROUND';
 	node.strokeAlign = 'CENTER';
 	node.dashPattern = [2, 4];
-
+	node.opacity = optionOpacity;
 	if (x != null && y != null) {
 		node.x = x - rootX - padding;
 		node.y = y - rootY - padding;
@@ -465,7 +472,10 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 		hasKey,
 		/** 로컬라이제이션 키 없는 데이터 */
 		nullKey,
-		/** 프레임 노드 목록 */
+		/**
+		 * frameId : Node 쌍
+		 * ignoreIds로 영역 쪼개서 데이터 얻고 백그라운드 확인해서 기존에 데이터가 들어 있는
+		 *  프레임 노드 목록 */
 		keepTarget,
 	};
 };
@@ -508,7 +518,7 @@ export const overRayRender = async () => {
 	backgroundFrame.setPluginData(BACKGROUND_STORE_KEY.background, 'true');
 	const { hasKey, nullKey, keys, keepTarget } = await autoKeyMapping(ignoreIds, backgroundFrame);
 
-	const optionColorMap = generatePastelColors(keys, getRandomNumber());
+	const optionColorMap = generatePastelColors(keys, 44);
 
 	const { x, y, width, height } = backgroundSize;
 	backgroundFrame.x = x;
@@ -519,17 +529,37 @@ export const overRayRender = async () => {
 	backgroundFrame.opacity = 0.7;
 	// frame.locked = true;
 
+	const selected = figma.currentPage.selection;
+
+	/**  기준 키가 있고  */
+	const selectedIds = selected
+
+		.map((item) => item.getPluginData(NODE_STORE_KEY.LOCATION))
+		.filter((item) => item != null);
+
+	// const keepTarget = clearBackground(backgroundFrame, metadata);
+	console.log('🚀 ~ overRayRender ~ selectedIds:', selectedIds);
 	hasKey.forEach((item, index) => {
 		const isBase = item.id === item.baseNodeId;
-
 		// 시작 대상 포커스 해도 됨
 		if (isHideNode(item)) {
 			// 설정 값이 없는 경우 무시 화면에 표시되지 않는 거임
 			return;
 		}
-		const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
-		if (isBase) {
-			baseNodeHighlight(item, node);
+		if (selectedIds.length === 0) {
+			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
+			if (isBase) {
+				baseNodeHighlight(item, node);
+			}
+		} else if (selectedIds.length > 0) {
+			const isSelected = selectedIds.includes(item.baseNodeId ?? '');
+			const optionOpacity = isSelected ? 1 : 0.3;
+			console.log('🚀 ~ hasKey.forEach ~ optionOpacity:', optionOpacity);
+
+			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget, optionOpacity);
+			if (isBase) {
+				baseNodeHighlight(item, node);
+			}
 		}
 	});
 

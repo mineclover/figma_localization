@@ -18,6 +18,8 @@ import {
 	onAutoSelectStyleUI,
 	onAutoSelectUI,
 } from './Search/visualModel';
+import { emit } from '@create-figma-plugin/utilities';
+import { RENDER_PAIR } from './constant';
 
 /**
  * duplex 전용 어댑터

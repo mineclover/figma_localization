@@ -1,11 +1,11 @@
 import { emit, on } from '@create-figma-plugin/utilities';
-import { MetaData, nodeMetaData, searchStore } from './searchStore';
+import { getFrameNodeMetaData, MetaData, nodeMetaData, searchStore, setFrameNodeMetaData } from './searchStore';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
 
 import {
 	AUTO_SELECT_NODE_EMIT,
 	AUTO_SELECT_STYLE_EMIT,
-	BACKGROUND_SYMBOL,
+	BACKGROUND_STORE_KEY,
 	DISABLE_RENDER_PAIR,
 	NODE_STORE_KEY,
 	RENDER_MODE_STATE,
@@ -131,12 +131,25 @@ export const getBackgroundSize = (ignoreIds: string[] = []) => {
 };
 
 /** 배경 프레임 조회 */
-const getBackgroundFrame = () => {
+export const getBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
 			//
-			if (node.getPluginData(BACKGROUND_SYMBOL.background) === 'true') {
+			if (node.getPluginData(BACKGROUND_STORE_KEY.background) === 'true') {
+				return node as FrameNode;
+			}
+		}
+	}
+};
+
+/** 배경 프레임 조회 */
+const initBackgroundFrame = () => {
+	const nodes = figma.currentPage.children;
+	for (const node of nodes) {
+		if (node.name === '##overlay') {
+			//
+			if (node.getPluginData(BACKGROUND_STORE_KEY.background) === 'true') {
 				return node as FrameNode;
 			}
 			// 있는데 플러그인 데이터가 없으면 삭제
@@ -150,7 +163,7 @@ const getBackgroundFrame = () => {
  * 배경 프레임 초기화 그냥 삭제하고 새로 만들어서 반환
  * 내부 프레임 없애야해서
  */
-const initBackgroundFrame = () => {
+const removeBackgroundFrame = () => {
 	const nodes = figma.currentPage.children;
 	for (const node of nodes) {
 		if (node.name === '##overlay') {
@@ -221,8 +234,8 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	const idSet = new Set<string>(idStore);
 	const { removeTarget, keepTarget } = nodes.reduce(
 		(acc, node) => {
-			const id = node.getPluginData(BACKGROUND_SYMBOL.idStore);
-			if (idSet.has(id)) {
+			const { id } = getFrameNodeMetaData(node as FrameNode) ?? {};
+			if (id != null && idSet.has(id)) {
 				acc.keepTarget.set(id, node as FrameNode);
 			} else {
 				acc.removeTarget.push(node as FrameNode);
@@ -246,9 +259,11 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
  */
 const lzTextOverlay = (
 	data: MetaData,
+
 	colorMap: Record<string, string>,
-	frame: FrameNode,
+	backgroundFrame: FrameNode,
 	position: { x: number; y: number },
+	// 프레임 노드 목록
 	keepTarget: Map<string, FrameNode>
 ) => {
 	const padding = 10;
@@ -256,14 +271,14 @@ const lzTextOverlay = (
 
 	// width, height 어디감0
 	const { x, y, width, height, localizationKey, id } = data;
+	// 프레임 노드 목록임 메타데이터는 컬러프레임을 알 수 없는 상태임
+
+	// id가 텍스트 아이디 인지 뭔 아이디인지
 
 	const node = keepTarget.get(id) ?? figma.createFrame();
 
-	try {
+	if (width != null && height != null) {
 		node.resize(width + padding * 2, height + padding * 2);
-	} catch (error) {
-		// 실행 전에 걸러서 괜찮긴 한데 있긴 해야 함
-		console.log('🚀 ~ lzTextOverlay ~ error:', error, data);
 	}
 	const color = colorMap[localizationKey] ?? '#ffffff';
 
@@ -271,9 +286,10 @@ const lzTextOverlay = (
 	const paint = figma.util.solidPaint(rgba);
 	node.fills = [paint];
 	node.name = '#' + localizationKey;
-	node.setPluginData(BACKGROUND_SYMBOL.background, 'true');
-	frame.appendChild(node);
-	node.setPluginData(BACKGROUND_SYMBOL.idStore, id);
+	setFrameNodeMetaData(node, data);
+	node.setPluginData(BACKGROUND_STORE_KEY.background, 'true');
+	backgroundFrame.appendChild(node);
+
 	// node.blendMode = 'OVERLAY';
 	node.blendMode = 'HARD_LIGHT';
 
@@ -285,12 +301,11 @@ const lzTextOverlay = (
 	node.strokeAlign = 'CENTER';
 	node.dashPattern = [2, 4];
 
-	try {
+	if (x != null && y != null) {
 		node.x = x - rootX - padding;
 		node.y = y - rootY - padding;
-	} catch (error) {
-		console.log('🚀 ~ position 오류 lzTextOverlay ~ error:', error, data);
 	}
+	searchStore.setFrameStore(id, node);
 
 	return node;
 };
@@ -337,16 +352,18 @@ const textMatchOverlay = (
 	const { x, y, width, height, text, id } = data;
 	const node = figma.createFrame();
 
-	node.resize(width + padding * 2, height + padding * 2);
+	if (width != null && height != null) {
+		node.resize(width + padding * 2, height + padding * 2);
+	}
 	const color = colorMap[text] ?? '#ffffff';
 
 	const rgba = hexToRGBA(color);
 	const paint = figma.util.solidPaint(rgba);
 	node.fills = [paint];
 	node.name = '#' + text;
-	node.setPluginData(BACKGROUND_SYMBOL.background, 'true');
+	node.setPluginData(BACKGROUND_STORE_KEY.background, 'true');
 	frame.appendChild(node);
-	node.setPluginData(BACKGROUND_SYMBOL.idStore, id);
+
 	// node.blendMode = 'OVERLAY';
 	node.blendMode = 'HARD_LIGHT';
 
@@ -358,8 +375,10 @@ const textMatchOverlay = (
 	node.strokeAlign = 'CENTER';
 	node.dashPattern = [2, 4];
 
-	node.x = x - rootX - padding;
-	node.y = y - rootY - padding;
+	if (x != null && y != null) {
+		node.x = x - rootX - padding;
+		node.y = y - rootY - padding;
+	}
 
 	return node;
 };
@@ -412,29 +431,36 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 };
 
 /** 반복해서 매핑하면서 nullKey를 완전히 제거 */
-const autoKeyMapping = async (ignoreIds: string[], frame: FrameNode, count: number = 0) => {
+const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, count: number = 0) => {
 	const { metadata, searchNodes } = await searchStore.search(ignoreIds);
 
 	// 전체 스토어 초기화하지 않음 > getBackgroundFrame 에서 없애고 시작하기 때문
 
 	// 쓰려했는데... 생각해보면 텍스트노드와 프레임 노드의 발생 시점이 다름
-	const keepTarget = clearBackground(frame, metadata);
-
+	const keepTarget = clearBackground(backgroundFrame, metadata);
+	// keepTarget 은 삭제되지 않은 프레임 노드
+	console.log('🚀 ~ autoKeyMapping ~ frame, metadata:', backgroundFrame, metadata);
+	// 메타데이터 기준  없는 데이터
 	const { hasKey, nullKey, keys } = localizationKeySplit(metadata);
+	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
 	const textMap = textSorter(nullKey);
+	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
 	const textMapId = (await textKeyRegister(textMap)) ?? {};
 
 	await textOriginRegister(textMapId);
 
 	if (nullKey.length > 0 && count < 4) {
 		console.log('🚀 ~ autoKeyMapping ~ count:', count);
-		return autoKeyMapping(ignoreIds, frame, count + 1);
+		return autoKeyMapping(ignoreIds, backgroundFrame, count + 1);
 	}
 
 	return {
 		keys,
+		/** 로컬라이제이션 키 있는 데이터 */
 		hasKey,
+		/** 로컬라이제이션 키 없는 데이터 */
 		nullKey,
+		/** 프레임 노드 목록 */
 		keepTarget,
 	};
 };
@@ -461,27 +487,31 @@ export const isHideNode = (node: MetaData) => {
 	return false;
 };
 
-/** 오버레이 트리거가 들어올 때 실행될 렌더링 로직 */
+/**
+ *
+ * 오버레이 트리거가 들어올 때 실행될 렌더링 로직
+ * 새로고침을 겸함
+ */
 export const overRayRender = async () => {
 	const ignoreIds = ignoreSectionAll().map((node) => node.id);
 	const backgroundSize = getBackgroundSize(ignoreIds);
 
 	// 지우고 다시 생성하는거 너무 비효율적임
 	// const frame = initBackgroundFrame();
-	const frame = getBackgroundFrame();
-	frame.name = '##overlay';
-	frame.setPluginData(BACKGROUND_SYMBOL.background, 'true');
-	const { hasKey, nullKey, keys, keepTarget } = await autoKeyMapping(ignoreIds, frame);
+	const backgroundFrame = initBackgroundFrame();
+	backgroundFrame.name = '##overlay';
+	backgroundFrame.setPluginData(BACKGROUND_STORE_KEY.background, 'true');
+	const { hasKey, nullKey, keys, keepTarget } = await autoKeyMapping(ignoreIds, backgroundFrame);
 
 	const optionColorMap = generatePastelColors(keys, getRandomNumber());
 
 	const { x, y, width, height } = backgroundSize;
-	frame.x = x;
-	frame.y = y;
-	frame.resize(width, height);
-	const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 0.4 });
-	frame.fills = [paint];
-	frame.opacity = 0.7;
+	backgroundFrame.x = x;
+	backgroundFrame.y = y;
+	backgroundFrame.resize(width, height);
+	const paint = figma.util.solidPaint({ r: 0, g: 0, b: 0, a: 1 });
+	backgroundFrame.fills = [paint];
+	backgroundFrame.opacity = 0.7;
 	// frame.locked = true;
 
 	hasKey.forEach((item, index) => {
@@ -492,7 +522,7 @@ export const overRayRender = async () => {
 			// 설정 값이 없는 경우 무시 화면에 표시되지 않는 거임
 			return;
 		}
-		const node = lzTextOverlay(item, optionColorMap, frame, { x, y }, keepTarget);
+		const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
 		if (isBase) {
 			baseNodeHighlight(item, node);
 		}
@@ -509,7 +539,7 @@ export const onRender = () => {
 /** 제거 */
 export const onDisableRender = () => {
 	on(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST, async () => {
-		const frame = initBackgroundFrame();
+		const frame = removeBackgroundFrame();
 		frame.remove();
 	});
 };

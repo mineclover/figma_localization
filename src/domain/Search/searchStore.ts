@@ -1,6 +1,7 @@
 import { CurrentCursorType, NodeData, SearchNodeData } from '@/model/types';
-import { NODE_STORE_KEY } from '../constant';
+import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
 import { SectionSearch } from '@/figmaPluginUtils';
+import { safeJsonParse } from '../utils/getStore';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -52,10 +53,10 @@ export type MetaData = {
 	text: string;
 	parentName?: string;
 	baseNodeId?: string;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
+	x?: number;
+	y?: number;
+	width?: number;
+	height?: number;
 };
 
 export const nodeMetaData = (node: TextNode) => {
@@ -79,32 +80,49 @@ export const nodeMetaData = (node: TextNode) => {
 	} as MetaData;
 };
 
+export const getFrameNodeMetaData = (node: FrameNode) => {
+	return safeJsonParse<MetaData>(node.getPluginData(BACKGROUND_STORE_KEY.data));
+};
+
+export const setFrameNodeMetaData = (node: FrameNode, data: MetaData) => {
+	node.setPluginData(BACKGROUND_STORE_KEY.data, JSON.stringify(data));
+};
+
 /** figma 클라이언트 */
 class SearchStore {
 	store: Map<string, MetaData>;
 	// 조회 기준 데이터 저장 목적
 	sectionStore: Map<string, Set<string>>;
-	// 키 저장 목적임
+	// 베이스노드를 공유하는 키 저장 목적임
 	baseNodeStore: Map<string, Set<string>>;
+	// 텍스트 노드를 프레임 노드로 매핑하는 목적
+	textToFrameStore: Map<string, FrameNode | null>;
 	constructor() {
 		this.store = new Map<string, MetaData>();
 		this.sectionStore = new Map<string, Set<string>>();
 		this.baseNodeStore = new Map<string, Set<string>>();
+		this.textToFrameStore = new Map<string, FrameNode | null>();
 	}
 
 	/**
 	 * 노드 저장
-	 * @param key 노드 id
-	 * @param node 노드
+
+	 * @param textNode 노드
 	 * @returns 노드 메타 데이터
 	 */
-	setStore(key: string, node: BaseNode) {
-		const meta = nodeMetaData(node as TextNode);
+	setStore(textNode: BaseNode) {
+		const key = textNode.id;
+		const meta = nodeMetaData(textNode as TextNode);
 		if (meta.baseNodeId) {
 			this.setBaseNode(meta.baseNodeId, key);
 		}
+
 		this.store.set(key, meta);
 		return meta;
+	}
+
+	setFrameStore(textId: string, frameNode: FrameNode) {
+		this.textToFrameStore.set(textId, frameNode);
 	}
 
 	refresh() {
@@ -113,7 +131,7 @@ class SearchStore {
 				types: ['TEXT'],
 			});
 			nodes.forEach((node) => {
-				this.setStore(node.id, node);
+				this.setStore(node);
 			});
 		}
 	}
@@ -128,7 +146,7 @@ class SearchStore {
 			});
 
 			nodes.forEach((node) => {
-				this.setStore(node.id, node);
+				this.setStore(node);
 			});
 			const result = nodes.filter((node) => {
 				const key = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
@@ -178,7 +196,7 @@ class SearchStore {
 					});
 					sectionStore.clear();
 					nodes.forEach((node) => {
-						this.setStore(node.id, node);
+						this.setStore(node);
 						sectionStore.add(node.id);
 						searchNodes.push(node);
 					});
@@ -227,7 +245,7 @@ class SearchStore {
 		if (this.isFigma()) {
 			const node = await figma.getNodeByIdAsync(key);
 			if (node) {
-				return this.setStore(key, node);
+				return this.setStore(node);
 			} else {
 				this.store.delete(key);
 			}
@@ -311,7 +329,7 @@ class SearchStore {
 				afterNode.setPluginData(NODE_STORE_KEY.LOCATION, after);
 
 				// 캐싱 store에 변경 반영하고 node 메타데이터 추가
-				this.setStore(afterNode.id, afterNode);
+				this.setStore(afterNode);
 			}
 		}
 		// 안쓰는 스토어 삭제

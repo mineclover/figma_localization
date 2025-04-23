@@ -28,6 +28,12 @@ export const NODE_STORE_KEY = {
 	MODIFIER: 'NODE_MODIFIER',
 };
 
+export const BACKGROUND_STORE_KEY = {
+	background: 'IS_BACKGROUND',
+	// idStore: 'BACKGROUND_ID_STORE',
+	data: 'METADATA',
+};
+
 export const CLIENT_STORE_KEY = {
 	USER_HASH: 'CLIENT_USER_HASH',
 };
@@ -237,11 +243,6 @@ export const RENDER_PAIR = {
 export const DISABLE_RENDER_PAIR = {
 	DISABLE_RENDER_REQUEST: 'DISABLE_RENDER_REQUEST',
 	DISABLE_RENDER_RESPONSE: 'DISABLE_RENDER_RESPONSE',
-};
-
-export const BACKGROUND_SYMBOL = {
-	background: 'IS_BACKGROUND',
-	idStore: 'BACKGROUND_ID_STORE',
 };
 
 export const RENDER_MODE_STATE = {

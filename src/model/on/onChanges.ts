@@ -22,7 +22,13 @@ import {
 	overRayRender,
 } from '@/domain/Search/visualModel';
 import { BACKGROUND_STORE_KEY } from '@/domain/constant';
-import { getFrameNodeMetaData, MetaData, nodeMetaData, searchStore } from '@/domain/Search/searchStore';
+import {
+	getFrameNodeMetaData,
+	MetaData,
+	nodeMetaData,
+	searchStore,
+	setFrameNodeMetaData,
+} from '@/domain/Search/searchStore';
 import { read } from 'fs';
 
 export let tempNode = '';
@@ -113,9 +119,9 @@ export const onNodeSelectionChange = () => {
 									return item != null;
 								});
 
-							console.log('🚀 ~ figma.on ~ targetFrames:', backgroundFrame, targetFrames);
-
 							if (targetFrames.length > 0) {
+								selectCycleStore.localizationKey = metaData.localizationKey;
+								selectCycleStore.baseNodeId = baseNodeId;
 								figma.currentPage.selection = targetFrames;
 							}
 						}
@@ -136,28 +142,19 @@ export const onNodeSelectionChange = () => {
 			console.log(4, new Date().toISOString());
 			// frames 는 새로운 프레임 노드들임
 			for (const node of frames) {
-				let baseNodeId = '';
 				const isOverlay = isOverlayFrame(node);
 				// 선택 대상이 있고 오버레이 프레임
 				if (isOverlay) {
 					// 오버레이 프레임 정보 가져옴
 					const metaData = overlayFrameInfo(node);
 					if (metaData) {
-						const { id, localizationKey } = metaData;
-
-						// 오버레이 프레임 정보로 텍스트 노드 선택하고 변환함
-						const textNode = (await figma.getNodeByIdAsync(id)) as TextNode;
-						console.log(5, new Date().toISOString());
-						textNode.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, selectCycleStore.localizationKey);
-
-						// node가 baseNode 인지 확인
-						const isBaseNode = baseNodeCheck(textNode);
-						// 현재 새로 선택된 노드가 baseNode이니 selectCycleStore 노드로 변경한다는 의미
-						await searchStore.baseChange(textNode.id, selectCycleStore.baseNodeId);
-						baseNodeId = textNode.id;
-
-						nextPointer.push(textNode);
-						cacheCheck.add(textNode.id);
+						const newMetaData = {
+							...metaData,
+							localizationKey: selectCycleStore.localizationKey,
+						};
+						setFrameNodeMetaData(node as FrameNode, newMetaData);
+						nextPointer.push(node);
+						cacheCheck.add(node.id);
 					}
 				}
 			}
@@ -178,23 +175,7 @@ export const onNodeSelectionChange = () => {
 				}
 				// 선택 리스트에 추가
 
-				const select = [...currentSelection, ...nextPointer];
 				// 선택 값 변경
-				if (!DEBUG_MODE) {
-					figma.currentPage.selection = select;
-				}
-
-				const hasKey: MetaData[] = [];
-
-				for (const node of select) {
-					const metaData = await searchStore.get(node.id);
-					// 화면에 보이지 않는 노드는 무시하도록 구성
-					if (metaData && !isHideNode(metaData)) {
-						hasKey.push(metaData);
-					}
-				}
-				console.log(6, new Date().toISOString());
-				await autoSelectNodeEmit(hasKey);
 			}
 			// next가 0이여서도 0인건 아님
 		} else {
@@ -207,6 +188,19 @@ export const onNodeSelectionChange = () => {
 			tempNode = node.id;
 			refreshNode(node);
 		}
+
+		const hasKey: MetaData[] = [];
+
+		for (const node of figma.currentPage.selection) {
+			const metaData = getFrameNodeMetaData(node as FrameNode);
+			// 화면에 보이지 않는 노드는 무시하도록 구성
+			if (metaData && !isHideNode(metaData)) {
+				hasKey.push(metaData);
+			}
+		}
+		console.log(6, new Date().toISOString());
+		await autoSelectNodeEmit(hasKey);
+
 		const sectionId = getCurrentSectionSelected(node);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
 	});

@@ -199,7 +199,7 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 						</div>
 
 						{/* 키 리스트 */}
-						<KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} />
+						{/* <KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} /> */}
 					</Fragment>
 				);
 			})}

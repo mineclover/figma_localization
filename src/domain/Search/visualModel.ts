@@ -270,12 +270,17 @@ const lzTextOverlay = (
 	const { x: rootX, y: rootY } = position;
 
 	// width, height 어디감0
-	const { x, y, width, height, localizationKey, id } = data;
+	const { x, y, width, height, id } = data;
 	// 프레임 노드 목록임 메타데이터는 컬러프레임을 알 수 없는 상태임
 
 	// id가 텍스트 아이디 인지 뭔 아이디인지
-
 	const node = keepTarget.get(id) ?? figma.createFrame();
+	const test = getFrameNodeMetaData(node as FrameNode);
+	console.log('🚀 ~ test:', test);
+	if (test) {
+		data = test;
+	}
+	const { localizationKey } = data;
 
 	if (width != null && height != null) {
 		node.resize(width + padding * 2, height + padding * 2);

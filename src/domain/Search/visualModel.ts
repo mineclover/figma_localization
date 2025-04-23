@@ -38,16 +38,18 @@ import { newGetStyleData } from '@/model/on/GET_STYLE_DATA';
 // 선택한 섹션 아이디는 뭐고, 액션은 뭐고, 로컬라이제이션 키는 뭐고, 위치 값은 뭐고, 스타일 키에 매핑되는 이름은 뭐고
 
 export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
-	console.log('autoSelectNodeEmit 전송함');
+	console.log('autoSelectNodeEmit 전송함', nodes);
 	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, nodes);
 
 	const style = nodes.map((node) => node.baseNodeId);
 	const styleSet = new Set(style);
+	console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', styleSet);
 	styleSet.delete(undefined);
 	//@ts-ignore
 	styleSet.delete(null);
 
 	if (styleSet.size === 1) {
+		console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 0);
 		const baseNodeId = styleSet.values().next().value!;
 		// const style = await newGetStyleData(baseNodeId);
 		// 스타일을 무조건 빼야할까? 안빼도 될 거 같은데
@@ -57,8 +59,10 @@ export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
 		console.log('🚀 ~ autoSelectNodeEmit ~ baseNodeId:', baseNodeId);
 	} else if (styleSet.size > 1) {
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'mixed');
+		console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 1);
 	} else {
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'none');
+		console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 2);
 	}
 };
 
@@ -534,7 +538,7 @@ export const overRayRender = async () => {
 	/**  기준 키가 있고  */
 	const selectedIds = selected
 
-		.map((item) => item.getPluginData(NODE_STORE_KEY.LOCATION))
+		.map((item) => getFrameNodeMetaData(item as FrameNode)?.baseNodeId)
 		.filter((item) => item != null);
 
 	// const keepTarget = clearBackground(backgroundFrame, metadata);
@@ -552,9 +556,8 @@ export const overRayRender = async () => {
 				baseNodeHighlight(item, node);
 			}
 		} else if (selectedIds.length > 0) {
-			const isSelected = selectedIds.includes(item.baseNodeId ?? '');
+			const isSelected = item.baseNodeId != null && selectedIds.includes(item.baseNodeId);
 			const optionOpacity = isSelected ? 1 : 0.3;
-			console.log('🚀 ~ hasKey.forEach ~ optionOpacity:', optionOpacity);
 
 			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget, optionOpacity);
 			if (isBase) {

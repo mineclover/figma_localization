@@ -158,7 +158,6 @@ export const onNodeSelectionChange = () => {
 			}
 			// 처리 된 노드가 있으면 오버레이 리렌더링
 			if (nextPointer.length > 0) {
-				await overRayRender();
 				const currentSelection = figma.currentPage.selection;
 				const arr = currentSelection.map((item) => item.id);
 
@@ -178,12 +177,11 @@ export const onNodeSelectionChange = () => {
 			// next가 0이여서도 0인건 아님
 		} else {
 			nullSelectEmit();
-			const backgroundFrame = getBackgroundFrame();
-			if (backgroundFrame) {
-				await overRayRender();
-			}
 		}
-
+		const backgroundFrame = getBackgroundFrame();
+		if (backgroundFrame) {
+			await overRayRender();
+		}
 		const node = nodes[0];
 		/** 업데이트 반영 코드 */
 		if (node && tempNode !== node.id) {
@@ -201,9 +199,9 @@ export const onNodeSelectionChange = () => {
 			}
 		}
 		console.log(6, new Date().toISOString());
-		await autoSelectNodeEmit(hasKey);
 
 		const sectionId = getCurrentSectionSelected(node);
+		await autoSelectNodeEmit(hasKey);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
 	});
 };

@@ -482,9 +482,9 @@ function BatchPage() {
 					</div>
 
 					<SimpleSelect searchHandler={searchHandler} />
-					<span className={clc(styles.text, currentPointer?.characters == null && styles.dangerText)}>
+					{/* <span className={clc(styles.text, currentPointer?.characters == null && styles.dangerText)}>
 						{currentPointer?.characters ?? 'Text 선택 안됨'}
-					</span>
+					</span> */}
 					<div className={styles.row}>
 						<Bold>Key : </Bold>
 						<Textbox

@@ -13,6 +13,8 @@ import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
 import { GET_PATTERN_MATCH_KEY } from '../constant';
 import {
+	autoCurrentNodesSignal,
+	autoCurrentNodeStyleSignal,
 	currentPointerSignal,
 	currentSectionSignal,
 	inputKeySignal,
@@ -143,19 +145,31 @@ const KeyIds = ({
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 
 function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void }) {
-	const currentPointer = useSignal(currentPointerSignal);
-	const currentSection = useSignal(currentSectionSignal);
 	const selectItems = useSignal(selectIdsSignal);
 	const selectKey = useSignal(selectedKeySignal);
 
 	const patternMatchData = useSignal(patternMatchDataSignal);
-	const ignoreSectionIds = useSignal(ignoreSectionIdsSignal);
-	const characters = currentPointer?.characters;
-	const currentId = currentPointer?.nodeId;
+
+	const batchId = useSignal(autoCurrentNodeStyleSignal);
+
+	const details = useSignal(autoCurrentNodesSignal);
+
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
 
 	const selectNodes = patternMatchData.filter((item) => selectItems.includes(item.id));
+
+	const target = patternMatchData.find((item) => item.id === batchId);
+
+	const baseNodes = patternMatchData.reduce((acc, item) => {
+		if (item.baseNodeId === item.id) {
+			if (acc.has(item.localizationKey)) {
+				console.log('🚀 ~ patternMatchData.reduce ~ item: 있을 수 없는 데이터', item);
+			}
+			acc.set(item.localizationKey, item);
+		}
+		return acc;
+	}, new Map<string, MetaData>());
 
 	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
 
@@ -179,14 +193,21 @@ function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void 
 	}, new Map<string, Set<MetaData>>());
 
 	const keyIds = Array.from(keyLayer.keys());
+	// 키 뽑아서 타겟 키에 제공
+	const targetKey = target?.localizationKey;
 
 	return (
 		<div className={styles.root}>
 			{Array.from(selectKeys).map((key) => {
+				const baseNodeMetaData = baseNodes.get(key);
+
+				const batchSum = targetKey === key;
+				const batchText = batchSum ? '' : ` => ${targetKey}`;
+
 				return (
 					<Fragment key={key}>
-						<Muted>#{key}</Muted>
-						{/* 키 있는 매칭 리스트 */}
+						<Muted>#{key + batchText} </Muted>
+						<Bold>{baseNodeMetaData?.text}</Bold>
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item) => {
 								const selected = selectItems.includes(item.id);

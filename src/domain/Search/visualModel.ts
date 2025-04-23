@@ -272,8 +272,7 @@ const lzTextOverlay = (
 	 * ignoreIds로 영역 쪼개서 데이터 얻고 백그라운드 확인해서 기존에 데이터가 들어 있는
 	 * 프레임 노드 목록
 	 */
-	keepTarget: Map<string, FrameNode>,
-	optionOpacity: number = 1
+	keepTarget: Map<string, FrameNode>
 ) => {
 	const padding = 10;
 	const { x: rootX, y: rootY } = position;
@@ -316,7 +315,7 @@ const lzTextOverlay = (
 	node.strokeCap = 'ROUND';
 	node.strokeAlign = 'CENTER';
 	node.dashPattern = [2, 4];
-	node.opacity = optionOpacity;
+
 	if (x != null && y != null) {
 		node.x = x - rootX - padding;
 		node.y = y - rootY - padding;
@@ -544,7 +543,6 @@ export const overRayRender = async () => {
 	// const keepTarget = clearBackground(backgroundFrame, metadata);
 	console.log('🚀 ~ overRayRender ~ selectedIds:', selectedIds);
 	hasKey.forEach((item, index) => {
-		const isBase = item.id === item.baseNodeId;
 		// 시작 대상 포커스 해도 됨
 		if (isHideNode(item)) {
 			// 설정 값이 없는 경우 무시 화면에 표시되지 않는 거임
@@ -552,16 +550,21 @@ export const overRayRender = async () => {
 		}
 		if (selectedIds.length === 0) {
 			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
-			if (isBase) {
-				baseNodeHighlight(item, node);
+			const metaData = getFrameNodeMetaData(node as FrameNode);
+			const isBase = metaData?.baseNodeId === metaData?.id;
+			if (isBase && metaData != null) {
+				baseNodeHighlight(metaData, node);
 			}
 		} else if (selectedIds.length > 0) {
-			const isSelected = item.baseNodeId != null && selectedIds.includes(item.baseNodeId);
-			const optionOpacity = isSelected ? 1 : 0.3;
+			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
 
-			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget, optionOpacity);
-			if (isBase) {
-				baseNodeHighlight(item, node);
+			const metaData = getFrameNodeMetaData(node as FrameNode);
+			const optionOpacity = metaData?.baseNodeId != null && selectedIds.includes(metaData?.baseNodeId) ? 1 : 0.3;
+			node.opacity = optionOpacity;
+			const isBase = metaData?.baseNodeId === metaData?.id;
+			if (isBase && metaData != null) {
+				console.log('🚀 XXX~ hasKey.forEach ~ item, node:', metaData, node);
+				baseNodeHighlight(metaData, node);
 			}
 		}
 	});

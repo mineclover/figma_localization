@@ -9,7 +9,7 @@ import {
 	RENDER_PAIR,
 } from '../../domain/constant';
 import { getCurrentSectionSelected } from '../../domain/Translate/TranslateModel';
-import { getCursorPosition } from '../../domain/Label/LabelModel';
+import { getCursorPosition } from '@/domain/getState';
 import { processTextNodeLocalization } from '../../domain/Label/TextPluginDataModel';
 import { newGetStyleData } from './GET_STYLE_DATA';
 import {
@@ -22,13 +22,8 @@ import {
 	overRayRender,
 } from '@/domain/Search/visualModel';
 import { BACKGROUND_STORE_KEY } from '@/domain/constant';
-import {
-	getFrameNodeMetaData,
-	MetaData,
-	nodeMetaData,
-	searchStore,
-	setFrameNodeMetaData,
-} from '@/domain/Search/searchStore';
+import { getFrameNodeMetaData, MetaData, searchStore, setFrameNodeMetaData } from '@/domain/Search/searchStore';
+import { nodeMetaData } from '@/domain/getState';
 import { read } from 'fs';
 
 export let tempNode = '';

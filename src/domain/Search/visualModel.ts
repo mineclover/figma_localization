@@ -1,5 +1,6 @@
 import { emit, on } from '@create-figma-plugin/utilities';
-import { getFrameNodeMetaData, MetaData, nodeMetaData, searchStore, setFrameNodeMetaData } from './searchStore';
+import { getFrameNodeMetaData, MetaData, searchStore, setFrameNodeMetaData } from './searchStore';
+import { nodeMetaData } from '../getState';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
 
 import {
@@ -22,14 +23,15 @@ import {
 	StyleData,
 } from '@/model/signal';
 import { ActionType } from '../System/ActionResourceDTO';
-import { getNodeData } from '../Label/TextPluginDataModel';
-import { LocalizationKeyDTO, Preset, PresetStore } from '@/model/types';
+
+import { LocalizationKeyDTO, LocationDTO, Preset, PresetStore } from '@/model/types';
 import { safeJsonParse } from '../utils/getStore';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB';
 import { generateRandomText2 } from '@/utils/textTools';
 import { baseIsAllNode, idsBaseAll } from '../Batch/batchModel';
 import { newGetStyleData } from '@/model/on/GET_STYLE_DATA';
+import { idSetLocation, setNodeLocation } from './locations';
 
 // 데이터 전송은 비활성화 시 발생
 // 인터렉션은 활성화 중에 발생
@@ -85,6 +87,7 @@ export const onAutoSelectStyleUI = () => {
 
 export const baseNodeCheck = (node: TextNode) => {
 	const baseNodeId = node.getPluginData(NODE_STORE_KEY.LOCATION);
+
 	return baseNodeId === node.id;
 };
 
@@ -419,7 +422,11 @@ export const textKeyRegister = async (data: Record<string, MetaData[]>) => {
 
 /** 키 생성 후 모든 노드에 키 등록 */
 export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKeyRegister>>) => {
+	console.log('🚀 ~ textOriginRegister ~ data:', data);
+	// localizationKey 는 data의 키 값임
+	// localizationKey 와 baseNodeId 가 없는 상태에서 들어옴
 	const domain = getDomainSetting();
+
 	if (domain == null || data == null) {
 		return;
 	}
@@ -432,7 +439,57 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 		// 근데 그 베이스 노드가 기준 노드고, 로컬라이제이션, 키, 액션 단위에서 한 개라고 가정되어있기 때문에 일단
 		// baseNode 를 시각적으로 인지시킨 후 이에 대해 자동 생성 ok 일 때 자동 생성하는 로직으로 진행
 
-		const baseNode = nodes[0].id;
+		// 1. baseNodeId 가 아예 없을 수 있음
+
+		// 첫번 째 : 그냥 아이디 값
+		const firstBaseNode = nodes.find((node) => node.id)!;
+		// 두번 째 : 있으면 잘 되는 것
+		const nullableBaseNode = nodes.find((node) => node.baseNodeId != null);
+
+		// 최적 값 : 인스턴스 노드가 아닌 텍스트 노드
+		const secondBaseNode = nodes.find((node) => {
+			const id = node.id;
+			// 아이디는 있고 인스턴스 노드가 아닌 텍스트 노드
+			if (id) {
+				return !id.startsWith('I');
+			}
+			return false;
+		});
+
+		// base 노드 체크
+		let baseCheck = false;
+		let location: LocationDTO | undefined = undefined;
+		let xNode: SceneNode | undefined = undefined;
+		// 아이디 생성이 필요한지 확인
+		//
+		const needNullBaseNode = nullableBaseNode == null;
+
+		// baseNode가 있으면 있는 기준 노드로 생성
+		if (needNullBaseNode) {
+			xNode = (await figma.getNodeByIdAsync(firstBaseNode.id)) as SceneNode;
+			if (xNode) {
+				location = await setNodeLocation(xNode as SceneNode);
+				baseCheck = true;
+			}
+		} else if (secondBaseNode) {
+			xNode = (await figma.getNodeByIdAsync(secondBaseNode.id)) as SceneNode;
+			if (xNode) {
+				location = await setNodeLocation(xNode as SceneNode);
+				baseCheck = true;
+			}
+		}
+		// 없으면 무작위 노드에서 찾아서 기준 노드로 설정
+		else if (nullableBaseNode) {
+			xNode = (await figma.getNodeByIdAsync(nullableBaseNode.id)) as SceneNode;
+			if (xNode) {
+				location = await setNodeLocation(xNode as SceneNode);
+				baseCheck = true;
+			}
+		}
+		// 로컬라이제이션 키가 없는게 맞는 걸 수도 있음
+		// 로컬 기준이 정확하지 않을 수 있음
+		// 항상 서버 기준으로 조회하는게 맞지 않냐는 말임
+		// lz키가 있는 상황에서 베이스 노드를 조회해보고 위 로직을 처리하는게 맞지 않냐는 말임
 
 		await idsBaseAll(
 			{
@@ -440,7 +497,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 				keyId: key,
 				ids: nodes.map((node) => node.id),
 			},
-			baseNode
+			location
 		);
 	}
 };
@@ -459,7 +516,7 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 	const { hasKey, nullKey, keys } = localizationKeySplit(metadata);
 	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
 	const textMap = textSorter(nullKey);
-	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
+	// 메타데이터 기준 로컬라이제이션 키 없는 데이터에 키 부여
 	const textMapId = (await textKeyRegister(textMap)) ?? {};
 
 	await textOriginRegister(textMapId);
@@ -519,6 +576,7 @@ export const overRayRender = async () => {
 	const backgroundFrame = initBackgroundFrame();
 	backgroundFrame.name = '##overlay';
 	backgroundFrame.setPluginData(BACKGROUND_STORE_KEY.background, 'true');
+	// 여기서 베이스 노드도 탐색 됨
 	const { hasKey, nullKey, keys, keepTarget } = await autoKeyMapping(ignoreIds, backgroundFrame);
 
 	const optionColorMap = generatePastelColors(keys, 44);
@@ -550,24 +608,26 @@ export const overRayRender = async () => {
 		}
 		if (selectedIds.length === 0) {
 			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
-			const metaData = getFrameNodeMetaData(node as FrameNode);
-			const isBase = metaData?.baseNodeId === metaData?.id;
-			if (isBase && metaData != null) {
-				baseNodeHighlight(metaData, node);
-			}
 		} else if (selectedIds.length > 0) {
 			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
-
 			const metaData = getFrameNodeMetaData(node as FrameNode);
 			const optionOpacity = metaData?.baseNodeId != null && selectedIds.includes(metaData?.baseNodeId) ? 1 : 0.3;
 			node.opacity = optionOpacity;
-			const isBase = metaData?.baseNodeId === metaData?.id;
-			if (isBase && metaData != null) {
-				console.log('🚀 XXX~ hasKey.forEach ~ item, node:', metaData, node);
-				baseNodeHighlight(metaData, node);
-			}
 		}
 	});
+
+	// baseNode들에 대한 표시
+	// baseNodeHighlight
+
+	const baseNodeStore = Array.from(searchStore.baseNodeStore.entries());
+
+	// baseNodeID(location id)로 데이터 흭득 후 식별해서 활성화
+
+	console.log('searchStore::', searchStore);
+	console.log('baseNodeStore::', Array.from(searchStore.baseNodeStore.entries()));
+	console.log('sectionStore::', Array.from(searchStore.sectionStore.entries()));
+	console.log('store::', Array.from(searchStore.store.entries()));
+	console.log('textToFrameStore::', Array.from(searchStore.textToFrameStore.entries()));
 
 	return hasKey;
 };
@@ -753,7 +813,8 @@ export const presetSave = (name: string, baseNodeId?: string, serverSectionId?: 
 	const preset: Preset = {
 		name,
 		figmaSectionIds: figmaSectionIds,
-		baseNodeId: baseNodeId ?? figmaSectionIds[0],
+		// 설계 의도를 모르겠음
+		// baseNodeId: baseNodeId ?? figmaSectionIds[0],
 		serverSectionId: serverSectionId ?? '',
 	};
 	return preset;

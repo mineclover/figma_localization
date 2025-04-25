@@ -32,8 +32,9 @@ import {
 } from '../Label/TextPluginDataModel';
 import { notify } from '@/figmaPluginUtils';
 import { patternMatchDataSignal } from '@/model/signal';
-import { SearchNodeData, PatternMatchData, GroupOption, ViewOption } from '@/model/types';
+import { SearchNodeData, PatternMatchData, GroupOption, ViewOption, LocationDTO } from '@/model/types';
 import { MetaData, searchStore } from '../Search/searchStore';
+import { getDirectLink } from '../getState';
 
 export const onPatternMatch = () => {
 	on(GET_PATTERN_MATCH_KEY.REQUEST_KEY, async (targetID?: string) => {
@@ -142,31 +143,44 @@ export const groupByPattern = (dataArr: SearchNodeData[], viewOption: ViewOption
 	};
 };
 
-export const idsBaseAll = async (data: { domainId: string; keyId: string; ids: string[] }, baseNodeId?: string) => {
+export const idsBaseAll = async (
+	data: { domainId: string; keyId: string; ids: string[] },
+	baseNodeData?: LocationDTO
+) => {
 	if (data.ids.length === 0) {
 		return;
 	}
+	if (baseNodeData == null) {
+		return;
+	}
+
+	const directLink = getDirectLink(baseNodeData);
+	console.log('🚀 ~ directLink:', directLink);
+
+	const baseNodeId = baseNodeData.node_id;
+	const baseLocation = baseNodeData.location_id;
 	// originalLocalizeId 조회 또는 등록
 	// searchTranslationCode
+
 	const xNode = baseNodeId ? await figma.getNodeByIdAsync(baseNodeId) : null;
 
-	// 기준 노드가 있으면 기준 노드 설정
+	// 기준 노드 중심으로 설정
 	if (xNode) {
 		setNodeData(xNode, {
 			domainId: data.domainId,
 			localizationKey: data.keyId,
-			baseNodeId: baseNodeId,
+			baseNodeId: String(baseLocation),
 		});
 	}
 
-	// 기준 노드가 없으면 모든 노드 설정
+	// 기준 나머지 노드도 설정
 	for (const id of data.ids) {
 		const node = await figma.getNodeByIdAsync(id);
 		if (node) {
 			setNodeData(node, {
 				domainId: data.domainId,
 				localizationKey: data.keyId,
-				baseNodeId: baseNodeId,
+				baseNodeId: String(baseLocation),
 			});
 		}
 	}

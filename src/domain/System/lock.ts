@@ -1,5 +1,5 @@
 import { CLIENT_STORE_KEY, GET_CURSOR_POSITION, PAGE_LOCK_KEY, SET_PAGE_LOCK_OPEN } from '../constant';
-import { getCursorPosition } from '../Label/LabelModel';
+import { getCursorPosition } from '../getState';
 
 import { emit, on } from '@create-figma-plugin/utilities';
 

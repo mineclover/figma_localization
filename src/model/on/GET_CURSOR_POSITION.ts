@@ -1,7 +1,7 @@
 import { emit, on } from '@create-figma-plugin/utilities';
 import { GET_CURSOR_POSITION } from '../../domain/constant';
 import { currentPointerSignal } from '../signal';
-import { getCursorPosition } from '../../domain/Label/LabelModel';
+import { getCursorPosition } from '@/domain/getState';
 import { CurrentCursorType } from '../types';
 
 /**

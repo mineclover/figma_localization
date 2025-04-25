@@ -14,7 +14,7 @@ import {
 	CLEAR_VARIABLE_DATA,
 } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
-import { getNodeData } from '../Label/TextPluginDataModel';
+import { getNodeData } from '../getState';
 import { CurrentNode, LocalizationTranslationDTO } from '@/model/types';
 import { fetchDB } from '../utils/fetchDB';
 import { textFontLoad } from '@/figmaPluginUtils/text';

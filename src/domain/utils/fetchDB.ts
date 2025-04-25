@@ -8,7 +8,12 @@ export const fetchDB = <V extends keyof paths>(url: V, options?: RequestInit) =>
 
 	if (!domainSetting) {
 		figma.notify('도메인 설정이 없습니다.');
-		return;
+		return new Response(JSON.stringify({ error: '도메인 설정이 없습니다.' }), {
+			status: 400,
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
 	}
 
 	return fetch(baseURL + url, {

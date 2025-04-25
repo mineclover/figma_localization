@@ -1,7 +1,7 @@
 import { CurrentCursorType, NodeData, SearchNodeData } from '@/model/types';
 import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
-import { SectionSearch } from '@/figmaPluginUtils';
 import { safeJsonParse } from '../utils/getStore';
+import { nodeMetaData } from '../getState';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -9,7 +9,7 @@ import { safeJsonParse } from '../utils/getStore';
  * absoluteBoundingBox : 컨테이너 사이즈
  */
 //
-const nodeMetric = (node: TextNode, count: number = 0) => {
+export const nodeMetric = (node: TextNode, count: number = 0) => {
 	/** 화면에 보여지는 bounds */
 	const renderBounds = node.absoluteRenderBounds;
 	/** 화면 표시 상관 없이 보여지는 영역 */
@@ -57,27 +57,6 @@ export type MetaData = {
 	y?: number;
 	width?: number;
 	height?: number;
-};
-
-export const nodeMetaData = (node: TextNode) => {
-	const metric = nodeMetric(node);
-	if (metric?.width == null || metric?.height == null) {
-	}
-	const root = SectionSearch(node);
-	// 섹션 있으면 처리 없으면 처리 안함
-	const rootId = root.section?.id == null ? root.page.id : root.section.id;
-
-	return {
-		id: node.id,
-		name: node.name,
-		root: rootId,
-		ignore: node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true',
-		localizationKey: node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY),
-		baseNodeId: node.getPluginData(NODE_STORE_KEY.LOCATION),
-		text: node.characters,
-		parentName: node.parent?.name,
-		...metric,
-	} as MetaData;
 };
 
 export const getFrameNodeMetaData = (node: FrameNode) => {
@@ -275,21 +254,22 @@ class SearchStore {
 	}
 
 	/**
-	 *
-	 * @param baseId 베이스 노드 id
+	 * 베이스 노드 아이디가 소유하고 있는 노드 아이디 저장
+	 * @param locationId 베이스 노드 id
 	 * @param nodeId 인스턴스 노드 id
 	 */
-	setBaseNode(baseId: string, nodeId: string) {
-		let baseSet = this.baseNodeStore.get(baseId);
+	setBaseNode(locationId: string, nodeId: string) {
+		let baseSet = this.baseNodeStore.get(locationId);
 		if (baseSet == null) {
 			baseSet = new Set<string>();
-			this.baseNodeStore.set(baseId, baseSet);
+			this.baseNodeStore.set(locationId, baseSet);
 		}
+
 		baseSet.add(nodeId);
 	}
 
-	getBaseNode(baseId: string) {
-		return Array.from(this.baseNodeStore.get(baseId) ?? []);
+	getBaseNode(locationId: string) {
+		return Array.from(this.baseNodeStore.get(locationId) ?? []);
 	}
 
 	/**

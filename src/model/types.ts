@@ -30,23 +30,19 @@ export interface TranslationState {
 	isLoading: boolean;
 }
 export type LocationDTO = {
-	created_at: string;
-	is_deleted: number;
-	is_pinned: number;
 	location_id: number;
-	node_id: string;
-	page_id: string;
 	project_id: string;
+	page_id: string;
+	node_id: string;
+	created_at: string;
 	updated_at: string;
 };
 
 export type Location = {
 	location_id: number;
 	project_id: string;
-	node_id: string;
 	page_id: string;
-	is_pinned: boolean;
-	is_deleted: boolean;
+	node_id: string;
 	created_at: string;
 	updated_at: string;
 };

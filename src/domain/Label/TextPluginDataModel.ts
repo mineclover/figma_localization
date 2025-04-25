@@ -13,7 +13,8 @@ import {
 import toNumber from 'strnum';
 
 import { notify } from '@/figmaPluginUtils';
-import { getCursorPosition, sectionNameParser } from './LabelModel';
+import { sectionNameParser } from './LabelModel';
+import { getCursorPosition, getNodeData } from '../getState';
 import { fetchDB } from '../utils/fetchDB';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
@@ -30,16 +31,15 @@ import {
 } from '@/model/types';
 import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
 import { parseXmlToFlatStructure } from '@/utils/xml2';
-import { ActionType } from '../System/ActionResourceDTO';
 
 export const locationMapping = (location: LocationDTO): Location => {
+	console.log('🚀 ~ locationMapping ~ location:', location);
 	return {
 		location_id: location.location_id,
 		project_id: location.project_id,
 		node_id: location.node_id,
 		page_id: location.page_id,
-		is_pinned: location.is_pinned === 1,
-		is_deleted: location.is_deleted === 1,
+
 		created_at: location.created_at,
 		updated_at: location.updated_at,
 	};
@@ -476,7 +476,7 @@ export const onTargetSetNodeLocation = () => {
 		if (node.type !== 'TEXT') {
 			return;
 		}
-		const result = await getCursorPosition(node);
+		const result = getCursorPosition(node);
 
 		if (!result) {
 			return;
@@ -545,25 +545,6 @@ export const onNodeReload = () => {
 
 		await reloadOriginalLocalizationName(node);
 	});
-};
-
-/** 플러그인 데이터 조회 */
-export const getNodeData = (node: BaseNode): NodeData => {
-	const localizationKey = node.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
-
-	const domainId = node.getPluginData(NODE_STORE_KEY.DOMAIN_ID);
-	const ignore = node.getPluginData(NODE_STORE_KEY.IGNORE) === 'true';
-	const action = node.getPluginData(NODE_STORE_KEY.ACTION) as ActionType | '';
-	const modifier = node.getPluginData(NODE_STORE_KEY.MODIFIER);
-
-	return {
-		localizationKey,
-
-		domainId: domainId || '',
-		ignore: ignore || false,
-		action: action === '' ? 'default' : action,
-		modifier,
-	};
 };
 
 /**

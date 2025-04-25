@@ -18,8 +18,8 @@ import {
 	reloadOriginalLocalizationName,
 	getLocalizationKeyData,
 	generateLocalizationName,
-	getNodeData,
 } from '../Label/TextPluginDataModel';
+import { getNodeData } from '../getState';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { fetchDB } from '../utils/fetchDB';
 import { parseTextBlock, parseXML } from '@/utils/xml';

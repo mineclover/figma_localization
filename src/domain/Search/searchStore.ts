@@ -1,7 +1,8 @@
-import { CurrentCursorType, NodeData, SearchNodeData } from '@/model/types';
+import { CurrentCursorType, LocationDTO, NodeData, SearchNodeData } from '@/model/types';
 import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
 import { safeJsonParse } from '../utils/getStore';
-import { nodeMetaData } from '../getState';
+import { getCursorPosition, nodeMetaData } from '../getState';
+import { fetchDB } from '../utils/fetchDB';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -76,11 +77,13 @@ class SearchStore {
 	baseNodeStore: Map<string, Set<string>>;
 	// 텍스트 노드를 프레임 노드로 매핑하는 목적
 	textToFrameStore: Map<string, FrameNode | null>;
+	baseLocationStore: Map<string, LocationDTO>;
 	constructor() {
 		this.store = new Map<string, MetaData>();
 		this.sectionStore = new Map<string, Set<string>>();
 		this.baseNodeStore = new Map<string, Set<string>>();
 		this.textToFrameStore = new Map<string, FrameNode | null>();
+		this.baseLocationStore = new Map<string, LocationDTO>();
 	}
 
 	/**
@@ -315,6 +318,44 @@ class SearchStore {
 		// 안쓰는 스토어 삭제
 
 		this.baseNodeStore.delete(before);
+	}
+	/**
+	 * base Location 얻기
+	 *
+	 * @param locationId
+	 * @returns
+	 */
+	async getBaseLocation(locationIds: string[]) {
+		const resultMap = new Map<string, LocationDTO>();
+		const needFetchIds: Set<string> = new Set<string>();
+
+		// 기존 데이터 확인 및 분리
+		locationIds.forEach((id) => {
+			const saved = this.baseLocationStore.get(id);
+			if (saved) {
+				resultMap.set(id, saved);
+			} else {
+				needFetchIds.add(id);
+			}
+		});
+
+		if (needFetchIds.size > 0) {
+			const idsString = Array.from(needFetchIds).join(',');
+			console.log('🚀 ~ SearchStore ~ getBaseLocation ~ idsString:', idsString);
+
+			const response = await fetchDB(('/figma/locations/bulk' + '?ids=' + idsString) as '/figma/locations/bulk', {
+				method: 'GET',
+			});
+			const data = (await response.json()) as LocationDTO[];
+
+			for (const location of data) {
+				console.log('🚀 ~ SearchStore ~ getBaseLocation ~ location:', location);
+				this.baseLocationStore.set(String(location.location_id), location);
+				resultMap.set(String(location.location_id), location);
+			}
+		}
+
+		return Array.from(resultMap.values());
 	}
 }
 

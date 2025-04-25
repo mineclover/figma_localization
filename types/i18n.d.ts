@@ -555,6 +555,142 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/localization/keys/history/{keyId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 키의 변경 내역 조회 */
+		get: operations['GetKeyHistoryEndPoint'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/versions/{keyId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 키의 버전 내역 조회 */
+		get: operations['GetKeyVersions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/version/{keyId}/{version}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 특정 버전의 키 정보 조회 */
+		get: operations['GetKeyVersion'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/{keyId}/revert/{version}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** @description 특정 버전으로 키 복원 */
+		post: operations['RevertKeyVersion'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/changes': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 전체 변경 내역 조회 */
+		get: operations['GetChangeHistory'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/changes/recent': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 최근 변경된 키 목록 조회 */
+		get: operations['GetRecentChanges'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/changes/user/{userId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 사용자별 변경 내역 조회 */
+		get: operations['GetChangesByUser'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/localization/keys/changes/date/{date}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 날짜별 변경 내역 조회 */
+		get: operations['GetChangesByDate'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/localization/actions': {
 		parameters: {
 			query?: never;
@@ -749,26 +885,6 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
-	'/figma/locations/{nodeId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * @deprecated
-		 * @description 쓸 일 없어서 설계 안함
-		 */
-		get: operations['GetLocation'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
 	'/figma/locations/{id}': {
 		parameters: {
 			query?: never;
@@ -776,9 +892,9 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		get?: never;
-		/** @deprecated */
-		put: operations['UpdateLocation'];
+		/** @description 단일 피그마 위치 정보 조회 */
+		get: operations['GetLocation'];
+		put?: never;
 		post?: never;
 		delete: operations['DeleteLocation'];
 		options?: never;
@@ -814,6 +930,23 @@ export interface paths {
 		put?: never;
 		post?: never;
 		delete: operations['DeleteMapping'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/figma/locations/bulk': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** @description 여러 피그마 위치 정보를 한 번에 조회 */
+		get: operations['GetBulkLocations'];
+		put?: never;
+		post?: never;
+		delete?: never;
 		options?: never;
 		head?: never;
 		patch?: never;
@@ -1592,13 +1725,7 @@ export interface components {
 			name: string;
 			alias: string | null;
 			/** Format: double */
-			parent_key_id: number | null;
-			is_variable: boolean;
-			is_temporary: boolean;
-			/** Format: double */
 			section_id: number | null;
-			/** Format: double */
-			version: number;
 			is_deleted: boolean;
 			created_at: string;
 			updated_at: string;
@@ -1608,31 +1735,18 @@ export interface components {
 			translation_count: number;
 			translated_languages: string[];
 		};
-		/** @description From T, pick a set of properties whose keys are in the union K */
-		'Pick_Resource.Exclude_keyofResource.style_value__': {
-			/** Format: double */
-			resource_id: number;
-			style_name: string;
-			style_type: string;
-			hash_value: string;
-			alias: string;
-			/** Format: double */
-			is_deleted: number;
-			created_at: string;
-			updated_at: string;
-		};
 		ResourceResponse: {
 			/** Format: double */
 			resource_id: number;
 			style_name: string;
 			style_type: string;
+			style_value: unknown;
 			hash_value: string;
-			alias: string;
+			alias: string | null;
 			/** Format: double */
 			is_deleted: number;
 			created_at: string;
 			updated_at: string;
-			style_value: unknown;
 		};
 		CreateResourceDTO: {
 			styleValue: unknown;
@@ -1656,27 +1770,8 @@ export interface components {
 			/** Format: double */
 			section_id: number | null;
 			section_name: string | null;
-			/** @description 저장된 origin 번역 값 */
-			origin_value: string | null;
-			/**
-			 * Format: double
-			 * @description 변수 정의나 스타일 키를 정의하게 되면 부모 키가 생성되는데, 이 때 부모 키의 ID가 저장됩니다.
-			 */
-			parent_key_id: number | null;
-			/** @description 키가 변수 키라면 true 로 설정
-			 *     변수 키는 로컬라이제이션 텍스트가 없어도 됨 */
-			is_variable: boolean;
-			/** @description 임시 키인지 여부 */
-			is_temporary: boolean;
-			/**
-			 * Format: double
-			 * @description 키의 버전
-			 */
-			version: number;
-			/** @description 삭제된 키인지 여부 */
-			is_deleted: boolean;
-			/** @description 별칭 */
 			alias: string | null;
+			is_deleted: boolean;
 			created_at: string;
 			updated_at: string;
 		};
@@ -1692,30 +1787,31 @@ export interface components {
 			alias?: string;
 			/**
 			 * Format: double
-			 * @description 부모 키 ID (optional)
-			 */
-			parentKeyId?: number;
-			/** @description 변수 포함 여부 (optional) */
-			isVariable?: boolean;
-			/** @description 임시 키 여부 (optional) */
-			isTemporary?: boolean;
-			/**
-			 * Format: double
 			 * @description 섹션 ID (optional)
 			 */
 			sectionId?: number;
+			/** @description 삭제 여부 (optional) */
+			isDeleted?: boolean;
 		};
 		UpdateLocalizationKeyDTO: {
+			/** @description 키 이름 */
 			name?: string;
-			domainId?: string;
+			/**
+			 * Format: double
+			 * @description 도메인 ID
+			 */
+			domainId?: number;
+			/**
+			 * Format: double
+			 * @description 섹션 ID
+			 */
+			sectionId?: number;
+			/** @description 별칭 */
 			alias?: string;
-			parentKeyId?: string;
-			isVariable?: boolean;
-			isTemporary?: boolean;
-			sectionId?: string;
-			/** Format: double */
-			version?: number;
+			/** @description 삭제 여부 */
 			isDeleted?: boolean;
+			/** @description 잠금 여부 */
+			locked?: boolean;
 		};
 		LocalizationKeyActionDTO: {
 			/** Format: double */
@@ -1769,7 +1865,6 @@ export interface components {
 			page_id: string;
 			/** @description 피그마 노드 ID */
 			node_id: string;
-			is_pinned: boolean;
 			created_at: string;
 			updated_at: string;
 		};
@@ -1777,13 +1872,6 @@ export interface components {
 			projectId: string;
 			pageId: string;
 			nodeId: string;
-			isPinned?: boolean;
-		};
-		UpdateFigmaLocationDTO: {
-			projectId?: string;
-			pageId?: string;
-			nodeId?: string;
-			isPinned?: boolean;
 		};
 		Domain: {
 			/** Format: double */
@@ -2779,6 +2867,195 @@ export interface operations {
 			};
 		};
 	};
+	GetKeyHistoryEndPoint: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				keyId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyVersions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				keyId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetKeyVersion: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				keyId: string;
+				version: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	RevertKeyVersion: {
+		parameters: {
+			query?: never;
+			header: {
+				Authorization: string;
+			};
+			path: {
+				keyId: string;
+				version: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetChangeHistory: {
+		parameters: {
+			query?: {
+				limit?: number;
+				offset?: number;
+				domainId?: string;
+				sectionId?: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetRecentChanges: {
+		parameters: {
+			query?: {
+				limit?: number;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetChangesByUser: {
+		parameters: {
+			query?: {
+				limit?: number;
+				offset?: number;
+			};
+			header?: never;
+			path: {
+				userId: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
+	GetChangesByDate: {
+		parameters: {
+			query?: {
+				limit?: number;
+				offset?: number;
+			};
+			header?: never;
+			path: {
+				date: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
 	GetKeyActionsByKeyIdAndAction: {
 		parameters: {
 			query: {
@@ -3166,37 +3443,12 @@ export interface operations {
 			query?: never;
 			header?: never;
 			path: {
-				nodeId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['FigmaLocation'];
-				};
-			};
-		};
-	};
-	UpdateLocation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
+				/** @description location_id */
 				id: string;
 			};
 			cookie?: never;
 		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateFigmaLocationDTO'];
-			};
-		};
+		requestBody?: never;
 		responses: {
 			/** @description Ok */
 			200: {
@@ -3274,6 +3526,29 @@ export interface operations {
 					[name: string]: unknown;
 				};
 				content?: never;
+			};
+		};
+	};
+	GetBulkLocations: {
+		parameters: {
+			query?: {
+				/** @description 콤마로 구분된 location id 목록 (예: "1,2,3" 또는 1,2,3) */
+				ids?: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocation'][];
+				};
 			};
 		};
 	};

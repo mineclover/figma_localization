@@ -481,7 +481,7 @@ function BatchPage() {
 						</div>
 					</div>
 
-					<SimpleSelect searchHandler={searchHandler} />
+					<SimpleSelect />
 					{/* <span className={clc(styles.text, currentPointer?.characters == null && styles.dangerText)}>
 						{currentPointer?.characters ?? 'Text 선택 안됨'}
 					</span> */}

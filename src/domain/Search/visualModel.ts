@@ -420,7 +420,10 @@ export const textKeyRegister = async (data: Record<string, MetaData[]>) => {
 	return newData;
 };
 
-/** 키 생성 후 모든 노드에 키 등록 */
+/**
+ * 키 생성 후 모든 노드에 키 등록
+ * null 만 처리된다는 단점
+ */
 export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKeyRegister>>) => {
 	console.log('🚀 ~ textOriginRegister ~ data:', data);
 	// localizationKey 는 data의 키 값임
@@ -511,7 +514,6 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 	// 쓰려했는데... 생각해보면 텍스트노드와 프레임 노드의 발생 시점이 다름
 	const keepTarget = clearBackground(backgroundFrame, metadata);
 	// keepTarget 은 삭제되지 않은 프레임 노드
-	console.log('🚀 ~ autoKeyMapping ~ frame, metadata:', backgroundFrame, metadata);
 	// 메타데이터 기준  없는 데이터
 	const { hasKey, nullKey, keys } = localizationKeySplit(metadata);
 	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
@@ -522,7 +524,6 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 	await textOriginRegister(textMapId);
 
 	if (nullKey.length > 0 && count < 4) {
-		console.log('🚀 ~ autoKeyMapping ~ count:', count);
 		return autoKeyMapping(ignoreIds, backgroundFrame, count + 1);
 	}
 
@@ -541,7 +542,7 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 };
 
 /** 베이스 노드 표시 하이라이트 */
-const baseNodeHighlight = (data: MetaData, node: FrameNode) => {
+const baseNodeHighlight = (node: FrameNode) => {
 	const redSolid = figma.util.solidPaint({ r: 1, g: 0, b: 0 });
 
 	if (node) {
@@ -600,11 +601,10 @@ export const overRayRender = async () => {
 
 	// const keepTarget = clearBackground(backgroundFrame, metadata);
 	console.log('🚀 ~ overRayRender ~ selectedIds:', selectedIds);
-	hasKey.forEach((item, index) => {
-		// 시작 대상 포커스 해도 됨
+	for (const item of hasKey) {
 		if (isHideNode(item)) {
 			// 설정 값이 없는 경우 무시 화면에 표시되지 않는 거임
-			return;
+			continue;
 		}
 		if (selectedIds.length === 0) {
 			const node = lzTextOverlay(item, optionColorMap, backgroundFrame, { x, y }, keepTarget);
@@ -614,20 +614,28 @@ export const overRayRender = async () => {
 			const optionOpacity = metaData?.baseNodeId != null && selectedIds.includes(metaData?.baseNodeId) ? 1 : 0.3;
 			node.opacity = optionOpacity;
 		}
-	});
+	}
 
-	// baseNode들에 대한 표시
-	// baseNodeHighlight
+	const baseNodeIds = Array.from(searchStore.baseNodeStore.keys());
+	// 전체 조회
 
-	const baseNodeStore = Array.from(searchStore.baseNodeStore.entries());
+	const locations = await searchStore.getBaseLocation(baseNodeIds);
+	console.log('🚀 ~ overRayRender ~ locations:', locations);
 
-	// baseNodeID(location id)로 데이터 흭득 후 식별해서 활성화
+	for (const location of locations) {
+		if (location) {
+			const targetId = location?.node_id;
+			if (targetId) {
+				const targetNode = searchStore.textToFrameStore.get(targetId);
 
-	console.log('searchStore::', searchStore);
-	console.log('baseNodeStore::', Array.from(searchStore.baseNodeStore.entries()));
-	console.log('sectionStore::', Array.from(searchStore.sectionStore.entries()));
-	console.log('store::', Array.from(searchStore.store.entries()));
-	console.log('textToFrameStore::', Array.from(searchStore.textToFrameStore.entries()));
+				if (targetNode) {
+					console.log('🚀 ~ overRayRender ~ targetMetaData:', targetNode);
+
+					baseNodeHighlight(targetNode);
+				}
+			}
+		}
+	}
 
 	return hasKey;
 };

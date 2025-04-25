@@ -5970,13 +5970,13 @@ export interface operations {
 				/** @description Short-lived token returned from "getPluginPaymentTokenAsync" in the plugin payments API and used to authenticate to this endpoint. Read more about generating this token through "Calling the Payments REST API from a plugin or widget" below. */
 				plugin_payment_token?: string;
 				/** @description The ID of the user to query payment information about. You can get the user ID by having the user OAuth2 to the Figma REST API. */
-				user_id?: number;
+				user_id?: string;
 				/** @description The ID of the Community file to query a user's payment information on. You can get the Community file ID from the file's Community page (look for the number after "file/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-				community_file_id?: number;
+				community_file_id?: string;
 				/** @description The ID of the plugin to query a user's payment information on. You can get the plugin ID from the plugin's manifest, or from the plugin's Community page (look for the number after "plugin/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-				plugin_id?: number;
+				plugin_id?: string;
 				/** @description The ID of the widget to query a user's payment information on. You can get the widget ID from the widget's manifest, or from the widget's Community page (look for the number after "widget/" in the URL). Provide exactly one of "community_file_id", "plugin_id", or "widget_id". */
-				widget_id?: number;
+				widget_id?: string;
 			};
 			header?: never;
 			path?: never;

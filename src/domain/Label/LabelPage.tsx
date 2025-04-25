@@ -78,15 +78,11 @@ function LabelPage() {
 	const modeState = useSignal(modeStateSignal);
 	const currentPointer = useSignal(currentPointerSignal);
 	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer);
-	const presetNames = Object.keys(presetStore);
+
 	const autoCurrentNodes = useSignal(autoCurrentNodesSignal);
 	console.log('🚀 ~ LabelPage ~ autoCurrentNodes:', autoCurrentNodes);
 	const autoCurrentNodeStyle = useSignal(autoCurrentNodeStyleSignal);
 	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentNodeStyle);
-
-	const searchHandler = (key: string) => {
-		inputKeySignal.value = key;
-	};
 
 	return (
 		<div className={styles.container}>
@@ -147,7 +143,7 @@ function LabelPage() {
 				</IconButton>
 			</div>
 			<Preset />
-			<SimpleSelect searchHandler={searchHandler} />
+			<SimpleSelect />
 			<span>{modeState}</span>
 
 			<div className={styles.row}>

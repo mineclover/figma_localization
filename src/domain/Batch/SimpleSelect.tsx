@@ -144,13 +144,14 @@ const KeyIds = ({
 
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 
-function SimpleSelect({ searchHandler }: { searchHandler: (key: string) => void }) {
+function SimpleSelect() {
 	const selectItems = useSignal(selectIdsSignal);
 	const selectKey = useSignal(selectedKeySignal);
 
 	const patternMatchData = useSignal(patternMatchDataSignal);
 
 	const batchId = useSignal(autoCurrentNodeStyleSignal);
+	console.log('🚀 ~ SimpleSelect ~ batchId:', batchId);
 
 	const details = useSignal(autoCurrentNodesSignal);
 

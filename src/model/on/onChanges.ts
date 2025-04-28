@@ -37,7 +37,7 @@ const refreshNode = async (node: SceneNode) => {
 		return;
 	}
 	tempNode = node.id;
-	const cursorPosition = await getCursorPosition(node);
+	const cursorPosition = getCursorPosition(node);
 	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
 	const localizationKey = await processTextNodeLocalization(node);
 	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, localizationKey);

@@ -114,3 +114,5 @@ export const sectionSelectModeSignal = signal<boolean>(true);
 /** 무시할 섹션 아이디 목록 */
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 export const modeStateSignal = signal(NULL_STATE);
+
+export const autoSelectModeSignal = signal<boolean>(false);

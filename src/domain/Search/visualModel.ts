@@ -4,6 +4,7 @@ import { nodeMetaData } from '../getState';
 import { generatePastelColors, hexToRGBA } from '@/utils/color';
 
 import {
+	AUTO_SELECT_MODE_PAIR,
 	AUTO_SELECT_NODE_EMIT,
 	AUTO_SELECT_STYLE_EMIT,
 	BACKGROUND_STORE_KEY,
@@ -21,6 +22,7 @@ import {
 import {
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
+	autoSelectModeSignal,
 	modeStateSignal,
 	selectIdsSignal,
 	StyleData,
@@ -285,6 +287,7 @@ const lzTextOverlay = (
 	// width, height 어디감0
 	// const { x, y, width, height, id ,localizationKey : oldLocalizationKey} = data;
 	const { x, y, width, height, id } = data;
+	let localizationKey = data.localizationKey;
 	// 프레임 노드 목록임 메타데이터는 컬러프레임을 알 수 없는 상태임
 	// id가 텍스트 아이디 인지 뭔 아이디인지
 
@@ -293,9 +296,12 @@ const lzTextOverlay = (
 	const isSelected = figma.currentPage.selection.some((item) => item.id === node.id);
 	const isSelected2 = figma.currentPage.selection.includes(node);
 	if (test && isSelected) {
-		data = test;
+		data = {
+			...test,
+			id,
+		};
 	}
-	const { localizationKey } = data;
+	localizationKey = data.localizationKey;
 
 	if (width != null && height != null) {
 		node.resize(width + padding * 2, height + padding * 2);
@@ -568,6 +574,29 @@ export const isHideNode = (node: MetaData) => {
 	return false;
 };
 
+/**
+ * get, set 통합
+ * @returns
+ */
+export const onAutoSelectModeRequest = () => {
+	return on(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, async (bool?: boolean) => {
+		if (bool != null) {
+			figma.root.setPluginData(STORE_KEY.AUTO_SELECT_MODE, JSON.stringify(bool));
+		}
+		const json = figma.root.getPluginData(STORE_KEY.AUTO_SELECT_MODE) == 'true' ? true : false;
+
+		emit(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, json);
+	});
+};
+
+export const onAutoSelectModeResponse = () => {
+	emit(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, autoSelectModeSignal.value);
+	return on(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, async (bool: boolean) => {
+		autoSelectModeSignal.value = bool;
+	});
+};
+
+/**
 /**
  *
  * 오버레이 트리거가 들어올 때 실행될 렌더링 로직

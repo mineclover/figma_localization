@@ -523,7 +523,7 @@ export const onTargetSetNodeLocation = () => {
 
 export const allRefresh = async (node: TextNode) => {
 	// getCursorPosition은 LabelModel.ts에서 가져와 사용
-	const cursorPosition = await getCursorPosition(node);
+	const cursorPosition = getCursorPosition(node);
 	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
 
 	// 이 함수는 이 파일에 있으므로 직접 호출

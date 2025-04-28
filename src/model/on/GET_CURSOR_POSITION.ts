@@ -10,7 +10,7 @@ import { CurrentCursorType } from '../types';
 export const onGetCursorPosition = () => {
 	on(GET_CURSOR_POSITION.REQUEST_KEY, async () => {
 		const node = figma.currentPage.selection[0];
-		const cursorPosition = await getCursorPosition(node);
+		const cursorPosition = getCursorPosition(node);
 		emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
 	});
 };

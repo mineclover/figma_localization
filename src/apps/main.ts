@@ -41,6 +41,7 @@ import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DAT
 import { onSetPageLockOpen } from '@/domain/System/lock';
 import { runExample } from '@/utils/test';
 import {
+	onAutoSelectModeRequest,
 	onBaseKeyInjection,
 	onBaseUpdate,
 	onDisableRender,
@@ -100,6 +101,7 @@ export default function () {
 
 	onBaseUpdate();
 	onBaseKeyInjection();
+	onAutoSelectModeRequest();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

@@ -17,6 +17,7 @@ import {
 	onBaseKeySelect,
 	onAutoSelectStyleUI,
 	onAutoSelectUI,
+	onAutoSelectModeResponse,
 } from './Search/visualModel';
 import { emit } from '@create-figma-plugin/utilities';
 import { RENDER_PAIR } from './constant';
@@ -52,6 +53,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onAutoSelectUI(),
 			onAutoSelectStyleUI(),
 			onClientLocation(),
+			onAutoSelectModeResponse(),
 		];
 
 		return () => {

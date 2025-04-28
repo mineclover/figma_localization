@@ -16,6 +16,7 @@ import {
 	RENDER_TRIGGER,
 	SAVE_ACTION,
 	SEARCH_STORE_LOCATION_EMIT,
+	SELECT_MODE,
 	STORE_KEY,
 	UPDATE_BASE_NODE,
 } from '../constant';
@@ -581,9 +582,9 @@ export const isHideNode = (node: MetaData) => {
 export const onAutoSelectModeRequest = () => {
 	return on(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, async (bool?: boolean) => {
 		if (bool != null) {
-			figma.root.setPluginData(STORE_KEY.AUTO_SELECT_MODE, JSON.stringify(bool));
+			figma.root.setPluginData(SELECT_MODE.AUTO_SELECT_MODE, JSON.stringify(bool));
 		}
-		const json = figma.root.getPluginData(STORE_KEY.AUTO_SELECT_MODE) == 'true' ? true : false;
+		const json = figma.root.getPluginData(SELECT_MODE.AUTO_SELECT_MODE) == 'true' ? true : false;
 
 		emit(AUTO_SELECT_MODE_PAIR.RESPONSE_KEY, json);
 	});

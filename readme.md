@@ -6,9 +6,10 @@
 
 ## 25-04-25
 
-### baseNodeId 최초 등록
+### baseNodeId 최초 등록 시점
 
 textOriginRegister > idsBaseAll 에서 시작 됨
+searchStore에서 관리됨
 
 # baseNode 표시는 baseNodeHighlight
 
@@ -28,3 +29,20 @@ if (backgroundFrame) {
 	await overlayRender();
 }
 ```
+
+## overlayRender 에 비효율적인 로직이 있음
+
+루프가 3번 돔
+한 텍스트를 기반으로 화면 생성을 두번 함.. > 겹친 텍스트가 많이 보임
+선택해제 할 때 1개로 줄면 다시 전체 선택 됨 > 자동 선택 온오프 할 수 있어야 함
+
+그리고 초기 설정 시, 설정 후 선택해제 등을 하고 다시 선택해야 정상작동하는 문제가 있음
+데이터플로우가 좀 ... 구림
+
+## 베이스 노드를 변경할 수 있음
+
+searchStore.updateBaseNode 에서 업데이트 할 수 있음
+전파도 알아서 됨
+변경을 위해 UI에서 선택 토글 로직 대신에 다음 베이스 노드를 선택하는 기능을 넣었음
+
+다중 선택은 기본적으로 베이스노드를 기반으로 선택 확장을 하겠다 라는 로직임

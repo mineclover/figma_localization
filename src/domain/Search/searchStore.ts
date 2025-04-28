@@ -1,4 +1,4 @@
-import { CurrentCursorType, LocationDTO, NodeData, SearchNodeData } from '@/model/types';
+import { BaseNodeProperty, CurrentCursorType, LocationDTO, NodeData, SearchNodeData } from '@/model/types';
 import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
 import { safeJsonParse } from '../utils/getStore';
 import { getCursorPosition, nodeMetaData } from '../getState';
@@ -361,10 +361,7 @@ class SearchStore {
 		return Array.from(resultMap.values());
 	}
 
-	async updateBaseNode(
-		baseNodeId: string,
-		{ nodeId, pageId, projectId }: { nodeId: string; pageId: string; projectId: string }
-	) {
+	async updateBaseNode(baseNodeId: string, { nodeId, pageId, projectId }: BaseNodeProperty) {
 		const response = await fetchDB(('/figma/locations/' + baseNodeId) as '/figma/locations/{id}', {
 			method: 'PUT',
 			body: JSON.stringify({ nodeId, pageId, projectId }),

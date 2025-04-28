@@ -13,38 +13,36 @@ import { nodeMetric, MetaData } from './Search/searchStore';
  */
 
 export const getCursorPosition = (node: BaseNode) => {
-	if (node && node.type === 'TEXT') {
-		// 첫번째 섹션
-		// const result = FilePathNodeSearch(node);
-		// const sectionNode = result.find((node) => node.type === 'SECTION');
-		// if (sectionNode) {
-		// 	const text = sectionNode.name.trim();
-		// 	const sectionName = text;
-		// 	sectionData.name = sectionName;
-		// 	sectionData.section_id = sectionNode.id;
-		// }
-		const projectId = getProjectId();
-		if (!projectId) {
-			return;
-		}
-		const NodeData = getNodeData(node);
-		const pageLock = figma.currentPage.getPluginData(PAGE_LOCK_KEY) === 'true';
-
-		const cursorPosition: CurrentCursorType = {
-			projectId,
-
-			pageName: figma.currentPage.name,
-			pageId: figma.currentPage.id,
-			nodeName: removeLeadingSymbols(node.name),
-			nodeId: node.id,
-			characters: node.characters,
-			autoRename: node.autoRename,
-			data: NodeData,
-			pageLock: pageLock,
-		};
-
-		return cursorPosition;
+	// 첫번째 섹션
+	// const result = FilePathNodeSearch(node);
+	// const sectionNode = result.find((node) => node.type === 'SECTION');
+	// if (sectionNode) {
+	// 	const text = sectionNode.name.trim();
+	// 	const sectionName = text;
+	// 	sectionData.name = sectionName;
+	// 	sectionData.section_id = sectionNode.id;
+	// }
+	const projectId = getProjectId();
+	if (!projectId) {
+		return;
 	}
+	const NodeData = getNodeData(node);
+	const pageLock = figma.currentPage.getPluginData(PAGE_LOCK_KEY) === 'true';
+
+	const cursorPosition: CurrentCursorType = {
+		projectId,
+
+		pageName: figma.currentPage.name,
+		pageId: figma.currentPage.id,
+		nodeName: removeLeadingSymbols(node.name),
+		nodeId: node.id,
+		characters: node.type === 'TEXT' ? node.characters : '',
+		autoRename: node.type === 'TEXT' ? node.autoRename : true,
+		data: NodeData,
+		pageLock: pageLock,
+	};
+
+	return cursorPosition;
 }; /** 플러그인 데이터 조회 */
 
 export const getNodeData = (node: BaseNode): NodeData => {

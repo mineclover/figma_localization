@@ -28,15 +28,16 @@ import {
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION } from '../constant';
+import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION, UPDATE_BASE_NODE } from '../constant';
 import { modeStateSignal } from '@/model/signal';
-import SimpleSelect from '../Batch/SimpleSelect';
+import SimpleSelect, { nextBaseSignal } from '../Batch/SimpleSelect';
 
 const Preset = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const editPreset = useSignal(editPresetSignal);
 	const presetStore = useSignal(presetStoreSignal);
+
 	const presetNames = Object.keys(presetStore);
 
 	return (
@@ -77,6 +78,7 @@ function LabelPage() {
 	const presetStore = useSignal(presetStoreSignal);
 	const modeState = useSignal(modeStateSignal);
 	const currentPointer = useSignal(currentPointerSignal);
+	const nextBase = useSignal(nextBaseSignal);
 	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer);
 
 	const autoCurrentNodes = useSignal(autoCurrentNodesSignal);
@@ -169,6 +171,14 @@ function LabelPage() {
 			<div className={styles.row}>
 				<Button>저장</Button>
 			</div>
+			<Button
+				onClick={() => {
+					const { baseNodeId, nodeId, pageId, projectId } = nextBase;
+					emit(UPDATE_BASE_NODE.REQUEST_KEY, baseNodeId, { nodeId, pageId, projectId });
+				}}
+			>
+				적용
+			</Button>
 		</div>
 	);
 }

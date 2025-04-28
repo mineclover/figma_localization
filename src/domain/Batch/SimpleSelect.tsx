@@ -11,7 +11,7 @@ import {
 import { Fragment, h } from 'preact';
 import { MetaData, searchStore } from '../Search/searchStore';
 import { emit } from '@create-figma-plugin/utilities';
-import { GET_PATTERN_MATCH_KEY } from '../constant';
+import { GET_PATTERN_MATCH_KEY, UPDATE_BASE_NODE } from '../constant';
 import {
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
@@ -35,6 +35,7 @@ import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
 import { SearchNodeData } from '@/model/types';
 import { clientFetchDBCurry } from '../utils/fetchDB';
 import { isHideNode } from '../Search/visualModel';
+import { notify } from '@/figmaPluginUtils';
 
 type Props = {
 	id: string;
@@ -42,9 +43,27 @@ type Props = {
 	keyMatch: boolean;
 	current: boolean;
 	hide: boolean;
+	isNext: boolean;
+	baseNodeId?: string;
+	pageId?: string;
+	projectId?: string;
 };
 
-const Test = ({ id, selected, keyMatch, current, hide }: Props) => {
+export const nextBaseSignal = signal<{
+	baseNodeId: string;
+	nodeId: string;
+	pageId: string;
+	projectId: string;
+}>({
+	baseNodeId: '',
+	nodeId: '',
+	pageId: '',
+	projectId: '',
+});
+
+const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageId, projectId }: Props) => {
+	const badRequestPrams = !baseNodeId || !pageId || !projectId;
+
 	return (
 		<button
 			onClick={() => {
@@ -52,13 +71,18 @@ const Test = ({ id, selected, keyMatch, current, hide }: Props) => {
 			}}
 			onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 				e.preventDefault(); // 기본 우클릭 메뉴 방지
-				if (selectIdsSignal.value.includes(id)) {
-					selectIdsSignal.value = selectIdsSignal.value.filter((item) => item !== id);
-				} else {
-					selectIdsSignal.value = [...selectIdsSignal.value, id];
+				if (badRequestPrams) {
+					notify('잘못된 파라미터 입니다.', 'OK');
+					return;
 				}
+				nextBaseSignal.value = {
+					baseNodeId,
+					nodeId: id,
+					pageId,
+					projectId,
+				};
 			}}
-			className={clc(styles.outline, current && styles.current)}
+			className={clc(styles.outline, current && styles.current, isNext && styles.next)}
 		>
 			<div
 				className={clc(styles.inline, keyMatch && styles.keyMatch, selected && styles.selected, hide && styles.hide)}
@@ -78,11 +102,14 @@ function SimpleSelect() {
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	/** 로케이션 키: 벨류 */
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
-	console.log('🚀 ~ SimpleSelect ~ searchStoreLocation:', searchStoreLocation);
+	const nextBase = useSignal(nextBaseSignal);
+
+	const { baseNodeId, nodeId, pageId, projectId } = nextBase;
 
 	const batchId = useSignal(autoCurrentNodeStyleSignal);
 
 	const details = useSignal(autoCurrentNodesSignal);
+	const currentNode = useSignal(currentPointerSignal);
 
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
@@ -109,7 +136,7 @@ function SimpleSelect() {
 
 	/** 전체 로컬라이제이션 키 종류 */
 	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
-	const selectBaseKeys = new Set(selectNodes.map((item) => item.baseNodeId));
+	console.log('🚀 ~ SimpleSelect ~ selectKeys:', selectKeys);
 
 	/** 키 종류로 분리 */
 	const keyLayer = selectNodes.reduce((acc, item) => {
@@ -131,13 +158,12 @@ function SimpleSelect() {
 	}, new Map<string, Set<MetaData>>());
 	console.log('🚀 ~ keyObject ~ keyObject:', keyObject);
 
-	const keyIds = Array.from(keyLayer.keys());
 	/**
 	 * 키 뽑아서 타겟 키에 제공
 	 *  */
+	const targetBase = target?.baseNodeId;
 	const targetKey = target?.localizationKey;
 
-	console.log('🚀 ~ selectKeys:', selectKeys);
 	return (
 		<div className={styles.root}>
 			{Array.from(selectKeys).map((key) => {
@@ -159,14 +185,27 @@ function SimpleSelect() {
 						<Muted>#{key + batchText} </Muted>
 						<Bold>{baseNodeText}</Bold>
 						<div className={styles.container}>
-							{Array.from(keyObject.get(key) ?? []).map((item) => {
+							{Array.from(keyObject.get(key) ?? []).map((item, _, arr) => {
 								const selected = selectItems.includes(item.id);
 
 								const keyMatch = selectKey === item.localizationKey;
 								const current = baseId === item.id;
 								const isHide = isHideNode(item);
 								// const current = currentId === item.id;
-								return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} hide={isHide} />;
+								const isNext = item.id === nodeId;
+								return (
+									<Test
+										id={item.id}
+										selected={selected}
+										keyMatch={keyMatch}
+										current={current}
+										hide={isHide}
+										isNext={isNext}
+										baseNodeId={String(targetBase)}
+										pageId={currentNode?.pageId}
+										projectId={currentNode?.projectId}
+									/>
+								);
 							})}
 						</div>
 

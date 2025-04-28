@@ -302,3 +302,9 @@ export type Preset = {
 };
 
 export type PresetStore = Record<Preset['name'], Preset>;
+
+export type BaseNodeProperty = {
+	nodeId: string;
+	pageId: string;
+	projectId: string;
+};

@@ -123,3 +123,7 @@
 .hide {
 	border-style: dashed;
 }
+
+.next {
+	background-color: var(--figma-color-bg-component);
+}

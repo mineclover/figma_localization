@@ -16,6 +16,7 @@ import {
 	SAVE_ACTION,
 	SEARCH_STORE_LOCATION_EMIT,
 	STORE_KEY,
+	UPDATE_BASE_NODE,
 } from '../constant';
 import {
 	autoCurrentNodesSignal,
@@ -26,7 +27,7 @@ import {
 } from '@/model/signal';
 import { ActionType } from '../System/ActionResourceDTO';
 
-import { LocalizationKeyDTO, LocationDTO, Preset, PresetStore } from '@/model/types';
+import { BaseNodeProperty, LocalizationKeyDTO, LocationDTO, Preset, PresetStore } from '@/model/types';
 import { safeJsonParse } from '../utils/getStore';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB';
@@ -551,7 +552,7 @@ const baseNodeHighlight = (node: FrameNode) => {
 
 	if (node) {
 		node.dashPattern = [0];
-		node.strokeWeight = 3;
+		node.strokeWeight = 4;
 		node.strokes = [redSolid];
 	}
 };
@@ -898,7 +899,7 @@ export const onSelectModeMain = () => {
  */
 export const postClientLocation = () => {
 	const nodeInfo = searchStore.baseLocationStore;
-	console.log('🚀 ~ postClientLocation ~ nodeInfo:', nodeInfo);
+
 	const nodeInfoArray = Array.from(nodeInfo.entries());
 
 	emit(SEARCH_STORE_LOCATION_EMIT.RESPONSE_KEY, nodeInfoArray);
@@ -930,6 +931,19 @@ export const onBaseKeySelect = () => {
 	return on(RENDER_TRIGGER.BASE_KEY_SELECT, async () => {
 		console.log('🚀 ~ onBaseKeySelect ~ onBaseKeySelect:', RENDER_MODE_STATE.BASE_KEY_SELECT);
 		modeStateSignal.value = RENDER_MODE_STATE.BASE_KEY_SELECT;
+	});
+};
+
+export const onBaseUpdate = () => {
+	on(UPDATE_BASE_NODE.REQUEST_KEY, async (baseNodeId: string, { nodeId, pageId, projectId }: BaseNodeProperty) => {
+		console.log('🚀 ~ on ~ baseNodeId: string, { nodeId, pageId, projectId }:', baseNodeId, {
+			nodeId,
+			pageId,
+			projectId,
+		});
+		await searchStore.updateBaseNode(baseNodeId, { nodeId, pageId, projectId });
+		postClientLocation();
+		overlayRender();
 	});
 };
 

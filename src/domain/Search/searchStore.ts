@@ -3,6 +3,7 @@ import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
 import { safeJsonParse } from '../utils/getStore';
 import { getCursorPosition, nodeMetaData } from '../getState';
 import { fetchDB } from '../utils/fetchDB';
+import { postClientLocation } from './visualModel';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -354,6 +355,9 @@ class SearchStore {
 				resultMap.set(String(location.location_id), location);
 			}
 		}
+
+		// 클라이언트 위치 정보 전달
+		postClientLocation();
 
 		return Array.from(resultMap.values());
 	}

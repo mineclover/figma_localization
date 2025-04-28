@@ -227,12 +227,26 @@ export const GET_PRESET = {
 	RESPONSE_KEY: 'GET_PRESET_RESPONSE',
 };
 
+/**
+ * 자동 선택 후 선택 된 노드 정보
+ */
 export const AUTO_SELECT_NODE_EMIT = {
 	RESPONSE_KEY: 'AUTO_SELECT_NODE_EMIT_RESPONSE',
 };
 
+/**
+ * 자동 선택 후 선택 된 노드 스타일 정보
+ */
 export const AUTO_SELECT_STYLE_EMIT = {
 	RESPONSE_KEY: 'AUTO_SELECT_STYLE_EMIT_RESPONSE',
+};
+
+/**
+ * store update
+ */
+
+export const SEARCH_STORE_LOCATION_EMIT = {
+	RESPONSE_KEY: 'SEARCH_STORE_LOCATION_EMIT_RESPONSE',
 };
 
 export const RENDER_PAIR = {

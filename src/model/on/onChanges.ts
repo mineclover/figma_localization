@@ -48,7 +48,6 @@ const refreshNode = async (node: SceneNode) => {
 const DEBUG_MODE = false;
 
 export const isOverlayFrame = (node: SceneNode) => {
-	console.log('🚀 ~ isOverlayFrame ~ node:', node);
 	return node?.parent?.name === '##overlay';
 };
 
@@ -190,6 +189,7 @@ export const onNodeSelectionChange = () => {
 
 		for (const node of nodes) {
 			const metaData = getFrameNodeMetaData(node as FrameNode);
+
 			// 화면에 보이지 않는 노드는 무시하도록 구성
 			if (metaData && !isHideNode(metaData)) {
 				hasKey.push(metaData);
@@ -201,6 +201,9 @@ export const onNodeSelectionChange = () => {
 		console.log('🚀 ~ figma.on ~ hasKey:', hasKey);
 		await autoSelectNodeEmit(hasKey);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
+		// location data 전송해야 함
+		// 그 외로도 보이는 지 판단 할 수 있는지 확인할 수 있게 하기 > 실선 점선
+		// 데이터 흐름 상 업데이트가 잘 되고 있는가 확인하기 > 진짜 확인하란 뜻
 	});
 };
 

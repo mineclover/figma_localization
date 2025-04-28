@@ -20,6 +20,7 @@ import {
 } from './Search/visualModel';
 import { emit } from '@create-figma-plugin/utilities';
 import { RENDER_PAIR } from './constant';
+import { onClientLocation } from './Search/clientLocation';
 
 /**
  * duplex 전용 어댑터
@@ -50,6 +51,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onSaveAccept(),
 			onAutoSelectUI(),
 			onAutoSelectStyleUI(),
+			onClientLocation(),
 		];
 
 		return () => {

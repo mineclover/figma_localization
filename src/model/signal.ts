@@ -1,5 +1,5 @@
 import { ValidAllStyleRangesType } from '@/figmaPluginUtils/text';
-import { LocalizationKeyDTO, Preset, PresetStore, SearchNodeData, StyleSync } from './types';
+import { LocalizationKeyDTO, LocationDTO, Preset, PresetStore, SearchNodeData, StyleSync } from './types';
 import { LocalizationKey } from './types';
 import { DomainSettingType } from './types';
 import { CurrentNode } from './types';
@@ -32,13 +32,23 @@ export const currentSectionSignal = signal<CurrentNode | null>(null);
 /** old:  현재 포인터의 노드 데이터 1개 ( 실시간 감지 ) */
 export const currentPointerSignal = signal<CurrentCursorType | null>(null);
 
-/** 자동 선택 시 다중 선택된 노드 데이터 */
+/*
+ * 자동 선택 시 다중 선택된 노드 데이터
+ */
 export const autoCurrentNodesSignal = signal<MetaData[]>([]);
 
-/** 자동 선택 시 다중 선택된 노드 스타일 데이터
+/**
+ * 자동 선택 시 다중 선택된 노드 스타일 데이터
  * 만약 baseNodeId가 다르면 mixed 반환할 계획
  */
 export const autoCurrentNodeStyleSignal = signal<string | 'mixed' | 'none'>('none');
+
+/**
+ * 선택된 키의 위치 정보
+ * 어쨌든 키 값이 얻어지고 구분 되게 됬을 때?
+ * 상태 갱신이 잘 되면 그대로 쓰고 안되면, new Map() 으로 새로 생
+ */
+export const searchStoreLocationSignal = signal<Map<string, LocationDTO>>(new Map());
 
 /** 프로젝트 아이디 */
 export const projectIdSignal = signal<string>('');

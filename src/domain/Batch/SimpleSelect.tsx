@@ -19,6 +19,7 @@ import {
 	currentSectionSignal,
 	inputKeySignal,
 	patternMatchDataSignal,
+	searchStoreLocationSignal,
 	selectedKeySignal,
 	selectIdsSignal,
 } from '@/model/signal';
@@ -33,15 +34,17 @@ import { TargetedEvent } from 'preact/compat';
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
 import { SearchNodeData } from '@/model/types';
 import { clientFetchDBCurry } from '../utils/fetchDB';
+import { isHideNode } from '../Search/visualModel';
 
 type Props = {
 	id: string;
 	selected: boolean;
 	keyMatch: boolean;
 	current: boolean;
+	hide: boolean;
 };
 
-const Test = ({ id, selected, keyMatch, current }: Props) => {
+const Test = ({ id, selected, keyMatch, current, hide }: Props) => {
 	return (
 		<button
 			onClick={() => {
@@ -57,88 +60,10 @@ const Test = ({ id, selected, keyMatch, current }: Props) => {
 			}}
 			className={clc(styles.outline, current && styles.current)}
 		>
-			<div className={clc(styles.inline, keyMatch && styles.keyMatch, selected && styles.selected)}></div>
+			<div
+				className={clc(styles.inline, keyMatch && styles.keyMatch, selected && styles.selected, hide && styles.hide)}
+			></div>
 		</button>
-	);
-};
-
-const KeyIdNameSignal = signal<Record<string, string>>({});
-
-const clientFetch = clientFetchDBCurry();
-
-const updateKeyIds = async (keyIds: string[]) => {
-	const oldKeyNames = KeyIdNameSignal.value;
-
-	const data = await clientFetch('/localization/keys/names-by-ids', {
-		method: 'POST',
-		body: JSON.stringify({
-			ids: keyIds,
-		}),
-	});
-
-	const newKeyNames = (await data.json()) as Record<string, string>;
-
-	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
-};
-
-/** 키 아이디 만 가져가게 할 건가... 전체 선택 되게 할 건가 */
-const KeyIds = ({
-	keyIds,
-	selectKey,
-	searchHandler,
-}: {
-	keyIds: string[];
-	selectKey: string | null;
-	searchHandler: (key: string) => void;
-}) => {
-	const keyNameStore = useSignal(KeyIdNameSignal);
-	const patternMatchData = useSignal(patternMatchDataSignal);
-
-	const selectIds = useSignal(selectIdsSignal);
-
-	const keyName = keyIds.map((id) => {
-		return [id, keyNameStore[id]];
-	});
-
-	useEffect(() => {
-		const nullKeyIds = keyName.filter((item) => item[1] == null).map((item) => item[0]);
-		if (nullKeyIds.length > 0) {
-			updateKeyIds(nullKeyIds);
-		}
-	}, [keyIds]);
-
-	return (
-		<div className={styles.keyIds}>
-			{keyName.map(([id, name]) => {
-				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
-				return (
-					<button
-						className={clc(styles.keyId, selectKey === id && styles.keyMatch)}
-						onClick={() => {
-							if (selectedKeySignal.value === id) {
-								selectedKeySignal.value = null;
-								searchHandler('');
-							} else {
-								selectedKeySignal.value = id;
-								searchHandler(name);
-							}
-						}}
-						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-							e.preventDefault(); // 기본 우클릭 메뉴 방지
-							if (selectIds.some((item) => list.includes(item))) {
-								const newList = new Set(selectIds.filter((item) => !list.includes(item)));
-								selectIdsSignal.value = Array.from(newList);
-							} else {
-								const newList = new Set([...selectIds, ...list]);
-								selectIdsSignal.value = Array.from(newList);
-							}
-						}}
-					>
-						#{id} : {name}
-					</button>
-				);
-			})}
-		</div>
 	);
 };
 
@@ -147,8 +72,9 @@ export const ignoreSectionIdsSignal = signal<string[]>([]);
 function SimpleSelect() {
 	const selectItems = useSignal(selectIdsSignal);
 	const selectKey = useSignal(selectedKeySignal);
-
+	console.log('🚀 ~ selectKey:', selectKey);
 	const patternMatchData = useSignal(patternMatchDataSignal);
+	const searchStoreLocation = useSignal(searchStoreLocationSignal);
 
 	const batchId = useSignal(autoCurrentNodeStyleSignal);
 	console.log('🚀 ~ SimpleSelect ~ batchId:', batchId);
@@ -160,10 +86,15 @@ function SimpleSelect() {
 
 	const selectNodes = patternMatchData.filter((item) => selectItems.includes(item.id));
 
-	const target = patternMatchData.find((item) => item.id === batchId);
+	const target = patternMatchData.find((item) => item.baseNodeId === batchId);
 
+	/** 로컬라이제이션 키 기준으로
+	 * 전체 선택 흭득
+	 * */
 	const baseNodes = patternMatchData.reduce((acc, item) => {
-		if (item.baseNodeId === item.id) {
+		const baseX = searchStoreLocation.get(item.baseNodeId ?? '');
+
+		if (baseX && item.id === String(baseX.node_id)) {
 			if (acc.has(item.localizationKey)) {
 				console.log('🚀 ~ patternMatchData.reduce ~ item: 있을 수 없는 데이터', item);
 			}
@@ -171,8 +102,12 @@ function SimpleSelect() {
 		}
 		return acc;
 	}, new Map<string, MetaData>());
+	// baseId에서 값 얻어서 baseNodes 에 들어갈 item을 선별함
+	console.log('🚀 ~ baseNodes ~ baseNodes:', baseNodes);
 
+	/** 전체 로컬라이제이션 키 종류 */
 	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
+	const selectBaseKeys = new Set(selectNodes.map((item) => item.baseNodeId));
 
 	/** 키 종류로 분리 */
 	const keyLayer = selectNodes.reduce((acc, item) => {
@@ -192,31 +127,46 @@ function SimpleSelect() {
 		}
 		return acc;
 	}, new Map<string, Set<MetaData>>());
+	console.log('🚀 ~ keyObject ~ keyObject:', keyObject);
 
 	const keyIds = Array.from(keyLayer.keys());
-	// 키 뽑아서 타겟 키에 제공
+	/**
+	 * 키 뽑아서 타겟 키에 제공
+	 *  */
 	const targetKey = target?.localizationKey;
 
+	console.log('🚀 ~ selectKeys:', selectKeys);
 	return (
 		<div className={styles.root}>
 			{Array.from(selectKeys).map((key) => {
+				// 선택 기준 노드 데이터
 				const baseNodeMetaData = baseNodes.get(key);
 
+				// 선택 기준의 베이스 아이디 흭득
+				// 근데 그걸 검색 된 데이터에서 얻는다
+				const baseX = searchStoreLocation.get(baseNodeMetaData?.baseNodeId ?? '');
+				const baseId = baseX?.node_id;
+				// 타겟 키 조건 확인
 				const batchSum = targetKey === key;
 				const batchText = batchSum ? '' : ` => ${targetKey}`;
+
+				const baseNodeText = baseNodeMetaData?.text ?? '';
 
 				return (
 					<Fragment key={key}>
 						<Muted>#{key + batchText} </Muted>
-						<Bold>{baseNodeMetaData?.text}</Bold>
+						<Bold>{baseNodeText}</Bold>
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item) => {
+								console.log('🚀 ~ {Array.from ~ selectItems:', selectItems);
 								const selected = selectItems.includes(item.id);
-								const keyMatch = selectKey === item.localizationKey;
+								console.log('🚀 ~ {Array.from ~ selected:', selected);
 
-								const current = item.baseNodeId === item.id;
+								const keyMatch = selectKey === item.localizationKey;
+								const current = baseId === item.id;
+								const isHide = isHideNode(item);
 								// const current = currentId === item.id;
-								return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} />;
+								return <Test id={item.id} selected={selected} keyMatch={keyMatch} current={current} hide={isHide} />;
 							})}
 						</div>
 

@@ -13,6 +13,7 @@ import {
 	RENDER_PAIR,
 	RENDER_TRIGGER,
 	SAVE_ACTION,
+	SEARCH_STORE_LOCATION_EMIT,
 	STORE_KEY,
 } from '../constant';
 import {
@@ -58,7 +59,6 @@ export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
 		// 대표 노드가 1개 또는 그 이상인게 식별되면 스타일이 별로 중요하지 않을 것 같다는 말임
 
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, baseNodeId);
-		console.log('🚀 ~ autoSelectNodeEmit ~ baseNodeId:', baseNodeId);
 	} else if (styleSet.size > 1) {
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'mixed');
 		console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 1);
@@ -425,7 +425,6 @@ export const textKeyRegister = async (data: Record<string, MetaData[]>) => {
  * null 만 처리된다는 단점
  */
 export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKeyRegister>>) => {
-	console.log('🚀 ~ textOriginRegister ~ data:', data);
 	// localizationKey 는 data의 키 값임
 	// localizationKey 와 baseNodeId 가 없는 상태에서 들어옴
 	const domain = getDomainSetting();
@@ -442,15 +441,19 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 		// 근데 그 베이스 노드가 기준 노드고, 로컬라이제이션, 키, 액션 단위에서 한 개라고 가정되어있기 때문에 일단
 		// baseNode 를 시각적으로 인지시킨 후 이에 대해 자동 생성 ok 일 때 자동 생성하는 로직으로 진행
 
-		// 1. baseNodeId 가 아예 없을 수 있음
+		// 0. baseNodeId 리스트에 아예 없을 수 있음
+		// 0. 있는데 리스트에는 없을 수 있음
+		// 0. 보이지 않는 상태일 수 없음 (기준 노드는 무조건 보여야 함)
+
+		const visibleNodes = nodes.filter((node) => !isHideNode(node));
 
 		// 첫번 째 : 그냥 아이디 값
-		const firstBaseNode = nodes.find((node) => node.id)!;
+		const firstBaseNode = visibleNodes.find((node) => node.id);
 		// 두번 째 : 있으면 잘 되는 것
-		const nullableBaseNode = nodes.find((node) => node.baseNodeId != null);
+		const nullableBaseNode = visibleNodes.find((node) => node.baseNodeId != null);
 
 		// 최적 값 : 인스턴스 노드가 아닌 텍스트 노드
-		const secondBaseNode = nodes.find((node) => {
+		const secondBaseNode = visibleNodes.find((node) => {
 			const id = node.id;
 			// 아이디는 있고 인스턴스 노드가 아닌 텍스트 노드
 			if (id) {
@@ -469,7 +472,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 
 		// baseNode가 있으면 있는 기준 노드로 생성
 		if (needNullBaseNode) {
-			xNode = (await figma.getNodeByIdAsync(firstBaseNode.id)) as SceneNode;
+			xNode = (await figma.getNodeByIdAsync(firstBaseNode?.id ?? '')) as SceneNode;
 			if (xNode) {
 				location = await setNodeLocation(xNode as SceneNode);
 				baseCheck = true;
@@ -616,11 +619,16 @@ export const overRayRender = async () => {
 		}
 	}
 
-	const baseNodeIds = Array.from(searchStore.baseNodeStore.keys());
 	// 전체 조회
+	const tempBaseNodeIds = Array.from(searchStore.baseNodeStore.keys());
+	let baseNodeIds: string[] = [];
+	if (selectedIds.length === 0) {
+		baseNodeIds = tempBaseNodeIds;
+	} else if (selectedIds.length > 0) {
+		baseNodeIds = tempBaseNodeIds.filter((item) => selectedIds.includes(item));
+	}
 
 	const locations = await searchStore.getBaseLocation(baseNodeIds);
-	console.log('🚀 ~ overRayRender ~ locations:', locations);
 
 	for (const location of locations) {
 		if (location) {
@@ -629,8 +637,6 @@ export const overRayRender = async () => {
 				const targetNode = searchStore.textToFrameStore.get(targetId);
 
 				if (targetNode) {
-					console.log('🚀 ~ overRayRender ~ targetMetaData:', targetNode);
-
 					baseNodeHighlight(targetNode);
 				}
 			}
@@ -884,11 +890,23 @@ export const onSelectModeMain = () => {
 	});
 };
 
+/** 클라이언트에 위치 정보 전달
+ *
+ * location 정보에서 키 얻어서 base id 판별
+ * 음.. 베이스 노드 반별 후 저장하고 있으면 안되는건가
+ */
+export const postClientLocation = () => {
+	const nodeInfo = searchStore.baseLocationStore;
+	console.log('🚀 ~ postClientLocation ~ nodeInfo:', nodeInfo);
+	const nodeInfoArray = Array.from(nodeInfo.entries());
+
+	emit(SEARCH_STORE_LOCATION_EMIT.RESPONSE_KEY, nodeInfoArray);
+};
+
 /** 상태 전달  */
 export const onSaveAccept = () => {
 	emit(RENDER_TRIGGER.SAVE_ACCEPT, NULL_STATE);
 	return on(RENDER_TRIGGER.SAVE_ACCEPT, async () => {
-		console.log('🚀 ~ onSaveAccept ~ onSaveAccept:', NULL_STATE);
 		modeStateSignal.value = NULL_STATE;
 	});
 };

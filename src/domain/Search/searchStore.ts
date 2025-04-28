@@ -350,7 +350,6 @@ class SearchStore {
 			const data = (await response.json()) as LocationDTO[];
 
 			for (const location of data) {
-				console.log('🚀 ~ SearchStore ~ getBaseLocation ~ location:', location);
 				this.baseLocationStore.set(String(location.location_id), location);
 				resultMap.set(String(location.location_id), location);
 			}
@@ -360,6 +359,20 @@ class SearchStore {
 		postClientLocation();
 
 		return Array.from(resultMap.values());
+	}
+
+	async updateBaseNode(
+		baseNodeId: string,
+		{ nodeId, pageId, projectId }: { nodeId: string; pageId: string; projectId: string }
+	) {
+		const response = await fetchDB(('/figma/locations/' + baseNodeId) as '/figma/locations/{id}', {
+			method: 'PUT',
+			body: JSON.stringify({ nodeId, pageId, projectId }),
+		});
+		const data = (await response.json()) as LocationDTO;
+		if (data) {
+			this.baseLocationStore.set(String(data.location_id), data);
+		}
 	}
 }
 

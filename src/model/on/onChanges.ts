@@ -19,7 +19,7 @@ import {
 	ignoreSectionAll,
 	isHideNode,
 	nullSelectEmit,
-	overRayRender,
+	overlayRender,
 } from '@/domain/Search/visualModel';
 import { BACKGROUND_STORE_KEY } from '@/domain/constant';
 import { getFrameNodeMetaData, MetaData, searchStore, setFrameNodeMetaData } from '@/domain/Search/searchStore';
@@ -85,7 +85,7 @@ export const onNodeSelectionChange = () => {
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 
 			if (searchStore.textToFrameStore.size === 0) {
-				await overRayRender();
+				await overlayRender();
 			}
 
 			// 오버레이 프레임 정보 가져옴
@@ -182,7 +182,8 @@ export const onNodeSelectionChange = () => {
 		}
 		const backgroundFrame = getBackgroundFrame();
 		if (backgroundFrame) {
-			await overRayRender();
+			// 이게 있으면 저장 해야 함
+			await overlayRender();
 		}
 
 		const hasKey: MetaData[] = [];

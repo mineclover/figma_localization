@@ -70,14 +70,17 @@ const Test = ({ id, selected, keyMatch, current, hide }: Props) => {
 export const ignoreSectionIdsSignal = signal<string[]>([]);
 
 function SimpleSelect() {
+	/** 선택된 전체 아이디 */
 	const selectItems = useSignal(selectIdsSignal);
+	/** 베이스 키 마케팅 운용 */
 	const selectKey = useSignal(selectedKeySignal);
-	console.log('🚀 ~ selectKey:', selectKey);
+	/** 검색된 키 : 벨류 */
 	const patternMatchData = useSignal(patternMatchDataSignal);
+	/** 로케이션 키: 벨류 */
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
+	console.log('🚀 ~ SimpleSelect ~ searchStoreLocation:', searchStoreLocation);
 
 	const batchId = useSignal(autoCurrentNodeStyleSignal);
-	console.log('🚀 ~ SimpleSelect ~ batchId:', batchId);
 
 	const details = useSignal(autoCurrentNodesSignal);
 
@@ -103,7 +106,6 @@ function SimpleSelect() {
 		return acc;
 	}, new Map<string, MetaData>());
 	// baseId에서 값 얻어서 baseNodes 에 들어갈 item을 선별함
-	console.log('🚀 ~ baseNodes ~ baseNodes:', baseNodes);
 
 	/** 전체 로컬라이제이션 키 종류 */
 	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
@@ -158,9 +160,7 @@ function SimpleSelect() {
 						<Bold>{baseNodeText}</Bold>
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item) => {
-								console.log('🚀 ~ {Array.from ~ selectItems:', selectItems);
 								const selected = selectItems.includes(item.id);
-								console.log('🚀 ~ {Array.from ~ selected:', selected);
 
 								const keyMatch = selectKey === item.localizationKey;
 								const current = baseId === item.id;

@@ -7,6 +7,7 @@ import {
 	AUTO_SELECT_NODE_EMIT,
 	AUTO_SELECT_STYLE_EMIT,
 	BACKGROUND_STORE_KEY,
+	BASE_KEY_INJECTION,
 	DISABLE_RENDER_PAIR,
 	NODE_STORE_KEY,
 	RENDER_MODE_STATE,
@@ -571,7 +572,7 @@ export const isHideNode = (node: MetaData) => {
  * 오버레이 트리거가 들어올 때 실행될 렌더링 로직
  * 새로고침을 겸함
  */
-export const overRayRender = async () => {
+export const overlayRender = async () => {
 	const ignoreIds = ignoreSectionAll().map((node) => node.id);
 	const backgroundSize = getBackgroundSize(ignoreIds);
 
@@ -648,7 +649,7 @@ export const overRayRender = async () => {
 
 /** 트리거 */
 export const onRender = () => {
-	on(RENDER_PAIR.RENDER_REQUEST, overRayRender);
+	on(RENDER_PAIR.RENDER_REQUEST, overlayRender);
 };
 
 /** 제거 */
@@ -929,5 +930,19 @@ export const onBaseKeySelect = () => {
 	return on(RENDER_TRIGGER.BASE_KEY_SELECT, async () => {
 		console.log('🚀 ~ onBaseKeySelect ~ onBaseKeySelect:', RENDER_MODE_STATE.BASE_KEY_SELECT);
 		modeStateSignal.value = RENDER_MODE_STATE.BASE_KEY_SELECT;
+	});
+};
+
+export const onBaseKeyInjection = () => {
+	// baseId 내부 데이터를 변경하고
+	//
+	on(BASE_KEY_INJECTION.REQUEST_KEY, async (baseNodeId: string, ids: string[]) => {
+		for (const id of ids) {
+			const node = await figma.getNodeByIdAsync(id);
+			if (node) {
+				node.setPluginData(NODE_STORE_KEY.LOCATION, baseNodeId);
+			}
+		}
+		overlayRender();
 	});
 };

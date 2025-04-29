@@ -73,15 +73,15 @@ export const onNodeSelectionChange = () => {
 	const metaDataStore = new Map<string, FrameNode>();
 
 	figma.on('selectionchange', async () => {
-		const nodes = figma.currentPage.selection;
+		const selectionNodes = figma.currentPage.selection;
 
 		// 선택 된 게 overlay 프레임 내에 있는 경우 선택을 조정한다
 		// 일단 선택 된 게 overlay 프레임 내에 있는 경우를 판단
 		console.log(1, new Date().toISOString());
 		cacheCheck.clear();
-		const node = nodes[0];
+		const node = selectionNodes[0];
 		const isOverlay = isOverlayFrame(node);
-		if (nodes.length === 1 && isOverlay) {
+		if (selectionNodes.length === 1 && isOverlay) {
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 
 			if (searchStore.textToFrameStore.size === 0) {
@@ -121,9 +121,9 @@ export const onNodeSelectionChange = () => {
 			}
 
 			/** 확장 선택 시 땅따먹기 처리 */
-		} else if (nodes.length > 1) {
+		} else if (selectionNodes.length > 1) {
 			/** 기존에 처리된 대상은 제외 */
-			const frames = nodes.filter((node) => {
+			const frames = selectionNodes.filter((node) => {
 				if (cacheCheck.has(node.id)) {
 					return false;
 				}
@@ -188,7 +188,7 @@ export const onNodeSelectionChange = () => {
 
 		const hasKey: MetaData[] = [];
 
-		for (const node of nodes) {
+		for (const node of selectionNodes) {
 			const metaData = getFrameNodeMetaData(node as FrameNode);
 
 			// 화면에 보이지 않는 노드는 무시하도록 구성

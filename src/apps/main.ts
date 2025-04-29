@@ -3,10 +3,12 @@ import { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types';
 
 import { nodeZoom_Adapter, pageNodeZoom_Adapter, pageSelectIds_Adapter } from '@/figmaPluginUtils/utilAdapter';
 import {
+	onGetApiKey,
 	onGetDomainSetting,
 	onGetLanguageCodes,
 	onGetUserHash,
 	onGetUserHashResponse,
+	onSetApiKey,
 	onSetDomainSetting,
 	onSetLanguageCodes,
 	onSetUserHash,
@@ -102,6 +104,9 @@ export default function () {
 	onBaseUpdate();
 	onBaseKeyInjection();
 	onAutoSelectModeRequest();
+
+	onSetApiKey();
+	onGetApiKey();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

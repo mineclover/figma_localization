@@ -5,7 +5,7 @@ import { ComponentChildren, Fragment, h } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { components } from 'types/i18n';
 import { onGetDomainSettingResponse, onGetLanguageCodesResponse } from './SettingModel';
-import { languageCodesSignal, userHashSignal } from '@/model/signal';
+import { apiKeySignal, languageCodesSignal, userHashSignal } from '@/model/signal';
 import { domainSettingSignal } from '@/model/signal';
 import DomainSelect from './DomainSelect';
 import { useSignal } from '@/hooks/useSignal';
@@ -26,6 +26,7 @@ import styles from './domainSelect.module.css';
 import {
 	GET_PROJECT_ID,
 	GET_USER_HASH_PAIR,
+	SET_API_KEY_PAIR,
 	SET_LANGUAGE_CODES,
 	SET_PROJECT_ID,
 	SET_USER_HASH_PAIR,
@@ -72,6 +73,7 @@ function SettingPage() {
 
 	const projectId = useSignal(projectIdSignal);
 	const domainSetting = useSignal(domainSettingSignal);
+	const apiKey = useSignal(apiKeySignal);
 	const userHash = useSignal(userHashSignal);
 	const languageCodes = useSignal(languageCodesSignal);
 	const [domainName, setDomainName] = useState('');
@@ -245,6 +247,32 @@ function SettingPage() {
 							const userHashValue = e.currentTarget.value;
 							if (userHashValue) {
 								emit(SET_USER_HASH_PAIR.REQUEST_KEY, userHashValue);
+							}
+						}
+					}}
+					onBlur={(e) => {
+						emit(GET_USER_HASH_PAIR.REQUEST_KEY);
+					}}
+				/>
+			</div>
+			<VerticalSpace space="extraSmall" />
+			<div className={styles.container}>
+				<div className={styles.domainContainer}>
+					<Bold>API Key</Bold>
+				</div>
+				<Text>Google Ai Studio API Key</Text>
+
+				<Textbox
+					placeholder={'api key'}
+					value={apiKey ?? ''}
+					onChange={(e) => {
+						apiKeySignal.value = e.currentTarget.value;
+					}}
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') {
+							const apiKeyValue = e.currentTarget.value;
+							if (apiKeyValue) {
+								emit(SET_API_KEY_PAIR.REQUEST_KEY, apiKeyValue);
 							}
 						}
 					}}

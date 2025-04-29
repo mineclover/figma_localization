@@ -8,9 +8,11 @@ import {
 	SET_USER_HASH_PAIR,
 	CLIENT_STORE_KEY,
 	GET_USER_HASH_PAIR,
+	SET_API_KEY_PAIR as SET_API_KEY_PAIR,
+	GET_API_KEY_PAIR,
 } from '../constant';
 import { getFigmaRootStore, setFigmaRootStore } from '../utils/getStore';
-import { domainSettingSignal, languageCodesSignal, userHashSignal } from '@/model/signal';
+import { apiKeySignal, domainSettingSignal, languageCodesSignal, userHashSignal } from '@/model/signal';
 import { DomainSettingType } from '@/model/types';
 
 export const getDomainSetting = () => {
@@ -76,6 +78,28 @@ export const onSetUserHash = () => {
 	on(SET_USER_HASH_PAIR.REQUEST_KEY, async (userHash: string) => {
 		const result = await figma.clientStorage.setAsync(CLIENT_STORE_KEY.USER_HASH, userHash);
 		emit(GET_USER_HASH_PAIR.RESPONSE_KEY, userHash);
+	});
+};
+
+export const onSetApiKey = () => {
+	on(SET_API_KEY_PAIR.REQUEST_KEY, async (apiKey: string) => {
+		const result = await figma.clientStorage.setAsync(CLIENT_STORE_KEY.API_KEY, apiKey);
+		emit(GET_API_KEY_PAIR.RESPONSE_KEY, apiKey);
+	});
+};
+
+export const onGetApiKey = () => {
+	on(GET_API_KEY_PAIR.REQUEST_KEY, async () => {
+		const apiKey = await figma.clientStorage.getAsync(CLIENT_STORE_KEY.API_KEY);
+		emit(GET_API_KEY_PAIR.RESPONSE_KEY, apiKey);
+	});
+};
+
+/** 있긴 해야 함 */
+export const onGetApiKeyResponse = () => {
+	emit(GET_API_KEY_PAIR.REQUEST_KEY);
+	return on(GET_API_KEY_PAIR.RESPONSE_KEY, (apiKey: string) => {
+		apiKeySignal.value = apiKey;
 	});
 };
 

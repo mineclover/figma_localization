@@ -116,3 +116,5 @@ export const ignoreSectionIdsSignal = signal<string[]>([]);
 export const modeStateSignal = signal(NULL_STATE);
 
 export const autoSelectModeSignal = signal<boolean>(false);
+
+export const apiKeySignal = signal<string | null>(null);

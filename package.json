@@ -1,9 +1,11 @@
 {
 	"dependencies": {
+		"@ai-sdk/google": "^1.2.14",
 		"@create-figma-plugin/ui": "^4.0.1",
 		"@create-figma-plugin/utilities": "^4.0.1",
 		"@preact/signals-core": "^1.8.0",
 		"@ramonak/react-progress-bar": "^5.3.0",
+		"ai": "^4.3.10",
 		"crypto-js": "^4.2.0",
 		"dom-serializer": "^2.0.0",
 		"domhandler": "^5.0.3",
@@ -51,6 +53,7 @@
 		"networkAccess": {
 			"allowedDomains": [
 				"https://figma.com",
+				"https://generativelanguage.googleapis.com/",
 				"https://jsonplaceholder.typicode.com"
 			],
 			"devAllowedDomains": [

@@ -25,18 +25,22 @@ import {
 	autoCurrentNodeStyleSignal,
 	currentPointerSignal,
 	inputKeySignal,
+	apiKeySignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
 import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION, UPDATE_BASE_NODE } from '../constant';
 import { modeStateSignal } from '@/model/signal';
 import SimpleSelect, { nextBaseSignal } from '../Batch/SimpleSelect';
+import { main } from '@/ai/example';
+import { textRecommend } from '@/ai/textRecommend';
 
 const Preset = () => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const editPreset = useSignal(editPresetSignal);
 	const presetStore = useSignal(presetStoreSignal);
+	const apiKey = useSignal(apiKeySignal);
 
 	const presetNames = Object.keys(presetStore);
 
@@ -50,6 +54,17 @@ const Preset = () => {
 					onChange={(e) => {
 						editPreset.name = e.currentTarget.value;
 						editPresetSignal.value = editPreset;
+					}}
+					onKeyDown={async (e) => {
+						if (e.key === 'Enter') {
+							const inputValue = e.currentTarget.value;
+							if (apiKey) {
+								console.log('🚀 ~ onKeyDown={ ~ apiKey:', apiKey);
+
+								const response = await textRecommend(apiKey, inputValue);
+								console.log('🚀 ~ response:', response, 'home');
+							}
+						}
 					}}
 				/>
 				<button className={clc(styles.iconButton, isOpen && styles.up)} onClick={() => setIsOpen(!isOpen)}>
@@ -88,8 +103,34 @@ function LabelPage() {
 
 	return (
 		<div className={styles.container}>
-			<p>현재 페이지 아이디: {autoCurrentNodeStyle}</p>
 			<div className={styles.row}>
+				<IconButton
+					onClick={() => {
+						emit(RENDER_PAIR.RENDER_REQUEST);
+						// 오버레이 존재 여부를 모른다는 단점
+					}}
+				>
+					<IconEyeSmall24></IconEyeSmall24>
+				</IconButton>
+				{/* 비활성화 */}
+				<IconButton
+					onClick={() => {
+						emit(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST);
+					}}
+				>
+					<IconHiddenSmall24 />
+				</IconButton>
+			</div>
+			<p>대표 로케이션 아이디: {autoCurrentNodeStyle}</p>
+			<Bold>섹션</Bold>
+			<div className={styles.row}>
+				<Button
+					onClick={() => {
+						emit(RENDER_TRIGGER.SECTION_SELECT);
+					}}
+				>
+					제외된 섹션 선택
+				</Button>
 				<IconButton
 					onClick={() => {
 						// 더하기
@@ -127,37 +168,10 @@ function LabelPage() {
 					<IconBooleanSubtract24 />
 				</IconButton>
 				{/* 활성화 */}
-				<IconButton
-					onClick={() => {
-						emit(RENDER_PAIR.RENDER_REQUEST);
-						// 오버레이 존재 여부를 모른다는 단점
-					}}
-				>
-					<IconEyeSmall24></IconEyeSmall24>
-				</IconButton>
-				{/* 비활성화 */}
-				<IconButton
-					onClick={() => {
-						emit(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST);
-					}}
-				>
-					<IconHiddenSmall24 />
-				</IconButton>
 			</div>
 			<Preset />
 			<SimpleSelect />
 			<span>{modeState}</span>
-
-			<div className={styles.row}>
-				<Button
-					onClick={() => {
-						emit(RENDER_TRIGGER.SECTION_SELECT);
-					}}
-				>
-					제외할 섹션 선택
-				</Button>
-				<p>선택 섹션들은 수정 대상에서 제외됩니다.(전체 선택 시 제외)</p>
-			</div>
 
 			<Bold>타겟 키 선택</Bold>
 			<span>선택할 수 있는 전체 키 목록</span>

@@ -61,6 +61,87 @@ export const nextBaseSignal = signal<{
 	projectId: '',
 });
 
+const KeyIdNameSignal = signal<Record<string, string>>({});
+
+const clientFetch = clientFetchDBCurry();
+
+const updateKeyIds = async (keyIds: string[]) => {
+	const oldKeyNames = KeyIdNameSignal.value;
+
+	const data = await clientFetch('/localization/keys/names-by-ids', {
+		method: 'POST',
+		body: JSON.stringify({
+			ids: keyIds,
+		}),
+	});
+
+	const newKeyNames = (await data.json()) as Record<string, string>;
+
+	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
+};
+
+/** 키 아이디 만 가져가게 할 건가... 전체 선택 되게 할 건가 */
+const KeyIds = ({
+	keyIds,
+	selectKey,
+	searchHandler,
+}: {
+	keyIds: string[];
+	selectKey: string | null;
+	searchHandler: (key: string) => void;
+}) => {
+	const keyNameStore = useSignal(KeyIdNameSignal);
+	const patternMatchData = useSignal(patternMatchDataSignal);
+	const selectIds = useSignal(selectIdsSignal);
+
+	const keyName = keyIds.map((id) => {
+		return [id, keyNameStore[id]];
+	});
+
+	useEffect(() => {
+		const nullKeyIds = keyName.filter((item) => item[1] == null).map((item) => item[0]);
+		if (nullKeyIds.length > 0) {
+			updateKeyIds(nullKeyIds);
+		}
+	}, [keyIds]);
+
+	return (
+		<div className={styles.keyIds}>
+			{keyName.map(([id, name]) => {
+				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
+				return (
+					<button
+						className={clc(styles.keyId, selectKey === id && styles.keyMatch)}
+						onClick={() => {
+							if (selectedKeySignal.value === id) {
+								selectedKeySignal.value = null;
+								searchHandler('');
+							} else {
+								selectedKeySignal.value = id;
+								searchHandler(name);
+							}
+						}}
+						// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
+
+						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
+							e.preventDefault(); // 기본 우클릭 메뉴 방지
+							if (selectIds.some((item) => list.includes(item))) {
+								const newList = new Set(selectIds.filter((item) => !list.includes(item)));
+								selectIdsSignal.value = Array.from(newList);
+							} else {
+								const newList = new Set([...selectIds, ...list]);
+								selectIdsSignal.value = Array.from(newList);
+							}
+						}}
+					>
+						#{id} : {name}
+					</button>
+				);
+			})}
+		</div>
+	);
+};
+
 const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageId, projectId }: Props) => {
 	const badRequestPrams = !baseNodeId || !pageId || !projectId;
 

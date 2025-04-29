@@ -356,7 +356,9 @@ export const addTranslation = async (node: TextNode) => {
 
 	// 대부분의 시스템에서 \n는 공백으로 처리되기 때문에 시각적으로 보이지 않음
 	// 따라서 시각적으로 보이게 하기 위해 br로 처리하는게 합리적이게 보임
+	// 피그마에서 공백은 \n이 아닌 다른 값임 찾아서 넣어야할 수 있음
 	const brString = xmlString.replace(/\n/g, '<br/>');
+	// 저장할 때부터 a 먹여서 넣어야하니까 여기부터 하면 됨
 	try {
 		const translations = await fetchDB('/localization/translations', {
 			method: 'PUT',

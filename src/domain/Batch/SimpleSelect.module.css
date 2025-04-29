@@ -31,29 +31,6 @@
 	max-width: 100%;
 }
 
-.keyIds {
-	display: flex;
-	flex-direction: row;
-	gap: 2px;
-	flex-wrap: wrap;
-
-	max-width: 100%;
-}
-
-.keyId {
-	padding: 2px 16px;
-	background-color: var(--figma-color-bg);
-	border: 3px solid var(--figma-color-border);
-	border-radius: 6px;
-
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-		border-color: var(--figma-color-border);
-	}
-
-	color: var(--figma-color-text);
-}
-
 /* 오버라이드 되는 애는 가장 아래로 */
 .current {
 	/* border-color: #ffc943;

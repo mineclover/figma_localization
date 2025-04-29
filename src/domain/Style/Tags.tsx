@@ -19,17 +19,28 @@ type Props = {
 	action: ActionType;
 };
 
+/** 파싱 */
 export const xmlParse = async (xmlString: string) => {
 	const flatItems = await parseXmlToFlatStructure(xmlString);
 	return flatItems;
 };
 
+/**
+ * 타겟 키 추출
+ * @param flatItems
+ * @returns
+ */
 export const targetKeyParse = async (flatItems: XmlFlatNode[]) => {
 	const targetKey = flatItems.filter((item) => item.tagName !== 'br');
 
 	return new Set(targetKey.map((item) => item.tagName));
 };
 
+/**
+ * 키 이름 변경 맵 받아서 변환
+ * @param flatItems
+ * @returns
+ */
 async function diff(
 	this: {
 		fn2: Awaited<ReturnType<typeof targetKeyParse>>;
@@ -40,6 +51,7 @@ async function diff(
 	const keyMap: Record<string, string> = {};
 	const list = this.fn2;
 
+	// 쓰기 좋게 키 이름으로 빈 문자열 만들고
 	for (const item of list) {
 		if (item !== '') {
 			keyMap[item] = '';
@@ -98,6 +110,7 @@ const TagsSort = ({ list, inputTags }: { list: Record<string, string>; inputTags
 	};
 	const esValues = Object.entries(tags);
 
+	// 선택지 만들기 위한 코드
 	const items = extractSelectedItems(tags);
 	const selected = Object.values(items);
 	const divideItems = divideItemsBySelection(Object.keys(StatusByCode), selected);

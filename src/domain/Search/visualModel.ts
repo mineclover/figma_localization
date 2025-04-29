@@ -244,9 +244,11 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 	const nodes = frame.children;
 	const idStore = data.map((item) => item.id);
 	const idSet = new Set<string>(idStore);
+
 	const { removeTarget, keepTarget } = nodes.reduce(
 		(acc, node) => {
 			const { id } = getFrameNodeMetaData(node as FrameNode) ?? {};
+
 			if (id != null && idSet.has(id)) {
 				acc.keepTarget.set(id, node as FrameNode);
 			} else {
@@ -259,6 +261,8 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 			keepTarget: new Map<string, FrameNode>(),
 		}
 	);
+	console.log('🚀 ~ clearBackground ~ idSet:', idSet);
+	console.log('🚀 ~ clearBackground ~ removeTarget:', removeTarget);
 	for (const node of removeTarget) {
 		node.remove();
 	}
@@ -532,9 +536,7 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 	const textMap = textSorter(nullKey);
 	// 메타데이터 기준 로컬라이제이션 키 없는 데이터에 키 부여
 	const textMapId = (await textKeyRegister(textMap)) ?? {};
-
 	await textOriginRegister(textMapId);
-
 	if (nullKey.length > 0 && count < 4) {
 		return autoKeyMapping(ignoreIds, backgroundFrame, count + 1);
 	}

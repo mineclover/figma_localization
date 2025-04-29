@@ -80,7 +80,18 @@ const updateKeyIds = async (keyIds: string[]) => {
 	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
 };
 
-/** 키 아이디 만 가져가게 할 건가... 전체 선택 되게 할 건가 */
+/**
+ * 단일 키 기준으로 변경할 선택지들을 제공하고
+ * 입력으로 추가하거나
+ * 추천 받은 것에서 선택하거나
+ * 새로운 공간에서 새로운 key를 새로 부여해야할 때 문제가 있음
+ * 의미적으로 완전히 같은데 피그마에서 완전히 새로 생겨났을 때 완전히 새로운 키로 생성되는 문제 임
+ * 이는 검색을 통해 똑같은 텍스트가 있으면 그 키를 추가하는 식으로 동기화하는 방법이 있긴 함
+ * 섹션이 없으면 그다지 유효하지 않음
+ * 섹션이 있으면 충분히 유효함
+ * 키에는 기존에 포함된 로케이션 키 이름이 있을 수 있음
+ *
+ */
 const KeyIds = ({
 	keyIds,
 	selectKey,
@@ -90,6 +101,8 @@ const KeyIds = ({
 	selectKey: string | null;
 	searchHandler: (key: string) => void;
 }) => {
+	// 로컬라이제이션 키에 저장 된 이름들
+	//
 	const keyNameStore = useSignal(KeyIdNameSignal);
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	const selectIds = useSignal(selectIdsSignal);

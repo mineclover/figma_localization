@@ -71,6 +71,7 @@ export const onNodeSelectionChange = () => {
 	/** 선택은 연속적으로 일어나고 그 사이에 노드 메타데이터 변경될 일이 없다 */
 	const cacheCheck = new Set<string>();
 	const metaDataStore = new Map<string, FrameNode>();
+	let recentRender = false;
 
 	figma.on('selectionchange', async () => {
 		const selectionNodes = figma.currentPage.selection;
@@ -78,13 +79,30 @@ export const onNodeSelectionChange = () => {
 		// 선택 된 게 overlay 프레임 내에 있는 경우 선택을 조정한다
 		// 일단 선택 된 게 overlay 프레임 내에 있는 경우를 판단
 		console.log(1, new Date().toISOString());
+
 		cacheCheck.clear();
 		const node = selectionNodes[0];
 		const isOverlay = isOverlayFrame(node);
+
+		/** 일반적인 업데이트 반영 코드 */
+		if (node && tempNode !== node.id) {
+			tempNode = node.id;
+			refreshNode(node);
+		}
+
+		if (recentRender) {
+			recentRender = false;
+
+			console.log('🚀 캔슬');
+			return;
+		}
+
 		if (selectionNodes.length === 1 && isOverlay) {
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 
 			if (searchStore.textToFrameStore.size === 0) {
+				console.log('🚀 ~ figma.on ~ searchStore:', searchStore);
+				// 렌더링 안되있을 떄를 위해 준비햇었음
 				await overlayRender();
 			}
 
@@ -121,7 +139,7 @@ export const onNodeSelectionChange = () => {
 			}
 
 			/** 확장 선택 시 땅따먹기 처리 */
-		} else if (selectionNodes.length > 1) {
+		} else if (selectionNodes.length > 1 && isOverlay) {
 			/** 기존에 처리된 대상은 제외 */
 			const frames = selectionNodes.filter((node) => {
 				if (cacheCheck.has(node.id)) {
@@ -171,24 +189,19 @@ export const onNodeSelectionChange = () => {
 			}
 			// next가 0이여서도 0인건 아님
 		} else {
-			console.log('🚀 ~ figma.on ~ nullSelectEmit:', 1);
 			nullSelectEmit();
-
-			/** 업데이트 반영 코드 */
-			if (node && tempNode !== node.id) {
-				tempNode = node.id;
-				refreshNode(node);
-			}
 		}
+
+		// 무조건 있는 거긴 한데.. 일단 렌더링 되있는지 확인
 		const backgroundFrame = getBackgroundFrame();
 		if (backgroundFrame) {
-			// 이게 있으면 저장 해야 함
+			// 이게 있으면 갱신 해야 함
 			await overlayRender();
 		}
 
 		const hasKey: MetaData[] = [];
-
-		for (const node of selectionNodes) {
+		const nextSelectionNodes = figma.currentPage.selection;
+		for (const node of nextSelectionNodes) {
 			const metaData = getFrameNodeMetaData(node as FrameNode);
 
 			// 화면에 보이지 않는 노드는 무시하도록 구성
@@ -197,14 +210,11 @@ export const onNodeSelectionChange = () => {
 			}
 		}
 		console.log(6, new Date().toISOString());
-
 		const sectionId = getCurrentSectionSelected(node);
 		console.log('🚀 ~ figma.on ~ hasKey:', hasKey);
 		await autoSelectNodeEmit(hasKey);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
-		// location data 전송해야 함
-		// 그 외로도 보이는 지 판단 할 수 있는지 확인할 수 있게 하기 > 실선 점선
-		// 데이터 흐름 상 업데이트가 잘 되고 있는가 확인하기 > 진짜 확인하란 뜻
+		recentRender = true;
 	});
 };
 

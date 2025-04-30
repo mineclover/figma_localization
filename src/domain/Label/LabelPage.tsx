@@ -16,19 +16,20 @@ import {
 } from '@create-figma-plugin/ui';
 import { clc } from '@/components/modal/utils';
 import { useEffect, useState } from 'preact/hooks';
-
+import { useFetch } from '@/hooks/useFetch';
 import {
 	selectedPresetNameSignal,
 	editPresetSignal,
 	presetStoreSignal,
 	autoCurrentNodesSignal,
-	autoCurrentNodeStyleSignal,
+	autoCurrentNodeStyleSignal as autoCurrentNodeBaseSignal,
 	currentPointerSignal,
 	inputKeySignal,
 	apiKeySignal,
 	patternMatchDataSignal,
 	selectedKeySignal,
 	selectIdsSignal,
+	searchStoreLocationSignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
@@ -40,6 +41,9 @@ import { textRecommend } from '@/ai/textRecommend';
 import { signal } from '@preact/signals-core';
 import { TargetedEvent } from 'preact/compat';
 import { clientFetchDBCurry } from '../utils/fetchDB';
+import { useAsync } from '@/hooks/useAsync';
+import { modalAlert } from '@/components/alert';
+import { ProviderResponse } from '@/ai/provider';
 
 const KeyIdNameSignal = signal<Record<string, string>>({});
 
@@ -60,8 +64,25 @@ const updateKeyIds = async (keyIds: string[]) => {
 	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
 };
 
+/** 단일 대상 키 이름 업데이트 */
+const updateKeyId = async (keyId: string) => {
+	const oldKeyNames = KeyIdNameSignal.value;
+
+	const data = await clientFetch('/localization/keys/names-by-ids', {
+		method: 'POST',
+		body: JSON.stringify({
+			ids: [keyId],
+		}),
+	});
+
+	const newKeyNames = (await data.json()) as Record<string, string>;
+
+	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
+};
+
+//  baseNode , key , action 으로 매칭 되야 함
 /**
- * 단일 키 기준으로 변경할 선택지들을 제공하고
+ * 단일 키 기준으로 변경할 선택지들을 제공하는 컴포넌트
  * 입력으로 추가하거나
  * 추천 받은 것에서 선택하거나
  * 새로운 공간에서 새로운 key를 새로 부여해야할 때 문제가 있음
@@ -73,61 +94,138 @@ const updateKeyIds = async (keyIds: string[]) => {
  *
  */
 const KeyIds = ({
-	keyIds,
-	selectKey,
-	searchHandler,
+	localizationKey,
+	action,
+	baseNodeId,
+	text,
+	prefix,
 }: {
-	keyIds: string[];
-	selectKey: string | null;
-	searchHandler: (key: string) => void;
+	localizationKey: string;
+	action: string;
+	baseNodeId: string;
+	text: string;
+	prefix: string;
 }) => {
 	// 로컬라이제이션 키에 저장 된 이름들
 	//
 	const keyNameStore = useSignal(KeyIdNameSignal);
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	const selectIds = useSignal(selectIdsSignal);
+	const apiKey = useSignal(apiKeySignal);
 
-	const keyName = keyIds.map((id) => {
-		return [id, keyNameStore[id]];
-	});
+	const [selectName, setSelectName] = useState<string>('');
 
 	useEffect(() => {
-		const nullKeyIds = keyName.filter((item) => item[1] == null).map((item) => item[0]);
+		// 초기 값 설정 시점을 확정할 수 없기 때문에
+		const settingName = keyNameStore[localizationKey];
+		console.log('🚀 ~ useEffect ~ settingName:', settingName);
+		setSelectName(settingName);
+	}, [localizationKey, keyNameStore]);
+
+	// 선택된 객체에서의 키 아이디
+	const tempSelectKeyId = patternMatchData
+		.filter((item) => selectIds.includes(item.id))
+		.map((item) => item.localizationKey);
+	// 중복 제거
+	const selectKeyId = new Set(tempSelectKeyId);
+	const { data, loading, error, executeAsync, hasMessage, setHasMessage } = useAsync<
+		ProviderResponse<{
+			variableName: string;
+			normalizePoint: number;
+		}>
+	>();
+
+	// 키 추천 모아서 바꿀 수 있게
+	// ai 추천 키 이름을 선택지로 제공
+
+	const selectKeyName = [] as { id: string; name: string; type: 'normal' | 'ai' }[];
+
+	// 초기화할 때 상태 넣으면 비효율적이지 않나
+	// 그런데 정확히 모든 연산이 끝난 후의 정보가 필요함
+	//
+
+	for (const item of selectKeyId) {
+		const keyName = keyNameStore[item];
+		selectKeyName.push({
+			id: item,
+			name: keyName,
+			type: 'normal',
+		});
+	}
+
+	// ai 루프까지를 기다렸다가 렌더링하는 것도 고려중임
+	// 일단 localizationKey 변경 시점은 너무 이르다
+	console.log('🚀 ~ KeyIds ~ normal count');
+	// localizationKey 이 변경 되면 선택한 키에서 이름 전부 얻고,
+	// 텍스트도 변경 된걸로 판단해서 localizationKey를 가지고 이름 추천을 받음
+	// 텍스트 얻은 걸로 추천 받아서 넣어야함
+	// 선택되면 변경 하고 , 업데이트 콜 다시 날려서 변경된 걸 키 네임 리스트에 넣어야 함
+	// 그리고 그게 selectKeyName 에 적용되어야 함 ( 즉 부분 갱신 )
+
+	// 근데 텍스트 선택 시점을 정확히 판단할 수 없고
+	// 피그마 상에서 자동 선택 중인 상태를 구분 할 수 없음
+	// 내부 로직에서 전체 업데이트가 두번 돎 이유를 모름
+
+	useEffect(() => {
+		if (data) {
+			for (const item of data.data) {
+				// const list = []
+				selectKeyName.push({
+					id: String(item.normalizePoint),
+					name: item.variableName,
+					type: 'ai',
+				});
+			}
+		}
+	}, [data]);
+
+	useEffect(() => {
+		console.log('🚀 ~ KeyIds ~ selectKeyName count', selectKeyName);
+	}, [selectKeyName]);
+
+	// 키 이름 업데이트 > 결국 selectKeyName 를 업데이트 하기 위함
+	// 변경이 됬든 안됬든 이벤트는 발생함 즉 selectKeyName는 무조건 변함
+	useEffect(() => {
+		const nullKeyIds = Array.from(selectKeyId).filter((item) => keyNameStore[item] == null);
 		if (nullKeyIds.length > 0) {
 			updateKeyIds(nullKeyIds);
 		}
-	}, [keyIds]);
+	}, [selectIds]);
+
+	// 어짜피 선택이 변경되면 추천이 갱신되야됨
 
 	return (
 		<div className={styles.keyIds}>
-			{keyName.map(([id, name]) => {
+			<span>{text}</span>
+			<Button
+				onClick={() => {
+					if (apiKey) {
+						executeAsync(textRecommend, apiKey, text, prefix);
+					} else {
+						modalAlert('api key 가 없습니다.');
+					}
+				}}
+			>
+				추천
+			</Button>
+			{loading && <p>Loading...5초</p>}
+			{error && <p>Error: {error.message}</p>}
+			{selectKeyName.map(({ id, name, type }) => {
 				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
 				return (
 					<button
-						className={clc(styles.keyId, selectKey === id && styles.keyMatch)}
+						className={clc(styles.keyId, selectName === name && styles.keyMatch)}
 						onClick={() => {
-							if (selectedKeySignal.value === id) {
-								selectedKeySignal.value = null;
-								searchHandler('');
-							} else {
-								selectedKeySignal.value = id;
-								searchHandler(name);
-							}
+							setSelectName(name);
 						}}
 						// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
 
 						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 							e.preventDefault(); // 기본 우클릭 메뉴 방지
-							if (selectIds.some((item) => list.includes(item))) {
-								const newList = new Set(selectIds.filter((item) => !list.includes(item)));
-								selectIdsSignal.value = Array.from(newList);
-							} else {
-								const newList = new Set([...selectIds, ...list]);
-								selectIdsSignal.value = Array.from(newList);
-							}
 						}}
 					>
-						#{id} : {name}
+						{type === 'ai' ? '표준화 추천 ' : '#'}
+						{id} : {name}
 					</button>
 				);
 			})}
@@ -193,13 +291,19 @@ function LabelPage() {
 	const presetStore = useSignal(presetStoreSignal);
 	const modeState = useSignal(modeStateSignal);
 	const currentPointer = useSignal(currentPointerSignal);
+	/** 로케이션 검색 공유 */
+	const searchStoreLocation = useSignal(searchStoreLocationSignal);
 	const nextBase = useSignal(nextBaseSignal);
 	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer);
 
 	const autoCurrentNodes = useSignal(autoCurrentNodesSignal);
 	console.log('🚀 ~ LabelPage ~ autoCurrentNodes:', autoCurrentNodes);
-	const autoCurrentNodeStyle = useSignal(autoCurrentNodeStyleSignal);
-	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentNodeStyle);
+
+	const autoCurrentBaseNode = useSignal(autoCurrentNodeBaseSignal);
+	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentBaseNode);
+
+	const selectLocation = searchStoreLocation.get(autoCurrentBaseNode);
+	const selectNodeData = autoCurrentNodes.find((item) => item.id === selectLocation?.node_id);
 
 	return (
 		<div className={styles.container}>
@@ -221,7 +325,7 @@ function LabelPage() {
 					<IconHiddenSmall24 />
 				</IconButton>
 			</div>
-			<p>대표 로케이션 아이디: {autoCurrentNodeStyle}</p>
+			<p>대표 로케이션 아이디: {autoCurrentBaseNode}</p>
 			<Bold>섹션</Bold>
 			<div className={styles.row}>
 				<Button
@@ -275,6 +379,13 @@ function LabelPage() {
 
 			<Bold>타겟 키 선택</Bold>
 			<span>선택할 수 있는 전체 키 목록</span>
+			<KeyIds
+				localizationKey={selectNodeData?.localizationKey ?? ''}
+				action={'default'}
+				baseNodeId={autoCurrentBaseNode}
+				text={selectNodeData?.text ?? ''}
+				prefix="test"
+			/>
 
 			<div className={styles.row}>
 				<Bold>선택 적용 옵션</Bold>

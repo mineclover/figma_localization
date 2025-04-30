@@ -762,6 +762,23 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/localization/actions/all': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 전체 키 액션 조회 */
+		get: operations['GetAllKeyActions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/localization/translations': {
 		parameters: {
 			query?: never;
@@ -867,6 +884,100 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	'/figma/location-actions/cleanup/unlinked': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** 연결되지 않은 로컬라이제이션 키 삭제 */
+		delete: operations['DeleteUnlinkedKeys'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/figma/location-actions': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** 단일 위치-키 액션 매핑 생성 */
+		post: operations['CreateLocationKeyAction'];
+		/** 특정 위치-키 액션 매핑 삭제 */
+		delete: operations['DeleteLocationKeyAction'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/figma/location-actions/bulk': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * 여러 위치-키 액션 매핑 일괄 생성
+		 * @description 하나의 위치에 여러 액션 매핑을 일괄 생성 하는게 맞음</br>
+		 *     정확히는 enum 이 여러개 일 수 있음</br>
+		 *     그런데 ... action을 쪼갤 수 있지만</br>
+		 *     그렇게까지 본격적인 목적은 아니고 연결만 식별되면 되는거라</br>
+		 *     암묵적으로 a를 사용함으로 요약할 수 있음</br>
+		 */
+		post: operations['BulkCreateLocationKeyActions'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/figma/location-actions/id/{locationId}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 위치 ID로 모든 키 액션 매핑 조회 */
+		get: operations['GetLocationKeyActions'];
+		put?: never;
+		post?: never;
+		/** 위치 ID로 모든 키 액션 매핑 삭제 */
+		delete: operations['DeleteLocationKeyActions'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/figma/location-actions/list': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** 모든 위치-키 액션 매핑 조회 */
+		get: operations['GetAllLocationKeyActions'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 	'/figma/locations': {
 		parameters: {
 			query?: never;
@@ -894,7 +1005,8 @@ export interface paths {
 		};
 		/** @description 단일 피그마 위치 정보 조회 */
 		get: operations['GetLocation'];
-		put?: never;
+		/** @description 피그마 위치 정보 수정 */
+		put: operations['UpdateLocation'];
 		post?: never;
 		delete: operations['DeleteLocation'];
 		options?: never;
@@ -942,10 +1054,12 @@ export interface paths {
 			path?: never;
 			cookie?: never;
 		};
-		/** @description 여러 피그마 위치 정보를 한 번에 조회 */
+		/** @description 여러 피그마 위치 정보를 한 번에 조회 (GET 방식) */
 		get: operations['GetBulkLocations'];
 		put?: never;
-		post?: never;
+		/** @description 여러 피그마 위치 정보를 한 번에 조회 (POST 방식)
+		 *     POST 방식은 많은 수의 ID를 처리할 때 사용 */
+		post: operations['PostBulkLocations'];
 		delete?: never;
 		options?: never;
 		head?: never;
@@ -1855,6 +1969,34 @@ export interface components {
 			language: string;
 			translation: string;
 			userId?: string;
+		};
+		FigmaLocationKeyActionDTO: {
+			/** Format: double */
+			locationId: number;
+			/** Format: double */
+			keyId: number;
+			action: components['schemas']['ActionType'];
+			fromEnum: string;
+			createdAt: string;
+			updatedAt: string;
+		};
+		CreateFigmaLocationKeyActionDTO: {
+			/** Format: double */
+			locationId: number;
+			/** Format: double */
+			keyId: number;
+			action: components['schemas']['ActionType'];
+			fromEnum: string;
+		};
+		BulkCreateFigmaLocationKeyActionDTO: {
+			/** Format: double */
+			locationId: number;
+			actions: {
+				fromEnum: string;
+				action: components['schemas']['ActionType'];
+				/** Format: double */
+				keyId: number;
+			}[];
 		};
 		FigmaLocation: {
 			/** Format: double */
@@ -3219,6 +3361,32 @@ export interface operations {
 			};
 		};
 	};
+	GetAllKeyActions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						message?: string;
+						/** Format: double */
+						count: number;
+						data: unknown[];
+						success: boolean;
+					};
+				};
+			};
+		};
+	};
 	GetTranslations: {
 		parameters: {
 			query?: never;
@@ -3394,6 +3562,167 @@ export interface operations {
 			};
 		};
 	};
+	DeleteUnlinkedKeys: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						/** Format: double */
+						deletedCount: number;
+					};
+				};
+			};
+		};
+	};
+	CreateLocationKeyAction: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['CreateFigmaLocationKeyActionDTO'];
+			};
+		};
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocationKeyActionDTO'];
+				};
+			};
+		};
+	};
+	DeleteLocationKeyAction: {
+		parameters: {
+			query: {
+				locationId: number;
+				keyId: number;
+				action: string;
+				fromEnum: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	BulkCreateLocationKeyActions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['BulkCreateFigmaLocationKeyActionDTO'];
+			};
+		};
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': {
+						errors: string[];
+						/** Format: double */
+						created: number;
+						success: boolean;
+					};
+				};
+			};
+		};
+	};
+	GetLocationKeyActions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				locationId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocationKeyActionDTO'][];
+				};
+			};
+		};
+	};
+	DeleteLocationKeyActions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				locationId: number;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description No content */
+			204: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+		};
+	};
+	GetAllLocationKeyActions: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocationKeyActionDTO'][];
+				};
+			};
+		};
+	};
 	GetLocations: {
 		parameters: {
 			query?: never;
@@ -3449,6 +3778,38 @@ export interface operations {
 			cookie?: never;
 		};
 		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocation'];
+				};
+			};
+		};
+	};
+	UpdateLocation: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/** @description location_id */
+				id: string;
+			};
+			cookie?: never;
+		};
+		/** @description projectId, pageId, nodeId */
+		requestBody: {
+			content: {
+				'application/json': {
+					nodeId: string;
+					pageId: string;
+					projectId: string;
+				};
+			};
+		};
 		responses: {
 			/** @description Ok */
 			200: {
@@ -3540,6 +3901,32 @@ export interface operations {
 			cookie?: never;
 		};
 		requestBody?: never;
+		responses: {
+			/** @description Ok */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['FigmaLocation'][];
+				};
+			};
+		};
+	};
+	PostBulkLocations: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': {
+					locationIds: string[];
+				};
+			};
+		};
 		responses: {
 			/** @description Ok */
 			200: {

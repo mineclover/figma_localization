@@ -19,9 +19,17 @@ prefix는 변수명의 접두사로 사용될 것임으로 변수명에 포함�
 
 텍스트: {text}
 접두사: {prefix}
-중복 된 변수명: {duplicate}
+이미 사용 중인 변수명: {duplicate}
 `;
 
+/**
+ * 텍스트 추천 api
+ * @param apiKey
+ * @param text
+ * @param prefix
+ * @param duplicate
+ * @returns ProviderResponse<Schema> 임 ProviderResponse에서 data : T[] 가 붙으므로 T만 추론하면 됨
+ */
 export async function textRecommend(apiKey: string, text: string, prefix: string = '', duplicate: string[] = []) {
 	// Create a provider with initial API key
 	const provider = new GoogleProvider({

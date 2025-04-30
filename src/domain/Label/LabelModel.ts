@@ -33,6 +33,13 @@ export const getProjectId = () => {
 	notify('editor 최초 설정 필요', 'error');
 };
 
+export const getPageId = () => {
+	const pageKey = figma.currentPage.id;
+	if (pageKey) {
+		return pageKey;
+	}
+};
+
 export const onGetProjectId = () => {
 	on(GET_PROJECT_ID.REQUEST_KEY, () => {
 		const projectId = getProjectId();

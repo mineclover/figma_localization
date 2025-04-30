@@ -63,6 +63,14 @@ export const getNodeData = (node: BaseNode): NodeData => {
 	};
 };
 
+export const getExtendNodeData = (node: BaseNode) => {
+	const nodeData = getNodeData(node);
+
+	return {
+		...nodeData,
+		id: node.id,
+	};
+};
 /**
  *
  * @param node

@@ -601,7 +601,11 @@ export const putLocalizationKey = async (localizationKey: string, body: PutLocal
 		return;
 	}
 
-	const data = (await result.json()) as LocalizationKeyDTO | string;
+	const data = (await result.json()) as {
+		success: boolean;
+		message: string;
+	};
+	console.log('🚀 ~ putLocalizationKey ~ data:', data);
 
 	return data;
 };

@@ -971,11 +971,6 @@ export const onBaseKeySelect = () => {
 
 export const onBaseUpdate = () => {
 	on(UPDATE_BASE_NODE.REQUEST_KEY, async (baseNodeId: string, { nodeId, pageId, projectId }: BaseNodeProperty) => {
-		console.log('🚀 ~ on ~ baseNodeId: string, { nodeId, pageId, projectId }:', baseNodeId, {
-			nodeId,
-			pageId,
-			projectId,
-		});
 		await searchStore.updateBaseNode(baseNodeId, { nodeId, pageId, projectId });
 		postClientLocation();
 		overlayRender();

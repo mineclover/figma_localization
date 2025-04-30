@@ -33,7 +33,14 @@ import {
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR, RENDER_TRIGGER, SAVE_ACTION, UPDATE_BASE_NODE } from '../constant';
+import {
+	DISABLE_RENDER_PAIR,
+	RENDER_PAIR,
+	RENDER_TRIGGER,
+	SAVE_ACTION,
+	TRANSLATION_ACTION_PAIR,
+	UPDATE_BASE_NODE,
+} from '../constant';
 import { modeStateSignal } from '@/model/signal';
 import SimpleSelect, { nextBaseSignal } from '../Batch/SimpleSelect';
 import { main } from '@/ai/example';
@@ -98,13 +105,13 @@ type SelectKeyNameType = { id: string; name: string; type: 'normal' | 'ai' };
 const KeyIds = ({
 	localizationKey,
 	action,
-	baseNodeId,
+
 	text,
 	prefix,
 }: {
 	localizationKey: string;
 	action: string;
-	baseNodeId: string;
+
 	text: string;
 	prefix: string;
 }) => {
@@ -114,9 +121,14 @@ const KeyIds = ({
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	const selectIds = useSignal(selectIdsSignal);
 	const apiKey = useSignal(apiKeySignal);
+	const nextBase = useSignal(nextBaseSignal);
 
 	const [selectName, setSelectName] = useState<string>('');
 	const [selectKeyName, setSelectKeyName] = useState<SelectKeyNameType[]>([]);
+	const baseNodeId = useSignal(autoCurrentNodeBaseSignal);
+
+	const searchStoreLocation = useSignal(searchStoreLocationSignal);
+	const selectLocation = searchStoreLocation.get(baseNodeId);
 
 	useEffect(() => {
 		const settingName = keyNameStore[localizationKey];
@@ -228,6 +240,7 @@ const KeyIds = ({
 			{error && <p>Error: {error.message}</p>}
 			{selectKeyName.map(({ id, name, type }) => {
 				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
+
 				return (
 					<button
 						className={clc(styles.keyId, selectName === name && styles.keyMatch)}
@@ -238,6 +251,19 @@ const KeyIds = ({
 
 						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 							e.preventDefault(); // 기본 우클릭 메뉴 방지
+							console.log('>>', localizationKey, action, baseNodeId, prefix, name);
+							// 선택한 다음 baseNodeId 선택 안했으면 = '' 올 수 있음
+							const { nodeId: nextNodeId, pageId, projectId } = nextBase;
+							console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId);
+							const nodeId = selectLocation?.node_id;
+							emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+								localizationKey,
+								action,
+								baseNodeId,
+								prefix,
+								name,
+								targetNodeId: nextNodeId ?? nodeId,
+							});
 						}}
 					>
 						{type === 'ai' ? '표준화 추천 ' : '#'}
@@ -310,17 +336,19 @@ function LabelPage() {
 	/** 로케이션 검색 공유 */
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
 	const nextBase = useSignal(nextBaseSignal);
+	const { baseNodeId, nodeId, pageId, projectId } = nextBase;
+
 	console.log('🚀 ~ LabelPage ~ currentPointer:', currentPointer);
 
 	const autoCurrentNodes = useSignal(autoCurrentNodesSignal);
 	console.log('🚀 ~ LabelPage ~ autoCurrentNodes:', autoCurrentNodes);
 
 	const autoCurrentBaseNode = useSignal(autoCurrentNodeBaseSignal);
-	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentBaseNode);
 
 	const selectLocation = searchStoreLocation.get(autoCurrentBaseNode);
 	const selectNodeData = autoCurrentNodes.find((item) => item.id === selectLocation?.node_id);
 
+	console.log('🚀 ~ LabelPage ~ 믹스 판단:', autoCurrentBaseNode);
 	return (
 		<div className={styles.container}>
 			<div className={styles.row}>
@@ -341,7 +369,7 @@ function LabelPage() {
 					<IconHiddenSmall24 />
 				</IconButton>
 			</div>
-			<p>대표 로케이션 아이디: {autoCurrentBaseNode}</p>
+
 			<Bold>섹션</Bold>
 			<div className={styles.row}>
 				<Button
@@ -398,7 +426,6 @@ function LabelPage() {
 			<KeyIds
 				localizationKey={selectNodeData?.localizationKey ?? ''}
 				action={'default'}
-				baseNodeId={autoCurrentBaseNode}
 				text={selectNodeData?.text ?? ''}
 				prefix="test"
 			/>
@@ -410,8 +437,6 @@ function LabelPage() {
 				<Bold>대표 노드 키 선택</Bold>
 				<Button
 					onClick={() => {
-						const { baseNodeId, nodeId, pageId, projectId } = nextBase;
-
 						emit(UPDATE_BASE_NODE.REQUEST_KEY, baseNodeId, { nodeId, pageId, projectId });
 					}}
 				>

@@ -90,13 +90,6 @@ export const onNodeSelectionChange = () => {
 			refreshNode(node);
 		}
 
-		if (recentRender) {
-			recentRender = false;
-
-			console.log('🚀 캔슬');
-			return;
-		}
-
 		if (selectionNodes.length === 1 && isOverlay) {
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 
@@ -140,6 +133,12 @@ export const onNodeSelectionChange = () => {
 
 			/** 확장 선택 시 땅따먹기 처리 */
 		} else if (selectionNodes.length > 1 && isOverlay) {
+			if (recentRender) {
+				recentRender = false;
+
+				console.log('🚀 캔슬');
+				return;
+			}
 			/** 기존에 처리된 대상은 제외 */
 			const frames = selectionNodes.filter((node) => {
 				if (cacheCheck.has(node.id)) {
@@ -201,6 +200,7 @@ export const onNodeSelectionChange = () => {
 
 		const hasKey: MetaData[] = [];
 		const nextSelectionNodes = figma.currentPage.selection;
+
 		for (const node of nextSelectionNodes) {
 			const metaData = getFrameNodeMetaData(node as FrameNode);
 
@@ -212,9 +212,10 @@ export const onNodeSelectionChange = () => {
 		console.log(6, new Date().toISOString());
 		const sectionId = getCurrentSectionSelected(node);
 		console.log('🚀 ~ figma.on ~ hasKey:', hasKey);
+		// 여기서 렌더링 되는 것을 캔슬
+		recentRender = true;
 		await autoSelectNodeEmit(hasKey);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
-		recentRender = true;
 	});
 };
 

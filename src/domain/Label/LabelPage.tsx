@@ -80,6 +80,8 @@ const updateKeyId = async (keyId: string) => {
 	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
 };
 
+type SelectKeyNameType = { id: string; name: string; type: 'normal' | 'ai' };
+
 //  baseNode , key , action 으로 매칭 되야 함
 /**
  * 단일 키 기준으로 변경할 선택지들을 제공하는 컴포넌트
@@ -114,13 +116,12 @@ const KeyIds = ({
 	const apiKey = useSignal(apiKeySignal);
 
 	const [selectName, setSelectName] = useState<string>('');
+	const [selectKeyName, setSelectKeyName] = useState<SelectKeyNameType[]>([]);
 
 	useEffect(() => {
-		// 초기 값 설정 시점을 확정할 수 없기 때문에
 		const settingName = keyNameStore[localizationKey];
-		console.log('🚀 ~ useEffect ~ settingName:', settingName);
 		setSelectName(settingName);
-	}, [localizationKey, keyNameStore]);
+	}, [keyNameStore]);
 
 	// 선택된 객체에서의 키 아이디
 	const tempSelectKeyId = patternMatchData
@@ -138,20 +139,48 @@ const KeyIds = ({
 	// 키 추천 모아서 바꿀 수 있게
 	// ai 추천 키 이름을 선택지로 제공
 
-	const selectKeyName = [] as { id: string; name: string; type: 'normal' | 'ai' }[];
-
 	// 초기화할 때 상태 넣으면 비효율적이지 않나
 	// 그런데 정확히 모든 연산이 끝난 후의 정보가 필요함
-	//
 
-	for (const item of selectKeyId) {
-		const keyName = keyNameStore[item];
-		selectKeyName.push({
-			id: item,
-			name: keyName,
-			type: 'normal',
-		});
-	}
+	// 변경되면 변경 반영
+	useEffect(() => {
+		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'normal');
+		const nextSelectKeyName = [] as SelectKeyNameType[];
+
+		for (const item of selectKeyId) {
+			const keyName = keyNameStore[item];
+
+			nextSelectKeyName.push({
+				id: item,
+				name: keyName,
+				type: 'normal',
+			});
+		}
+		setSelectKeyName([...prevSelectKeyName, ...nextSelectKeyName]);
+	}, [keyNameStore]);
+
+	useEffect(() => {
+		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'ai');
+		const nextSelectKeyName = [] as SelectKeyNameType[];
+
+		if (data && !loading) {
+			for (const item of data.data) {
+				nextSelectKeyName.push({
+					id: String(item.normalizePoint),
+					name: item.variableName,
+					type: 'ai',
+				});
+			}
+		}
+		setSelectKeyName([...prevSelectKeyName, ...nextSelectKeyName]);
+	}, [loading, data]);
+
+	useEffect(() => {
+		// 키 이름 변경 시 추천 키 이름 제거
+		// 문제는
+		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'ai');
+		setSelectKeyName([...prevSelectKeyName]);
+	}, [localizationKey]);
 
 	// ai 루프까지를 기다렸다가 렌더링하는 것도 고려중임
 	// 일단 localizationKey 변경 시점은 너무 이르다
@@ -165,19 +194,6 @@ const KeyIds = ({
 	// 근데 텍스트 선택 시점을 정확히 판단할 수 없고
 	// 피그마 상에서 자동 선택 중인 상태를 구분 할 수 없음
 	// 내부 로직에서 전체 업데이트가 두번 돎 이유를 모름
-
-	useEffect(() => {
-		if (data) {
-			for (const item of data.data) {
-				// const list = []
-				selectKeyName.push({
-					id: String(item.normalizePoint),
-					name: item.variableName,
-					type: 'ai',
-				});
-			}
-		}
-	}, [data]);
 
 	useEffect(() => {
 		console.log('🚀 ~ KeyIds ~ selectKeyName count', selectKeyName);

@@ -261,8 +261,7 @@ const clearBackground = (frame: FrameNode, data: MetaData[]) => {
 			keepTarget: new Map<string, FrameNode>(),
 		}
 	);
-	console.log('🚀 ~ clearBackground ~ idSet:', idSet);
-	console.log('🚀 ~ clearBackground ~ removeTarget:', removeTarget);
+
 	for (const node of removeTarget) {
 		node.remove();
 	}
@@ -445,7 +444,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 	if (domain == null || data == null) {
 		return;
 	}
-	for (const [key, nodes] of Object.entries(data)) {
+	for (const [key, visibleNodes] of Object.entries(data)) {
 		// 키 등록
 		// 누구를 기준으로 할거냐
 		// 키만 등록하고 스타일 등록은 미루는 것도 방법임
@@ -458,7 +457,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 		// 0. 있는데 리스트에는 없을 수 있음
 		// 0. 보이지 않는 상태일 수 없음 (기준 노드는 무조건 보여야 함)
 
-		const visibleNodes = nodes.filter((node) => !isHideNode(node));
+		// const visibleNodes = nodes.filter((node) => !isHideNode(node));
 
 		// 첫번 째 : 그냥 아이디 값
 		const firstBaseNode = visibleNodes.find((node) => node.id);
@@ -514,7 +513,7 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 			{
 				domainId: String(domain.domainId),
 				keyId: key,
-				ids: nodes.map((node) => node.id),
+				ids: visibleNodes.map((node) => node.id),
 			},
 			location
 		);
@@ -532,12 +531,16 @@ const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, c
 	// keepTarget 은 삭제되지 않은 프레임 노드
 	// 메타데이터 기준  없는 데이터
 	const { hasKey, nullKey, keys } = localizationKeySplit(metadata);
+
+	// 	await textOriginRegister(textMapId) 에서 visibleNodes 만 받음
+	const visibleNodes = nullKey.filter((node) => !isHideNode(node));
 	// 메타데이터 기준 로컬라이제이션 키 없는 데이터
-	const textMap = textSorter(nullKey);
+	const textMap = textSorter(visibleNodes);
 	// 메타데이터 기준 로컬라이제이션 키 없는 데이터에 키 부여
 	const textMapId = (await textKeyRegister(textMap)) ?? {};
 	await textOriginRegister(textMapId);
-	if (nullKey.length > 0 && count < 4) {
+	console.log('🚀 ~ autoKeyMapping ~ nullKey:', visibleNodes, nullKey, nullKey.length);
+	if (visibleNodes.length > 0 && count < 4) {
 		return autoKeyMapping(ignoreIds, backgroundFrame, count + 1);
 	}
 

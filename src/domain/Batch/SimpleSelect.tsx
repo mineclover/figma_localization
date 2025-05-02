@@ -1,39 +1,24 @@
-import {
-	Bold,
-	Button,
-	Divider,
-	IconBooleanSmall24,
-	IconButton,
-	IconCloseSmall24,
-	Muted,
-	VerticalSpace,
-} from '@create-figma-plugin/ui';
+import { Bold, Muted } from '@create-figma-plugin/ui';
 import { Fragment, h } from 'preact';
-import { MetaData, searchStore } from '../Search/searchStore';
-import { emit } from '@create-figma-plugin/utilities';
-import { GET_PATTERN_MATCH_KEY, UPDATE_BASE_NODE } from '../constant';
+import { MetaData } from '../Search/searchStore';
+
 import {
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
 	currentPointerSignal,
-	currentSectionSignal,
-	inputKeySignal,
 	patternMatchDataSignal,
 	searchStoreLocationSignal,
 	selectedKeySignal,
 	selectIdsSignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
-import { SearchArea, useSearch } from '../Label/LabelSearch';
-import { useEffect, useState } from 'preact/hooks';
-import { onPatternMatchResponse } from './batchModel';
+
 import { signal } from '@preact/signals-core';
 import styles from './SimpleSelect.module.css';
 import { clc } from '@/components/modal/utils';
 import { TargetedEvent } from 'preact/compat';
-import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
-import { SearchNodeData } from '@/model/types';
-import { clientFetchDBCurry } from '../utils/fetchDB';
+import { pageNodeZoomAction, selectIdsAction, selectIdsToBoxAction } from '@/figmaPluginUtils/utilAction';
+
 import { isHideNode } from '../Search/visualModel';
 import { notify } from '@/figmaPluginUtils';
 
@@ -49,6 +34,7 @@ type Props = {
 	projectId?: string;
 };
 
+/** basenode로 등록할 때 */
 export const nextBaseSignal = signal<{
 	baseNodeId: string;
 	nodeId: string;
@@ -66,8 +52,14 @@ const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageI
 
 	return (
 		<button
-			onClick={() => {
-				pageNodeZoomAction(id, false);
+			onClick={(e) => {
+				// 화면만 움직여서 문제 없었던거임
+				const shiftKey = e.shiftKey;
+				if (shiftKey) {
+					pageNodeZoomAction(id, true);
+				} else {
+					pageNodeZoomAction(id, false);
+				}
 			}}
 			onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
 				e.preventDefault(); // 기본 우클릭 메뉴 방지
@@ -75,12 +67,27 @@ const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageI
 					notify('잘못된 파라미터 입니다.', 'OK');
 					return;
 				}
-				nextBaseSignal.value = {
-					baseNodeId,
-					nodeId: id,
-					pageId,
-					projectId,
-				};
+				const shiftKey = e.shiftKey;
+
+				if (shiftKey) {
+					// 무조건 선택도 추가
+					selectIdsSignal.value = [...selectIdsSignal.value, id];
+
+					nextBaseSignal.value = {
+						baseNodeId,
+						nodeId: id,
+						pageId,
+						projectId,
+					};
+				} else {
+					if (selectIdsSignal.value.includes(id)) {
+						// 선택해제 했으면 선택을 바꾸는 걸 추천,
+						selectIdsSignal.value = selectIdsSignal.value.filter((item) => item !== id);
+					} else {
+						selectIdsSignal.value = [...selectIdsSignal.value, id];
+					}
+					selectIdsToBoxAction(selectIdsSignal.value, true);
+				}
 			}}
 			className={clc(styles.outline, current && styles.current, isNext && styles.next)}
 		>
@@ -115,6 +122,7 @@ function SimpleSelect() {
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
 
 	const selectNodes = patternMatchData.filter((item) => selectItems.includes(item.id));
+	console.log('🚀 ~ SimpleSelect ~ selectNodes:', selectNodes);
 
 	const target = patternMatchData.find((item) => item.baseNodeId === batchId);
 
@@ -156,7 +164,6 @@ function SimpleSelect() {
 		}
 		return acc;
 	}, new Map<string, Set<MetaData>>());
-	console.log('🚀 ~ keyObject ~ keyObject:', keyObject);
 
 	/**
 	 * 키 뽑아서 타겟 키에 제공
@@ -191,6 +198,7 @@ function SimpleSelect() {
 								const keyMatch = selectKey === item.localizationKey;
 								const current = baseId === item.id;
 								const isHide = isHideNode(item);
+
 								// const current = currentId === item.id;
 								const isNext = item.id === nodeId;
 								return (

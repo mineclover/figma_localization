@@ -371,6 +371,10 @@ class SearchStore {
 			this.baseLocationStore.set(String(data.location_id), data);
 		}
 	}
+
+	getTextToFrame(id: string) {
+		return this.textToFrameStore.get(id);
+	}
 }
 
 export const searchStore = new SearchStore();

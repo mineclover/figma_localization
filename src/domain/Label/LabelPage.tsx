@@ -30,6 +30,7 @@ import {
 	selectedKeySignal,
 	selectIdsSignal,
 	searchStoreLocationSignal,
+	KeyIdNameSignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
@@ -51,8 +52,6 @@ import { clientFetchDBCurry } from '../utils/fetchDB';
 import { useAsync } from '@/hooks/useAsync';
 import { modalAlert } from '@/components/alert';
 import { ProviderResponse } from '@/ai/provider';
-
-const KeyIdNameSignal = signal<Record<string, string>>({});
 
 const clientFetch = clientFetchDBCurry();
 
@@ -130,10 +129,11 @@ const KeyIds = ({
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
 	const selectLocation = searchStoreLocation.get(baseNodeId);
 
-	useEffect(() => {
-		const settingName = keyNameStore[localizationKey];
-		setSelectName(settingName);
-	}, [keyNameStore]);
+	// useEffect(() => {
+	// 	const settingName = keyNameStore[localizationKey];
+	// 	console.log('🚀 ~ useEffect ~ settingName:', settingName);
+	// 	setSelectName(settingName);
+	// }, [keyNameStore]);
 
 	// 선택된 객체에서의 키 아이디
 	const tempSelectKeyId = patternMatchData
@@ -156,6 +156,12 @@ const KeyIds = ({
 
 	// 변경되면 변경 반영
 	useEffect(() => {
+		const settingName = keyNameStore[localizationKey];
+		console.log('🚀 ~ useEffect ~ settingName:', settingName);
+		// 선택된 키 이름
+		setSelectName(settingName);
+
+		// 표시 될 키 이름 관리
 		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'normal');
 		const nextSelectKeyName = [] as SelectKeyNameType[];
 
@@ -168,7 +174,7 @@ const KeyIds = ({
 				type: 'normal',
 			});
 		}
-		setSelectKeyName([...prevSelectKeyName, ...nextSelectKeyName]);
+		setSelectKeyName(() => [...prevSelectKeyName, ...nextSelectKeyName]);
 	}, [keyNameStore]);
 
 	useEffect(() => {
@@ -246,16 +252,13 @@ const KeyIds = ({
 						className={clc(styles.keyId, selectName === name && styles.keyMatch)}
 						onClick={() => {
 							setSelectName(name);
-						}}
-						// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
 
-						onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-							e.preventDefault(); // 기본 우클릭 메뉴 방지
 							console.log('>>', localizationKey, action, baseNodeId, prefix, name);
 							// 선택한 다음 baseNodeId 선택 안했으면 = '' 올 수 있음
 							const { nodeId: nextNodeId, pageId, projectId } = nextBase;
-							console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId);
+
 							const nodeId = selectLocation?.node_id;
+							console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId, nodeId);
 							emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
 								localizationKey,
 								action,
@@ -265,6 +268,7 @@ const KeyIds = ({
 								targetNodeId: nextNodeId ?? nodeId,
 							});
 						}}
+						// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
 					>
 						{type === 'ai' ? '표준화 추천 ' : '#'}
 						{id} : {name}

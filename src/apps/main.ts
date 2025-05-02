@@ -50,7 +50,11 @@ import {
 	onRender,
 	onSelectModeMain,
 } from '@/domain/Search/visualModel';
-import { onTranslationActionRequest } from '@/domain/Search/locations';
+import {
+	onTextToFrameSelect,
+	onTranslationActionRequest,
+	onTranslationActionResponse,
+} from '@/domain/Search/locations';
 
 export default function () {
 	// 세팅
@@ -110,6 +114,7 @@ export default function () {
 	onGetApiKey();
 
 	onTranslationActionRequest();
+	onTextToFrameSelect();
 
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;

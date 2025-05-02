@@ -118,3 +118,5 @@ export const modeStateSignal = signal(NULL_STATE);
 export const autoSelectModeSignal = signal<boolean>(false);
 
 export const apiKeySignal = signal<string | null>(null);
+
+export const KeyIdNameSignal = signal<Record<string, string>>({});

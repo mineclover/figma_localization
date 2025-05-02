@@ -82,7 +82,7 @@ function Plugin() {
 		//   value: nav[2],
 		// },
 	] as const;
-	const [value, setValue] = useState<string>(nav[0]);
+	const [value, setValue] = useState<string>(nav[9]);
 
 	return (
 		<AppProvider>

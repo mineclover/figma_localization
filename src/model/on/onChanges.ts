@@ -94,7 +94,6 @@ export const onNodeSelectionChange = () => {
 			// 선택 대상이 한 개 인데 오버레이 프레임임
 
 			if (searchStore.textToFrameStore.size === 0) {
-				console.log('🚀 ~ figma.on ~ searchStore:', searchStore);
 				// 렌더링 안되있을 떄를 위해 준비햇었음
 				await overlayRender();
 			}
@@ -125,6 +124,7 @@ export const onNodeSelectionChange = () => {
 							selectCycleStore.localizationKey = metaData.localizationKey;
 							selectCycleStore.baseNodeId = baseNodeId;
 							figma.currentPage.selection = targetFrames;
+							recentRender = true;
 						}
 					}
 				}
@@ -136,7 +136,6 @@ export const onNodeSelectionChange = () => {
 			if (recentRender) {
 				recentRender = false;
 
-				console.log('🚀 캔슬');
 				return;
 			}
 			/** 기존에 처리된 대상은 제외 */
@@ -213,7 +212,7 @@ export const onNodeSelectionChange = () => {
 		const sectionId = getCurrentSectionSelected(node);
 		console.log('🚀 ~ figma.on ~ hasKey:', hasKey);
 		// 여기서 렌더링 되는 것을 캔슬
-		recentRender = true;
+
 		await autoSelectNodeEmit(hasKey);
 		emit(CURRENT_SECTION_SELECTED.RESPONSE_KEY, sectionId);
 	});

@@ -11,11 +11,13 @@ import toNumber from 'strnum';
 import { styleToXml } from '../Style/styleAction';
 import { XmlFlatNode } from '@/utils/types';
 import { keyActionFetchCurry } from '../Style/actionFetch';
-import { on } from '@create-figma-plugin/utilities';
+import { emit, on } from '@create-figma-plugin/utilities';
 import { ActionType } from '../System/ActionResourceDTO';
 import { getFrameNodeMetaData, searchStore } from './searchStore';
 import { postClientLocation, overlayRender } from './visualModel';
 import { getPageId, getProjectId } from '../Label/LabelModel';
+import { PageSelectIdsToBoxHandler } from '@/figmaPluginUtils/types';
+import { KeyIdNameSignal } from '@/model/signal';
 
 export const setNodeLocation = async (node: SceneNode) => {
 	const domainSetting = getDomainSetting();
@@ -311,6 +313,8 @@ export const onTranslationActionRequest = () => {
 			return;
 		} else {
 			notify(result1?.message ?? '로컬라이제이션 키 등록 성공', 'ok');
+			// kv 업데이트 해줘야 됨
+			updateLocalizationName(localizationKey, putLocalizationData);
 		}
 
 		const baseNode = await figma.getNodeByIdAsync(baseNodeData.id);
@@ -342,4 +346,55 @@ export const onTranslationActionRequest = () => {
 		postClientLocation();
 		// aasdf
 	});
+};
+
+/** 특정 값으로 노드 줌 */
+export const onTextToFrameSelect = () => {
+	on<PageSelectIdsToBoxHandler>('PAGE_SELECT_IDS_TO_BOX', async ({ ids, select }) => {
+		// console.log('🚀 ~ pageSelectIds_Adapter ~ ids:', ids);
+
+		const nodes = ids
+			.map((id) => {
+				const node = searchStore.getTextToFrame(id);
+				return node;
+			})
+			.filter((item) => item != null);
+		// const nodes = figma.currentPage.findAll((node) => ids.includes(node.id));
+
+		if (nodes) {
+			// 노드로 화면 줌
+			if (select) {
+				figma.currentPage.selection = nodes;
+			}
+			figma.viewport.scrollAndZoomIntoView(nodes);
+		}
+	});
+};
+
+export const updateLocalizationName = (localizationKey: string, putLocalizationData: PutLocalizationKeyType) => {
+	emit(TRANSLATION_ACTION_PAIR.RESPONSE_KEY, {
+		localizationKey,
+		...putLocalizationData,
+	} as { localizationKey: string } & PutLocalizationKeyType);
+};
+
+export const onTranslationActionResponse = () => {
+	return on(
+		TRANSLATION_ACTION_PAIR.RESPONSE_KEY,
+		async (data: { localizationKey: string } & PutLocalizationKeyType) => {
+			console.log('🚀 ~ onTranslationActionResponse ~ data:', data);
+			const { localizationKey, name, alias, sectionId, domainId } = data;
+
+			if (name === '' || name == null) {
+				return;
+			}
+
+			const oldValue = KeyIdNameSignal.value;
+			console.log('🚀 ~ on ~ oldValue:', oldValue);
+			KeyIdNameSignal.value = {
+				...oldValue,
+				[localizationKey]: name,
+			};
+		}
+	);
 };

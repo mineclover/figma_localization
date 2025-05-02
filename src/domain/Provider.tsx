@@ -27,6 +27,7 @@ import {
 import { emit } from '@create-figma-plugin/utilities';
 import { RENDER_PAIR } from './constant';
 import { onClientLocation } from './Search/clientLocation';
+import { onTranslationActionResponse } from './Search/locations';
 
 /**
  * duplex 전용 어댑터
@@ -60,6 +61,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onClientLocation(),
 			onAutoSelectModeResponse(),
 			onGetApiKeyResponse(),
+			onTranslationActionResponse(),
 		];
 
 		return () => {

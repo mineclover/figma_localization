@@ -24,3 +24,8 @@ export interface PageSelectIdsHandler extends EventHandler {
 	name: 'PAGE_SELECT_IDS';
 	handler: ({ ids }: { ids: string[] }) => void;
 }
+
+export interface PageSelectIdsToBoxHandler extends EventHandler {
+	name: 'PAGE_SELECT_IDS_TO_BOX';
+	handler: ({ ids, select }: { ids: string[]; select: boolean }) => void;
+}

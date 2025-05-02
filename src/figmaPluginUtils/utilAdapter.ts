@@ -28,6 +28,7 @@ export const nodeZoom_Adapter = () => {
 export const pageNodeZoom_Adapter = () => {
 	on<PageNodeZoomHandler>('PAGE_NODE_ZOOM', async ({ nodeId, select }) => {
 		const node = (await figma.getNodeByIdAsync(nodeId)) as SceneNode;
+		console.log('🚀 ~ on<PageNodeZoomHandler> ~ node:', node);
 		if (node) {
 			// 노드로 화면 줌
 

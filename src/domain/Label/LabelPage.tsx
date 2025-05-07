@@ -55,6 +55,7 @@ import { ProviderResponse } from '@/ai/provider';
 
 const clientFetch = clientFetchDBCurry();
 
+/** KeyIdNameSignal 업데이트 */
 const updateKeyIds = async (keyIds: string[]) => {
 	const oldKeyNames = KeyIdNameSignal.value;
 
@@ -114,6 +115,7 @@ const KeyIds = ({
 	text: string;
 	prefix: string;
 }) => {
+	console.log('🚀 ~ localizationKey:', localizationKey);
 	// 로컬라이제이션 키에 저장 된 이름들
 	//
 	const keyNameStore = useSignal(KeyIdNameSignal);
@@ -128,7 +130,11 @@ const KeyIds = ({
 
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
 	const selectLocation = searchStoreLocation.get(baseNodeId);
-
+	const tempSelectKeyId = patternMatchData
+		.filter((item) => selectIds.includes(item.id))
+		.map((item) => item.localizationKey);
+	// 중복 제거
+	const selectKeyId = new Set(tempSelectKeyId);
 	// useEffect(() => {
 	// 	const settingName = keyNameStore[localizationKey];
 	// 	console.log('🚀 ~ useEffect ~ settingName:', settingName);
@@ -136,11 +142,7 @@ const KeyIds = ({
 	// }, [keyNameStore]);
 
 	// 선택된 객체에서의 키 아이디
-	const tempSelectKeyId = patternMatchData
-		.filter((item) => selectIds.includes(item.id))
-		.map((item) => item.localizationKey);
-	// 중복 제거
-	const selectKeyId = new Set(tempSelectKeyId);
+
 	const { data, loading, error, executeAsync, hasMessage, setHasMessage } = useAsync<
 		ProviderResponse<{
 			variableName: string;
@@ -156,6 +158,8 @@ const KeyIds = ({
 
 	// 변경되면 변경 반영
 	useEffect(() => {
+		///
+
 		const settingName = keyNameStore[localizationKey];
 		console.log('🚀 ~ useEffect ~ settingName:', settingName);
 		// 선택된 키 이름
@@ -175,7 +179,8 @@ const KeyIds = ({
 			});
 		}
 		setSelectKeyName(() => [...prevSelectKeyName, ...nextSelectKeyName]);
-	}, [keyNameStore]);
+		// keyNameStore 만 찍으면 전부 업데이트된 이후로 업데이트가 안됨
+	}, [keyNameStore, localizationKey]);
 
 	useEffect(() => {
 		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'ai');
@@ -193,29 +198,17 @@ const KeyIds = ({
 		setSelectKeyName([...prevSelectKeyName, ...nextSelectKeyName]);
 	}, [loading, data]);
 
-	useEffect(() => {
-		// 키 이름 변경 시 추천 키 이름 제거
-		// 문제는
-		const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'ai');
-		setSelectKeyName([...prevSelectKeyName]);
-	}, [localizationKey]);
+	// useEffect(() => {
+	// 	// 키 이름 변경 시 추천 키 이름 제거
+	// 	// 문제는
+	// 	const prevSelectKeyName = selectKeyName.filter((item) => item.type !== 'ai');
+	// 	setSelectKeyName([...prevSelectKeyName]);
+	// }, [localizationKey]);
 
 	// ai 루프까지를 기다렸다가 렌더링하는 것도 고려중임
 	// 일단 localizationKey 변경 시점은 너무 이르다
 	console.log('🚀 ~ KeyIds ~ normal count');
 	// localizationKey 이 변경 되면 선택한 키에서 이름 전부 얻고,
-	// 텍스트도 변경 된걸로 판단해서 localizationKey를 가지고 이름 추천을 받음
-	// 텍스트 얻은 걸로 추천 받아서 넣어야함
-	// 선택되면 변경 하고 , 업데이트 콜 다시 날려서 변경된 걸 키 네임 리스트에 넣어야 함
-	// 그리고 그게 selectKeyName 에 적용되어야 함 ( 즉 부분 갱신 )
-
-	// 근데 텍스트 선택 시점을 정확히 판단할 수 없고
-	// 피그마 상에서 자동 선택 중인 상태를 구분 할 수 없음
-	// 내부 로직에서 전체 업데이트가 두번 돎 이유를 모름
-
-	useEffect(() => {
-		console.log('🚀 ~ KeyIds ~ selectKeyName count', selectKeyName);
-	}, [selectKeyName]);
 
 	// 키 이름 업데이트 > 결국 selectKeyName 를 업데이트 하기 위함
 	// 변경이 됬든 안됬든 이벤트는 발생함 즉 selectKeyName는 무조건 변함
@@ -244,37 +237,43 @@ const KeyIds = ({
 			</Button>
 			{loading && <p>Loading...5초</p>}
 			{error && <p>Error: {error.message}</p>}
-			{selectKeyName.map(({ id, name, type }) => {
-				const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
+			{selectKeyName
+				.sort((a, b) => {
+					const typeCompare = b.type.localeCompare(a.type);
+					if (typeCompare !== 0) return typeCompare;
+					return a.id.localeCompare(b.id);
+				})
+				.map(({ id, name, type }) => {
+					const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
 
-				return (
-					<button
-						className={clc(styles.keyId, selectName === name && styles.keyMatch)}
-						onClick={() => {
-							setSelectName(name);
+					return (
+						<button
+							className={clc(styles.keyId, selectName === name && styles.keyMatch)}
+							onClick={() => {
+								setSelectName(name);
 
-							console.log('>>', localizationKey, action, baseNodeId, prefix, name);
-							// 선택한 다음 baseNodeId 선택 안했으면 = '' 올 수 있음
-							const { nodeId: nextNodeId, pageId, projectId } = nextBase;
+								console.log('>>', localizationKey, action, baseNodeId, prefix, name);
+								// 선택한 다음 baseNodeId 선택 안했으면 = '' 올 수 있음
+								const { nodeId: nextNodeId, pageId, projectId } = nextBase;
 
-							const nodeId = selectLocation?.node_id;
-							console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId, nodeId);
-							emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
-								localizationKey,
-								action,
-								baseNodeId,
-								prefix,
-								name,
-								targetNodeId: nextNodeId ?? nodeId,
-							});
-						}}
-						// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
-					>
-						{type === 'ai' ? '표준화 추천 ' : '#'}
-						{id} : {name}
-					</button>
-				);
-			})}
+								const nodeId = selectLocation?.node_id;
+								console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId, nodeId);
+								emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+									localizationKey,
+									action,
+									baseNodeId,
+									prefix,
+									name,
+									targetNodeId: nextNodeId ?? nodeId,
+								});
+							}}
+							// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함
+						>
+							{type === 'ai' ? '표준화 추천 ' : '#'}
+							{id} : {name}
+						</button>
+					);
+				})}
 		</div>
 	);
 };
@@ -425,7 +424,6 @@ function LabelPage() {
 			<SimpleSelect />
 			<span>{modeState}</span>
 
-			<Bold>타겟 키 선택</Bold>
 			<span>선택할 수 있는 전체 키 목록</span>
 			<KeyIds
 				localizationKey={selectNodeData?.localizationKey ?? ''}
@@ -434,22 +432,13 @@ function LabelPage() {
 				prefix="test"
 			/>
 
-			<div className={styles.row}>
-				<Bold>선택 적용 옵션</Bold>
-			</div>
-			<div className={styles.row}>
-				<Bold>대표 노드 키 선택</Bold>
-				<Button
+			{/* <Button
 					onClick={() => {
 						emit(UPDATE_BASE_NODE.REQUEST_KEY, baseNodeId, { nodeId, pageId, projectId });
 					}}
 				>
-					베이스 적용
-				</Button>
-			</div>
-			<div className={styles.row}>
-				<Button>저장</Button>
-			</div>
+					베이스만 적용
+				</Button> */}
 		</div>
 	);
 }

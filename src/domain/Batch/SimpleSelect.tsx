@@ -24,6 +24,8 @@ import { isHideNode } from '../Search/visualModel';
 import { notify } from '@/figmaPluginUtils';
 import { HoverAltButton } from '@/components/button/HoverAltButton';
 import { updateKeyIds } from '../Search/searchModel';
+import { TRANSLATION_ACTION_PAIR } from '../constant';
+import { emit } from '@create-figma-plugin/utilities';
 
 type Props = {
 	id: string;
@@ -113,6 +115,7 @@ function SimpleSelect() {
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	/** 로케이션 키: 벨류 */
 	const searchStoreLocation = useSignal(searchStoreLocationSignal);
+	console.log('🚀 ~ searchStoreLocation:', searchStoreLocation);
 	const nextBase = useSignal(nextBaseSignal);
 
 	const { baseNodeId, nodeId, pageId, projectId } = nextBase;
@@ -131,20 +134,34 @@ function SimpleSelect() {
 
 	const target = patternMatchData.find((item) => item.baseNodeId === batchId);
 
-	/** 로컬라이제이션 키 기준으로
+	console.log('🚀 ~ patternMatchData.reduce ~ item:', patternMatchData);
+	/**
+	 * 검색된 노드 아이디들의 데이터 정보에서 베이스 아이디들을 찾아서
+	 *
+	 * 로컬라이제이션 키 기준으로
 	 * 전체 선택 흭득
 	 * */
 	const baseNodes = patternMatchData.reduce((acc, item) => {
-		const baseX = searchStoreLocation.get(item.baseNodeId ?? '');
-
-		if (baseX && item.id === String(baseX.node_id)) {
+		// 인식된 노드 중에서 베이스 아이디가 있는지 확인
+		const baseId = item.baseNodeId;
+		const baseX = searchStoreLocation.get(baseId ?? '');
+		// 있으면 그 아이디랑 현재 노드 아이디를 비교
+		if (baseId && baseX && item.id === String(baseX.node_id)) {
 			if (acc.has(item.localizationKey)) {
-				console.log('🚀 ~ patternMatchData.reduce ~ item: 있을 수 없는 데이터', item);
+				// 베이스 아이디 1개에 여러 키가 있는 건 논리 상으로 불가능한데...
+				// 구조상 가능한가?
+				// 로컬라이제이션 키 하나에 여러 위치는 가능하다
+				// action이 쪼개지기 때문에
 			}
-			acc.set(item.localizationKey, item);
+			// 어떤 방식으로든 action과 연결된 baseId만 우효함
+			acc.set(item.localizationKey, { [baseId]: item });
 		}
 		return acc;
-	}, new Map<string, MetaData>());
+	}, new Map<string, Record<string, MetaData>>());
+	console.log(
+		'🚀 ~ baseNodes ~ baseNodes: 베이스 아이디 처리 방식이 잘못됨.... 지금 기준 노드, 매핑된 데이터의 로케이션 키를 쓰는지 가 분명하지 않음',
+		baseNodes
+	);
 	// baseId에서 값 얻어서 baseNodes 에 들어갈 item을 선별함
 
 	/** 전체 로컬라이제이션 키 종류 */
@@ -181,37 +198,60 @@ function SimpleSelect() {
 	 * 키 뽑아서 타겟 키에 제공
 	 *  */
 	const targetBase = target?.baseNodeId;
+
+	const { nodeId: nextNodeId, pageId: nextPageId, projectId: nextProjectId, baseNodeId: nextBaseNode } = nextBase;
+
 	// const targetKey = target?.localizationKey;
 
 	return (
 		<div className={styles.root}>
 			{Array.from(allKeys).map((key) => {
 				// 선택 기준 노드 데이터
-				const baseNodeMetaData = baseNodes.get(key);
+				// 여기서 키는 로컬라이제이션 키
 
-				// 선택 기준의 베이스 아이디 흭득
-				// 근데 그걸 검색 된 데이터에서 얻는다
-				const baseX = searchStoreLocation.get(baseNodeMetaData?.baseNodeId ?? '');
-				const baseId = baseX?.node_id;
 				// 타겟 키 조건 확인
 				// const batchSum = targetKey === key;
 				// const batchText = batchSum ? '' : ` => ${targetKey}`;
+				const ids = patternMatchData.filter((item) => item.localizationKey === key).map((item) => item.id);
 
 				const baseNodeName = keyNameStore[key] ?? '';
 
-				const baseNodeText = baseNodeMetaData?.text ?? '';
-				console.log('🚀 ~ {Array.from ~ baseNodeMetaData:', baseNodeMetaData);
+				// const baseNodeText = baseNodeMetaData?.text ?? '';
 
 				return (
-					<article key={key} className={styles.article}>
+					<article key={key} className={styles.article} onClick={() => {}}>
 						<div className={styles.row}>
 							<div className={styles.column}>
 								<Muted>
 									{/* #{key + batchText} : {baseNodeName} */}#{key} : {baseNodeName}
 								</Muted>
-								<Bold>{baseNodeText}</Bold>
+								{/* <Bold>{baseNodeText}</Bold> */}
 							</div>
-							<HoverAltButton alt={`선택 대상을 #${key}로 병합`}>
+							<HoverAltButton
+								alt={`선택 대상을 #${key}로 병합`}
+								onClick={(e) => {
+									// 전파 방지
+									e.stopPropagation();
+									console.log(`선택 대상을 #${key}로 병합`, {
+										localizationKey: key,
+										action: 'default',
+										baseNodeId: nextBaseNode,
+										prefix: 'sectionName',
+										name: baseNodeName,
+										targetNodeId: nodeId,
+										beforeIds: ids,
+									});
+									// emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+									// 	localizationKey: key,
+									// 	action: 'default',
+									// 	baseNodeId,
+									// 	prefix: 'sectionName',
+									// 	name: baseNodeName,
+									// 	targetNodeId: isNextBase ? baseId : nodeId,
+									// 	beforeIds: ids,
+									// });
+								}}
+							>
 								<IconCollapse24 />
 							</HoverAltButton>
 						</div>
@@ -221,7 +261,8 @@ function SimpleSelect() {
 								const selected = selectItems.includes(item.id);
 
 								const keyMatch = selectKey === item.localizationKey;
-								const current = baseId === item.id;
+								// baseId에 대한 처리가 미흡해서 전부 삭제 중
+								const current = false;
 								const isHide = isHideNode(item);
 
 								// const current = currentId === item.id;

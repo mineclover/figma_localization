@@ -124,6 +124,7 @@ export type TranslationInputType = {
 	// ids: string[]; // or nodeId 베이스 선택용
 	sectionId: number;
 	targetNodeId: string;
+	beforeIds: string[];
 };
 
 /**
@@ -236,7 +237,7 @@ export const addTranslationV2 = async (node: TextNode, localizationKey: string, 
 
 export const onTranslationActionRequest = () => {
 	on(TRANSLATION_ACTION_PAIR.REQUEST_KEY, async (data: TranslationInputType) => {
-		const { localizationKey, baseNodeId, action, prefix, name, targetNodeId, sectionId } = data;
+		const { localizationKey, baseNodeId, action, prefix, name, targetNodeId, sectionId, beforeIds } = data;
 		console.log(`🚀 ~ on ~  { localizationKey, baseNodeId, action, prefix, name, nodeId, sectionId }:`, {
 			localizationKey,
 			baseNodeId,
@@ -260,8 +261,8 @@ export const onTranslationActionRequest = () => {
 
 		const { node_id: location_node_id } = location;
 
-		const idsNode = figma.currentPage.selection;
-		const idsNodeData = idsNode.map((item) => getFrameNodeMetaData(item as FrameNode));
+		const nextIdsNode = figma.currentPage.selection;
+		const idsNodeData = nextIdsNode.map((item) => getFrameNodeMetaData(item as FrameNode));
 
 		const baseNodeData = idsNodeData.find((item) => item?.id === location_node_id);
 
@@ -342,9 +343,15 @@ export const onTranslationActionRequest = () => {
 			console.log('🚀 ~ on ~ data:', data);
 		}
 
-		postClientLocation();
 		// aasdf
 	});
+};
+
+export const onGetBaseNode = () => {
+	// baseStore도 초기화 됨
+	searchStore.refresh();
+
+	postClientLocation();
 };
 
 /** 특정 값으로 노드 줌 */

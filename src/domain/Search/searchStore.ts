@@ -322,6 +322,8 @@ class SearchStore {
 		// 추가
 		baseSet.add(after);
 
+		// this.setBaseNode(after, before);
+
 		// 이동
 		this.baseNodeStore.set(after, baseSet);
 		console.log('🚀 ~ SearchStore ~ baseChange ~ baseSet:', baseSet);
@@ -381,6 +383,7 @@ class SearchStore {
 	}
 
 	async updateBaseNode(baseNodeId: string, { nodeId, pageId, projectId }: BaseNodeProperty) {
+		console.log('🚀 ~ SearchStore ~ updateBaseNode ~ updateBaseNode:', baseNodeId, nodeId, pageId, projectId);
 		const response = await fetchDB(('/figma/locations/' + baseNodeId) as '/figma/locations/{id}', {
 			method: 'PUT',
 			body: JSON.stringify({ nodeId, pageId, projectId }),

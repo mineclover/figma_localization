@@ -183,6 +183,7 @@ const KeyIds = ({
 
 	return (
 		<div className={styles.keyIds}>
+			<span>{baseNodeId}</span>
 			<span>{text}</span>
 			<Button
 				onClick={() => {
@@ -204,7 +205,7 @@ const KeyIds = ({
 					return a.id.localeCompare(b.id);
 				})
 				.map(({ id, name, type }) => {
-					const list = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
+					const ids = patternMatchData.filter((item) => item.localizationKey === id).map((item) => item.id);
 
 					return (
 						<button
@@ -214,8 +215,9 @@ const KeyIds = ({
 
 								console.log('>>', localizationKey, action, baseNodeId, prefix, name);
 								// 선택한 다음 baseNodeId 선택 안했으면 = '' 올 수 있음
-								const { nodeId: nextNodeId, pageId, projectId } = nextBase;
+								const { nodeId: nextNodeId, pageId, projectId, baseNodeId: nextBaseNode } = nextBase;
 
+								const isNextBase = nextBaseNode === baseNodeId;
 								const nodeId = selectLocation?.node_id;
 								console.log('🚀 ~ {selectKeyName.map ~ nodeId:', nextNodeId, nodeId);
 								emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
@@ -224,7 +226,8 @@ const KeyIds = ({
 									baseNodeId,
 									prefix,
 									name,
-									targetNodeId: nextNodeId ?? nodeId,
+									targetNodeId: isNextBase ? nextNodeId : nodeId,
+									beforeIds: ids,
 								});
 							}}
 							// 원래 기능은 다중 선택 기능이였으나 이름 추천 후 선택 변경 , 및 저장으로 대체하려 함

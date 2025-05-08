@@ -11,6 +11,10 @@
 textOriginRegister > idsBaseAll 에서 시작 됨
 searchStore에서 관리됨
 
+### getBaseLocation 를 통해 새로고침 됨
+
+getBaseLocation
+
 # baseNode 표시는 baseNodeHighlight
 
 # 박스 오버레이 lzTextOverlay
@@ -102,3 +106,21 @@ FIGMA_LOCATION_KEY_ACTIONS 에서 연결되지 않은 것은 완결되지 않은
 # 최소 메인에서 실행되는 Fetch 코드들은 emit 으로 실패에 대한 메시지를 보내야 함
 
 ㅇㅇ.. 특히 서버 문제 있는데 뭐가 문제인지 안보이는 건 문제임
+
+# 로컬라이제이션 키와 로케이션 간의 관계 정의
+
+그 아래 내용인데..
+key, action, enum 의 조합에서 enum은 텍스트에서 처리하고 action은 그 위에서 처리 함
+
+하나의 키에 여러 로케이션이 붙을 수 있음 키는 key, action, enum 으로 분기되서 관리하기 때문임
+
+위치 > 키 는 n : 1 가능
+키 > 위치 1 : n 임 ㅇㅇ..
+근데 키에서 1개의 위치를 얻는다? 더 있을 수 있다
+
+고로 틀림
+
+## 로케이션은 엑션 매핑이 되야 완전함
+
+액션 매핑이 안된 로케이션은 더미임
+기준에 대한 값이 모호함 그저 현재의 baseId는 로케이션이 아니라 기준 노드 아이디임 로케이션이 있는거랑 햇갈리면 안됨

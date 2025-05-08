@@ -193,7 +193,6 @@ export const addTranslationV2 = async (node: TextNode, localizationKey: string, 
 		if (translations.status === 200) {
 			const data = (await translations.json()) as LocalizationTranslationDTO;
 			console.log('🚀 ~ addTranslationV2 ~ data:', data);
-			node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
 		} else {
 			// response에서 값 읽어서 안전하게 뽑는 것을 고려할만 함
 			const data = await translations.json();

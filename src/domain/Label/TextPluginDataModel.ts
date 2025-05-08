@@ -14,7 +14,7 @@ import toNumber from 'strnum';
 
 import { notify } from '@/figmaPluginUtils';
 import { sectionNameParser } from './LabelModel';
-import { getCursorPosition, getNodeData } from '../getState';
+import { getCursorPosition, getNodeData, nodeMetaData } from '../getState';
 import { fetchDB } from '../utils/fetchDB';
 import { getDomainSetting } from '../Setting/SettingModel';
 import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
@@ -31,6 +31,7 @@ import {
 } from '@/model/types';
 import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
 import { parseXmlToFlatStructure } from '@/utils/xml2';
+import { overlayRender } from '../Search/visualModel';
 
 export const locationMapping = (location: LocationDTO): Location => {
 	console.log('🚀 ~ locationMapping ~ location:', location);
@@ -97,7 +98,7 @@ export const onSetNodeResetKey = () => {
 
 		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '');
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '');
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, '');
+
 		node.setPluginData(NODE_STORE_KEY.LOCATION, '');
 		node.setPluginData(NODE_STORE_KEY.ACTION, '');
 		node.setPluginData(NODE_STORE_KEY.MODIFIER, '');
@@ -373,7 +374,6 @@ export const addTranslation = async (node: TextNode) => {
 		}
 		if (translations.status === 200) {
 			const data = (await translations.json()) as LocalizationTranslationDTO;
-			node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, data.localization_id.toString());
 
 			return data;
 		} else {
@@ -455,6 +455,10 @@ export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString());
 	}
 
+	if (data.action != null) {
+		node.setPluginData(NODE_STORE_KEY.ACTION, data.action.toString());
+	}
+
 	if (data.localizationKey != null) {
 		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString());
 	}
@@ -466,6 +470,27 @@ export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 	if (data.baseNodeId != null) {
 		node.setPluginData(NODE_STORE_KEY.LOCATION, data.baseNodeId.toString());
 	}
+};
+
+/**
+ * 노드 데이터 초기화 및 무시 설정
+ * @param nodes - 초기화할 노드 배열
+ */
+export const resetAndIgnore = (nodes: TextNode[]) => {
+	console.log('🚀 ~ resetAndIgnore ~ nodes:', nodes);
+	for (const node of nodes) {
+		setNodeData(node, {
+			ignore: true,
+			action: 'default',
+			localizationKey: '',
+			domainId: '',
+			baseNodeId: '',
+		});
+	}
+	const data = nodeMetaData(nodes[0]);
+	console.log('🚀 ~ resetAndIgnore ~ data:', data);
+
+	overlayRender();
 };
 
 /**
@@ -635,7 +660,6 @@ export const onUpdateNodeStoreBatchKey = () => {
 		if (!translation) {
 			return;
 		}
-		node.setPluginData(NODE_STORE_KEY.ORIGINAL_LOCALIZE_ID, translation.localization_id.toString());
 		await allRefresh(node);
 		figma.commitUndo();
 

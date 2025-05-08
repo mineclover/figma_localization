@@ -38,6 +38,8 @@ import { generateRandomText2 } from '@/utils/textTools';
 import { baseIsAllNode, idsBaseAll } from '../Batch/batchModel';
 import { newGetStyleData } from '@/model/on/GET_STYLE_DATA';
 import { idSetLocation, setNodeLocation } from './locations';
+import { isOverlayFrame } from '@/model/on/onChanges';
+import { resetAndIgnore, setNodeData } from '../Label/TextPluginDataModel';
 
 // 데이터 전송은 비활성화 시 발생
 // 인터렉션은 활성화 중에 발생
@@ -522,9 +524,12 @@ export const textOriginRegister = async (data: Awaited<ReturnType<typeof textKey
 
 /** 반복해서 매핑하면서 nullKey를 완전히 제거 */
 const autoKeyMapping = async (ignoreIds: string[], backgroundFrame: FrameNode, count: number = 0) => {
-	const { metadata, searchNodes } = await searchStore.search(ignoreIds);
+	const { metadata: tempMetadata, searchNodes } = await searchStore.search(ignoreIds);
 
 	// 전체 스토어 초기화하지 않음 > getBackgroundFrame 에서 없애고 시작하기 때문
+
+	// 단순 조회는 ignore를 처리하지 않아서 구분 해야 함
+	const metadata = tempMetadata.filter((item) => !item.ignore);
 
 	// 쓰려했는데... 생각해보면 텍스트노드와 프레임 노드의 발생 시점이 다름
 	const keepTarget = clearBackground(backgroundFrame, metadata);
@@ -563,9 +568,14 @@ const baseNodeHighlight = (node: FrameNode) => {
 	const redSolid = figma.util.solidPaint({ r: 1, g: 0, b: 0 });
 
 	if (node) {
-		node.dashPattern = [0];
-		node.strokeWeight = 4;
-		node.strokes = [redSolid];
+		console.log('🚀 ~ baseNodeHighlight ~ node:', node);
+		try {
+			node.dashPattern = [0];
+			node.strokeWeight = 4;
+			node.strokes = [redSolid];
+		} catch (error) {
+			console.log('🚀 ~ baseNodeHighlight ~ error:', error);
+		}
 	}
 };
 /** 회전을 위한 랜덤 회전 */
@@ -609,6 +619,8 @@ export const onAutoSelectModeResponse = () => {
  * 새로고침을 겸함
  */
 export const overlayRender = async () => {
+	// 상태 값 업데이트에 대한 반영이 되려면 새로고침이 되야 함
+
 	const ignoreIds = ignoreSectionAll().map((node) => node.id);
 	const backgroundSize = getBackgroundSize(ignoreIds);
 
@@ -852,6 +864,24 @@ const setSectionAction = async (acceptAction: keyof typeof SAVE_ACTION, option: 
 	newPreset(name, baseNodeId, serverSectionId);
 };
 
+const setOverlayAction = async (acceptAction: keyof typeof SAVE_ACTION, option: PresetMetaData) => {
+	const { localizationKey, action, name, baseNodeId, serverSectionId } = option;
+	// 필터링 되서 들어온 것으로 취급함
+	const selectedNodes = figma.currentPage.selection.filter((node) => node.type === 'FRAME');
+
+	if (acceptAction === SAVE_ACTION.SUBTRACT) {
+		// 키 제거
+
+		const metadata = selectedNodes
+			.map((node) => getFrameNodeMetaData(node as FrameNode))
+			.filter((item) => item != null);
+
+		const textNodes = searchStore.getTextNodes(metadata);
+
+		resetAndIgnore(textNodes);
+	}
+};
+
 /**
  * 프리셋 저장
  * baseNodeId 는 최초에 설정 값이 없거나
@@ -911,14 +941,19 @@ export const onSelectModeMain = () => {
 		console.log('🚀 ~ on ~ acceptAction:', acceptAction);
 		const mode = figma.currentPage.getPluginData(STORE_KEY.SELECT_MODE);
 		const onlySection = figma.currentPage.selection.every((node) => node.type === 'SECTION');
+		const onlyOverlayFrame = figma.currentPage.selection.every((node) => node.type === 'FRAME' && isOverlayFrame(node));
 		console.log('🚀 ~ on ~ mode:', mode);
 		if (mode === NULL_STATE) {
 			// 만약 선택 대상이 섹션만 있는 상태라면 특정 행동을 원한 것을 유추할 수 있다
 			if (onlySection) {
 				setSectionAction(acceptAction, option);
 			}
+			if (onlyOverlayFrame) {
+				setOverlayAction(acceptAction, option);
+			}
 			return;
 		}
+
 		// 저장을 눌렀을 때 이미 선택된 노드가 있었으면
 		if (mode === RENDER_MODE_STATE.SECTION_SELECT) {
 			setSectionAction(acceptAction, option);

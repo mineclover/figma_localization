@@ -1,9 +1,10 @@
 import { BaseNodeProperty, CurrentCursorType, LocationDTO, NodeData, SearchNodeData } from '@/model/types';
-import { BACKGROUND_STORE_KEY, NODE_STORE_KEY } from '../constant';
+import { BACKGROUND_STORE_KEY, GET_PATTERN_MATCH_KEY, NODE_STORE_KEY } from '../constant';
 import { safeJsonParse } from '../utils/getStore';
 import { getCursorPosition, nodeMetaData } from '../getState';
 import { fetchDB } from '../utils/fetchDB';
 import { postClientLocation } from './visualModel';
+import { emit } from '@create-figma-plugin/utilities';
 
 /**
  * absoluteRenderBounds : 자식과 효과를 포함해서 렌더링되는 전체 크기
@@ -144,7 +145,8 @@ class SearchStore {
 	}
 
 	/**
-	 * 일단 모든 최신 데이터를 조회
+	 * 일단 모든 최신 데이터를 조회함
+	 * 새로고침 후 조회함
 	 * @param ignoreSectionIds
 	 * @returns
 	 */
@@ -201,14 +203,17 @@ class SearchStore {
 				}
 				continue;
 			}
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, metadata);
 			return { metadata, searchNodes };
 		} else {
+			emit(GET_PATTERN_MATCH_KEY.RESPONSE_KEY, metadata);
 			return { metadata, searchNodes };
 		}
 	}
 
 	async get(key: string) {
 		const node = this.store.get(key);
+		console.log('🚀 ~ SearchStore ~ get ~ node:', node);
 		if (node && this.nodeValid(node)) {
 			return node;
 		} else {
@@ -222,6 +227,19 @@ class SearchStore {
 
 	isFigma() {
 		return typeof figma !== 'undefined';
+	}
+
+	getTextNodes(metadata: MetaData[]) {
+		if (this.isFigma()) {
+			const nodes = figma.currentPage.findAllWithCriteria({
+				types: ['TEXT'],
+			});
+			const ids = metadata.map((item) => item.id);
+			const targetNodes = nodes.filter((node) => ids.includes(node.id));
+
+			return targetNodes;
+		}
+		return [];
 	}
 
 	async update(key: string) {

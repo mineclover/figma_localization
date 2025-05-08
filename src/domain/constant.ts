@@ -19,12 +19,11 @@ export const NODE_STORE_KEY = {
 	/** baseNodeId 로 써도 될듯? 이라고.... */
 	LOCATION: 'NODE_LOCATION', //baseNodeId
 	LOCALIZATION_KEY: 'NODE_LOCALIZATION_KEY',
-	ORIGINAL_LOCALIZE_ID: 'NODE_ORIGINAL_LOCALIZE_ID',
-	/** 섹션 용 */
-	SECTION: 'NODE_SECTION',
-	IGNORE: 'NODE_IGNORE',
 	DOMAIN_ID: 'NODE_DOMAIN_ID',
 	ACTION: 'NODE_ACTION',
+	IGNORE: 'NODE_IGNORE',
+	/** 섹션 용 */
+	SECTION: 'NODE_SECTION',
 	// 스타일 변경 시 초기화 해야함? 그럴거면 안두는게 맞을지도? 하지만 최소한의 연산을 위해 필요하긴 함
 	// 손 댔으면 변한 것이다 라는 것을 전재로 두면 쓸만함 근데 불가능함
 	// 이유는 스타일 데이터는 몇개든 될 수 있음
@@ -121,11 +120,6 @@ export const SET_NODE_LOCATION = {
 export const SET_NODE_LOCALIZATION_KEY = {
 	REQUEST_KEY: 'SET_NODE_LOCALIZATION_KEY_REQUEST',
 	RESPONSE_KEY: 'SET_NODE_LOCALIZATION_KEY_RESPONSE',
-};
-
-export const SET_NODE_ORIGINAL_LOCALIZE_ID = {
-	REQUEST_KEY: 'SET_NODE_ORIGINAL_LOCALIZE_ID_REQUEST',
-	RESPONSE_KEY: 'SET_NODE_ORIGINAL_LOCALIZE_ID_RESPONSE',
 };
 
 export const RELOAD_NODE = {

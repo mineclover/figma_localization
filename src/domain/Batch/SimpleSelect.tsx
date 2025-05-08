@@ -1,4 +1,4 @@
-import { Bold, Muted } from '@create-figma-plugin/ui';
+import { Bold, IconButton, IconCollapse24, Muted } from '@create-figma-plugin/ui';
 import { Fragment, h } from 'preact';
 import { MetaData } from '../Search/searchStore';
 
@@ -6,6 +6,7 @@ import {
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
 	currentPointerSignal,
+	KeyIdNameSignal,
 	patternMatchDataSignal,
 	searchStoreLocationSignal,
 	selectedKeySignal,
@@ -16,11 +17,13 @@ import { useSignal } from '@/hooks/useSignal';
 import { signal } from '@preact/signals-core';
 import styles from './SimpleSelect.module.css';
 import { clc } from '@/components/modal/utils';
-import { TargetedEvent } from 'preact/compat';
+import { TargetedEvent, useEffect } from 'preact/compat';
 import { pageNodeZoomAction, selectIdsAction, selectIdsToBoxAction } from '@/figmaPluginUtils/utilAction';
 
 import { isHideNode } from '../Search/visualModel';
 import { notify } from '@/figmaPluginUtils';
+import { HoverAltButton } from '@/components/button/HoverAltButton';
+import { updateKeyIds } from '../Search/searchModel';
 
 type Props = {
 	id: string;
@@ -56,7 +59,16 @@ const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageI
 				// 화면만 움직여서 문제 없었던거임
 				const shiftKey = e.shiftKey;
 				if (shiftKey) {
-					pageNodeZoomAction(id, true);
+					// 범용성 있게 표준화
+					if (selectIdsSignal.value.includes(id)) {
+						// 선택해제 했으면 선택을 바꾸는 걸 추천,
+						selectIdsSignal.value = selectIdsSignal.value.filter((item) => item !== id);
+					} else {
+						selectIdsSignal.value = [...selectIdsSignal.value, id];
+					}
+					selectIdsToBoxAction(selectIdsSignal.value, true);
+					// 선택 중에 선택해제 되는게 불편해서 뺌
+					// pageNodeZoomAction(id, true);
 				} else {
 					pageNodeZoomAction(id, false);
 				}
@@ -79,14 +91,6 @@ const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageI
 						pageId,
 						projectId,
 					};
-				} else {
-					if (selectIdsSignal.value.includes(id)) {
-						// 선택해제 했으면 선택을 바꾸는 걸 추천,
-						selectIdsSignal.value = selectIdsSignal.value.filter((item) => item !== id);
-					} else {
-						selectIdsSignal.value = [...selectIdsSignal.value, id];
-					}
-					selectIdsToBoxAction(selectIdsSignal.value, true);
 				}
 			}}
 			className={clc(styles.outline, current && styles.current, isNext && styles.next)}
@@ -117,6 +121,7 @@ function SimpleSelect() {
 
 	const details = useSignal(autoCurrentNodesSignal);
 	const currentNode = useSignal(currentPointerSignal);
+	const keyNameStore = useSignal(KeyIdNameSignal);
 
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
@@ -143,18 +148,25 @@ function SimpleSelect() {
 	// baseId에서 값 얻어서 baseNodes 에 들어갈 item을 선별함
 
 	/** 전체 로컬라이제이션 키 종류 */
-	const selectKeys = new Set(selectNodes.map((item) => item.localizationKey));
-	console.log('🚀 ~ SimpleSelect ~ selectKeys:', selectKeys);
+	const allKeys = new Set(patternMatchData.map((item) => item.localizationKey));
+	allKeys.delete('');
+
+	useEffect(() => {
+		const nullKeyIds = Array.from(allKeys).filter((item) => keyNameStore[item] == null);
+		if (nullKeyIds.length > 0) {
+			updateKeyIds(nullKeyIds);
+		}
+	}, [allKeys]);
 
 	/** 키 종류로 분리 */
-	const keyLayer = selectNodes.reduce((acc, item) => {
-		if (acc.has(item.localizationKey)) {
-			acc.get(item.localizationKey)?.add(item.id);
-		} else {
-			acc.set(item.localizationKey, new Set([item.id]));
-		}
-		return acc;
-	}, new Map<string, Set<string>>());
+	// const keyLayer = selectNodes.reduce((acc, item) => {
+	// 	if (acc.has(item.localizationKey)) {
+	// 		acc.get(item.localizationKey)?.add(item.id);
+	// 	} else {
+	// 		acc.set(item.localizationKey, new Set([item.id]));
+	// 	}
+	// 	return acc;
+	// }, new Map<string, Set<string>>());
 
 	const keyObject = patternMatchData.reduce((acc, item) => {
 		if (acc.has(item.localizationKey)) {
@@ -169,11 +181,11 @@ function SimpleSelect() {
 	 * 키 뽑아서 타겟 키에 제공
 	 *  */
 	const targetBase = target?.baseNodeId;
-	const targetKey = target?.localizationKey;
+	// const targetKey = target?.localizationKey;
 
 	return (
 		<div className={styles.root}>
-			{Array.from(selectKeys).map((key) => {
+			{Array.from(allKeys).map((key) => {
 				// 선택 기준 노드 데이터
 				const baseNodeMetaData = baseNodes.get(key);
 
@@ -182,15 +194,28 @@ function SimpleSelect() {
 				const baseX = searchStoreLocation.get(baseNodeMetaData?.baseNodeId ?? '');
 				const baseId = baseX?.node_id;
 				// 타겟 키 조건 확인
-				const batchSum = targetKey === key;
-				const batchText = batchSum ? '' : ` => ${targetKey}`;
+				// const batchSum = targetKey === key;
+				// const batchText = batchSum ? '' : ` => ${targetKey}`;
+
+				const baseNodeName = keyNameStore[key] ?? '';
 
 				const baseNodeText = baseNodeMetaData?.text ?? '';
+				console.log('🚀 ~ {Array.from ~ baseNodeMetaData:', baseNodeMetaData);
 
 				return (
-					<Fragment key={key}>
-						<Muted>#{key + batchText} </Muted>
-						<Bold>{baseNodeText}</Bold>
+					<article key={key} className={styles.article}>
+						<div className={styles.row}>
+							<div className={styles.column}>
+								<Muted>
+									{/* #{key + batchText} : {baseNodeName} */}#{key} : {baseNodeName}
+								</Muted>
+								<Bold>{baseNodeText}</Bold>
+							</div>
+							<HoverAltButton alt={`선택 대상을 #${key}로 병합`}>
+								<IconCollapse24 />
+							</HoverAltButton>
+						</div>
+
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item, _, arr) => {
 								const selected = selectItems.includes(item.id);
@@ -219,7 +244,7 @@ function SimpleSelect() {
 
 						{/* 키 리스트 */}
 						{/* <KeyIds keyIds={keyIds} selectKey={selectKey} searchHandler={searchHandler} /> */}
-					</Fragment>
+					</article>
 				);
 			})}
 		</div>

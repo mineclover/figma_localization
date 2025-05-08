@@ -147,6 +147,7 @@ class SearchStore {
 	/**
 	 * 일단 모든 최신 데이터를 조회함
 	 * 새로고침 후 조회함
+	 * TODO: 과하게 갱신되는걸로도 보임
 	 * @param ignoreSectionIds
 	 * @returns
 	 */
@@ -213,7 +214,7 @@ class SearchStore {
 
 	async get(key: string) {
 		const node = this.store.get(key);
-		console.log('🚀 ~ SearchStore ~ get ~ node:', node);
+
 		if (node && this.nodeValid(node)) {
 			return node;
 		} else {

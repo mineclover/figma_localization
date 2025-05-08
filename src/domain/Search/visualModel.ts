@@ -568,7 +568,6 @@ const baseNodeHighlight = (node: FrameNode) => {
 	const redSolid = figma.util.solidPaint({ r: 1, g: 0, b: 0 });
 
 	if (node) {
-		console.log('🚀 ~ baseNodeHighlight ~ node:', node);
 		try {
 			node.dashPattern = [0];
 			node.strokeWeight = 4;

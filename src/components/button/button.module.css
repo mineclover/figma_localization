@@ -1,0 +1,17 @@
+.hover {
+	position: absolute;
+	top: 0;
+
+	background-color: rgba(0, 0, 0, 0.5);
+	padding: 2px 4px;
+	white-space: nowrap;
+	border-radius: 2px;
+}
+
+.right {
+	right: 100%;
+}
+
+.left {
+	left: 100%;
+}

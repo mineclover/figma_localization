@@ -48,44 +48,10 @@ import { main } from '@/ai/example';
 import { textRecommend } from '@/ai/textRecommend';
 import { signal } from '@preact/signals-core';
 import { TargetedEvent } from 'preact/compat';
-import { clientFetchDBCurry } from '../utils/fetchDB';
 import { useAsync } from '@/hooks/useAsync';
 import { modalAlert } from '@/components/alert';
 import { ProviderResponse } from '@/ai/provider';
-
-const clientFetch = clientFetchDBCurry();
-
-/** KeyIdNameSignal 업데이트 */
-const updateKeyIds = async (keyIds: string[]) => {
-	const oldKeyNames = KeyIdNameSignal.value;
-
-	const data = await clientFetch('/localization/keys/names-by-ids', {
-		method: 'POST',
-		body: JSON.stringify({
-			ids: keyIds,
-		}),
-	});
-
-	const newKeyNames = (await data.json()) as Record<string, string>;
-
-	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
-};
-
-/** 단일 대상 키 이름 업데이트 */
-const updateKeyId = async (keyId: string) => {
-	const oldKeyNames = KeyIdNameSignal.value;
-
-	const data = await clientFetch('/localization/keys/names-by-ids', {
-		method: 'POST',
-		body: JSON.stringify({
-			ids: [keyId],
-		}),
-	});
-
-	const newKeyNames = (await data.json()) as Record<string, string>;
-
-	KeyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
-};
+import { updateKeyIds } from '../Search/searchModel';
 
 type SelectKeyNameType = { id: string; name: string; type: 'normal' | 'ai' };
 
@@ -212,12 +178,6 @@ const KeyIds = ({
 
 	// 키 이름 업데이트 > 결국 selectKeyName 를 업데이트 하기 위함
 	// 변경이 됬든 안됬든 이벤트는 발생함 즉 selectKeyName는 무조건 변함
-	useEffect(() => {
-		const nullKeyIds = Array.from(selectKeyId).filter((item) => keyNameStore[item] == null);
-		if (nullKeyIds.length > 0) {
-			updateKeyIds(nullKeyIds);
-		}
-	}, [selectIds]);
 
 	// 어짜피 선택이 변경되면 추천이 갱신되야됨
 

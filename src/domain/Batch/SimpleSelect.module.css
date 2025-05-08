@@ -96,6 +96,11 @@
 	width: 100%;
 	justify-content: space-between;
 }
+.column {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
 
 .hide {
 	border-style: dashed;
@@ -103,4 +108,20 @@
 
 .next {
 	background-color: var(--figma-color-bg-component);
+}
+
+.article {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	border-radius: 2px;
+	border: 1px solid var(--figma-color-border);
+	padding: 2px 4px;
+	&:hover:not(:has([class^='_iconButton']:hover)) {
+		background-color: var(--figma-color-bg-hover);
+		border: 1px solid var(--figma-color-border-brand);
+	}
+	&:active {
+		background-color: var(--figma-color-bg-pressed);
+	}
 }

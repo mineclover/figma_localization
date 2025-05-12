@@ -278,7 +278,7 @@ class SearchStore {
 
 	/**
 	 * 베이스 노드 아이디가 소유하고 있는 노드 아이디 저장
-	 * @param locationId 베이스 노드 id
+	 * @param locationId id
 	 * @param nodeId 인스턴스 노드 id
 	 */
 	setBaseNode(locationId: string, nodeId: string) {
@@ -295,11 +295,16 @@ class SearchStore {
 		return Array.from(this.baseNodeStore.get(locationId) ?? []);
 	}
 
+	// baseNodeStore 랑 baseLocationStore 구분 잘 해야 함
+	// baseLocationStore는 locationID를 가지고 있고 그 아래에 인스턴스 노드들을 가지고 있음
+
+	// 목적은 대표 노드 하위에 인스턴스 노드의 관리
 	/**
 	 * 기존 노드들 설정에서 before 베이스 노드를 캐싱함 store에서 삭제하고
 	 * after 베이스 노드로 캐싱 store에 추가
 	 * baseNode는 특정 노드가 지목하는 대상임
 	 * remove 있으면 삭제하고 이동
+	 *
 	 * @param before 이전 베이스 노드 ( baseNode에 있어야 함 )
 	 * @param after  새로운 베이스 노드 ( baseNode 내 세션에 있어야 함? )
 	 * @param remove
@@ -341,13 +346,14 @@ class SearchStore {
 
 		this.baseNodeStore.delete(before);
 	}
+
 	/**
-	 * base Location 얻기
+	 * base Location 정보 얻기
 	 *
 	 * @param locationId
 	 * @returns
 	 */
-	async getBaseLocation(locationIds: string[]) {
+	async getBaseLocationInfo(locationIds: string[]) {
 		const resultMap = new Map<string, LocationDTO>();
 		const needFetchIds: Set<string> = new Set<string>();
 

@@ -6,7 +6,7 @@ import {
 	autoCurrentNodesSignal,
 	autoCurrentNodeStyleSignal,
 	currentPointerSignal,
-	KeyIdNameSignal,
+	keyIdNameSignal,
 	patternMatchDataSignal,
 	searchStoreLocationSignal,
 	selectedKeySignal,
@@ -26,6 +26,7 @@ import { HoverAltButton } from '@/components/button/HoverAltButton';
 import { updateKeyIds } from '../Search/searchModel';
 import { TRANSLATION_ACTION_PAIR } from '../constant';
 import { emit } from '@create-figma-plugin/utilities';
+import { TranslationInputType } from '../Search/locations';
 
 type Props = {
 	id: string;
@@ -34,7 +35,7 @@ type Props = {
 	current: boolean;
 	hide: boolean;
 	isNext: boolean;
-	baseNodeId?: string;
+	locationId?: string;
 	pageId?: string;
 	projectId?: string;
 };
@@ -52,8 +53,20 @@ export const nextBaseSignal = signal<{
 	projectId: '',
 });
 
-const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageId, projectId }: Props) => {
-	const badRequestPrams = !baseNodeId || !pageId || !projectId;
+const Test = ({ id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId }: Props) => {
+	console.log(
+		'🚀 ~ Test ~  id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId:',
+		id,
+		selected,
+		keyMatch,
+		current,
+		hide,
+		isNext,
+		locationId,
+		pageId,
+		projectId
+	);
+	const badRequestPrams = !locationId || !pageId || !projectId;
 
 	return (
 		<button
@@ -88,7 +101,7 @@ const Test = ({ id, selected, keyMatch, current, hide, isNext, baseNodeId, pageI
 					selectIdsSignal.value = [...selectIdsSignal.value, id];
 
 					nextBaseSignal.value = {
-						baseNodeId,
+						baseNodeId: locationId,
 						nodeId: id,
 						pageId,
 						projectId,
@@ -124,7 +137,7 @@ function SimpleSelect() {
 
 	const details = useSignal(autoCurrentNodesSignal);
 	const currentNode = useSignal(currentPointerSignal);
-	const keyNameStore = useSignal(KeyIdNameSignal);
+	const keyNameStore = useSignal(keyIdNameSignal);
 
 	/** 제어할 수 있게 해야해서 합쳐야 함 */
 	// const allSectionIds = new Set([...sectionIds, ...ignoreSectionIds]);
@@ -235,21 +248,25 @@ function SimpleSelect() {
 									console.log(`선택 대상을 #${key}로 병합`, {
 										localizationKey: key,
 										action: 'default',
-										baseNodeId: nextBaseNode,
+										locationId: nextBaseNode,
 										prefix: 'sectionName',
 										name: baseNodeName,
 										targetNodeId: nodeId,
 										beforeIds: ids,
-									});
-									// emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
-									// 	localizationKey: key,
-									// 	action: 'default',
-									// 	baseNodeId,
-									// 	prefix: 'sectionName',
-									// 	name: baseNodeName,
-									// 	targetNodeId: isNextBase ? baseId : nodeId,
-									// 	beforeIds: ids,
-									// });
+									} as TranslationInputType);
+									emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+										// 기준 키
+										localizationKey: key,
+										action: 'default',
+										locationId: nextBaseNode,
+										prefix: 'sectionName',
+										// 추천 이름 받았으면 변경할 아이디
+										name: baseNodeName,
+										// 베이스노드 변경해야하면 바꿀 아이디
+										targetNodeId: nodeId,
+										// 없어도 될 수 도 있음
+										beforeIds: ids,
+									} as TranslationInputType);
 								}}
 							>
 								<IconCollapse24 />
@@ -258,6 +275,7 @@ function SimpleSelect() {
 
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item, _, arr) => {
+								console.log('🚀 ~ {Array.from ~ item:', item);
 								const selected = selectItems.includes(item.id);
 
 								const keyMatch = selectKey === item.localizationKey;
@@ -275,7 +293,7 @@ function SimpleSelect() {
 										current={current}
 										hide={isHide}
 										isNext={isNext}
-										baseNodeId={String(targetBase)}
+										locationId={targetBase}
 										pageId={currentNode?.pageId}
 										projectId={currentNode?.projectId}
 									/>

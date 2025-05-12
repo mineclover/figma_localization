@@ -30,7 +30,7 @@ import {
 	selectedKeySignal,
 	selectIdsSignal,
 	searchStoreLocationSignal,
-	KeyIdNameSignal,
+	keyIdNameSignal,
 } from '@/model/signal';
 import { useSignal } from '@/hooks/useSignal';
 import { emit } from '@create-figma-plugin/utilities';
@@ -84,7 +84,7 @@ const KeyIds = ({
 	console.log('🚀 ~ localizationKey:', localizationKey);
 	// 로컬라이제이션 키에 저장 된 이름들
 	//
-	const keyNameStore = useSignal(KeyIdNameSignal);
+	const keyNameStore = useSignal(keyIdNameSignal);
 	const patternMatchData = useSignal(patternMatchDataSignal);
 	const selectIds = useSignal(selectIdsSignal);
 	const apiKey = useSignal(apiKeySignal);

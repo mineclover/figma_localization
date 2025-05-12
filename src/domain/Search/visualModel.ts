@@ -676,7 +676,7 @@ export const overlayRender = async () => {
 		baseNodeIds = tempBaseNodeIds.filter((item) => selectedIds.includes(item));
 	}
 
-	const locations = await searchStore.getBaseLocation(baseNodeIds);
+	const locations = await searchStore.getBaseLocationInfo(baseNodeIds);
 
 	for (const location of locations) {
 		if (location) {

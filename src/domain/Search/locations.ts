@@ -17,7 +17,7 @@ import { getFrameNodeMetaData, searchStore } from './searchStore';
 import { postClientLocation, overlayRender } from './visualModel';
 import { getPageId, getProjectId } from '../Label/LabelModel';
 import { PageSelectIdsToBoxHandler } from '@/figmaPluginUtils/types';
-import { KeyIdNameSignal } from '@/model/signal';
+import { keyIdNameSignal } from '@/model/signal';
 
 export const setNodeLocation = async (node: SceneNode) => {
 	const domainSetting = getDomainSetting();
@@ -117,7 +117,7 @@ const changeXml = async (text: string, tags: Record<string, string>) => {
 
 export type TranslationInputType = {
 	localizationKey: string;
-	baseNodeId: string;
+	locationId: string;
 	action: ActionType;
 	prefix: string;
 	name: string;
@@ -237,10 +237,12 @@ export const addTranslationV2 = async (node: TextNode, localizationKey: string, 
 
 export const onTranslationActionRequest = () => {
 	on(TRANSLATION_ACTION_PAIR.REQUEST_KEY, async (data: TranslationInputType) => {
-		const { localizationKey, baseNodeId, action, prefix, name, targetNodeId, sectionId, beforeIds } = data;
+		const { localizationKey, locationId, action, prefix: tempPrefix, name, targetNodeId, sectionId, beforeIds } = data;
+
+		const prefix = tempPrefix.toUpperCase();
 		console.log(`🚀 ~ on ~  { localizationKey, baseNodeId, action, prefix, name, nodeId, sectionId }:`, {
 			localizationKey,
-			baseNodeId,
+			locationId,
 			action,
 			prefix,
 			name,
@@ -252,7 +254,7 @@ export const onTranslationActionRequest = () => {
 		// 3. 이름 변경되서 올 수 있다
 
 		const nodeInfo = searchStore.baseLocationStore;
-		const location = nodeInfo.get(baseNodeId);
+		const location = nodeInfo.get(locationId);
 		if (!location) {
 			notify('location id를 찾을 수 없음', 'error');
 
@@ -260,19 +262,21 @@ export const onTranslationActionRequest = () => {
 		}
 
 		const { node_id: location_node_id } = location;
-
 		const nextIdsNode = figma.currentPage.selection;
 		const idsNodeData = nextIdsNode.map((item) => getFrameNodeMetaData(item as FrameNode));
 
 		const baseNodeData = idsNodeData.find((item) => item?.id === location_node_id);
-
 		if (!baseNodeData) {
 			notify('베이스 아이디를 찾을 수 없음', 'error');
-
 			return;
 		}
 
-		// const
+		const baseNode = await figma.getNodeByIdAsync(baseNodeData.id);
+		if (!baseNode) {
+			notify('베이스 아이디를 찾을 수 없음', 'error');
+			return;
+		}
+
 		const domainSetting = getDomainSetting();
 		const projectId = getProjectId();
 		const pageId = getPageId();
@@ -281,19 +285,20 @@ export const onTranslationActionRequest = () => {
 
 			return;
 		}
-		console.log('🚀 ~ on ~ baseNodeId, { nodeId, pageId, projectId }:', baseNodeId, {
-			targetNodeId,
-			pageId,
-			projectId,
-		});
+
+		// 		단일화 키를 쓰는 기존 노드들 : prev
+		// 다음 그룹 값 : next
+
+		const prev1 = searchStore.baseLocationStore.get(locationId);
+		console.log('🚀 ~ on ~ prev1:', prev1);
+		const prev2 = searchStore.baseNodeStore.get(location_node_id);
+		console.log('🚀 ~ on ~ prev2:', prev2);
 
 		// 로케이션 베이스 아이디 업데이트 > 변경 요청
 		if (targetNodeId && targetNodeId !== '') {
 			console.log('🚀 ~ on ~ targetNodeId:', targetNodeId);
-			await searchStore.updateBaseNode(baseNodeId, { nodeId: targetNodeId, pageId, projectId });
+			await searchStore.updateBaseNode(locationId, { nodeId: targetNodeId, pageId, projectId });
 		}
-
-		// overlayRender();
 
 		const reg = new RegExp(`^${prefix}`, 'g');
 
@@ -309,41 +314,36 @@ export const onTranslationActionRequest = () => {
 		// 등록 실패하면 어떻게 반환할건지 정해야 함
 		console.log('🚀 ~ on ~ result1:', result1);
 		if (!result1?.success) {
-			notify(result1?.message ?? '로컬라이제이션 키 등록 실패', 'error');
+			notify(result1?.message ?? '로컬라이제이션 키 업데이트 실패', 'error');
 			return;
 		} else {
-			notify(result1?.message ?? '로컬라이제이션 키 등록 성공', 'ok');
-			// kv 업데이트 해줘야 됨
-			updateLocalizationName(localizationKey, putLocalizationData);
+			notify(result1?.message ?? '로컬라이제이션 키 업데이트 성공', 'ok');
+			updateLocalizationResponse(localizationKey, putLocalizationData);
 		}
 
-		const baseNode = await figma.getNodeByIdAsync(baseNodeData.id);
-		if (!baseNode) {
-			notify('베이스 아이디를 찾을 수 없음', 'error');
-
-			return;
-		}
+		// 스타일 추출과 텍스트 업데이트
 		const result2 = await addTranslationV2(baseNode as TextNode, localizationKey, action);
 		console.log('🚀 ~ on ~ result2:', result2);
 
+		// 위치 매핑 업데이트
+		// action 연결은 로케이션 연결용이기 때문에 a,b,c 등 여러가지 연결할 필요 없어서 a로 고정적으로 처리함
+		// action은 여러개 올 수 있음
 		const result = await fetchDB('/figma/location-actions', {
 			method: 'POST',
 			body: JSON.stringify({
 				keyId: localizationKey,
 				action: action,
-				locationId: baseNodeId,
+				locationId: locationId,
 				fromEnum: 'a',
 			}),
 		});
 		if (!result) {
-			notify('Failed to set location - actions mapping ' + baseNodeId, 'error');
+			notify('Failed to set location - actions mapping ' + locationId, 'error');
 		}
 		if (result) {
 			const data = await result.json();
 			console.log('🚀 ~ on ~ data:', data);
 		}
-
-		// aasdf
 	});
 };
 
@@ -377,7 +377,8 @@ export const onTextToFrameSelect = () => {
 	});
 };
 
-export const updateLocalizationName = (localizationKey: string, putLocalizationData: PutLocalizationKeyType) => {
+/** 클라이언트로 보내는 것 */
+export const updateLocalizationResponse = (localizationKey: string, putLocalizationData: PutLocalizationKeyType) => {
 	emit(TRANSLATION_ACTION_PAIR.RESPONSE_KEY, {
 		localizationKey,
 		...putLocalizationData,
@@ -395,9 +396,9 @@ export const onTranslationActionResponse = () => {
 				return;
 			}
 
-			const oldValue = KeyIdNameSignal.value;
+			const oldValue = keyIdNameSignal.value;
 			console.log('🚀 ~ on ~ oldValue:', oldValue);
-			KeyIdNameSignal.value = {
+			keyIdNameSignal.value = {
 				...oldValue,
 				[localizationKey]: name,
 			};

@@ -443,7 +443,6 @@ function BatchPage() {
 			if (data) {
 				modalAlert('"' + data.name + '" 으로 추가 완료');
 			} else if (error) {
-				console.log('🚀 ~ useEffect ~ error:', error);
 				modalAlert(error.message);
 			}
 			setHasMessage(false);
@@ -510,7 +509,6 @@ function BatchPage() {
 							onClick={async () => {
 								if (hasSelectedKey) {
 									// 변경할 키가 있으면 바로 일괄 변경 로직
-									console.log('🚀 ~ onClick ~ selectedKeyData:', data, selectedKeyData);
 									const isOriginNull = selectedKeyData?.origin_value == null || selectedKeyData.origin_value === '';
 
 									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {

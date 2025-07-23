@@ -56,66 +56,76 @@ import {
 	onTranslationActionResponse,
 } from '@/domain/Search/locations';
 
-export default function () {
-	// 세팅
+function initializeSettings() {
 	onSetProjectId();
 	onGetProjectId();
-
 	onGetDomainSetting();
 	onSetDomainSetting();
 	onGetLanguageCodes();
 	onSetLanguageCodes();
-	onGetCursorPosition();
-	// 플러그인 데이터 세팅
+	onSetApiKey();
+	onGetApiKey();
+	onGetUserHash();
+	onSetUserHash();
+}
 
+function initializePluginData() {
 	onTargetSetNodeLocation();
 	onNodeReload();
 	onSetNodeResetKey();
 	onGetKeyTranslations();
 	onGetLocalizationKeyData();
 	onPutLocalizationKey();
-
 	onSetLanguageCode();
-	onPatternMatch();
+}
 
+function initializeBatchOperations() {
+	onPatternMatch();
 	onSetNodeLocalizationKeyBatch();
 	onUpdateNodeStoreBatchKey();
 	onUpdateNodeLocalizationKeyBatch();
 	onSetNodeIgnore();
+}
+
+function initializeStyleAndVariables() {
 	onSetStyle();
 	onDownloadStyle();
+	onGetStyleData();
+	onStyleChange();
 	onGetVariableData();
 	onSetVariableData();
 	onClearVariableData();
+}
 
-	onSetPageLockOpen();
-	// 유틸
+function initializeViewportAndSelection() {
 	onNodeSelectionChange();
 	nodeZoom_Adapter();
 	pageNodeZoom_Adapter();
 	pageSelectIds_Adapter();
 	onCurrentSectionSelected();
 	onSetNodeAction();
-	// 페이지에 고유 이름 부여 ( 섹션 키 조회 시 페이지 이름을 대체하기 위함 )
-	onStyleChange();
-	onGetStyleData();
-	// runExample();
-	onGetUserHash();
-	onSetUserHash();
+	onGetCursorPosition();
+}
+
+function initializeVisualizationMode() {
 	onRender();
 	onDisableRender();
 	onSelectModeMain();
-
 	onBaseUpdate();
 	onBaseKeyInjection();
 	onAutoSelectModeRequest();
+}
 
-	onSetApiKey();
-	onGetApiKey();
-
+function initializeTranslationActions() {
 	onTranslationActionRequest();
 	onTextToFrameSelect();
+}
 
+function initializeSystemFeatures() {
+	onSetPageLockOpen();
+}
+
+function initializeUIHandlers() {
 	on<ResizeWindowHandler>('RESIZE_WINDOW', function (windowSize: { width: number; height: number }) {
 		const { width, height } = windowSize;
 		figma.ui.resize(width, height);
@@ -124,6 +134,19 @@ export default function () {
 	once<CloseHandler>('CLOSE', function () {
 		figma.closePlugin();
 	});
+}
+
+export default function () {
+	initializeSettings();
+	initializePluginData();
+	initializeBatchOperations();
+	initializeStyleAndVariables();
+	initializeViewportAndSelection();
+	initializeVisualizationMode();
+	initializeTranslationActions();
+	initializeSystemFeatures();
+	initializeUIHandlers();
+
 	showUI({
 		height: 500,
 		width: 330,

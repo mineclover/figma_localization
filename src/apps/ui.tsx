@@ -18,71 +18,76 @@ import SimpleSelect from '@/domain/Batch/SimpleSelect';
 import LogsPage from '@/domain/Logs/LogsPage';
 import { runExample } from '@/utils/test';
 import IconPage from '@/domain/Icon/Icon';
-const nav = ['Keys', 'Section', 'Preview', 'Table', 'Setting', 'Style', 'Translate', 'Batch', 'Logs', 'Label', 'Icon'];
+
+const TAB_NAMES = {
+	ICON: 'Icon',
+	LABEL: 'Label',
+	KEYS: 'Keys',
+	STYLE: 'Style',
+	TRANSLATE: 'Translate',
+	SETTING: 'Setting',
+	LOGS: 'Logs',
+} as const;
+
+const DEFAULT_TAB = TAB_NAMES.LABEL;
+
+const WINDOW_CONFIG = {
+	maxHeight: 1080,
+	maxWidth: 1920,
+	minHeight: 120,
+	minWidth: 120,
+	resizeBehaviorOnDoubleClick: 'minimize' as const,
+};
+
+function createTabOptions(): Array<TabsOption> {
+	return [
+		{
+			children: <IconPage />,
+			value: TAB_NAMES.ICON,
+		},
+		{
+			children: <LabelPage />,
+			value: TAB_NAMES.LABEL,
+		},
+		{
+			children: <BatchPage />,
+			value: TAB_NAMES.KEYS,
+		},
+		{
+			children: <StylePage />,
+			value: TAB_NAMES.STYLE,
+		},
+		{
+			children: <TranslatePage />,
+			value: TAB_NAMES.TRANSLATE,
+		},
+		{
+			children: <SettingPage />,
+			value: TAB_NAMES.SETTING,
+		},
+		{
+			children: <LogsPage />,
+			value: TAB_NAMES.LOGS,
+		},
+	];
+}
 
 function Plugin() {
 	const isBatch = useSignal(isDirectSignal);
+	const [activeTab, setActiveTab] = useState<string>(DEFAULT_TAB);
+
+	const tabOptions = createTabOptions();
+
 	function onWindowResize(windowSize: { width: number; height: number }) {
 		emit<ResizeWindowHandler>('RESIZE_WINDOW', windowSize);
 	}
 
-	// useEffect(() => {
-	// 	runExample();
-	// }, []);
+	useWindowResize(onWindowResize, WINDOW_CONFIG);
 
-	useWindowResize(onWindowResize, {
-		maxHeight: 1080,
-		maxWidth: 1920,
-		minHeight: 120,
-		minWidth: 120,
-		resizeBehaviorOnDoubleClick: 'minimize',
-	});
-
-	function handleChange(
-		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
-		event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]
-	) {
+	function handleTabChange(event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]) {
 		const newValue = event.currentTarget.value;
-		setValue(newValue);
+		setActiveTab(newValue);
 	}
-
-	const options: Array<TabsOption> = [
-		{
-			children: <IconPage />,
-			value: nav[10],
-		},
-		{
-			children: <LabelPage />,
-			value: nav[9],
-		},
-		{
-			children: <BatchPage />,
-			value: nav[0],
-		},
-
-		{
-			children: <StylePage />,
-			value: nav[5],
-		},
-		{
-			children: <TranslatePage />,
-			value: nav[6],
-		},
-
-		{
-			children: <SettingPage />,
-			value: nav[4],
-		},
-		{
-			children: <LogsPage />,
-			value: nav[8],
-		},
-		// {
-		//   children: <Inspect></Inspect>,
-		//   value: nav[2],
-		// },
-	] as const;
-	const [value, setValue] = useState<string>(nav[9]);
 
 	return (
 		<AppProvider>
@@ -92,7 +97,7 @@ function Plugin() {
 					background: isBatch ? 'var(--figma-color-bg-danger-secondary)' : 'var(--figma-color-bg)',
 				}}
 			>
-				<Tabs options={options} value={value} onChange={handleChange} />
+				<Tabs options={tabOptions} value={activeTab} onChange={handleTabChange} />
 			</Container>
 		</AppProvider>
 	);

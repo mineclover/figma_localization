@@ -3,51 +3,59 @@ import { emit, on } from '@create-figma-plugin/utilities';
 import { clientFetchDBCurry } from '../utils/fetchDB';
 
 const clientFetch = clientFetchDBCurry();
-/**
- * KeyIdNameSignal 업데이트
- * 이름 없는 애들이 요청 들어오는 거임
- */
+
 export const updateKeyIds = async (keyIds: string[]) => {
-	const oldKeyNames = keyIdNameSignal.value;
-	const removeTarget = removeKeyIdsSignal.value;
-	console.log('🚀 ~ updateKeyIds ~ removeTarget:', removeTarget);
+	try {
+		const oldKeyNames = keyIdNameSignal.value;
+		const removeTarget = removeKeyIdsSignal.value;
 
-	// 무한 제귀 방지
-	const requestIds = keyIds.filter((id) => !removeTarget.includes(id));
-	console.log('🚀 ~ updateKeyIds ~ requestIds:', requestIds);
+		const requestIds = keyIds.filter((id) => !removeTarget.includes(id));
 
-	if (requestIds.length === 0) {
-		return;
-	}
+		if (requestIds.length === 0) {
+			return;
+		}
 
-	const data = await clientFetch('/localization/keys/names-by-ids', {
-		method: 'POST',
-		body: JSON.stringify({
-			ids: requestIds,
-		}),
-	});
+		const response = await clientFetch('/localization/keys/names-by-ids', {
+			method: 'POST',
+			body: JSON.stringify({
+				ids: requestIds,
+			}),
+		});
 
-	if (data.ok) {
-		const newKeyNames = (await data.json()) as Record<string, string>;
+		if (!response.ok) {
+			throw new Error(`Failed to fetch key names: ${response.status}`);
+		}
+
+		const newKeyNames = (await response.json()) as Record<string, string>;
 		const removeKeyIds = keyIds.filter((id) => !Object.keys(newKeyNames).includes(id));
-		console.log('🚀 ~ updateKeyIds ~ removeKeyIds:', removeKeyIds);
 
 		removeKeyIdsSignal.value = removeKeyIds;
 		keyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
+	} catch (error) {
+		console.error('Error updating key IDs:', error);
+		throw error;
 	}
 };
-/** 단일 대상 키 이름 업데이트 */
+
 const updateKeyId = async (keyId: string) => {
-	const oldKeyNames = keyIdNameSignal.value;
+	try {
+		const oldKeyNames = keyIdNameSignal.value;
 
-	const data = await clientFetch('/localization/keys/names-by-ids', {
-		method: 'POST',
-		body: JSON.stringify({
-			ids: [keyId],
-		}),
-	});
+		const response = await clientFetch('/localization/keys/names-by-ids', {
+			method: 'POST',
+			body: JSON.stringify({
+				ids: [keyId],
+			}),
+		});
 
-	const newKeyNames = (await data.json()) as Record<string, string>;
+		if (!response.ok) {
+			throw new Error(`Failed to fetch key name: ${response.status}`);
+		}
 
-	keyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
+		const newKeyNames = (await response.json()) as Record<string, string>;
+		keyIdNameSignal.value = { ...oldKeyNames, ...newKeyNames };
+	} catch (error) {
+		console.error('Error updating key ID:', error);
+		throw error;
+	}
 };

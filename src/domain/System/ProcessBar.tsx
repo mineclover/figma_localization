@@ -55,8 +55,6 @@ const ProcessBar = () => {
 				const process = processStore[key]
 				const { process_status, process_name, process_end } = process
 
-				console.log(process_status, process_end)
-
 				return (
 					<div className={styles.row}>
 						<Bold className={styles.text}>{process_name}</Bold>

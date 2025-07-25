@@ -154,7 +154,6 @@ export const idsBaseAll = async (
 	}
 
 	const directLink = getDirectLink(baseNodeData)
-	console.log('🚀 ~ directLink:', directLink)
 
 	const baseNodeId = baseNodeData.node_id
 	const baseLocation = baseNodeData.location_id

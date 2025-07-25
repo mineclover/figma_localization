@@ -44,7 +44,6 @@ const TaskMonitor = () => {
 
 	const createTaskQueue = () => {
 		if (patternMatchData.length === 0) {
-			console.warn('patternMatchData가 비어있습니다.')
 			return
 		}
 

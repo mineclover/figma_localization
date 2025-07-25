@@ -27,8 +27,8 @@ const JSXGroups = {
 	a: UtilTypeTest,
 }
 
-type JSX_A = ExtractProps<typeof JSXGroups, 'a'>
-
-type JSX_B = NonNullableComponentTypeExtract<(typeof JSXGroups)['a'], 'hello'>
+// 예제용 타입 별칭들 (사용되지 않음)
+// type JSX_A = ExtractProps<typeof JSXGroups, 'a'>
+// type JSX_B = NonNullableComponentTypeExtract<(typeof JSXGroups)['a'], 'hello'>
 
 export default UtilTypeTest

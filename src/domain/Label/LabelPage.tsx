@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import styles from './Label.module.css';
+import { useLabelActions } from './useLabelActions';
 import {
 	Bold,
 	Button,
@@ -52,22 +53,18 @@ function LabelPage() {
 
 	const selectLocation = searchStoreLocation.get(autoCurrentBaseNode);
 	const selectNodeData = autoCurrentNodes.find((item) => item.id === selectLocation?.node_id);
+	const { dispatch, actions } = useLabelActions();
 	return (
 		<div className={styles.container}>
 			<div className={styles.row}>
 				<IconButton
-					onClick={() => {
-						emit(RENDER_PAIR.RENDER_REQUEST);
-						// 오버레이 존재 여부를 모른다는 단점
-					}}
+					onClick={() => dispatch(actions.renderPair())}
 				>
 					<IconEyeSmall24></IconEyeSmall24>
 				</IconButton>
 				{/* 비활성화 */}
 				<IconButton
-					onClick={() => {
-						emit(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST);
-					}}
+					onClick={() => dispatch(actions.disableRender())}
 				>
 					<IconHiddenSmall24 />
 				</IconButton>
@@ -76,45 +73,34 @@ function LabelPage() {
 			<Bold>섹션</Bold>
 			<div className={styles.row}>
 				<Button
-					onClick={() => {
-						emit(RENDER_TRIGGER.SECTION_SELECT);
-					}}
+					onClick={() => dispatch(actions.selectExcludedSection())}
 				>
 					제외된 섹션 선택
 				</Button>
 				<IconButton
-					onClick={() => {
-						// 더하기
-						emit(RENDER_TRIGGER.SAVE_ACTION, SAVE_ACTION.INSERT, {
-							localizationKey: 'insert',
-							action: 'default, hover 등등',
-							baseNodeId: 'test',
-						});
-					}}
+					onClick={() => dispatch(actions.insertAction([
+						'insert',
+						'default, hover 등등',
+						'test'
+					]))}
 				>
 					<IconInsert24 />
 				</IconButton>
 				<IconButton
-					onClick={() => {
-						// 합집합
-						emit(RENDER_TRIGGER.SAVE_ACTION, SAVE_ACTION.UNION, {
-							localizationKey: 'union',
-							action: 'default, hover 등등',
-							baseNodeId: 'test',
-						});
-					}}
+					onClick={() => dispatch(actions.unionAction([
+						'union',
+						'default, hover 등등',
+						'test'
+					]))}
 				>
 					<IconBooleanUnion24 />
 				</IconButton>
 				<IconButton
-					onClick={() => {
-						// 차집합
-						emit(RENDER_TRIGGER.SAVE_ACTION, SAVE_ACTION.SUBTRACT, {
-							localizationKey: 'subtract',
-							action: 'default, hover 등등',
-							baseNodeId: 'test',
-						});
-					}}
+					onClick={() => dispatch(actions.subtractAction([
+						'subtract',
+						'default, hover 등등',
+						'test'
+					]))}
 				>
 					<IconBooleanSubtract24 />
 				</IconButton>

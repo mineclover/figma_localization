@@ -1,11 +1,15 @@
-import { modalAlert } from '@/components/alert';
+import { modalAlert } from "@/components/alert";
 
-import { h } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
-import { languageCodesSignal, StyleData, styleDataSignal } from '@/model/signal';
-import { domainSettingSignal } from '@/model/signal';
+import { h } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import {
+	languageCodesSignal,
+	StyleData,
+	styleDataSignal,
+} from "@/model/signal";
+import { domainSettingSignal } from "@/model/signal";
 
-import { useSignal } from '@/hooks/useSignal';
+import { useSignal } from "@/hooks/useSignal";
 import {
 	Bold,
 	Button,
@@ -22,36 +26,42 @@ import {
 	TextboxMultiline,
 	Toggle,
 	VerticalSpace,
-} from '@create-figma-plugin/ui';
+} from "@create-figma-plugin/ui";
 
-import { DOWNLOAD_STYLE, SET_NODE_ACTION, SET_NODE_RESET_KEY, SET_PAGE_LOCK_OPEN, SET_STYLE } from '../constant';
-import { emit } from '@create-figma-plugin/utilities';
+import {
+	DOWNLOAD_STYLE,
+	SET_NODE_ACTION,
+	SET_NODE_RESET_KEY,
+	SET_PAGE_LOCK_OPEN,
+	SET_STYLE,
+} from "../constant";
+import { emit } from "@create-figma-plugin/utilities";
 
-import { styleTagModeSignal } from '@/model/signal';
-import { currentPointerSignal } from '@/model/signal';
+import { styleTagModeSignal } from "@/model/signal";
+import { currentPointerSignal } from "@/model/signal";
 
-import { clientFetchDBCurry } from '../utils/fetchDB';
+import { clientFetchDBCurry } from "../utils/fetchDB";
 
-import styles from './LabelSearch.module.css';
+import styles from "./LabelSearch.module.css";
 
-import { signal } from '@preact/signals-core';
+import { signal } from "@preact/signals-core";
 
-import { deepEqual } from '@/utils/data';
+import { deepEqual } from "@/utils/data";
 
-import { isXmlCheck } from '@/utils/xml';
-import { localizationKeySignal } from '@/model/signal';
-import { StyleSync, StyleHashSegment } from '@/model/types';
-import { ErrorBoundary, ResourceProvider } from './suspense';
-import { Suspense, TargetedEvent } from 'preact/compat';
-import { styleResourceCache, styleToXml, xmlToStyle } from './styleAction';
-import { safeJsonParse } from '../utils/getStore';
-import { clc } from '@/components/modal/utils';
-import { removeLeadingSymbols } from '@/utils/textTools';
-import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
-import Tags, { extractSelectedItems, tagsSignal } from './Tags';
-import { replaceTagNames, unwrapTag, wrapTextWithTag } from '@/utils/xml2';
-import { ActionType, actionTypes } from '../System/ActionResourceDTO';
-import TranslateLine from '../Translate/TranslateLine';
+import { isXmlCheck } from "@/utils/xml";
+import { localizationKeySignal } from "@/model/signal";
+import { StyleSync, StyleHashSegment } from "@/model/types";
+import { ErrorBoundary, ResourceProvider } from "./suspense";
+import { Suspense, TargetedEvent } from "preact/compat";
+import { styleResourceCache, styleToXml, xmlToStyle } from "./styleAction";
+import { safeJsonParse } from "../utils/getStore";
+import { clc } from "@/components/modal/utils";
+import { removeLeadingSymbols } from "@/utils/textTools";
+import { pageNodeZoomAction } from "@/figmaPluginUtils/utilAction";
+import Tags, { extractSelectedItems, tagsSignal } from "./Tags";
+import { replaceTagNames, unwrapTag, wrapTextWithTag } from "@/utils/xml2";
+import { ActionType, actionTypes } from "../System/ActionResourceDTO";
+import TranslateLine from "../Translate/TranslateLine";
 
 type CurrentMetadata = {
 	nodeId?: string;
@@ -61,10 +71,18 @@ type CurrentMetadata = {
 	domainValid: boolean;
 };
 
-const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, domainValid }: CurrentMetadata) => {
+const MetadataBlock = ({
+	nodeId,
+	name,
+	localizationKey,
+	originalLocalizeId,
+	domainValid,
+}: CurrentMetadata) => {
 	const currentPointer = useSignal(currentPointerSignal);
-	const action = currentPointer?.data.action ?? 'default';
-	const options = Object.entries(actionTypes).map(([key, value]) => ({ value: value }));
+	const action = currentPointer?.data.action ?? "default";
+	const options = Object.entries(actionTypes).map(([key, value]) => ({
+		value: value,
+	}));
 
 	const handleChange = (event: TargetedEvent<HTMLInputElement, Event>) => {
 		const next = event.currentTarget.value as ActionType;
@@ -102,7 +120,9 @@ const MetadataBlock = ({ nodeId, name, localizationKey, originalLocalizeId, doma
 				</IconButton>
 			</div>
 
-			{domainValid ? null : <Text className={styles.dangerText}>도메인이 다르거나 없음</Text>}
+			{domainValid ? null : (
+				<Text className={styles.dangerText}>도메인이 다르거나 없음</Text>
+			)}
 		</div>
 	);
 };
@@ -115,35 +135,40 @@ export const StyleXml = ({
 		read: () => {
 			xmlString: string;
 			styleStoreArray: StyleSync[];
-			effectStyle: Omit<StyleSync, 'ranges'> | null;
+			effectStyle: Omit<StyleSync, "ranges"> | null;
 		};
 	};
 	focusUpdateCount: number;
 }) => {
-	const { xmlString, styleStoreArray: styleValues, effectStyle } = resource.read();
+	const {
+		xmlString,
+		styleStoreArray: styleValues,
+		effectStyle,
+	} = resource.read();
 
 	// br로 할지 br로 할지 결정되지 않음
 	// 안정적인 건 br긴 함
-	const brString = xmlString.replace(/\n/g, '<br/>');
+	const brString = xmlString.replace(/\n/g, "<br/>");
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const currentPointer = useSignal(currentPointerSignal);
-	const isKeySetting = currentPointer && currentPointer.data.localizationKey !== '';
-	const action = currentPointer?.data.action ?? 'default';
+	const isKeySetting =
+		currentPointer && currentPointer.data.localizationKey !== "";
+	const action = currentPointer?.data.action ?? "default";
 	const [resultXml, setResultXml] = useState<string>(brString);
 	const tags = useSignal<Record<string, string>>(tagsSignal);
 
 	const changeXml = async () => {
 		let result = brString;
 		for (const [key, value] of Object.entries(tags)) {
-			if (value !== '') {
+			if (value !== "") {
 				result = await replaceTagNames(result, key, value);
 			}
 		}
 		const result1 = await unwrapTag(result);
 		const result2 = await wrapTextWithTag(result1);
 
-		console.log('🚀 ~ 무결성 검사 : ', result === result2);
-		const brString2 = result1.replace(/\n/g, '<br/>');
+		console.log("🚀 ~ 무결성 검사 : ", result === result2);
+		const brString2 = result1.replace(/\n/g, "<br/>");
 
 		setResultXml(brString2);
 	};
@@ -173,9 +198,9 @@ export const StyleXml = ({
 					)}
 				</ResourceProvider> */}
 			<Tags
-				localizationKey={currentPointer?.data.localizationKey ?? ''}
+				localizationKey={currentPointer?.data.localizationKey ?? ""}
 				xmlString={brString}
-				action={currentPointer?.data.action ?? 'default'}
+				action={currentPointer?.data.action ?? "default"}
 			/>
 
 			{isKeySetting ? (
@@ -187,19 +212,21 @@ export const StyleXml = ({
 							action: action,
 							domainId: currentPointer?.data.domainId,
 						});
-						const fetchClient = clientFetchDBCurry(currentPointer?.data.domainId);
+						const fetchClient = clientFetchDBCurry(
+							currentPointer?.data.domainId,
+						);
 
-						const fetchData2 = await fetchClient('/localization/translations', {
-							method: 'PUT',
+						const fetchData2 = await fetchClient("/localization/translations", {
+							method: "PUT",
 							body: JSON.stringify({
 								keyId: currentPointer?.data.localizationKey,
-								language: 'origin',
+								language: "origin",
 								translation: resultXml,
 							}),
 						});
 
 						const data2 = await fetchData2.json();
-						console.log('🚀 ~ 업로드 됨', data2);
+						console.log("🚀 ~ 업로드 됨", data2);
 						const selected = extractSelectedItems(tags);
 
 						const body = {
@@ -207,18 +234,18 @@ export const StyleXml = ({
 							action: action,
 							mappings: selected,
 						};
-						console.log('🚀 ~ onClick={ ~ body:', body);
+						console.log("🚀 ~ onClick={ ~ body:", body);
 
-						const fetchData = await fetchClient('/localization/actions/bulk', {
-							method: 'POST',
+						const fetchData = await fetchClient("/localization/actions/bulk", {
+							method: "POST",
 							body: JSON.stringify(body),
 						});
 						const data = await fetchData.json();
 						modalAlert(
 							<div>
-								<Text>{data.success ? '성공' : '실패'}</Text>
+								<Text>{data.success ? "성공" : "실패"}</Text>
 								<Text>{data.message}</Text>
-							</div>
+							</div>,
 						);
 
 						// 키, 액션, xml 로 저장
@@ -242,7 +269,7 @@ const StylePage = () => {
 	/** 도메인에 설정된 리스트 */
 	const languageCodes = useSignal(languageCodesSignal);
 	const currentPointer = useSignal(currentPointerSignal);
-	console.log('🚀 ~ currentPointer:', currentPointer?.pageLock);
+	console.log("🚀 ~ currentPointer:", currentPointer?.pageLock);
 
 	const styleTagMode = useSignal(styleTagModeSignal);
 	const styleData = useSignal(styleDataSignal);
@@ -252,15 +279,17 @@ const StylePage = () => {
 	// const localizationKeyValue = useSignal(localizationKeySignal);
 	// const pageLock = currentPointer?.pageLock ?? false;
 
-	const targetArray = ['origin', ...languageCodes];
-	const action = currentPointer?.data.action ?? 'default';
+	const targetArray = ["origin", ...languageCodes];
+	const action = currentPointer?.data.action ?? "default";
 	const isStyle = currentPointer;
 
 	const currentMetadata = {
 		nodeId: currentPointer?.nodeId,
-		name: currentPointer?.nodeName ? removeLeadingSymbols(currentPointer?.nodeName) : '',
+		name: currentPointer?.nodeName
+			? removeLeadingSymbols(currentPointer?.nodeName)
+			: "",
 		localizationKey: currentPointer?.data.localizationKey,
-
+		// 숫자가 넘어오기 때문에
 		domainValid: currentPointer?.data.domainId == domainSetting?.domainId,
 	};
 
@@ -305,7 +334,9 @@ const StylePage = () => {
 				<VerticalSpace space="small" />
 
 				<VerticalSpace space="small" />
-				<Text>{(domainSetting.domainId, currentPointer.characters, styleData)}</Text>
+				<Text>
+					{(domainSetting.domainId, currentPointer.characters, styleData)}
+				</Text>
 
 				<ErrorBoundary>
 					<ResourceProvider
@@ -318,11 +349,15 @@ const StylePage = () => {
 							domainId: number;
 							characters: string;
 							StyleDataArr: StyleData;
-							mode: 'id' | 'name';
+							mode: "id" | "name";
 						}) => {
 							if (isXmlCheck(characters)) {
-								console.log('🚀 ~ fetchFn={ ~ characters:', characters);
-								return xmlToStyle(characters, currentPointer.data.localizationKey, action);
+								console.log("🚀 ~ fetchFn={ ~ characters:", characters);
+								return xmlToStyle(
+									characters,
+									currentPointer.data.localizationKey,
+									action,
+								);
 							} else {
 								return styleToXml(domainId, characters, StyleDataArr, mode);
 							}
@@ -335,8 +370,15 @@ const StylePage = () => {
 					>
 						{(resource) => {
 							return (
-								<Suspense fallback={<div className="loading">데이터를 불러오는 중...</div>}>
-									<StyleXml resource={resource} focusUpdateCount={focusUpdateCount} />
+								<Suspense
+									fallback={
+										<div className="loading">데이터를 불러오는 중...</div>
+									}
+								>
+									<StyleXml
+										resource={resource}
+										focusUpdateCount={focusUpdateCount}
+									/>
 								</Suspense>
 							);
 						}}

@@ -34,9 +34,6 @@ import { emit } from '@create-figma-plugin/utilities';
 import {
 	GET_LOCALIZATION_KEY_VALUE,
 	GET_PATTERN_MATCH_KEY,
-	SET_NODE_IGNORE,
-	SET_NODE_LOCALIZATION_KEY_BATCH,
-	UPDATE_NODE_LOCALIZATION_KEY_BATCH,
 } from '../constant';
 import { groupByPattern } from './batchModel';
 import { GroupOption, ViewOption } from '@/model/types';
@@ -53,118 +50,12 @@ import { LocalizationKeyDTO } from '@/model/types';
 import { SearchArea, useSearch } from '../Label/LabelSearch';
 import { selectedKeySignal } from '@/model/signal';
 import { NonNullableComponentTypeExtract } from 'types/utilType';
-import { keyConventionRegex } from '@/utils/textTools';
 import { currentPointerSignal } from '@/model/signal';
-import { TargetedEvent } from 'preact/compat';
 import SimpleSelect from './SimpleSelect';
 import { getTimeAgo } from '@/utils/time';
+import { useBatchActions } from './useBatchActions';
+import { SearchResult } from './components/SearchResult';
 
-const selectStyle = (selected: boolean) => {
-	if (selected) {
-		return {
-			secondary: false,
-		};
-	}
-
-	return {
-		secondary: true,
-	};
-};
-
-export const SearchResult = ({ ignore, name, text, parentName, localizationKey, ids }: PatternMatchData) => {
-	const [isExtended, setIsExtended] = useState<boolean>(false);
-
-	const selectIds = useSignal(selectIdsSignal);
-	const hasAnyId = ids.some((id) => selectIds.includes(id));
-	return (
-		<div className={clc(styles.container, hasAnyId && styles.containerSelected)}>
-			<div className={styles.column}>
-				<div className={styles.row}>
-					<IconButton
-						onClick={() => {
-							emit(SET_NODE_IGNORE.REQUEST_KEY, {
-								ignore: !ignore,
-								ids: ids,
-							});
-							emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-						}}
-					>
-						{ignore ? <IconHiddenSmall24 /> : <IconEyeSmall24></IconEyeSmall24>}
-					</IconButton>
-					<Text align="left" className={styles.width}>
-						<Code>text: {text}</Code>
-					</Text>
-
-					<IconButton
-						onClick={() => {
-							setIsExtended(true);
-							// ids 리스트 중 하나라도 현재 선택된 리스트에 있는지 확인
-
-							if (hasAnyId) {
-								// 하나라도 있으면 해당 ids 리스트의 모든 항목 제거
-								selectIdsSignal.value = selectIds.filter((id) => !ids.includes(id));
-							} else {
-								// 하나도 없으면 모든 항목 추가
-								selectIdsSignal.value = [...selectIds, ...ids];
-							}
-						}}
-					>
-						{hasAnyId ? <IconCloseSmall24 /> : ids.length.toString()}
-					</IconButton>
-				</div>
-				<div className={styles.row}>
-					<Bold className={clc(localizationKey === '' && styles.disabled)}>
-						key: {localizationKey === '' ? 'NULL' : localizationKey}
-					</Bold>
-					<IconButton
-						onClick={() => {
-							setIsExtended(!isExtended);
-						}}
-					>
-						{isExtended ? <IconChevronUp24 /> : <IconChevronDown24 />}
-					</IconButton>
-				</div>
-			</div>
-			<div className={clc(!isExtended && styles.rowExtended)}>
-				<button
-					className={styles.button}
-					onClick={() => {
-						selectIdsSignal.value = ids;
-						emit('PAGE_SELECT_IDS', { ids });
-					}}
-				>
-					{parentName} / {name}
-				</button>
-
-				<div className={styles.wrap}>
-					{ids.map((item) => {
-						const selected = selectIds.includes(item);
-
-						return (
-							<Button
-								{...selectStyle(selected)}
-								onClick={() => {
-									pageNodeZoomAction(item);
-								}}
-								onContextMenu={(e: TargetedEvent<HTMLButtonElement, MouseEvent>) => {
-									e.preventDefault(); // 기본 우클릭 메뉴 방지
-									// 아이템이 이미 선택 목록에 있으면 제거하고, 없으면 추가합니다
-									if (selectIds.includes(item)) {
-										selectIdsSignal.value = selectIds.filter((id) => id !== item);
-									} else {
-										selectIdsSignal.value = [...selectIds, item];
-									}
-								}}
-							>
-								{item}
-							</Button>
-						);
-					})}
-				</div>
-			</div>
-		</div>
-	);
-};
 
 type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name';
 
@@ -196,6 +87,7 @@ const SearchSection = ({
 	setAllView,
 	patternMatchDataGroup,
 	filteredDataLength,
+	dispatch,
 }: {
 	searchOption: SearchOption;
 	setSearchOption: Dispatch<StateUpdater<SearchOption>>;
@@ -212,6 +104,7 @@ const SearchSection = ({
 	setAllView: Dispatch<StateUpdater<boolean>>;
 	patternMatchDataGroup: PatternMatchData[];
 	filteredDataLength: number;
+	dispatch: Dispatch<any>;
 }) => {
 	return (
 		<Fragment>
@@ -291,7 +184,7 @@ const SearchSection = ({
 				{patternMatchDataGroup
 					.sort((a, b) => a.text.localeCompare(b.text))
 					.map((item) => {
-						return <SearchResult {...item} />;
+						return <SearchResult {...item} dispatch={dispatch} />;
 					})}
 			</div>
 		</Fragment>
@@ -321,6 +214,7 @@ function BatchPage() {
 	const selectedKey = useSignal(selectedKeySignal);
 	const selectedKeyData = useSignal(selectedKeyDataSignal);
 	const { data: searchResult, search, setSearch } = useSearch();
+	const { dispatch, actions } = useBatchActions();
 
 	// const hasSelectedKey = typeof selectedKeyData === 'object';
 	const hasSelectedKey = selectedKey !== null;
@@ -405,9 +299,7 @@ function BatchPage() {
 		setTabValue(newValue);
 	}
 	const searchHandler = (key: string) => {
-		inputKeySignal.value = key;
-		setSearch(key);
-		setTabValue('Search');
+		dispatch(actions.searchKey([key, setSearch, setTabValue]));
 	};
 
 	const options: Array<TabsOption> = [
@@ -428,6 +320,7 @@ function BatchPage() {
 					setAllView={setAllView}
 					patternMatchDataGroup={patternMatchDataGroup}
 					filteredDataLength={filteredDataLength}
+					dispatch={dispatch}
 				/>
 			),
 			value: nav[0],
@@ -471,9 +364,7 @@ function BatchPage() {
 						<div className={styles.row}>
 							<Muted className={styles.noWrapSecondary}>{updateTimeString}</Muted>
 							<IconButton
-								onClick={() => {
-									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-								}}
+								onClick={() => dispatch(actions.refreshPatternMatch())}
 							>
 								<IconSwapSmall24 />
 							</IconButton>
@@ -491,61 +382,24 @@ function BatchPage() {
 							placeholder="새로운 키 값 입력"
 							value={hasSelectedKey && selectedKeyData ? selectedKeyData?.name : localizationKey}
 							onChange={(e) => {
-								const next = keyConventionRegex(e.currentTarget.value);
-
-								searchHandler(next);
+								searchHandler(e.currentTarget.value);
 							}}
 						></Textbox>
 						<IconButton
-							onClick={() => {
-								setSearch('');
-								selectedKeySignal.value = null;
-								inputKeySignal.value = '';
-							}}
+							onClick={() => dispatch(actions.clearKeySelection([setSearch]))}
 						>
 							<IconCloseSmall24 />
 						</IconButton>
 						<Button
-							onClick={async () => {
-								if (hasSelectedKey) {
-									// 변경할 키가 있으면 바로 일괄 변경 로직
-									const isOriginNull = selectedKeyData?.origin_value == null || selectedKeyData.origin_value === '';
-
-									emit(UPDATE_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY, {
-										domainId: selectedKeyData?.domain_id,
-										keyId: selectedKeyData?.key_id,
-										originId: isOriginNull ? null : selectedKeyData?.origin_id,
-										ids: selectIds,
-									});
-									emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-								} else {
-									// 변경할 키가 없으면 추가하고
-									const result = await fetchData('/localization/keys', {
-										method: 'POST',
-										headers: {
-											'Content-Type': 'application/json',
-										},
-										body: JSON.stringify({
-											domainId: domainSetting.domainId,
-											name: localizationKey,
-											isTemporary: true,
-										}),
-									});
-
-									if (result.data) {
-										emit(
-											SET_NODE_LOCALIZATION_KEY_BATCH.REQUEST_KEY,
-											{
-												domainId: result.data.domain_id,
-												keyId: result.data.key_id,
-												ids: selectIds,
-											},
-											currentPointer?.nodeId
-										);
-										emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY);
-									}
-								}
-							}}
+							onClick={() => dispatch(actions.updateLocalizationKey([
+								hasSelectedKey,
+								selectedKeyData,
+								selectIds,
+								domainSetting,
+								localizationKey,
+								currentPointer,
+								fetchData
+							]))}
 							secondary
 						>
 							{hasSelectedKey ? '변경' : '추가'}

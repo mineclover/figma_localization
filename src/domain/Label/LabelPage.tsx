@@ -56,6 +56,15 @@ function LabelPage() {
 	const { dispatch, actions } = useLabelActions()
 	return (
 		<div className={styles.container}>
+			<span>{modeState}</span>
+
+			<span>선택할 수 있는 전체 키 목록</span>
+			<KeyIds
+				localizationKey={selectNodeData?.localizationKey ?? ''}
+				action={'default'}
+				text={selectNodeData?.text ?? ''}
+				prefix="test"
+			/>
 			<div className={styles.row}>
 				<IconButton onClick={() => dispatch(actions.renderPair())}>
 					<IconEyeSmall24></IconEyeSmall24>
@@ -80,17 +89,8 @@ function LabelPage() {
 				</IconButton>
 				{/* 활성화 */}
 			</div>
-			<Preset />
+			{/* <Preset /> */}
 			<SimpleSelect />
-			<span>{modeState}</span>
-
-			<span>선택할 수 있는 전체 키 목록</span>
-			<KeyIds
-				localizationKey={selectNodeData?.localizationKey ?? ''}
-				action={'default'}
-				text={selectNodeData?.text ?? ''}
-				prefix="test"
-			/>
 
 			{/* <Button
 					onClick={() => {

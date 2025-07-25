@@ -11,6 +11,7 @@ import LogsPage from '@/domain/Logs/LogsPage'
 import { AppProvider } from '@/domain/Provider'
 import SettingPage from '@/domain/Setting/SettingPage'
 import StylePage from '@/domain/Style/StylePage'
+import TaskMonitor from '@/domain/Task/TaskMonitor'
 import TranslatePage from '@/domain/Translate/TranslatePage'
 import { useSignal } from '@/hooks/useSignal'
 import { isDirectSignal } from '@/model/signal'
@@ -21,6 +22,7 @@ const TAB_NAMES = {
 	ICON: 'Icon',
 	LABEL: 'Label',
 	KEYS: 'Keys',
+	TASKS: 'Tasks',
 	STYLE: 'Style',
 	TRANSLATE: 'Translate',
 	SETTING: 'Setting',
@@ -50,6 +52,10 @@ function createTabOptions(): Array<TabsOption> {
 		{
 			children: <BatchPage />,
 			value: TAB_NAMES.KEYS,
+		},
+		{
+			children: <TaskMonitor />,
+			value: TAB_NAMES.TASKS,
 		},
 		{
 			children: <StylePage />,

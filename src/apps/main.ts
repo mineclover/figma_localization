@@ -50,6 +50,8 @@ import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE'
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges'
 import { runExample } from '@/utils/test'
 import type { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
+import { TaskProcessor } from '@/domain/Task/taskProcessor'
+import { PatternMatchTaskExecutor } from '@/domain/Task/PatternMatchTaskExecutor'
 
 function initializeSettings() {
 	onSetProjectId()
@@ -120,6 +122,11 @@ function initializeSystemFeatures() {
 	onSetPageLockOpen()
 }
 
+function initializeTaskProcessor() {
+	// Register task executors
+	TaskProcessor.registerExecutor('pattern-match', new PatternMatchTaskExecutor())
+}
+
 function initializeUIHandlers() {
 	on<ResizeWindowHandler>('RESIZE_WINDOW', (windowSize: { width: number; height: number }) => {
 		const { width, height } = windowSize
@@ -140,6 +147,7 @@ export default function () {
 	initializeVisualizationMode()
 	initializeTranslationActions()
 	initializeSystemFeatures()
+	initializeTaskProcessor()
 	initializeUIHandlers()
 
 	showUI({

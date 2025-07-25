@@ -8,8 +8,8 @@ import {
 	Text,
 } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
-import ProgressBar from '@ramonak/react-progress-bar'
-import { Fragment, h } from 'preact'
+import { h } from 'preact'
+import ProgressBar from '@/components/ProgressBar'
 import { useSignal } from '@/hooks/useSignal'
 import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal'
 import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../constant'

@@ -117,15 +117,18 @@ export const FilePathNodeSearch = (node: BaseNode, pathNode: BaseNode[] = []): B
 import type { Prettify } from '../../types/utilType'
 
 export const notify = (message: string, closeLabel: string, timeout = 2000) => {
-	const NotificationHandler = figma.notify(message, {
-		timeout: timeout,
-		button: {
-			text: closeLabel,
-			action: () => {
-				NotificationHandler.cancel()
+	if (typeof figma === 'object') {
+		const NotificationHandler = figma.notify(message, {
+			timeout: timeout,
+			button: {
+				text: closeLabel,
+				action: () => {
+					NotificationHandler.cancel()
+				},
 			},
-		},
-	})
+		})
+	}
+	console.log('🚀 ~ notify ~ message:', message)
 }
 
 const notifyMap = {} as Record<string, number>

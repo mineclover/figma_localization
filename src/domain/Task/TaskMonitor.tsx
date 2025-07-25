@@ -1,17 +1,18 @@
 import { Bold, Button, Divider, IconButton, IconTrash24, Text, VerticalSpace } from '@create-figma-plugin/ui'
-import ProgressBar from '@ramonak/react-progress-bar'
 import { Fragment, h } from 'preact'
 import { useState } from 'preact/hooks'
 import { useSignal } from '@/hooks/useSignal'
 import { patternMatchDataSignal } from '@/model/signal'
-import { PatternMatchData } from '@/model/types'
+import { MetaData } from '@/domain/Search/searchStore'
+import ProgressBar from '@/components/ProgressBar'
 import styles from './TaskMonitor.module.css'
 import { TaskProcessor, taskProcessorSignal } from './taskProcessor'
 
-export interface TaskItem {
+export interface TaskItem<T = any> {
 	id: string
 	name: string
-	data: PatternMatchData
+	type: string
+	data: T
 	status: 'pending' | 'processing' | 'completed' | 'failed'
 	progress: number
 	error?: string
@@ -48,9 +49,10 @@ const TaskMonitor = () => {
 		}
 
 		const queueId = `queue_${Date.now()}`
-		const tasks: TaskItem[] = patternMatchData.map((data, index) => ({
+		const tasks: TaskItem<MetaData>[] = patternMatchData.map((data, index) => ({
 			id: `task_${queueId}_${index}`,
 			name: data.text || data.name || `작업 ${index + 1}`,
+			type: 'pattern-match',
 			data,
 			status: 'pending',
 			progress: 0,
@@ -181,7 +183,7 @@ const TaskMonitor = () => {
 												labelAlignment="center"
 												bgColor="var(--figma-color-bg-success)"
 												baseBgColor="var(--figma-color-bg-secondary)"
-												labelColor="var(--figma-color-text-onbrand)"
+												labelColor="var(--figma-color-text-on-brand)"
 												margin="2px 0"
 											/>
 										)}

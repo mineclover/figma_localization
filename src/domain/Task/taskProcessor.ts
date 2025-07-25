@@ -1,22 +1,29 @@
 import { emit } from '@create-figma-plugin/utilities'
 import { signal } from '@preact/signals-core'
 import { notify } from '@/figmaPluginUtils'
-import { domainSettingSignal } from '@/model/signal'
-import { PatternMatchData } from '@/model/types'
-import { baseIsAllNode } from '../Batch/batchModel'
 import { GET_PATTERN_MATCH_KEY } from '../constant'
 import { TaskItem, TaskQueue } from './TaskMonitor'
+
+// Re-export TaskItem from TaskMonitor
+export type { TaskItem } from './TaskMonitor'
+
+// Task executor interface
+export interface TaskExecutor<T = any> {
+	execute(task: TaskItem<T>, onProgress: (progress: number) => void): Promise<void>
+}
 
 interface TaskProcessorState {
 	queues: Record<string, TaskQueue>
 	isProcessing: boolean
 	currentQueueId: string | null
+	executors: Map<string, TaskExecutor>
 }
 
 export const taskProcessorSignal = signal<TaskProcessorState>({
 	queues: {},
 	isProcessing: false,
 	currentQueueId: null,
+	executors: new Map(),
 })
 
 // 모듈 레벨 변수들
@@ -73,7 +80,6 @@ const processNextTask = async () => {
 
 const executeTask = async (queueId: string, task: TaskItem) => {
 	const state = taskProcessorSignal.value
-	const _queue = state.queues[queueId]
 
 	// 작업 시작
 	const updatedTask = {
@@ -86,8 +92,14 @@ const executeTask = async (queueId: string, task: TaskItem) => {
 	updateTask(queueId, updatedTask)
 
 	try {
-		// 실제 작업 수행 - patternMatchData를 기반으로 로컬라이제이션 작업 수행
-		await performLocalizationTask(updatedTask, (progress: number) => {
+		// Get the executor for this task type
+		const executor = state.executors.get(task.type)
+		if (!executor) {
+			throw new Error(`No executor registered for task type: ${task.type}`)
+		}
+
+		// Execute the task using the registered executor
+		await executor.execute(updatedTask, (progress: number) => {
 			updateTaskProgress(queueId, task.id, progress)
 		})
 
@@ -115,38 +127,7 @@ const executeTask = async (queueId: string, task: TaskItem) => {
 	}
 }
 
-const performLocalizationTask = async (task: TaskItem, onProgress: (progress: number) => void): Promise<void> => {
-	const { data } = task
-
-	onProgress(20)
-
-	// 로컬라이제이션 키 설정 작업 수행
-	if (data.ids && data.ids.length > 0) {
-		// 현재 도메인 설정 가져오기
-		const domainSetting = domainSettingSignal.value
-		if (!domainSetting?.domainId) {
-			throw new Error('도메인 설정이 없습니다.')
-		}
-
-		// 기존 batchModel의 baseIsAllNode 함수 활용
-		const localizationData = {
-			domainId: domainSetting.domainId,
-			keyId: data.localizationKey || `auto_key_${Date.now()}`,
-			ids: data.ids,
-		}
-
-		onProgress(50)
-
-		// 첫 번째 노드를 기준 노드로 설정
-		const baseNodeId = data.ids[0]
-
-		await baseIsAllNode(localizationData, baseNodeId)
-
-		onProgress(100)
-	} else {
-		throw new Error('작업할 노드 ID가 없습니다.')
-	}
-}
+// Remove performLocalizationTask - this should be implemented externally
 
 const updateTask = (queueId: string, updatedTask: TaskItem) => {
 	const state = taskProcessorSignal.value
@@ -228,9 +209,9 @@ const completeQueue = (queueId: string) => {
 	const failedTasks = queue.tasks.filter(task => task.status === 'failed')
 	const finalStatus = failedTasks.length > 0 ? 'failed' : 'completed'
 
-	const updatedQueue = {
+	const updatedQueue: TaskQueue = {
 		...queue,
-		status: finalStatus as const,
+		status: finalStatus as TaskQueue['status'],
 		completedAt: new Date(),
 	}
 
@@ -271,6 +252,18 @@ const checkForNextQueue = () => {
 
 // 공개 API
 export const TaskProcessor = {
+	// Register a task executor for a specific task type
+	registerExecutor(taskType: string, executor: TaskExecutor) {
+		const state = taskProcessorSignal.value
+		state.executors.set(taskType, executor)
+	},
+
+	// Unregister a task executor
+	unregisterExecutor(taskType: string) {
+		const state = taskProcessorSignal.value
+		state.executors.delete(taskType)
+	},
+
 	addQueue(queue: TaskQueue) {
 		const state = taskProcessorSignal.value
 		taskProcessorSignal.value = {
@@ -284,7 +277,7 @@ export const TaskProcessor = {
 
 	removeQueue(queueId: string) {
 		const state = taskProcessorSignal.value
-		const { [queueId]: removed, ...remainingQueues } = state.queues
+		const { [queueId]: _removed, ...remainingQueues } = state.queues
 
 		taskProcessorSignal.value = {
 			...state,
@@ -345,7 +338,7 @@ export const TaskProcessor = {
 	},
 
 	// 패턴 매치 데이터 요청 메서드
-	async requestPatternMatchData(targetID?: string): Promise<void> {
+	requestPatternMatchData(targetID?: string): void {
 		// 기존 batchModel의 onPatternMatchResponse 로직 활용
 		emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, targetID)
 	},

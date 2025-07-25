@@ -129,6 +129,7 @@ export type SearchNodeData = {
 
 export type PatternMatchData = Omit<SearchNodeData, 'id'> & {
 	ids: string[]
+	localizationKey?: string
 }
 export type GroupOption = {
 	localizationKey: boolean

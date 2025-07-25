@@ -356,7 +356,7 @@ export const onGetBaseNode = () => {
 
 /** 특정 값으로 노드 줌 */
 export const onTextToFrameSelect = () => {
-	on<PageSelectIdsToBoxHandler>('PAGE_SELECT_IDS_TO_BOX', async ({ ids, select }) => {
+	on<PageSelectIdsToBoxHandler>('PAGE_SELECT_IDS_TO_BOX', ({ ids, select }) => {
 		// console.log('🚀 ~ pageSelectIds_Adapter ~ ids:', ids);
 
 		const nodes = ids

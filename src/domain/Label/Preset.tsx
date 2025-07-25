@@ -1,31 +1,31 @@
-import { h } from 'preact';
-import { useState } from 'preact/hooks';
-import { Bold, Textbox, IconChevronDownLarge24 } from '@create-figma-plugin/ui';
-import { useSignal } from '@/hooks/useSignal';
-import { editPresetSignal, presetStoreSignal, apiKeySignal } from '@/model/signal';
-import { textRecommend } from '@/ai/textRecommend';
-import { clc } from '@/components/modal/utils';
-import styles from './Label.module.css';
+import { Bold, IconChevronDownLarge24, Textbox } from '@create-figma-plugin/ui'
+import { h } from 'preact'
+import { useState } from 'preact/hooks'
+import { textRecommend } from '@/ai/textRecommend'
+import { clc } from '@/components/modal/utils'
+import { useSignal } from '@/hooks/useSignal'
+import { apiKeySignal, editPresetSignal, presetStoreSignal } from '@/model/signal'
+import styles from './Label.module.css'
 
 export const Preset = () => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false)
 
-	const editPreset = useSignal(editPresetSignal);
-	const presetStore = useSignal(presetStoreSignal);
-	const apiKey = useSignal(apiKeySignal);
+	const editPreset = useSignal(editPresetSignal)
+	const presetStore = useSignal(presetStoreSignal)
+	const apiKey = useSignal(apiKeySignal)
 
-	const presetNames = Object.keys(presetStore);
+	const presetNames = Object.keys(presetStore)
 
 	const handlePresetNameChange = (value: string) => {
-		editPreset.name = value;
-		editPresetSignal.value = editPreset;
-	};
+		editPreset.name = value
+		editPresetSignal.value = editPreset
+	}
 
 	const handleEnterKeyPress = async (inputValue: string) => {
 		if (apiKey) {
-			const response = await textRecommend(apiKey, inputValue);
+			const _response = await textRecommend(apiKey, inputValue)
 		}
-	};
+	}
 
 	return (
 		<div className={styles.wrap}>
@@ -34,30 +34,34 @@ export const Preset = () => {
 				<Textbox
 					placeholder="프리셋 이름 입력 가능"
 					value={editPreset.name}
-					onChange={(e) => handlePresetNameChange(e.currentTarget.value)}
-					onKeyDown={async (e) => {
+					onChange={e => handlePresetNameChange(e.currentTarget.value)}
+					onKeyDown={async e => {
 						if (e.key === 'Enter') {
-							const inputValue = e.currentTarget.value;
-							await handleEnterKeyPress(inputValue);
+							const inputValue = e.currentTarget.value
+							await handleEnterKeyPress(inputValue)
 						}
 					}}
 				/>
-				<button className={clc(styles.iconButton, isOpen && styles.up)} onClick={() => setIsOpen(!isOpen)}>
+				<button
+					type="button"
+					className={clc(styles.iconButton, isOpen && styles.up)}
+					onClick={() => setIsOpen(!isOpen)}
+				>
 					<IconChevronDownLarge24 />
 				</button>
 			</div>
 			{isOpen && (
 				<div className={styles.wrap}>
-					{presetNames.map((item) => {
-						const preset = presetStore[item];
+					{presetNames.map(item => {
+						const preset = presetStore[item]
 						return (
-							<button key={item} className={styles.item}>
+							<button type="button" key={item} className={styles.item}>
 								{preset.name} : {preset.figmaSectionIds.join(',')}
 							</button>
-						);
+						)
 					})}
 				</div>
 			)}
 		</div>
-	);
-};
+	)
+}

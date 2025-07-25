@@ -772,4 +772,4 @@ export const icons = {
 		'IconZoomNoSmall24',
 		'IconZoomOutSmall24',
 	],
-};
+}

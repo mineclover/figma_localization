@@ -1,30 +1,29 @@
-import { useSignal } from '@/hooks/useSignal';
-import ProgressBar from '@ramonak/react-progress-bar';
-import { h, Fragment } from 'preact';
-import { Process, processSignal } from './process';
-import styles from './Process.module.css';
 import {
 	Bold,
-	Text,
+	Button,
+	IconButton,
 	IconLockLocked16,
 	IconLockUnlocked16,
-	IconButton,
 	IconTrash24,
-	Button,
-} from '@create-figma-plugin/ui';
-
-import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal';
-import { emit } from '@create-figma-plugin/utilities';
-import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../constant';
+	Text,
+} from '@create-figma-plugin/ui'
+import { emit } from '@create-figma-plugin/utilities'
+import ProgressBar from '@ramonak/react-progress-bar'
+import { Fragment, h } from 'preact'
+import { useSignal } from '@/hooks/useSignal'
+import { currentPointerSignal, patternMatchDataSignal } from '@/model/signal'
+import { DISABLE_RENDER_PAIR, RENDER_PAIR } from '../constant'
+import styles from './Process.module.css'
+import { Process, processSignal } from './process'
 
 const ProcessBar = () => {
-	const processStore = useSignal(processSignal);
+	const processStore = useSignal(processSignal)
 
-	const keys = Object.keys(processStore);
-	const currentPointer = useSignal(currentPointerSignal);
-	const patternMatchData = useSignal(patternMatchDataSignal);
+	const keys = Object.keys(processStore)
+	const currentPointer = useSignal(currentPointerSignal)
+	const _patternMatchData = useSignal(patternMatchDataSignal)
 
-	const isPageLock = currentPointer?.pageLock ?? false;
+	const isPageLock = currentPointer?.pageLock ?? false
 
 	// process_id: string;
 	// process_name: string;
@@ -35,14 +34,14 @@ const ProcessBar = () => {
 		<div className={styles.container}>
 			<Button
 				onClick={() => {
-					emit(RENDER_PAIR.RENDER_REQUEST);
+					emit(RENDER_PAIR.RENDER_REQUEST)
 				}}
 			>
 				활성화
 			</Button>
 			<Button
 				onClick={() => {
-					emit(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST);
+					emit(DISABLE_RENDER_PAIR.DISABLE_RENDER_REQUEST)
 				}}
 			>
 				비활성화
@@ -52,11 +51,11 @@ const ProcessBar = () => {
 				{isPageLock ? <IconLockLocked16 /> : <IconLockUnlocked16 />}
 			</div>
 			{keys.length > 0 && <Bold>변경 대상의 번역 상태</Bold>}
-			{keys.map((key) => {
-				const process = processStore[key];
-				const { process_status, process_name, process_end } = process;
+			{keys.map(key => {
+				const process = processStore[key]
+				const { process_status, process_name, process_end } = process
 
-				console.log(process_status, process_end);
+				console.log(process_status, process_end)
 
 				return (
 					<div className={styles.row}>
@@ -80,17 +79,17 @@ const ProcessBar = () => {
 						/>
 						<IconButton
 							onClick={() => {
-								delete processStore[key];
-								processSignal.value = { ...processStore };
+								delete processStore[key]
+								processSignal.value = { ...processStore }
 							}}
 						>
 							<IconTrash24 />
 						</IconButton>
 					</div>
-				);
+				)
 			})}
 		</div>
-	);
-};
+	)
+}
 
-export default ProcessBar;
+export default ProcessBar

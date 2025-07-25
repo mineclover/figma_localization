@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from 'preact'
 
 const GithubIcon = ({ size = 24, color = '#1B1F23', ...props }) => {
 	return (
@@ -10,7 +10,7 @@ const GithubIcon = ({ size = 24, color = '#1B1F23', ...props }) => {
 				fill={color}
 			/>
 		</svg>
-	);
-};
+	)
+}
 
-export default GithubIcon;
+export default GithubIcon

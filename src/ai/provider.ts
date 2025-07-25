@@ -1,45 +1,45 @@
 // types.ts
 export interface ProviderOptions {
-	apiKey: string;
-	[key: string]: any;
+	apiKey: string
+	[key: string]: any
 }
 
 export interface ProviderResponse<T> {
 	// output array = T[]
-	data: T[];
-	[key: string]: any;
+	data: T[]
+	[key: string]: any
 }
 
 export interface ModelConfig {
-	modelId: string;
-	[key: string]: any;
+	modelId: string
+	[key: string]: any
 }
 
 // provider.ts
-import { z } from 'zod';
+import type { z } from 'zod'
 
 /**
  * Abstract Provider class for AI model interactions
  */
 export abstract class Provider<T extends ProviderOptions> {
-	protected options: T;
-	protected modelId: string;
-	protected model: any = null;
+	protected options: T
+	protected modelId: string
+	protected model: any = null
 
 	/**
 	 * Constructor for the Provider class
 	 * @param options Provider-specific configuration options
 	 */
 	constructor(options: T) {
-		this.options = options;
-		this.modelId = '';
+		this.options = options
+		this.modelId = ''
 	}
 
 	/**
 	 * Initialize the provider with given options
 	 * @param modelConfig Configuration for the specific model
 	 */
-	abstract initialize(modelConfig: ModelConfig): void;
+	abstract initialize(modelConfig: ModelConfig): void
 
 	/**
 	 * Send a message to the AI model
@@ -51,13 +51,13 @@ export abstract class Provider<T extends ProviderOptions> {
 		prompt: string,
 		schema: z.ZodType<R>,
 		additionalOptions?: any
-	): Promise<ProviderResponse<R>>;
+	): Promise<ProviderResponse<R>>
 
 	/**
 	 * Get the current API key
 	 */
 	getApiKey(): string {
-		return this.options.apiKey;
+		return this.options.apiKey
 	}
 
 	/**
@@ -65,10 +65,10 @@ export abstract class Provider<T extends ProviderOptions> {
 	 * @param apiKey New API key
 	 */
 	setApiKey(apiKey: string): void {
-		this.options.apiKey = apiKey;
+		this.options.apiKey = apiKey
 		// Re-initialize to apply the new API key
 		if (this.modelId) {
-			this.initialize({ modelId: this.modelId });
+			this.initialize({ modelId: this.modelId })
 		}
 	}
 }

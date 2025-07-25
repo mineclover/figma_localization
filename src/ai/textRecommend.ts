@@ -1,11 +1,11 @@
-import { z } from 'zod';
-import { GoogleProvider, GoogleProviderOptions } from './model';
+import { z } from 'zod'
+import { GoogleProvider, GoogleProviderOptions } from './model'
 
 // Schema for structured output
 const textSchema = z.object({
 	variableName: z.string(),
 	normalizePoint: z.number(),
-});
+})
 
 const prompt = `
 텍스트를 보고 적절한 로컬라이제이션 변수명을 추천.
@@ -20,7 +20,7 @@ prefix는 변수명의 접두사로 사용될 것임으로 변수명에 포함�
 텍스트: {text}
 접두사: {prefix}
 이미 사용 중인 변수명: {duplicate}
-`;
+`
 
 /**
  * 텍스트 추천 api
@@ -36,12 +36,12 @@ export async function textRecommend(apiKey: string, text: string, prefix: string
 		apiKey: apiKey,
 		responseModalities: ['TEXT'],
 		temperature: 0.8,
-	});
+	})
 
 	// Initialize with model ID
 	provider.initialize({
 		modelId: 'gemini-2.5-flash-preview-04-17',
-	});
+	})
 
 	try {
 		// Generate structured output
@@ -49,9 +49,9 @@ export async function textRecommend(apiKey: string, text: string, prefix: string
 			prompt.replace('{text}', text).replace('{prefix}', prefix).replace('{duplicate}', duplicate.join(',')),
 			textSchema
 			// Override temperature for this request
-		);
-		return response;
+		)
+		return response
 	} catch (error) {
-		console.error('Error generating object:', error);
+		console.error('Error generating object:', error)
 	}
 }

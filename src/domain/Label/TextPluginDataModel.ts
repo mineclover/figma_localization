@@ -1,5 +1,19 @@
-import { NodeData } from '@/model/types';
-import { emit, on } from '@create-figma-plugin/utilities';
+import { emit, on } from '@create-figma-plugin/utilities'
+import toNumber from 'strnum'
+import type { components } from 'types/i18n'
+import { notify } from '@/figmaPluginUtils'
+import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text'
+import type {
+	LocalizationKey,
+	LocalizationKeyDTO,
+	LocalizationKeyProps,
+	LocalizationTranslation,
+	LocalizationTranslationDTO,
+	Location,
+	LocationDTO,
+	NodeData,
+} from '@/model/types'
+import { parseXmlToFlatStructure } from '@/utils/xml2'
 import {
 	GET_CURSOR_POSITION,
 	GET_LOCALIZATION_KEY_VALUE,
@@ -9,32 +23,16 @@ import {
 	SET_NODE_LOCATION,
 	SET_NODE_RESET_KEY,
 	UPDATE_NODE_STORE_KEY,
-} from '../constant';
-import toNumber from 'strnum';
-
-import { notify } from '@/figmaPluginUtils';
-import { sectionNameParser } from './LabelModel';
-import { getCursorPosition, getNodeData, nodeMetaData } from '../getState';
-import { fetchDB } from '../utils/fetchDB';
-import { getDomainSetting } from '../Setting/SettingModel';
-import { getAllStyleRanges, textFontLoad } from '@/figmaPluginUtils/text';
-import { components } from 'types/i18n';
-
-import {
-	LocationDTO,
-	Location,
-	LocalizationKey,
-	LocalizationKeyDTO,
-	LocalizationKeyProps,
-	LocalizationTranslation,
-	LocalizationTranslationDTO,
-} from '@/model/types';
-import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction';
-import { parseXmlToFlatStructure } from '@/utils/xml2';
-import { overlayRender } from '../Search/visualModel';
+} from '../constant'
+import { getCursorPosition, getNodeData, nodeMetaData } from '../getState'
+import { overlayRender } from '../Search/visualModel'
+import { getDomainSetting } from '../Setting/SettingModel'
+import { styleToXml, TargetNodeStyleUpdate } from '../Style/styleAction'
+import { fetchDB } from '../utils/fetchDB'
+import { sectionNameParser } from './LabelModel'
 
 export const locationMapping = (location: LocationDTO): Location => {
-	console.log('🚀 ~ locationMapping ~ location:', location);
+	console.log('🚀 ~ locationMapping ~ location:', location)
 	return {
 		location_id: location.location_id,
 		project_id: location.project_id,
@@ -43,8 +41,8 @@ export const locationMapping = (location: LocationDTO): Location => {
 
 		created_at: location.created_at,
 		updated_at: location.updated_at,
-	};
-};
+	}
+}
 
 export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey => {
 	return {
@@ -61,17 +59,17 @@ export const localizationKeyMapping = (dto: LocalizationKeyDTO): LocalizationKey
 		is_deleted: dto.is_deleted === 1,
 		created_at: dto.created_at,
 		updated_at: dto.updated_at,
-	};
-};
+	}
+}
 
 /** 노드에서 키에 소속된 모든 번역 값 조회 */
 export const getNodeTranslations = async (node: BaseNode) => {
-	const nodeData = getNodeData(node);
+	const nodeData = getNodeData(node)
 	if (nodeData.localizationKey === '') {
-		return;
+		return
 	}
-	return await getTargetTranslations(nodeData.localizationKey);
-};
+	return await getTargetTranslations(nodeData.localizationKey)
+}
 
 /**
  * 키에 번역된 언어 검색 , 작업 중
@@ -79,32 +77,32 @@ export const getNodeTranslations = async (node: BaseNode) => {
  */
 export const onGetKeyTranslations = () => {
 	on(GET_LOCALIZATION_KEY_VALUE.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0];
+		const node = figma.currentPage.selection[0]
 		if (!node || node.type !== 'TEXT') {
-			return;
+			return
 		}
 
-		const result = await getNodeTranslations(node);
-	});
-};
+		const _result = await getNodeTranslations(node)
+	})
+}
 
 /** 낙관적 업데이트로 반영 */
 export const onSetNodeResetKey = () => {
 	on(SET_NODE_RESET_KEY.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0];
+		const node = figma.currentPage.selection[0]
 		if (!node || node.type !== 'TEXT') {
-			return;
+			return
 		}
 
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '');
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '');
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, '')
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, '')
 
-		node.setPluginData(NODE_STORE_KEY.LOCATION, '');
-		node.setPluginData(NODE_STORE_KEY.ACTION, '');
-		node.setPluginData(NODE_STORE_KEY.MODIFIER, '');
-		node.autoRename = true;
-	});
-};
+		node.setPluginData(NODE_STORE_KEY.LOCATION, '')
+		node.setPluginData(NODE_STORE_KEY.ACTION, '')
+		node.setPluginData(NODE_STORE_KEY.MODIFIER, '')
+		node.autoRename = true
+	})
+}
 
 export const localizationTranslationMapping = (dto: LocalizationTranslationDTO): LocalizationTranslation => {
 	return {
@@ -117,24 +115,24 @@ export const localizationTranslationMapping = (dto: LocalizationTranslationDTO):
 		text: dto.text,
 		updated_at: dto.updated_at,
 		version: dto.version,
-	};
-};
+	}
+}
 
 export const generateLocalizationName = (keyData: LocalizationKeyDTO) => {
 	/** 임시 값이면 @ 붙이고 아니면 # 붙임 */
-	const prefix = keyData.is_temporary ? '❎' : '✅';
-	const name = prefix + keyData.name;
+	const prefix = keyData.is_temporary ? '❎' : '✅'
+	const name = prefix + keyData.name
 
-	return name;
-};
+	return name
+}
 
 // 캐시 시스템 구현
 interface CacheItem<T> {
-	timestamp: number;
-	data: T;
+	timestamp: number
+	data: T
 }
 
-const requestCache = new Map<string, CacheItem<any>>();
+const requestCache = new Map<string, CacheItem<any>>()
 
 /**
  * 로컬라이제이션 키를 기준으로 이름 리로드
@@ -144,57 +142,57 @@ export const getLocalizationKeyData = async (
 	now: number
 ): Promise<LocalizationKeyDTO | null> => {
 	if (localizationKey === '') {
-		return null;
+		return null
 	}
 
-	const apiPath = '/localization/keys/id/' + localizationKey;
-	const cacheKey = apiPath;
+	const apiPath = `/localization/keys/id/${localizationKey}`
+	const cacheKey = apiPath
 
-	const cachedItem = requestCache.get(cacheKey);
+	const cachedItem = requestCache.get(cacheKey)
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (0.5초)
 
 	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
-		console.log(`cache hit: ${cacheKey}`);
-		return cachedItem.data;
+		console.log(`cache hit: ${cacheKey}`)
+		return cachedItem.data
 	}
 
 	// 캐시가 없거나 만료된 경우 새로운 요청 수행
 	const result = await fetchDB(apiPath as '/localization/keys/id/{id}', {
 		method: 'GET',
-	});
-	console.log('🚀 ~ result:', result);
+	})
+	console.log('🚀 ~ result:', result)
 
 	if (!result || result.status === 500) {
-		return null;
+		return null
 	}
-	const data = (await result.json()) as LocalizationKeyDTO;
+	const data = (await result.json()) as LocalizationKeyDTO
 
 	if (result.status === 200) {
 		// 결과 캐싱
 		requestCache.set(cacheKey, {
 			timestamp: now,
 			data: data,
-		});
-		console.log('캐싱 갱신 됨');
-		return data;
+		})
+		console.log('캐싱 갱신 됨')
+		return data
 	}
-	return null;
-};
+	return null
+}
 
 /** 번역 키 기반 단일 값 조회 */
 export const getTargetLocalizationName = async (id: string) => {
-	const result = await fetchDB(('/localization/translations/id/' + id) as '/localization/translations/id/{id}', {
+	const result = await fetchDB(`/localization/translations/id/${id}` as '/localization/translations/id/{id}', {
 		method: 'GET',
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO;
-	return data.text;
-};
+	const data = (await result.json()) as LocalizationTranslationDTO
+	return data.text
+}
 
 /** 번역에 대해 수정하거나 업데이트하거나 */
 export const putTargetTranslations = async (id: string, language: string, text: string) => {
@@ -205,16 +203,16 @@ export const putTargetTranslations = async (id: string, language: string, text: 
 			language: language,
 			translation: text,
 		}),
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO;
+	const data = (await result.json()) as LocalizationTranslationDTO
 
-	return data;
-};
+	return data
+}
 
 /** 하나만 얻음 */
 export const searchTargetLocalization = async (id: string, language: string) => {
@@ -224,52 +222,52 @@ export const searchTargetLocalization = async (id: string, language: string) => 
 			keyId: id,
 			language: language,
 		}),
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO;
+	const data = (await result.json()) as LocalizationTranslationDTO
 
-	return data.text;
-};
+	return data.text
+}
 
-const localizationKeyTranslationCache = new Map<string, CacheItem<LocalizationTranslationDTO[]>>();
+const localizationKeyTranslationCache = new Map<string, CacheItem<LocalizationTranslationDTO[]>>()
 
 /** 키 아이디 기반으로 여러개 얻음 */
 export const getTargetTranslations = async (id: string, date?: number) => {
-	const apiPath = '/localization/keys/' + id + '/translations';
-	const cacheKey = apiPath;
-	const now = date || Date.now();
+	const apiPath = `/localization/keys/${id}/translations`
+	const cacheKey = apiPath
+	const now = date || Date.now()
 
-	const cachedItem = localizationKeyTranslationCache.get(cacheKey);
+	const cachedItem = localizationKeyTranslationCache.get(cacheKey)
 
 	// 캐시된 항목이 있고, 캐시 기간이 지나지 않았으면 캐시된 데이터 반환 (3초)
 	if (cachedItem && now - (cachedItem?.timestamp ?? 0) < 3000) {
-		console.log(`cache hit: ${cacheKey}`);
-		return cachedItem.data;
+		console.log(`cache hit: ${cacheKey}`)
+		return cachedItem.data
 	}
 
 	const result = await fetchDB(apiPath as '/localization/keys/{id}/translations', {
 		method: 'GET',
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
-	const data = (await result.json()) as LocalizationTranslationDTO[];
+	const data = (await result.json()) as LocalizationTranslationDTO[]
 
 	// 결과 캐싱
 	localizationKeyTranslationCache.set(cacheKey, {
 		timestamp: now,
 		data: data,
-	});
-	console.log('번역 데이터 캐싱 갱신 됨');
+	})
+	console.log('번역 데이터 캐싱 갱신 됨')
 
-	return data;
-};
+	return data
+}
 
 /**
  * 오리지널 로컬라이제이션 키를 기준으로 값 일괄 수정
@@ -277,37 +275,37 @@ export const getTargetTranslations = async (id: string, date?: number) => {
  * allRefresh
  */
 export const reloadOriginalLocalizationName = async (node: BaseNode) => {
-	const nodeData = getNodeData(node);
+	const nodeData = getNodeData(node)
 	if (nodeData.localizationKey === '') {
-		return;
+		return
 	}
-	const localizationKey = nodeData.localizationKey;
-	figma.skipInvisibleInstanceChildren = true;
+	const localizationKey = nodeData.localizationKey
+	figma.skipInvisibleInstanceChildren = true
 
 	const arr = figma.currentPage.findAllWithCriteria({
 		types: ['TEXT'],
 		pluginData: {
 			keys: [NODE_STORE_KEY.LOCALIZATION_KEY],
 		},
-	});
+	})
 
-	const targetOrigin = new Map<string, Set<TextNode>>();
+	const targetOrigin = new Map<string, Set<TextNode>>()
 
 	//  map 말고 foreach 해도 될지도?
 	/**
 	 * 현재 로컬라이제이션 키가 같은 노드들을 모아서 처리
 	 */
-	const targetTextArr = arr
+	const _targetTextArr = arr
 
-		.filter((item) => {
-			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY);
+		.filter(item => {
+			const currentLocalizationKey = item.getPluginData(NODE_STORE_KEY.LOCALIZATION_KEY)
 			if (localizationKey === currentLocalizationKey) {
-				return true;
+				return true
 			}
-			return false;
+			return false
 		})
-		.map((node) => {
-			const nodeData = getNodeData(node);
+		.map(node => {
+			const nodeData = getNodeData(node)
 			// if (nodeData.originalLocalizeId != null && nodeData.originalLocalizeId !== '') {
 			// 	let temp = targetOrigin.get(nodeData.originalLocalizeId);
 			// 	if (temp == null) {
@@ -319,16 +317,16 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
 			return {
 				node: node,
 				data: nodeData,
-			};
-		});
+			}
+		})
 
-	const now = Date.now();
-	for (const [key, targetNodes] of targetOrigin.entries()) {
+	const now = Date.now()
+	for (const [_key, targetNodes] of targetOrigin.entries()) {
 		for (const node of targetNodes) {
-			await TargetNodeStyleUpdate(node, localizationKey, 'origin', now);
+			await TargetNodeStyleUpdate(node, localizationKey, 'origin', now)
 		}
 	}
-};
+}
 
 /** 이거 자체가 문제가 있음
  * 스타일 데이터를 처리 할 때 리소스 키를 등록하고
@@ -340,25 +338,25 @@ export const reloadOriginalLocalizationName = async (node: BaseNode) => {
  * 라벨 매칭도 프론트에서 가능
  */
 export const addTranslation = async (node: TextNode) => {
-	const nodeData = getNodeData(node);
+	const nodeData = getNodeData(node)
 
 	if (nodeData.localizationKey === '' || nodeData.domainId == null) {
-		notify('335 Failed to get localization key', 'error');
-		return;
+		notify('335 Failed to get localization key', 'error')
+		return
 	}
 
-	const styleData = getAllStyleRanges(node);
+	const styleData = getAllStyleRanges(node)
 	const { xmlString, styleStoreArray, effectStyle } = await styleToXml(
 		toNumber(nodeData.domainId),
 		node.characters,
 		styleData,
 		'id'
-	);
+	)
 
 	// 대부분의 시스템에서 \n는 공백으로 처리되기 때문에 시각적으로 보이지 않음
 	// 따라서 시각적으로 보이게 하기 위해 br로 처리하는게 합리적이게 보임
 	// 피그마에서 공백은 \n이 아닌 다른 값임 찾아서 넣어야할 수 있음
-	const brString = xmlString.replace(/\n/g, '<br/>');
+	const brString = xmlString.replace(/\n/g, '<br/>')
 	// 저장할 때부터 a 먹여서 넣어야하니까 여기부터 하면 됨
 	try {
 		const translations = await fetchDB('/localization/translations', {
@@ -368,28 +366,28 @@ export const addTranslation = async (node: TextNode) => {
 				language: 'origin',
 				translation: brString,
 			}),
-		});
+		})
 		if (!translations) {
-			return;
+			return
 		}
 		if (translations.status === 200) {
-			const data = (await translations.json()) as LocalizationTranslationDTO;
+			const data = (await translations.json()) as LocalizationTranslationDTO
 
-			return data;
+			return data
 		} else {
-			const data = await translations.json();
+			const data = await translations.json()
 
 			// 잘못 등록된  경우도 에러임
 			if (data.message.details === 'SQLITE_CONSTRAINT: FOREIGN KEY constraint failed') {
-				notify('로컬라이제이션 키를 찾을 수 없음', 'error');
+				notify('로컬라이제이션 키를 찾을 수 없음', 'error')
 			} else {
-				notify('오리진 값이 등록되지 않았을 확률이 큼', 'error');
+				notify('오리진 값이 등록되지 않았을 확률이 큼', 'error')
 			}
 		}
-	} catch (error) {}
+	} catch (_error) {}
 
-	const flatItems = await parseXmlToFlatStructure(brString);
-	for (const style of styleStoreArray) {
+	const _flatItems = await parseXmlToFlatStructure(brString)
+	for (const _style of styleStoreArray) {
 		// 매핑 로직이 변경 됨
 		// key , action,type
 		// const result = await fetchDB('/localization/actions', {
@@ -407,7 +405,7 @@ export const addTranslation = async (node: TextNode) => {
 		// 	continue;
 		// }
 	}
-};
+}
 
 /**
  * 일반 localization key 생성
@@ -421,63 +419,63 @@ export const createNormalLocalizationKey = async (
 		name: name,
 		isTemporary: true,
 		sectionId: sectionId,
-	} as LocalizationKeyProps;
+	} as LocalizationKeyProps
 	// 섹션이 비지 않았고, 섹션이 같으면
 
 	if (alias) {
-		temp.alias = alias;
+		temp.alias = alias
 	}
 
 	// targetData
 	const result = await fetchDB('/localization/keys', {
 		method: 'POST',
 		body: JSON.stringify(temp, null, 2),
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
-	const data = (await result.json()) as LocalizationKeyDTO;
+	const data = (await result.json()) as LocalizationKeyDTO
 
 	if (result.status === 200) {
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString());
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString());
-		return data;
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domain_id.toString())
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.key_id.toString())
+		return data
 	} else {
-		notify('Failed to set localization key', 'error');
+		notify('Failed to set localization key', 'error')
 	}
-};
+}
 
 /** 1. 노드 데이터 설정 */
 export const setNodeData = (node: BaseNode, data: Partial<NodeData>) => {
 	if (data.domainId != null) {
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString());
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, data.domainId.toString())
 	}
 
 	if (data.action != null) {
-		node.setPluginData(NODE_STORE_KEY.ACTION, data.action.toString());
+		node.setPluginData(NODE_STORE_KEY.ACTION, data.action.toString())
 	}
 
 	if (data.localizationKey != null) {
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString());
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, data.localizationKey.toString())
 	}
 
 	if (data.ignore != null) {
-		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString());
+		node.setPluginData(NODE_STORE_KEY.IGNORE, data.ignore.toString())
 	}
 
 	if (data.baseNodeId != null) {
-		node.setPluginData(NODE_STORE_KEY.LOCATION, data.baseNodeId.toString());
+		node.setPluginData(NODE_STORE_KEY.LOCATION, data.baseNodeId.toString())
 	}
-};
+}
 
 /**
  * 노드 데이터 초기화 및 무시 설정
  * @param nodes - 초기화할 노드 배열
  */
 export const resetAndIgnore = (nodes: TextNode[]) => {
-	console.log('🚀 ~ resetAndIgnore ~ nodes:', nodes);
+	console.log('🚀 ~ resetAndIgnore ~ nodes:', nodes)
 	for (const node of nodes) {
 		setNodeData(node, {
 			ignore: true,
@@ -485,13 +483,13 @@ export const resetAndIgnore = (nodes: TextNode[]) => {
 			localizationKey: '',
 			domainId: '',
 			baseNodeId: '',
-		});
+		})
 	}
-	const data = nodeMetaData(nodes[0]);
-	console.log('🚀 ~ resetAndIgnore ~ data:', data);
+	const data = nodeMetaData(nodes[0])
+	console.log('🚀 ~ resetAndIgnore ~ data:', data)
 
-	overlayRender();
-};
+	overlayRender()
+}
 
 /**
  * 지금 안씀
@@ -499,14 +497,14 @@ export const resetAndIgnore = (nodes: TextNode[]) => {
  * 플러그인 데이터 생성 */
 export const onTargetSetNodeLocation = () => {
 	on(SET_NODE_LOCATION.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0];
+		const node = figma.currentPage.selection[0]
 		if (node.type !== 'TEXT') {
-			return;
+			return
 		}
-		const result = getCursorPosition(node);
+		const result = getCursorPosition(node)
 
 		if (!result) {
-			return;
+			return
 			// 실행 될리가 없는 곳이긴 함
 		}
 		/**
@@ -518,10 +516,10 @@ export const onTargetSetNodeLocation = () => {
 		// 변경 가능하고 저장 가능하게 임시 값 보여야 함
 		// 섹션 관리 되야 함
 
-		const domainSetting = getDomainSetting();
+		const domainSetting = getDomainSetting()
 
 		if (!domainSetting) {
-			return;
+			return
 		}
 
 		// section은 [sectionName] {기존 제목} 으로 처리 됨
@@ -529,50 +527,50 @@ export const onTargetSetNodeLocation = () => {
 		const newKey = await createNormalLocalizationKey(node, {
 			domainId: domainSetting.domainId,
 			name: result.nodeName,
-		});
+		})
 		if (!newKey) {
-			return;
+			return
 		}
 
-		const originTextResult = await getLocalizationKeyData(newKey.key_id.toString(), Date.now());
+		const originTextResult = await getLocalizationKeyData(newKey.key_id.toString(), Date.now())
 		if (originTextResult == null) {
-			return;
+			return
 		}
-		node.name = generateLocalizationName(originTextResult);
+		node.name = generateLocalizationName(originTextResult)
 
 		// 두번 눌렀을 때 처리 어떻게 할지 정해야 됨
 		// await addTranslation(node);
 
 		/** 업데이트 반영 코드 */
-		await allRefresh(node);
-	});
-};
+		await allRefresh(node)
+	})
+}
 
 export const allRefresh = async (node: TextNode) => {
 	// getCursorPosition은 LabelModel.ts에서 가져와 사용
-	const cursorPosition = getCursorPosition(node);
-	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition);
+	const cursorPosition = getCursorPosition(node)
+	emit(GET_CURSOR_POSITION.RESPONSE_KEY, cursorPosition)
 
 	// 이 함수는 이 파일에 있으므로 직접 호출
-	const value = await processTextNodeLocalization(node);
-	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value);
-};
+	const value = await processTextNodeLocalization(node)
+	emit(GET_LOCALIZATION_KEY_VALUE.RESPONSE_KEY, value)
+}
 
 /**
  * allRefresh
  */
 export const onNodeReload = () => {
 	on(RELOAD_NODE.REQUEST_KEY, async () => {
-		const node = figma.currentPage.selection[0];
+		const node = figma.currentPage.selection[0]
 		if (!node || node.type !== 'TEXT') {
-			return;
+			return
 		}
 
-		figma.commitUndo();
+		figma.commitUndo()
 
-		await reloadOriginalLocalizationName(node);
-	});
-};
+		await reloadOriginalLocalizationName(node)
+	})
+}
 
 /**
  * TEXT 타입 노드의 지역화 키에 대한 데이터를 처리합니다.
@@ -581,91 +579,91 @@ export const onNodeReload = () => {
  */
 export const processTextNodeLocalization = async (node: SceneNode) => {
 	if (!node || node.type !== 'TEXT') {
-		return;
+		return
 	}
 
-	const nodeData = getNodeData(node);
+	const nodeData = getNodeData(node)
 	if (nodeData.localizationKey === '') {
-		return;
+		return
 	}
 
-	const result = await getLocalizationKeyData(nodeData.localizationKey, Date.now());
+	const result = await getLocalizationKeyData(nodeData.localizationKey, Date.now())
 	if (!result) {
-		return;
+		return
 	}
 
-	return localizationKeyMapping(result);
-};
+	return localizationKeyMapping(result)
+}
 
-export type PutLocalizationKeyType = components['schemas']['UpdateLocalizationKeyDTO'];
+export type PutLocalizationKeyType = components['schemas']['UpdateLocalizationKeyDTO']
 
 export const onPutLocalizationKey = () => {
 	on(PUT_LOCALIZATION_KEY.REQUEST_KEY, async (localizationKey: string, data: PutLocalizationKeyType) => {
-		const result = await putLocalizationKey(localizationKey, data);
+		const result = await putLocalizationKey(localizationKey, data)
 
 		if (!result) {
-			return;
+			return
 		}
 
 		if (typeof result === 'string') {
-			notify(result, 'error');
-			return;
+			notify(result, 'error')
+			return
 		}
 
 		// emit(PUT_LOCALIZATION_KEY.RESPONSE_KEY, result)
-	});
-};
+	})
+}
 
 export const putLocalizationKey = async (localizationKey: string, body: PutLocalizationKeyType) => {
-	const result = await fetchDB(('/localization/keys/' + localizationKey) as '/localization/keys/{id}', {
+	const result = await fetchDB(`/localization/keys/${localizationKey}` as '/localization/keys/{id}', {
 		method: 'PUT',
 		body: JSON.stringify(body, null, 2),
-	});
+	})
 
 	if (!result) {
-		return;
+		return
 	}
 
 	const data = (await result.json()) as {
-		success: boolean;
-		message: string;
-	};
-	console.log('🚀 ~ putLocalizationKey ~ data:', data);
+		success: boolean
+		message: string
+	}
+	console.log('🚀 ~ putLocalizationKey ~ data:', data)
 
-	return data;
-};
+	return data
+}
 
 export const onUpdateNodeStoreBatchKey = () => {
 	on(UPDATE_NODE_STORE_KEY.REQUEST_KEY, async (key: number) => {
-		const node = figma.currentPage.selection[0];
+		const node = figma.currentPage.selection[0]
 		if (!node || node.type !== 'TEXT') {
-			return;
+			return
 		}
 
-		const domainSetting = getDomainSetting();
+		const domainSetting = getDomainSetting()
 		if (!domainSetting) {
-			return;
+			return
 		}
 
-		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, domainSetting.domainId.toString());
+		node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, domainSetting.domainId.toString())
 
-		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString());
+		node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, key.toString())
 
-		const translations = await getTargetTranslations(key.toString());
+		const translations = await getTargetTranslations(key.toString())
 		if (!translations || translations.length === 0) {
-			return;
+			return
 		}
 
-		const translation = translations[0];
+		const translation = translations[0]
 		if (!translation) {
-			return;
+			return
 		}
-		await allRefresh(node);
-		figma.commitUndo();
+		await allRefresh(node)
+		figma.commitUndo()
 
-		await reloadOriginalLocalizationName(node);
-	});
-};
+		await reloadOriginalLocalizationName(node)
+	})
+}
 // 지금 안쓰는 컴포넌트임
 /**
  * 입력 값에 섹션 명을 붙여준다
@@ -674,12 +672,12 @@ export const onUpdateNodeStoreBatchKey = () => {
  * @returns
  */
 export const enforcePrefix = (input: string, sectionName: string): string => {
-	const sectionPrefix = sectionNameParser(sectionName) ?? '';
-	const finalPrefix = sectionPrefix;
+	const sectionPrefix = sectionNameParser(sectionName) ?? ''
+	const finalPrefix = sectionPrefix
 	// const finalPrefix = sectionPrefix === '' ? 'Default' : sectionPrefix
 	if (finalPrefix === '') {
-		return input;
+		return input
 	}
 
-	return input.startsWith(finalPrefix + '_') ? input : finalPrefix + '_' + input;
-};
+	return input.startsWith(`${finalPrefix}_`) ? input : `${finalPrefix}_${input}`
+}

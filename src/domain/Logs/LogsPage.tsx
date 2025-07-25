@@ -1,31 +1,31 @@
-import { ComponentChildren, Fragment, h } from 'preact';
-import { useState } from 'preact/hooks';
-import styles from './LogsPage.module.css';
+import { ComponentChildren, Fragment, h } from 'preact'
+import { useState } from 'preact/hooks'
+import styles from './LogsPage.module.css'
 
-type Props = {};
+type Props = {}
 
 // 로그 항목의 타입 정의
 type LogItem = {
-	is_creation: boolean;
-	version_id: number;
-	localization_id: number;
-	key_id: number;
-	key_name: string;
-	language_code: string;
-	domain_id: number;
-	domain_name: string;
-	version: number;
-	text: string;
-	user_id: number;
-	modified_by_username: string;
-	created_at: string;
-};
+	is_creation: boolean
+	version_id: number
+	localization_id: number
+	key_id: number
+	key_name: string
+	language_code: string
+	domain_id: number
+	domain_name: string
+	version: number
+	text: string
+	user_id: number
+	modified_by_username: string
+	created_at: string
+}
 
 // 로그 데이터의 타입 정의
 type LogsData = {
-	total: number;
-	logs: LogItem[];
-};
+	total: number
+	logs: LogItem[]
+}
 
 // 테스트용 더미 데이터
 const dummyData = {
@@ -65,36 +65,37 @@ const dummyData = {
 				created_at: `2025-03-${14 - (i % 14)} ${i % 24}:${i % 60}:${i % 60}`,
 			})),
 	],
-};
+}
 
-const LogsPage = (props: Props) => {
+const LogsPage = (_props: Props) => {
 	// 페이지네이션 상태 관리
-	const [currentPage, setCurrentPage] = useState(1);
-	const itemsPerPage = 10;
+	const [currentPage, setCurrentPage] = useState(1)
+	const itemsPerPage = 10
 
 	// 데이터 소스 (실제 구현에서는 API 호출로 대체될 수 있음)
-	const data: LogsData = dummyData;
+	const data: LogsData = dummyData
 
 	// 전체 페이지 수 계산
-	const totalPages = Math.ceil(data.total / itemsPerPage);
+	const totalPages = Math.ceil(data.total / itemsPerPage)
 
 	// 현재 페이지의 데이터 계산
-	const startIndex = (currentPage - 1) * itemsPerPage;
-	const endIndex = Math.min(startIndex + itemsPerPage, data.logs.length);
-	const currentLogs = data.logs.slice(startIndex, endIndex);
+	const startIndex = (currentPage - 1) * itemsPerPage
+	const endIndex = Math.min(startIndex + itemsPerPage, data.logs.length)
+	const currentLogs = data.logs.slice(startIndex, endIndex)
 
 	// 페이지 변경 핸들러
 	const handlePageChange = (page: number) => {
-		setCurrentPage(page);
-	};
+		setCurrentPage(page)
+	}
 
 	// 페이지네이션 버튼 생성
 	const renderPaginationButtons = () => {
-		const buttons = [];
+		const buttons = []
 
 		// 이전 페이지 버튼
 		buttons.push(
 			<button
+				type="button"
 				key="prev"
 				className={styles.pageButton}
 				onClick={() => handlePageChange(currentPage - 1)}
@@ -102,24 +103,31 @@ const LogsPage = (props: Props) => {
 			>
 				이전
 			</button>
-		);
+		)
 
 		// 페이지 번호 버튼들
-		const maxButtons = 5; // 표시할 최대 버튼 수
-		const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-		const endPage = Math.min(totalPages, startPage + maxButtons - 1);
+		const maxButtons = 5 // 표시할 최대 버튼 수
+		const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2))
+		const endPage = Math.min(totalPages, startPage + maxButtons - 1)
 
 		for (let i = startPage; i <= endPage; i++) {
 			buttons.push(
-				<button key={i} className={styles.pageButton} onClick={() => handlePageChange(i)} disabled={currentPage === i}>
+				<button
+					type="button"
+					key={i}
+					className={styles.pageButton}
+					onClick={() => handlePageChange(i)}
+					disabled={currentPage === i}
+				>
 					{i}
 				</button>
-			);
+			)
 		}
 
 		// 다음 페이지 버튼
 		buttons.push(
 			<button
+				type="button"
 				key="next"
 				className={styles.pageButton}
 				onClick={() => handlePageChange(currentPage + 1)}
@@ -127,10 +135,10 @@ const LogsPage = (props: Props) => {
 			>
 				다음
 			</button>
-		);
+		)
 
-		return buttons;
-	};
+		return buttons
+	}
 
 	return (
 		<div>
@@ -150,7 +158,7 @@ const LogsPage = (props: Props) => {
 					</tr>
 				</thead>
 				<tbody>
-					{currentLogs.map((log) => (
+					{currentLogs.map(log => (
 						<tr key={log.version_id}>
 							<td>{log.version_id}</td>
 							<td>{log.key_name}</td>
@@ -171,7 +179,7 @@ const LogsPage = (props: Props) => {
 				총 {data.total}개의 로그, {currentPage} / {totalPages} 페이지
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default LogsPage;
+export default LogsPage

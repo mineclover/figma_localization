@@ -1,10 +1,10 @@
 // xml-tag-replacer.js
-import { Parser } from 'htmlparser2';
-import { DomHandler } from 'domhandler';
-import * as domutils from 'domutils';
-import render from 'dom-serializer';
-import { XmlFlatNode, XmlFlatStructure, XmlHierarchy } from './types';
-import { Element, ChildNode } from 'domhandler';
+
+import render from 'dom-serializer'
+import { type ChildNode, DomHandler, type Element } from 'domhandler'
+import * as domutils from 'domutils'
+import { Parser } from 'htmlparser2'
+import type { XmlFlatNode, XmlFlatStructure, XmlHierarchy } from './types'
 
 /**
  * XML 문자열에서 특정 태그 이름을 변경합니다.
@@ -17,35 +17,35 @@ export function replaceTagNames(xmlString: string, oldTagName: string, newTagNam
 	return new Promise<string>((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
 			// 지정된 태그 찾기
-			const tagsToRename = domutils.findAll((elem) => elem.type === 'tag' && elem.name === oldTagName, dom);
+			const tagsToRename = domutils.findAll(elem => elem.type === 'tag' && elem.name === oldTagName, dom)
 
 			// 찾은 태그의 이름 변경
-			tagsToRename.forEach((tag) => {
-				tag.name = newTagName;
-			});
+			tagsToRename.forEach(tag => {
+				tag.name = newTagName
+			})
 
 			// 변경된 DOM을 XML 문자열로 변환
 			const result = render(dom, {
 				xmlMode: true,
 				decodeEntities: false,
-			});
+			})
 
-			resolve(result);
-		});
+			resolve(result)
+		})
 
 		const parser = new Parser(handler, {
 			xmlMode: true,
 			decodeEntities: false,
-		});
+		})
 
-		parser.write(xmlString);
-		parser.end();
-	});
+		parser.write(xmlString)
+		parser.end()
+	})
 }
 
 /**
@@ -65,38 +65,38 @@ export function replaceTagsWithCondition(
 	return new Promise<string>((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
 			// 조건을 만족하는 태그 찾기
 			const tagsToRename = domutils.findAll(
-				(elem) => elem.type === 'tag' && elem.name === oldTagName && condition(elem),
+				elem => elem.type === 'tag' && elem.name === oldTagName && condition(elem),
 				dom
-			);
+			)
 
 			// 찾은 태그의 이름 변경
-			tagsToRename.forEach((tag) => {
-				tag.name = newTagName;
-			});
+			tagsToRename.forEach(tag => {
+				tag.name = newTagName
+			})
 
 			// 변경된 DOM을 XML 문자열로 변환
 			const result = render(dom, {
 				xmlMode: true,
 				decodeEntities: false,
-			});
+			})
 
-			resolve(result);
-		});
+			resolve(result)
+		})
 
 		const parser = new Parser(handler, {
 			xmlMode: true,
 			decodeEntities: false,
-		});
+		})
 		// 모델 처리 랑 비슷함
-		parser.write(xmlString);
-		parser.end();
-	});
+		parser.write(xmlString)
+		parser.end()
+	})
 }
 
 /**
@@ -108,12 +108,12 @@ export function replaceTagsWithCondition(
 export function preserveXmlDeclaration(originalXml: string, transformedXml: string) {
 	// originalXml 에서 xml 선언이 있었으면 그것을 넣어서 리턴
 	// 보통 최상단에 있음
-	const xmlDeclMatch = originalXml.match(/^<\?xml[^?]*\?>/);
+	const xmlDeclMatch = originalXml.match(/^<\?xml[^?]*\?>/)
 	if (xmlDeclMatch) {
-		return xmlDeclMatch[0] + transformedXml;
+		return xmlDeclMatch[0] + transformedXml
 	}
 	// 없으면 그냥 리턴
-	return transformedXml;
+	return transformedXml
 }
 
 /**
@@ -125,23 +125,23 @@ export function parseXmlToHierarchy(xmlString: string): Promise<XmlHierarchy> {
 	return new Promise((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
 			// DOM을 계층 구조 객체로 변환
-			const result = domToHierarchy(dom);
-			resolve(result);
-		});
+			const result = domToHierarchy(dom)
+			resolve(result)
+		})
 
 		const parser = new Parser(handler, {
 			xmlMode: true,
 			decodeEntities: false,
-		});
+		})
 
-		parser.write(xmlString);
-		parser.end();
-	});
+		parser.write(xmlString)
+		parser.end()
+	})
 }
 
 /**
@@ -151,33 +151,33 @@ export function parseXmlToHierarchy(xmlString: string): Promise<XmlHierarchy> {
  */
 function domToHierarchy(dom: any): any {
 	if (Array.isArray(dom)) {
-		return dom.map(domToHierarchy).filter((item) => item !== null);
+		return dom.map(domToHierarchy).filter(item => item !== null)
 	}
 
 	if (dom.type === 'text') {
-		return dom.data.trim() === '' ? null : dom.data.trim();
+		return dom.data.trim() === '' ? null : dom.data.trim()
 	}
 
 	if (dom.type === 'tag') {
 		const result: any = {
 			tagName: dom.name,
 			attributes: dom.attribs || {},
-		};
+		}
 
-		const children = domToHierarchy(dom.children);
+		const children = domToHierarchy(dom.children)
 
 		if (Array.isArray(children)) {
 			if (children.length === 1 && typeof children[0] === 'string') {
-				result.text = children[0];
+				result.text = children[0]
 			} else if (children.length > 0) {
-				result.children = children;
+				result.children = children
 			}
 		}
 
-		return result;
+		return result
 	}
 
-	return null;
+	return null
 }
 
 /**
@@ -197,9 +197,9 @@ function flattenDom(
 ): void {
 	if (Array.isArray(dom)) {
 		dom.forEach((item, index) => {
-			flattenDom(item, path, result, depth, index);
-		});
-		return;
+			flattenDom(item, path, result, depth, index)
+		})
+		return
 	}
 
 	// 처리를 외부로 빼면 문제 생김
@@ -212,13 +212,13 @@ function flattenDom(
 			siblingIndex: siblingIndex,
 			attributes: {},
 			text: dom.data.trim(),
-		};
+		}
 
-		result.push(item);
+		result.push(item)
 	}
 
 	if (dom.type === 'tag') {
-		const currentPath = path ? `${path}/${dom.name}` : dom.name;
+		const currentPath = path ? `${path}/${dom.name}` : dom.name
 
 		const item: any = {
 			path: currentPath,
@@ -227,15 +227,15 @@ function flattenDom(
 			order: result.length, // 전체 순서
 			siblingIndex: siblingIndex, // 형제 간 순서
 			attributes: dom.attribs || {},
-		};
+		}
 
-		result.push(item);
+		result.push(item)
 
 		// 자식 요소 처리
 
 		dom.children.forEach((child: ChildNode, index: number) => {
-			flattenDom(child, currentPath, result, depth + 1, index);
-		});
+			flattenDom(child, currentPath, result, depth + 1, index)
+		})
 	}
 }
 
@@ -252,29 +252,29 @@ export function parseXmlToFlatStructure(
 	return new Promise((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
-			const flatItems: Array<XmlFlatNode> = [];
-			flattenDom(dom, '', flatItems);
+			const flatItems: Array<XmlFlatNode> = []
+			flattenDom(dom, '', flatItems)
 
 			// 원래 순서대로 정렬 (이미 순서대로 추가되었기 때문에 기본적으로는 필요 없음)
 			if (sortByOriginalOrder) {
-				flatItems.sort((a, b) => a.order - b.order);
+				flatItems.sort((a, b) => a.order - b.order)
 			}
 
-			resolve(flatItems);
-		});
+			resolve(flatItems)
+		})
 
 		const parser = new Parser(handler, {
 			xmlMode: true,
 			decodeEntities: false,
-		});
+		})
 
-		parser.write(xmlString);
-		parser.end();
-	});
+		parser.write(xmlString)
+		parser.end()
+	})
 }
 
 /**
@@ -284,61 +284,61 @@ export function parseXmlToFlatStructure(
  */
 export function convertFlatStructureToXml(flatItems: XmlFlatStructure): string {
 	// 원본 순서대로 정렬
-	flatItems.sort((a, b) => a.order - b.order);
+	flatItems.sort((a, b) => a.order - b.order)
 
 	// 계층 구조 재구성을 위한 맵
-	const nodeMap = new Map<string, any>();
-	const rootNodes: any[] = [];
+	const nodeMap = new Map<string, any>()
+	const rootNodes: any[] = []
 
 	// 먼저 모든 노드 생성
-	flatItems.forEach((item) => {
+	flatItems.forEach(item => {
 		const node = {
 			tagName: item.tagName,
 			attributes: item.attributes || {},
 			children: [],
 			text: item.text || null,
 			order: item.order, // 원본 순서 보존
-		};
+		}
 
-		nodeMap.set(`${item.path}_${item.order}`, node); // 경로와 순서로 고유키 생성
+		nodeMap.set(`${item.path}_${item.order}`, node) // 경로와 순서로 고유키 생성
 
 		// 루트 노드 저장
 		if (!item.path.includes('/')) {
-			rootNodes.push(node);
+			rootNodes.push(node)
 		}
-	});
+	})
 
 	// 부모-자식 관계 설정
-	flatItems.forEach((item) => {
+	flatItems.forEach(item => {
 		if (item.path.includes('/')) {
-			const pathParts = item.path.split('/');
-			const currentTagName = pathParts.pop(); // 현재 노드 이름 제거
-			const parentPath = pathParts.join('/');
+			const pathParts = item.path.split('/')
+			const _currentTagName = pathParts.pop() // 현재 노드 이름 제거
+			const parentPath = pathParts.join('/')
 
 			// 부모의 고유 키를 찾기
 			const parentNodeEntries = Array.from(nodeMap.entries())
 				.filter(([key, _]) => key.startsWith(`${parentPath}_`))
-				.sort(([_, nodeA], [__, nodeB]) => nodeA.order - nodeB.order);
+				.sort(([_, nodeA], [__, nodeB]) => nodeA.order - nodeB.order)
 
 			// 가장 가까운 상위 부모 찾기 (현재 노드보다 앞에 있는 가장 마지막 부모)
-			const closestParentEntry = parentNodeEntries.filter(([_, node]) => node.order < item.order).pop();
+			const closestParentEntry = parentNodeEntries.filter(([_, node]) => node.order < item.order).pop()
 
 			if (closestParentEntry) {
-				const parentNode = closestParentEntry[1];
-				const currentNode = nodeMap.get(`${item.path}_${item.order}`);
+				const parentNode = closestParentEntry[1]
+				const currentNode = nodeMap.get(`${item.path}_${item.order}`)
 
 				if (parentNode && currentNode) {
-					parentNode.children.push(currentNode);
+					parentNode.children.push(currentNode)
 				}
 			}
 		}
-	});
+	})
 
 	// 모든 루트 노드를 XML 문자열로 변환하여 연결
 	return rootNodes
 		.sort((a, b) => a.order - b.order) // 원본 순서대로 정렬
-		.map((node) => nodeToXmlString(node))
-		.join('');
+		.map(node => nodeToXmlString(node))
+		.join('')
 }
 
 /**
@@ -347,38 +347,40 @@ export function convertFlatStructureToXml(flatItems: XmlFlatStructure): string {
  * @returns {string} XML 문자열
  */
 function nodeToXmlString(node: any): string {
-	if (!node) return '';
+	if (!node) {
+		return ''
+	}
 
 	// 태그 시작 부분 생성
-	let xml = `<${node.tagName}`;
+	let xml = `<${node.tagName}`
 
 	// 속성 추가
 	for (const [key, value] of Object.entries(node.attributes)) {
-		xml += ` ${key}="${value}"`;
+		xml += ` ${key}="${value}"`
 	}
 
 	// 닫는 태그 또는 내용 추가
 	if (node.children.length === 0 && !node.text) {
 		// 자식 노드와 텍스트가 없는 경우
-		xml += ' />';
+		xml += ' />'
 	} else {
-		xml += '>';
+		xml += '>'
 
 		// 텍스트 추가
 		if (node.text) {
-			xml += node.text;
+			xml += node.text
 		}
 
 		// 자식 노드 추가
 		node.children.forEach((child: any) => {
-			xml += nodeToXmlString(child);
-		});
+			xml += nodeToXmlString(child)
+		})
 
 		// 닫는 태그
-		xml += `</${node.tagName}>`;
+		xml += `</${node.tagName}>`
 	}
 
-	return xml;
+	return xml
 }
 
 /**
@@ -397,59 +399,59 @@ export function wrapTextWithTag(
 	return new Promise((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
 			// 텍스트 노드를 지정된 태그로 변환
 			const result = dom.map((node: any) => {
 				if (node.type === 'text') {
-					const trimmedText = node.data.trim();
+					const trimmedText = node.data.trim()
 					if (trimmedText !== '') {
 						return {
 							type: 'tag',
 							name: tagName,
 							attribs: {},
 							children: [{ type: 'text', data: trimmedText }],
-						};
+						}
 					}
 					// 줄바꿈만 유지하고 다른 공백은 제거
-					const hasNewline = /\n/.test(node.data);
-					return hasNewline ? { type: 'text', data: '\n' } : null;
+					const hasNewline = /\n/.test(node.data)
+					return hasNewline ? { type: 'text', data: '\n' } : null
 				}
-				return node;
-			});
+				return node
+			})
 
 			// null 노드 제거
-			const filteredResult = result.filter((node: any) => node !== null);
+			const filteredResult = result.filter((node: any) => node !== null)
 
 			if (options.addBrTags) {
 				// br 태그 추가
-				const resultWithBr: any[] = [];
-				const lastIndex = filteredResult.length - 1;
+				const resultWithBr: any[] = []
+				const lastIndex = filteredResult.length - 1
 
 				filteredResult.forEach((node: any, index: number) => {
-					resultWithBr.push(node);
+					resultWithBr.push(node)
 					if (index !== lastIndex) {
 						resultWithBr.push({
 							type: 'tag',
 							name: 'br',
 							attribs: {},
 							children: [],
-						});
+						})
 					}
-				});
+				})
 
-				resolve(render(resultWithBr, { xmlMode: true, decodeEntities: false }));
+				resolve(render(resultWithBr, { xmlMode: true, decodeEntities: false }))
 			} else {
-				resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }));
+				resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }))
 			}
-		});
-		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
+		})
+		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false })
 
-		parser.write(xmlString);
-		parser.end();
-	});
+		parser.write(xmlString)
+		parser.end()
+	})
 }
 
 /**
@@ -462,33 +464,33 @@ export function unwrapTag(xmlString: string, tagName: string = 'a'): Promise<str
 	return new Promise((resolve, reject) => {
 		const handler = new DomHandler((error, dom) => {
 			if (error) {
-				reject(error);
-				return;
+				reject(error)
+				return
 			}
 
 			// 지정된 태그를 텍스트로 변환
 			const result = dom.map((node: any, index: number) => {
 				if (node.type === 'tag' && node.name === tagName) {
-					const textContent = domutils.textContent(node).trim();
+					const textContent = domutils.textContent(node).trim()
 					// 이전 노드가 줄바꿈을 포함하는지 확인
-					const prevNode = dom[index - 1];
-					const hasNewlineBefore = prevNode?.type === 'text' && /\n/.test(prevNode.data);
+					const prevNode = dom[index - 1]
+					const hasNewlineBefore = prevNode?.type === 'text' && /\n/.test(prevNode.data)
 
-					return { type: 'text', data: hasNewlineBefore ? '\n' + textContent : textContent };
+					return { type: 'text', data: hasNewlineBefore ? `\n${textContent}` : textContent }
 				}
-				return node;
-			});
+				return node
+			})
 
 			// null 노드 제거
-			const filteredResult = result.filter((node: any) => node !== null);
-			resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }));
-		});
+			const filteredResult = result.filter((node: any) => node !== null)
+			resolve(render(filteredResult, { xmlMode: true, decodeEntities: false }))
+		})
 
-		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false });
-		const brString = xmlString.replace(/<br\/>/g, '\n');
-		parser.write(brString);
-		parser.end();
-	});
+		const parser = new Parser(handler, { xmlMode: true, decodeEntities: false })
+		const brString = xmlString.replace(/<br\/>/g, '\n')
+		parser.write(brString)
+		parser.end()
+	})
 }
 
 /**
@@ -499,5 +501,5 @@ export function unwrapTag(xmlString: string, tagName: string = 'a'): Promise<str
  * @returns {Promise<string>} 변환된 XML 문자열
  */
 export function convertTag(xmlString: string, fromTag: string, toTag: string): Promise<string> {
-	return replaceTagNames(xmlString, fromTag, toTag);
+	return replaceTagNames(xmlString, fromTag, toTag)
 }

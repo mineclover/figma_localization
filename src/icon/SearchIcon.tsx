@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from 'preact'
 
 const SearchIcon = ({ size = 24, color = '#5F6368', ...props }) => {
 	return (
@@ -8,7 +8,7 @@ const SearchIcon = ({ size = 24, color = '#5F6368', ...props }) => {
 				fill={color}
 			/>
 		</svg>
-	);
-};
+	)
+}
 
-export default SearchIcon;
+export default SearchIcon

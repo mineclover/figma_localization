@@ -9,22 +9,24 @@ export const FileMetaSearch = (
 	page?: PageNode,
 	document?: DocumentNode
 ): { page: PageNode; document: DocumentNode } | undefined => {
-	const parent = node.parent;
+	const parent = node.parent
 
 	if (parent != null) {
 		if (parent.type === 'PAGE') {
-			const name = parent;
-			return FileMetaSearch(parent, name);
+			const name = parent
+			return FileMetaSearch(parent, name)
 		} else {
-			return FileMetaSearch(parent, page, document);
+			return FileMetaSearch(parent, page, document)
 		}
 	} else if (node.type === 'DOCUMENT') {
-		const name = node;
-		if (!page) throw Error('DOCUMENT is null');
-		return { page, document: name };
+		const name = node
+		if (!page) {
+			throw Error('DOCUMENT is null')
+		}
+		return { page, document: name }
 	}
-	return undefined;
-};
+	return undefined
+}
 
 /**
  * 컴포넌트 최상단 페이지, 세션 찾기 없으면 undefined
@@ -37,19 +39,19 @@ export const SectionSearch = (
 	section?: SectionNode,
 	page?: PageNode
 ): { page: PageNode; section?: SectionNode } => {
-	const parent = node.parent;
+	const parent = node.parent
 
 	if (parent && parent?.type !== 'DOCUMENT') {
 		if (parent.type === 'SECTION') {
-			return SectionSearch(parent, parent);
+			return SectionSearch(parent, parent)
 		} else {
-			return SectionSearch(parent, section, page ?? figma.currentPage);
+			return SectionSearch(parent, section, page ?? figma.currentPage)
 		}
 	} else if (node.type === 'PAGE') {
-		return { page: page ?? figma.currentPage, section };
+		return { page: page ?? figma.currentPage, section }
 	}
-	return { page: page ?? figma.currentPage, section };
-};
+	return { page: page ?? figma.currentPage, section }
+}
 
 /**
  * 선택된 노드 상위에 path 역할을 수행할 수 있는 이름을 전체 조회
@@ -58,7 +60,7 @@ export const SectionSearch = (
  * @returns
  */
 export const FilePathSearch = (node: BaseNode, pathNode: PathNodeInfo[] = []): PathNodeInfo[] => {
-	const parent = node.parent;
+	const parent = node.parent
 
 	if (parent != null) {
 		if (pathNodeType.includes(parent.type as PathNodeInfo['type'])) {
@@ -66,21 +68,23 @@ export const FilePathSearch = (node: BaseNode, pathNode: PathNodeInfo[] = []): P
 			pathNode.push({
 				type: parent.type as PathNodeInfo['type'],
 				name: parent.name,
-			});
+			})
 			/**
 			 * 저장 다했으니 순회 종료
 			 * 텍스트 순서 맞춰주는 목적으로 reverse 함
 			 */
-			if (parent.type === 'DOCUMENT') return pathNode.reverse();
-			return FilePathSearch(parent, pathNode);
+			if (parent.type === 'DOCUMENT') {
+				return pathNode.reverse()
+			}
+			return FilePathSearch(parent, pathNode)
 		} else {
 			// 아니면 그냥 진행
-			return FilePathSearch(parent, pathNode);
+			return FilePathSearch(parent, pathNode)
 		}
 	}
 
-	return pathNode;
-};
+	return pathNode
+}
 
 /**
  * 시작 노드를 저장
@@ -93,22 +97,24 @@ export const FilePathSearch = (node: BaseNode, pathNode: PathNodeInfo[] = []): P
  */
 export const FilePathNodeSearch = (node: BaseNode, pathNode: BaseNode[] = []): BaseNode[] => {
 	if (linkPathNodeType.includes(node.type as (typeof linkPathNodeType)[number])) {
-		pathNode.push(node);
+		pathNode.push(node)
 	} else if (pathNode.length === 0) {
 		// 처음 노드 저장
-		pathNode.push(node);
+		pathNode.push(node)
 	}
-	const parent = node.parent;
+	const parent = node.parent
 	if (parent != null) {
 		// 위에 올 수록 앞에 오게 처리
-		if (parent.type === 'DOCUMENT') return pathNode.reverse();
-		return FilePathNodeSearch(parent, pathNode);
+		if (parent.type === 'DOCUMENT') {
+			return pathNode.reverse()
+		}
+		return FilePathNodeSearch(parent, pathNode)
 	}
 
-	return pathNode;
-};
+	return pathNode
+}
 
-import { Prettify } from '../../types/utilType';
+import type { Prettify } from '../../types/utilType'
 
 export const notify = (message: string, closeLabel: string, timeout = 2000) => {
 	const NotificationHandler = figma.notify(message, {
@@ -116,37 +122,41 @@ export const notify = (message: string, closeLabel: string, timeout = 2000) => {
 		button: {
 			text: closeLabel,
 			action: () => {
-				NotificationHandler.cancel();
+				NotificationHandler.cancel()
 			},
 		},
-	});
-};
+	})
+}
 
-const notifyMap = {} as Record<string, number>;
+const notifyMap = {} as Record<string, number>
 /** progress 생성 */
 export const figmaProgress = (name: string, reset?: boolean) => {
-	if (reset) notifyMap[name] = 0;
-	if (notifyMap[name] == null) notifyMap[name] = 0;
-	notifyMap[name] = notifyMap[name] + 1;
-	notify(name, String(notifyMap[name]), 1000);
-};
+	if (reset) {
+		notifyMap[name] = 0
+	}
+	if (notifyMap[name] == null) {
+		notifyMap[name] = 0
+	}
+	notifyMap[name] += 1
+	notify(name, String(notifyMap[name]), 1000)
+}
 
 /** 인스턴스의 컴포넌트를 반환 */
 export async function findMainComponent(instance: InstanceNode) {
 	while (instance.type === 'INSTANCE') {
-		const main = await instance.getMainComponentAsync();
+		const main = await instance.getMainComponentAsync()
 		if (main) {
-			return main;
+			return main
 		}
-		return null; // 메인 컴포넌트를 찾지 못한 경우
+		return null // 메인 컴포넌트를 찾지 못한 경우
 	}
 }
 
-type 참조 = Prettify<BaseNodeMixin>;
+type 참조 = Prettify<BaseNodeMixin>
 
 export interface RecursiveFigmaNode<T extends BaseNode['type']> extends BaseNodeMixin {
-	type: T;
-	children: RecursiveFigmaNode<T>[];
+	type: T
+	children: RecursiveFigmaNode<T>[]
 }
 
 // baseNode 사용 시 전체 키
@@ -172,37 +182,42 @@ export interface RecursiveFigmaNode<T extends BaseNode['type']> extends BaseNode
 // setDevResourcePreviewAsync: asdf,
 
 // type TestNode = Prettify<BaseNodeMixin>;
-let temp: TestNode = null as any;
+const _temp: TestNode = null as any
 
-type TestNode = Prettify<BaseNodeMixin>;
+type TestNode = Prettify<BaseNodeMixin>
 
 type PathNodeInfo = {
-	type:
-		| PageNode['type']
-		| DocumentNode['type']
-		| ComponentSetNode['type']
-		| ComponentNode['type']
-		| SectionNode['type'];
-	name: string;
-};
+	type: PageNode['type'] | DocumentNode['type'] | ComponentSetNode['type'] | ComponentNode['type'] | SectionNode['type']
+	name: string
+}
 
-export const pathNodeType = ['DOCUMENT', 'PAGE', 'SECTION', 'COMPONENT_SET', 'COMPONENT'] as const;
-export const linkPathNodeType = ['DOCUMENT', 'PAGE', 'SECTION'] as const;
+export const pathNodeType = ['DOCUMENT', 'PAGE', 'SECTION', 'COMPONENT_SET', 'COMPONENT'] as const
+export const linkPathNodeType = ['DOCUMENT', 'PAGE', 'SECTION'] as const
 
 export type FilterType = {
-	DOCUMENT: boolean;
-	PAGE: boolean;
-	SECTION: boolean;
-	COMPONENT_SET: boolean;
-	COMPONENT: boolean;
-};
+	DOCUMENT: boolean
+	PAGE: boolean
+	SECTION: boolean
+	COMPONENT_SET: boolean
+	COMPONENT: boolean
+}
 
 // 노드로 해야하나..
 export const FilterTypeIndex = (text: string) => {
-	if (text === 'DOCUMENT') return 1;
-	if (text === 'PAGE') return 2;
-	if (text === 'SECTION') return 3;
-	if (text === 'COMPONENT_SET') return 4;
-	if (text === 'COMPONENT') return 5;
-	return 0;
-};
+	if (text === 'DOCUMENT') {
+		return 1
+	}
+	if (text === 'PAGE') {
+		return 2
+	}
+	if (text === 'SECTION') {
+		return 3
+	}
+	if (text === 'COMPONENT_SET') {
+		return 4
+	}
+	if (text === 'COMPONENT') {
+		return 5
+	}
+	return 0
+}

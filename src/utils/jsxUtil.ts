@@ -1,1 +1,1 @@
-export type NullableString = string | boolean | undefined;
+export type NullableString = string | boolean | undefined

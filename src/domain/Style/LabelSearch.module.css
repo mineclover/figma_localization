@@ -236,10 +236,10 @@
 
 	gap: 4px;
 
-	[class^='_textbox'] {
+	[class^="_textbox"] {
 		flex-grow: 1;
 	}
-	[class^='_bold'] {
+	[class^="_bold"] {
 		flex-grow: 1;
 	}
 }

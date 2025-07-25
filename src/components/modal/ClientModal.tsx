@@ -1,21 +1,21 @@
-import { h } from 'preact';
-import { useEffect } from 'preact/hooks';
-import { BaseProps, clc } from './utils';
-import styles from './modal.module.css';
-import { deleteLayer } from './Modal';
+import { h } from 'preact'
+import { useEffect } from 'preact/hooks'
+import { deleteLayer } from './Modal'
+import styles from './modal.module.css'
+import { type BaseProps, clc } from './utils'
 
-type DivType = BaseProps['div'];
+type DivType = BaseProps['div']
 
 export interface ClientModalProps extends DivType {
 	/** 필수 */
 
 	/** 외부 영역 클릭 시 모달 닫힘 여부 */
-	outsideDismiss?: boolean;
+	outsideDismiss?: boolean
 	/** Esc 클릭 시 모달 닫힘 */
-	escapeActive?: boolean;
+	escapeActive?: boolean
 	/** 닫힐 때 실행할 함수 넣고 싶으면 */
-	onCloseTrigger?: () => void;
-	close?: boolean;
+	onCloseTrigger?: () => void
+	close?: boolean
 	/**
 	 * 모달 활성화 시 스크롤 안되게 막을지 여부
 	 * 보류
@@ -37,19 +37,19 @@ const ClientModal = ({
 	useEffect(() => {
 		const handleKeyPress = (event: KeyboardEvent) => {
 			if (escapeActive && event.code === 'Escape') {
-				deleteLayer(modalKey);
+				deleteLayer(modalKey)
 			}
-		};
-		window.addEventListener('keydown', handleKeyPress);
+		}
+		window.addEventListener('keydown', handleKeyPress)
 
 		return () => {
-			window.removeEventListener('keydown', handleKeyPress);
-		};
-	}, []);
+			window.removeEventListener('keydown', handleKeyPress)
+		}
+	}, [escapeActive, modalKey])
 
 	function onDismiss() {
 		if (outsideDismiss) {
-			deleteLayer(modalKey);
+			deleteLayer(modalKey)
 		}
 	}
 
@@ -57,24 +57,24 @@ const ClientModal = ({
 		<div
 			{...props}
 			className={clc(styles.modal_backdrop, className as string, close && styles.close)}
-			onClick={(e) => {
+			onClick={e => {
 				if (e.currentTarget === e.target) {
-					onDismiss();
-					onCloseTrigger && onCloseTrigger();
-					props.onClick && props.onClick(e);
+					onDismiss()
+					onCloseTrigger?.()
+					props.onClick?.(e)
 				}
 			}}
-			onTouchEnd={(e) => {
+			onTouchEnd={e => {
 				if (e.currentTarget === e.target) {
-					onDismiss();
-					onCloseTrigger && onCloseTrigger();
-					props.onTouchEnd && props.onTouchEnd(e);
+					onDismiss()
+					onCloseTrigger?.()
+					props.onTouchEnd?.(e)
 				}
 			}}
 		>
 			{children}
 		</div>
-	);
-};
+	)
+}
 
-export default ClientModal;
+export default ClientModal

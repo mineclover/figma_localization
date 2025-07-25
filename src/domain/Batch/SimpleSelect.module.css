@@ -117,7 +117,7 @@
 	border-radius: 2px;
 	border: 1px solid var(--figma-color-border);
 	padding: 2px 4px;
-	&:hover:not(:has([class^='_iconButton']:hover)) {
+	&:hover:not(:has([class^="_iconButton"]:hover)) {
 		background-color: var(--figma-color-bg-hover);
 		border: 1px solid var(--figma-color-border-brand);
 	}

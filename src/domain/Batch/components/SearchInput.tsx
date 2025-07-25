@@ -1,13 +1,13 @@
-import { h, Fragment } from 'preact';
-import { SearchTextbox, Dropdown, IconChevronDown24 } from '@create-figma-plugin/ui';
-import { NonNullableComponentTypeExtract } from 'types/utilType';
-import { SearchOption } from '../hooks/useSearchState';
+import { Dropdown, IconChevronDown24, SearchTextbox } from '@create-figma-plugin/ui'
+import { Fragment, h } from 'preact'
+import type { NonNullableComponentTypeExtract } from 'types/utilType'
+import type { SearchOption } from '../hooks/useSearchState'
 
 interface SearchInputProps {
-	searchValue: string;
-	setSearchValue: (value: string) => void;
-	searchOption: SearchOption;
-	setSearchOption: (option: SearchOption) => void;
+	searchValue: string
+	setSearchValue: (value: string) => void
+	searchOption: SearchOption
+	setSearchOption: (option: SearchOption) => void
 }
 
 const searchOptions = [
@@ -15,18 +15,18 @@ const searchOptions = [
 	{ text: 'name', value: 'name' },
 	{ text: 'parentName', value: 'parentName' },
 	{ text: 'localizationKey', value: 'localizationKey' },
-];
+]
 
 export const SearchInput = ({ searchValue, setSearchValue, searchOption, setSearchOption }: SearchInputProps) => {
 	const handleSearchChange = (
 		event: Parameters<NonNullableComponentTypeExtract<typeof SearchTextbox, 'onInput'>>[0]
 	) => {
-		setSearchValue(event.currentTarget.value);
-	};
+		setSearchValue(event.currentTarget.value)
+	}
 
 	const handleOptionChange = (event: Parameters<NonNullableComponentTypeExtract<typeof Dropdown, 'onChange'>>[0]) => {
-		setSearchOption(event.currentTarget.value as SearchOption);
-	};
+		setSearchOption(event.currentTarget.value as SearchOption)
+	}
 
 	return (
 		<Fragment>
@@ -38,5 +38,5 @@ export const SearchInput = ({ searchValue, setSearchValue, searchOption, setSear
 				value={searchOption}
 			/>
 		</Fragment>
-	);
-};
+	)
+}

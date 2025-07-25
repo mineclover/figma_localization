@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from 'preact'
 
 const NotionIcon = ({ size = 24, bgColor = 'white', color = 'black', ...props }) => {
 	return (
@@ -14,7 +14,7 @@ const NotionIcon = ({ size = 24, bgColor = 'white', color = 'black', ...props })
 				fill={color}
 			/>
 		</svg>
-	);
-};
+	)
+}
 
-export default NotionIcon;
+export default NotionIcon

@@ -257,8 +257,6 @@ export type TentacledChild = {
 	styles?: ChildStyles
 }
 
-typ
-
 export type Fill = {
 	opacity?: number
 	blendMode?: BlendMode

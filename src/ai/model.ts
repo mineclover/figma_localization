@@ -2,45 +2,41 @@
 import {
 	createGoogleGenerativeAI,
 	GoogleGenerativeAIProvider,
-	GoogleGenerativeAIProviderOptions,
-} from '@ai-sdk/google';
-import { generateObject, LanguageModelV1 } from 'ai';
-import { z } from 'zod';
-import { Provider, ProviderOptions, ProviderResponse, ModelConfig } from './provider';
+	type GoogleGenerativeAIProviderOptions,
+} from '@ai-sdk/google'
+import { generateObject, type LanguageModelV1 } from 'ai'
+import type { z } from 'zod'
+import { type ModelConfig, Provider, type ProviderOptions, type ProviderResponse } from './provider'
 
 export interface GoogleProviderOptions extends ProviderOptions {
-	responseModalities?: string[];
-	temperature?: number;
+	responseModalities?: string[]
+	temperature?: number
 }
 
 /**
  * Google AI Provider implementation
  */
 export class GoogleProvider extends Provider<GoogleProviderOptions> {
-	protected model: LanguageModelV1 | null = null;
-
-	constructor(options: GoogleProviderOptions) {
-		super(options);
-	}
+	protected model: LanguageModelV1 | null = null
 
 	/**
 	 * Initialize the Google AI provider
 	 * @param modelConfig Configuration for the specific model
 	 */
 	initialize(modelConfig: ModelConfig): void {
-		this.modelId = modelConfig.modelId;
+		this.modelId = modelConfig.modelId
 
 		// Create Google AI client
 		const google = createGoogleGenerativeAI({
 			apiKey: this.options.apiKey,
-		});
+		})
 
 		// Initialize the model
 		this.model = google(this.modelId, {
 			structuredOutputs: true,
 			// Add any additional model-specific configurations
 			...modelConfig,
-		});
+		})
 	}
 
 	/**
@@ -55,13 +51,13 @@ export class GoogleProvider extends Provider<GoogleProviderOptions> {
 		additionalOptions?: Partial<GoogleGenerativeAIProviderOptions>
 	): Promise<ProviderResponse<R>> {
 		if (!this.model) {
-			throw new Error('Model not initialized. Call initialize() first.');
+			throw new Error('Model not initialized. Call initialize() first.')
 		}
 
 		const providerOptions: GoogleGenerativeAIProviderOptions = {
 			responseModalities: (this.options.responseModalities as ('TEXT' | 'IMAGE')[]) || ['TEXT'],
 			...additionalOptions,
-		};
+		}
 
 		/**
 		 * https://sdk.vercel.ai/docs/reference/ai-sdk-core/generate-object
@@ -74,10 +70,10 @@ export class GoogleProvider extends Provider<GoogleProviderOptions> {
 			providerOptions: {
 				google: providerOptions,
 			},
-		});
+		})
 
 		return {
 			data: result.object,
-		};
+		}
 	}
 }

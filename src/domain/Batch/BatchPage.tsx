@@ -1,8 +1,3 @@
-import { useSignal } from '@/hooks/useSignal';
-import { Fragment, h } from 'preact';
-import { CurrentNode } from '@/model/types';
-import { currentSectionSignal, inputKeySignal, selectedKeyDataSignal } from '@/model/signal';
-import { Dispatch, StateUpdater, useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import {
 	Bold,
 	Button,
@@ -14,50 +9,60 @@ import {
 	IconChevronDown24,
 	IconChevronUp24,
 	IconCloseSmall24,
-	IconSwapSmall24,
-	IconPrototyping24,
-	IconToggleButton,
+	IconEyeSmall24,
 	IconHiddenSmall24,
+	IconPrototyping24,
+	IconSwapSmall24,
+	IconToggleButton,
 	IconVisible16,
 	Muted,
 	SearchTextbox,
 	Stack,
 	Tabs,
-	TabsOption,
+	type TabsOption,
 	Text,
 	Textbox,
 	Toggle,
 	VerticalSpace,
-	IconEyeSmall24,
-} from '@create-figma-plugin/ui';
-import { emit } from '@create-figma-plugin/utilities';
+} from '@create-figma-plugin/ui'
+import { emit } from '@create-figma-plugin/utilities'
+import { Fragment, h } from 'preact'
+import { type Dispatch, type StateUpdater, useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import type { NonNullableComponentTypeExtract } from 'types/utilType'
+import { modalAlert } from '@/components/alert'
+import { clc } from '@/components/modal/utils'
+import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
+import { useFetch } from '@/hooks/useFetch'
+import { useSignal } from '@/hooks/useSignal'
 import {
-	GET_LOCALIZATION_KEY_VALUE,
-	GET_PATTERN_MATCH_KEY,
-} from '../constant';
-import { groupByPattern } from './batchModel';
-import { GroupOption, ViewOption } from '@/model/types';
-import { PatternMatchData, SearchNodeData } from '@/model/types';
-import { patternMatchDataSignal, selectIdsSignal } from '@/model/signal';
-import styles from './batch.module.css';
-import { clc } from '@/components/modal/utils';
-import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction';
-import { clientFetchDBCurry } from '../utils/fetchDB';
-import { domainSettingSignal } from '@/model/signal';
-import { useFetch } from '@/hooks/useFetch';
-import { modalAlert } from '@/components/alert';
-import { LocalizationKeyDTO } from '@/model/types';
-import { SearchArea, useSearch } from '../Label/LabelSearch';
-import { selectedKeySignal } from '@/model/signal';
-import { NonNullableComponentTypeExtract } from 'types/utilType';
-import { currentPointerSignal } from '@/model/signal';
-import SimpleSelect from './SimpleSelect';
-import { getTimeAgo } from '@/utils/time';
-import { useBatchActions } from './useBatchActions';
-import { SearchResult } from './components/SearchResult';
+	currentPointerSignal,
+	currentSectionSignal,
+	domainSettingSignal,
+	inputKeySignal,
+	patternMatchDataSignal,
+	selectedKeyDataSignal,
+	selectedKeySignal,
+	selectIdsSignal,
+} from '@/model/signal'
+import {
+	CurrentNode,
+	type GroupOption,
+	type LocalizationKeyDTO,
+	type PatternMatchData,
+	type SearchNodeData,
+	type ViewOption,
+} from '@/model/types'
+import { getTimeAgo } from '@/utils/time'
+import { GET_LOCALIZATION_KEY_VALUE, GET_PATTERN_MATCH_KEY } from '../constant'
+import { SearchArea, useSearch } from '../Label/LabelSearch'
+import { clientFetchDBCurry } from '../utils/fetchDB'
+import styles from './batch.module.css'
+import { groupByPattern } from './batchModel'
+import { SearchResult } from './components/SearchResult'
+import SimpleSelect from './SimpleSelect'
+import { useBatchActions } from './useBatchActions'
 
-
-type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name';
+type SearchOption = 'text' | 'localizationKey' | 'parentName' | 'name'
 
 const optionAlias = {
 	text: '텍스트',
@@ -68,7 +73,7 @@ const optionAlias = {
 	notIgnore: '표시 대상',
 	hasLocalizationKey: '키 값 있음',
 	notHasLocalizationKey: '키 값 없음',
-};
+}
 
 // SearchSection 컴포넌트를 별도로 분리
 const SearchSection = ({
@@ -89,30 +94,30 @@ const SearchSection = ({
 	filteredDataLength,
 	dispatch,
 }: {
-	searchOption: SearchOption;
-	setSearchOption: Dispatch<StateUpdater<SearchOption>>;
-	searchValue: string;
-	setSearchValue: Dispatch<StateUpdater<string>>;
-	openOption: boolean;
-	setOpenOption: Dispatch<StateUpdater<boolean>>;
+	searchOption: SearchOption
+	setSearchOption: Dispatch<StateUpdater<SearchOption>>
+	searchValue: string
+	setSearchValue: Dispatch<StateUpdater<string>>
+	openOption: boolean
+	setOpenOption: Dispatch<StateUpdater<boolean>>
 
-	groupOption: GroupOption;
-	setGroupOption: Dispatch<StateUpdater<GroupOption>>;
-	viewOption: ViewOption;
-	setViewOption: Dispatch<StateUpdater<ViewOption>>;
-	allView: boolean;
-	setAllView: Dispatch<StateUpdater<boolean>>;
-	patternMatchDataGroup: PatternMatchData[];
-	filteredDataLength: number;
-	dispatch: Dispatch<any>;
+	groupOption: GroupOption
+	setGroupOption: Dispatch<StateUpdater<GroupOption>>
+	viewOption: ViewOption
+	setViewOption: Dispatch<StateUpdater<ViewOption>>
+	allView: boolean
+	setAllView: Dispatch<StateUpdater<boolean>>
+	patternMatchDataGroup: PatternMatchData[]
+	filteredDataLength: number
+	dispatch: Dispatch<any>
 }) => {
 	return (
 		<Fragment>
 			<Stack space="extraSmall">
 				<div className={styles.row}>
 					<Dropdown
-						onChange={(e) => {
-							setSearchOption(e.currentTarget.value as SearchOption);
+						onChange={e => {
+							setSearchOption(e.currentTarget.value as SearchOption)
 						}}
 						options={[
 							{ text: 'text', value: 'text' },
@@ -124,8 +129,8 @@ const SearchSection = ({
 					/>
 
 					<SearchTextbox
-						onChange={(e) => {
-							setSearchValue(e.currentTarget.value);
+						onChange={e => {
+							setSearchValue(e.currentTarget.value)
 						}}
 						placeholder="검색..."
 						value={searchValue}
@@ -133,7 +138,7 @@ const SearchSection = ({
 					<IconToggleButton
 						value={openOption}
 						onClick={() => {
-							setOpenOption(!openOption);
+							setOpenOption(!openOption)
 						}}
 					>
 						<IconAdjustSmall24></IconAdjustSmall24>
@@ -144,24 +149,24 @@ const SearchSection = ({
 					<div className={styles.rowLeft}>
 						<div className={styles.miniColumn}>
 							<Bold>그룹 기준</Bold>
-							{(Object.keys(groupOption) as Array<keyof GroupOption>).map((key) => {
-								const value = groupOption[key];
+							{(Object.keys(groupOption) as Array<keyof GroupOption>).map(key => {
+								const value = groupOption[key]
 								return (
-									<Toggle value={value} onClick={() => setGroupOption((prev) => ({ ...prev, [key]: !value }))}>
+									<Toggle value={value} onClick={() => setGroupOption(prev => ({ ...prev, [key]: !value }))}>
 										{key}
 									</Toggle>
-								);
+								)
 							})}
 						</div>
 						<div className={styles.miniColumn}>
 							<Bold>보여줄 옵션</Bold>
-							{(Object.keys(viewOption) as Array<keyof ViewOption>).map((key) => {
-								const value = viewOption[key];
+							{(Object.keys(viewOption) as Array<keyof ViewOption>).map(key => {
+								const value = viewOption[key]
 								return (
-									<Toggle value={value} onClick={() => setViewOption((prev) => ({ ...prev, [key]: !value }))}>
+									<Toggle value={value} onClick={() => setViewOption(prev => ({ ...prev, [key]: !value }))}>
 										{optionAlias[key]}
 									</Toggle>
-								);
+								)
 							})}
 						</div>
 					</div>
@@ -183,13 +188,13 @@ const SearchSection = ({
 			<div className={styles.column}>
 				{patternMatchDataGroup
 					.sort((a, b) => a.text.localeCompare(b.text))
-					.map((item) => {
-						return <SearchResult {...item} dispatch={dispatch} />;
+					.map(item => {
+						return <SearchResult {...item} dispatch={dispatch} />
 					})}
 			</div>
 		</Fragment>
-	);
-};
+	)
+}
 
 /**
  * 그루핑 할때는 아이디를 하위 값으로 두고 속성을 위로 올린다
@@ -205,22 +210,22 @@ const SearchSection = ({
  * 업데이트 > 노드 아이디로 키 추가
  */
 function BatchPage() {
-	const section = useSignal(currentSectionSignal);
+	const _section = useSignal(currentSectionSignal)
 
-	const selectIds = useSignal(selectIdsSignal);
-	const domainSetting = useSignal(domainSettingSignal);
+	const selectIds = useSignal(selectIdsSignal)
+	const domainSetting = useSignal(domainSettingSignal)
 
-	const currentPointer = useSignal(currentPointerSignal);
-	const selectedKey = useSignal(selectedKeySignal);
-	const selectedKeyData = useSignal(selectedKeyDataSignal);
-	const { data: searchResult, search, setSearch } = useSearch();
-	const { dispatch, actions } = useBatchActions();
+	const currentPointer = useSignal(currentPointerSignal)
+	const selectedKey = useSignal(selectedKeySignal)
+	const selectedKeyData = useSignal(selectedKeyDataSignal)
+	const { data: searchResult, search, setSearch } = useSearch()
+	const { dispatch, actions } = useBatchActions()
 
 	// const hasSelectedKey = typeof selectedKeyData === 'object';
-	const hasSelectedKey = selectedKey !== null;
+	const hasSelectedKey = selectedKey !== null
 
 	/** 숨김 대상을 포함할 것인가 */
-	const [allView, setAllView] = useState<boolean>(true);
+	const [allView, setAllView] = useState<boolean>(true)
 
 	/** 그루핑 옵션 */
 	const [groupOption, setGroupOption] = useState<GroupOption>({
@@ -232,7 +237,7 @@ function BatchPage() {
 		name: false,
 		/** 텍스트를 그루핑 파라미터로 사용 */
 		text: true,
-	});
+	})
 	/** 보여줄 옵션 */
 	const [viewOption, setViewOption] = useState<ViewOption>({
 		/** 숨김 대상을 표시 */
@@ -244,63 +249,60 @@ function BatchPage() {
 		// hasLocalizationKey: false,
 		/** 키 값이 없는 대상을 표시 */
 		notHasLocalizationKey: true,
-	});
+	})
 
 	/** 입력한 키 값 */
-	const localizationKey = useSignal(inputKeySignal);
+	const localizationKey = useSignal(inputKeySignal)
 
 	/** 옵션 열기 */
-	const [openOption, setOpenOption] = useState<boolean>(false);
+	const [openOption, setOpenOption] = useState<boolean>(false)
 
 	/** 검색 옵션 */
-	const [searchOption, setSearchOption] = useState<SearchOption>('text');
+	const [searchOption, setSearchOption] = useState<SearchOption>('text')
 
 	/** 피그마 텍스트 스캔 데이터 */
-	const patternMatchData = useSignal(patternMatchDataSignal);
+	const patternMatchData = useSignal(patternMatchDataSignal)
 
 	const { filteredDataLength, patternMatchData: allPatternData } = groupByPattern(
 		patternMatchData as unknown as SearchNodeData[],
 		viewOption,
 		groupOption
-	);
+	)
 
-	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>();
+	const { data, loading, error, fetchData, hasMessage, setHasMessage } = useFetch<LocalizationKeyDTO>()
 
 	// const textList = Array.from(matchDataSet.values()).sort()
 
-	const [tabValue, setTabValue] = useState<string>('Scan');
+	const [tabValue, setTabValue] = useState<string>('Scan')
 
 	/** 검색 값 */
-	const [searchValue, setSearchValue] = useState<string>('');
+	const [searchValue, setSearchValue] = useState<string>('')
 
-	const patternMatchDataGroup = allPatternData.filter((item) => {
-		{
-			/* 검색이 선택 보기 상태면 선택한 아이디를 제공 */
-		}
+	const patternMatchDataGroup = allPatternData.filter(item => {
 		if (!allView) {
-			if (item.ids.some((id) => selectIds.includes(id))) {
-				return true;
+			if (item.ids.some(id => selectIds.includes(id))) {
+				return true
 			} else {
-				return false;
+				return false
 			}
 		}
 		if (searchValue === '') {
-			return true;
+			return true
 		}
-		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase());
-	});
+		return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
+	})
 
-	const nav = ['Scan', 'Search'];
+	const nav = ['Scan', 'Search']
 	function handleChange(
 		//  event: NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>
 		event: Parameters<NonNullableComponentTypeExtract<typeof Tabs, 'onChange'>>[0]
 	) {
-		const newValue = event.currentTarget.value;
-		setTabValue(newValue);
+		const newValue = event.currentTarget.value
+		setTabValue(newValue)
 	}
 	const searchHandler = (key: string) => {
-		dispatch(actions.searchKey([key, setSearch, setTabValue]));
-	};
+		dispatch(actions.searchKey([key, setSearch, setTabValue]))
+	}
 
 	const options: Array<TabsOption> = [
 		{
@@ -329,29 +331,29 @@ function BatchPage() {
 			children: <SearchArea search={search} data={searchResult ?? []} searchHandler={searchHandler} />,
 			value: nav[1],
 		},
-	] as const;
+	] as const
 
 	useEffect(() => {
 		if (hasMessage && loading === false) {
 			if (data) {
-				modalAlert('"' + data.name + '" 으로 추가 완료');
+				modalAlert(`"${data.name}" 으로 추가 완료`)
 			} else if (error) {
-				modalAlert(error.message);
+				modalAlert(error.message)
 			}
-			setHasMessage(false);
+			setHasMessage(false)
 		}
-	}, [hasMessage, loading]);
+	}, [hasMessage, loading, data, error, setHasMessage])
 
-	const [updateTime, setUpdateTime] = useState<Date>(new Date());
+	const [updateTime, setUpdateTime] = useState<Date>(new Date())
 
-	const updateTimeString = getTimeAgo(updateTime);
+	const updateTimeString = getTimeAgo(updateTime)
 
 	useEffect(() => {
-		setUpdateTime(new Date());
-	}, [patternMatchData]);
+		setUpdateTime(new Date())
+	}, [])
 
 	if (domainSetting?.domainId == null) {
-		return <div>도메인 설정이 없습니다.</div>;
+		return <div>도메인 설정이 없습니다.</div>
 	}
 
 	return (
@@ -363,9 +365,7 @@ function BatchPage() {
 
 						<div className={styles.row}>
 							<Muted className={styles.noWrapSecondary}>{updateTimeString}</Muted>
-							<IconButton
-								onClick={() => dispatch(actions.refreshPatternMatch())}
-							>
+							<IconButton onClick={() => dispatch(actions.refreshPatternMatch())}>
 								<IconSwapSmall24 />
 							</IconButton>
 						</div>
@@ -381,25 +381,27 @@ function BatchPage() {
 							disabled={hasSelectedKey}
 							placeholder="새로운 키 값 입력"
 							value={hasSelectedKey && selectedKeyData ? selectedKeyData?.name : localizationKey}
-							onChange={(e) => {
-								searchHandler(e.currentTarget.value);
+							onChange={e => {
+								searchHandler(e.currentTarget.value)
 							}}
 						></Textbox>
-						<IconButton
-							onClick={() => dispatch(actions.clearKeySelection([setSearch]))}
-						>
+						<IconButton onClick={() => dispatch(actions.clearKeySelection([setSearch]))}>
 							<IconCloseSmall24 />
 						</IconButton>
 						<Button
-							onClick={() => dispatch(actions.updateLocalizationKey([
-								hasSelectedKey,
-								selectedKeyData,
-								selectIds,
-								domainSetting,
-								localizationKey,
-								currentPointer,
-								fetchData
-							]))}
+							onClick={() =>
+								dispatch(
+									actions.updateLocalizationKey([
+										hasSelectedKey,
+										selectedKeyData,
+										selectIds,
+										domainSetting,
+										localizationKey,
+										currentPointer,
+										fetchData,
+									])
+								)
+							}
 							secondary
 						>
 							{hasSelectedKey ? '변경' : '추가'}
@@ -412,6 +414,6 @@ function BatchPage() {
 
 			<Tabs options={options} value={tabValue} onChange={handleChange} />
 		</div>
-	);
+	)
 }
-export default BatchPage;
+export default BatchPage

@@ -1,33 +1,32 @@
-import { ComponentChildren, Fragment, h } from 'preact';
-import { useLayoutEffect } from 'preact/hooks';
-import ClientModalProvider from '@/components/modal/Modal';
-
-import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE';
+import { emit } from '@create-figma-plugin/utilities'
+import { type ComponentChildren, Fragment, h } from 'preact'
+import { useLayoutEffect } from 'preact/hooks'
+import ClientModalProvider from '@/components/modal/Modal'
+import { onGetCursorPositionResponse } from '@/model/on/GET_CURSOR_POSITION'
+import { onGetLocalizationKeyResponse } from '@/model/on/GET_LOCALIZATION_KEY_VALUE'
+import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA'
+import { onPatternMatchResponse } from './Batch/batchModel'
+import { RENDER_PAIR } from './constant'
+import { onSetProjectIdResponse } from './Label/LabelModel'
+import { onClientLocation } from './Search/clientLocation'
+import { onTranslationActionResponse } from './Search/locations'
+import {
+	onAutoSelectModeResponse,
+	onAutoSelectStyleUI,
+	onAutoSelectUI,
+	onBaseKeySelect,
+	onMultiKeySelect,
+	onSaveAccept,
+	onSectionSelect,
+} from './Search/visualModel'
 import {
 	onGetApiKeyResponse,
 	onGetDomainSettingResponse,
 	onGetLanguageCodesResponse,
 	onGetUserHashResponse,
-} from './Setting/SettingModel';
-import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel';
-import { onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA';
-import { onProcessResponse } from './System/process';
-import { onGetCursorPositionResponse } from '@/model/on/GET_CURSOR_POSITION';
-import { onSetProjectIdResponse } from './Label/LabelModel';
-import { onPatternMatchResponse } from './Batch/batchModel';
-import {
-	onSaveAccept,
-	onSectionSelect,
-	onMultiKeySelect,
-	onBaseKeySelect,
-	onAutoSelectStyleUI,
-	onAutoSelectUI,
-	onAutoSelectModeResponse,
-} from './Search/visualModel';
-import { emit } from '@create-figma-plugin/utilities';
-import { RENDER_PAIR } from './constant';
-import { onClientLocation } from './Search/clientLocation';
-import { onTranslationActionResponse } from './Search/locations';
+} from './Setting/SettingModel'
+import { onProcessResponse } from './System/process'
+import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel'
 
 /**
  * duplex 전용 어댑터
@@ -62,15 +61,15 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onAutoSelectModeResponse(),
 			onGetApiKeyResponse(),
 			onTranslationActionResponse(),
-		];
+		]
 
 		return () => {
-			events.forEach((event) => event());
-		};
-	}, []);
+			events.forEach(event => event())
+		}
+	}, [])
 
-	return <Fragment>{children}</Fragment>;
-};
+	return <Fragment>{children}</Fragment>
+}
 
 /**
  * 최종 provider
@@ -84,5 +83,5 @@ export function AppProvider({ children }: { children: preact.ComponentChildren }
 			{children}
 			<ClientModalProvider></ClientModalProvider>
 		</Duplex_Adapter>
-	);
+	)
 }

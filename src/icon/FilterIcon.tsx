@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from 'preact'
 
 const FilterIcon = ({ size = 16, color = 'var(--figma-color-icon)', ...props }) => {
 	return (
@@ -8,7 +8,7 @@ const FilterIcon = ({ size = 16, color = 'var(--figma-color-icon)', ...props }) 
 				fill={color}
 			/>
 		</svg>
-	);
-};
+	)
+}
 
-export default FilterIcon;
+export default FilterIcon

@@ -45,8 +45,11 @@ export type ExtractProps<T, K extends keyof T> = T[K] extends (props: infer P) =
 export type SingleExtractProps<T> = T extends (props: infer P) => any ? P : never
 
 // 가장 컴포넌트의 첫번째 파라미터인(props)를 추출
-export type ExtractComponentTypeProps<T> =
-	T extends React.ComponentType<infer P> ? P : T extends (...args: any[]) => any ? Parameters<T>[0] : never
+export type ExtractComponentTypeProps<T> = T extends React.ComponentType<infer P>
+	? P
+	: T extends (...args: any[]) => any
+		? Parameters<T>[0]
+		: never
 
 /**
  * 리엑트 컴포넌트의 props에서 K 타입을 NonNullable로 추출

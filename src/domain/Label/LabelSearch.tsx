@@ -1,61 +1,61 @@
-import { useFetch } from '@/hooks/useFetch';
 import {
+	Bold,
+	Code,
 	IconButton,
-	Textbox,
-	Text,
 	IconChevronDown24,
 	IconChevronUp24,
+	IconLockLocked16,
+	IconLockUnlocked16,
 	IconPlus24,
 	IconStar16,
-	IconLockUnlocked16,
-	IconLockLocked16,
+	SearchTextbox,
+	Text,
+	Textbox,
 	Toggle,
 	VerticalSpace,
-	SearchTextbox,
-	Code,
-	Bold,
-} from '@create-figma-plugin/ui';
-import { Fragment, h } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
-import { LocalizationKeyDTO } from '@/model/types';
+} from '@create-figma-plugin/ui'
+import { emit } from '@create-figma-plugin/utilities'
+import { computed } from '@preact/signals-core'
+import { Fragment, h } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
+import { modalAlert } from '@/components/alert'
+import { clc } from '@/components/modal/utils'
+import { useFetch } from '@/hooks/useFetch'
+import { useSignal } from '@/hooks/useSignal'
 import {
 	currentPointerSignal,
+	domainSettingSignal,
 	isDirectSignal,
 	isTravelSignal,
 	selectedKeyDataSignal,
 	selectedKeySignal,
-} from '@/model/signal';
-import { useSignal } from '@/hooks/useSignal';
-import { domainSettingSignal } from '@/model/signal';
-import styles from '../Style/LabelSearch.module.css';
-import { clc } from '@/components/modal/utils';
-import { UPDATE_NODE_STORE_KEY } from '../constant';
-import { emit } from '@create-figma-plugin/utilities';
-import { modalAlert } from '@/components/alert';
-import { computed } from '@preact/signals-core';
-import { keyConventionRegex } from '@/utils/textTools';
+} from '@/model/signal'
+import type { LocalizationKeyDTO } from '@/model/types'
+import { keyConventionRegex } from '@/utils/textTools'
+import { UPDATE_NODE_STORE_KEY } from '../constant'
+import styles from '../Style/LabelSearch.module.css'
 
 export const NullDisableText = ({
 	className,
 	placeholder,
 	children,
 }: {
-	className?: string;
-	placeholder?: string;
-	children?: React.ReactNode;
+	className?: string
+	placeholder?: string
+	children?: React.ReactNode
 }) => {
 	return (
 		<span className={clc(className, children == null && styles.textDisabled)}>
 			{children == null ? placeholder : children}
 		</span>
-	);
-};
-const nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
+	)
+}
+const _nameOrAliasIcon = (isNameOpen: boolean, is_temporary: number) => {
 	if (isNameOpen) {
-		return is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />;
+		return is_temporary === 1 ? <IconLockUnlocked16 /> : <IconLockLocked16 />
 	}
-	return <IconStar16 />;
-};
+	return <IconStar16 />
+}
 
 const SearchResultItem = ({
 	key_id,
@@ -66,9 +66,9 @@ const SearchResultItem = ({
 	origin_value,
 	searchHandler,
 }: LocalizationKeyDTO & {
-	searchHandler: (key: string) => void;
+	searchHandler: (key: string) => void
 }) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false)
 
 	return (
 		<div
@@ -78,8 +78,8 @@ const SearchResultItem = ({
 			)}
 			key={key_id}
 			onClick={() => {
-				selectedKeySignal.value = key_id.toString();
-				searchHandler(name);
+				selectedKeySignal.value = key_id.toString()
+				searchHandler(name)
 			}}
 		>
 			<div className={styles.searchResultTop}>
@@ -107,8 +107,8 @@ const SearchResultItem = ({
 				</IconButton> */}
 			</div>
 		</div>
-	);
-};
+	)
+}
 
 export const SearchArea = ({
 	search,
@@ -116,10 +116,10 @@ export const SearchArea = ({
 	data,
 	searchHandler,
 }: {
-	search: string;
+	search: string
 
-	data: LocalizationKeyDTO[];
-	searchHandler: (key: string) => void;
+	data: LocalizationKeyDTO[]
+	searchHandler: (key: string) => void
 }) => {
 	return (
 		<Fragment>
@@ -128,80 +128,82 @@ export const SearchArea = ({
 				key={'searchTextbox'}
 				placeholder="Search..."
 				value={search}
-				onChange={(e) => {
-					searchHandler(e.currentTarget.value);
+				onChange={e => {
+					searchHandler(e.currentTarget.value)
 					// setSearch(keyConventionRegex(e.currentTarget.value))
 				}}
 			></SearchTextbox>
 			<VerticalSpace space="extraSmall"></VerticalSpace>
 			<div className={styles.searchResult}>
-				{data?.map((item) => <SearchResultItem {...item} searchHandler={searchHandler} />)}
+				{data?.map(item => (
+					<SearchResultItem {...item} searchHandler={searchHandler} />
+				))}
 			</div>
 		</Fragment>
-	);
-};
+	)
+}
 
 export const useSearch = () => {
-	const [search, setSearch] = useState('');
-	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>();
-	const domainSetting = useSignal(domainSettingSignal);
-	const selectedKey = useSignal(selectedKeySignal);
+	const [search, setSearch] = useState('')
+	const { data, loading, error, fetchData } = useFetch<LocalizationKeyDTO[]>()
+	const domainSetting = useSignal(domainSettingSignal)
+	const selectedKey = useSignal(selectedKeySignal)
 
 	useEffect(() => {
-		const tempData = data?.find((item) => item.key_id.toString() === (selectedKey ?? '0'));
+		const tempData = data?.find(item => item.key_id.toString() === (selectedKey ?? '0'))
 		if (tempData) {
-			selectedKeyDataSignal.value = tempData;
+			selectedKeyDataSignal.value = tempData
 		}
-	}, [data]);
+	}, [data, selectedKey])
 
 	useEffect(() => {
 		if (loading) {
-			return;
+			return
 		}
-		const domainId = domainSetting?.domainId;
+		const domainId = domainSetting?.domainId
 
 		if (!domainId) {
-			return;
+			return
 		}
 		if (search.length === 0) {
-			return;
+			return
 		}
 
-		fetchData(('/localization/keys/name/' + search) as '/localization/keys/name/{name}', {
+		fetchData(`/localization/keys/name/${search}` as '/localization/keys/name/{name}', {
 			method: 'GET',
 			headers: {
 				'X-Domain-Id': domainId.toString(),
 				'Content-Type': 'application/json',
 			},
-		});
+		})
 		return () => {
-			selectedKeySignal.value = null;
-		};
-	}, [search]);
+			selectedKeySignal.value = null
+		}
+	}, [search, domainSetting?.domainId, fetchData, loading])
 
-	return { search, setSearch, data, loading, error, fetchData };
-};
+	return { search, setSearch, data, loading, error, fetchData }
+}
 
 /** search bar */
 function LabelSearch() {
-	const { data, search, setSearch } = useSearch();
+	const { data, search, setSearch } = useSearch()
 
-	const isBatch = useSignal(isDirectSignal);
+	const isBatch = useSignal(isDirectSignal)
 
-	const isTravel = useSignal(isTravelSignal);
+	const _isTravel = useSignal(isTravelSignal)
 
-	const currentPointer = useSignal(currentPointerSignal);
-	const selectedKey = useSignal(selectedKeySignal);
+	const currentPointer = useSignal(currentPointerSignal)
+	const selectedKey = useSignal(selectedKeySignal)
 	const searchHandler = (key: string) => {
-		setSearch(key);
-	};
+		setSearch(key)
+	}
 
 	// 즉시 적용 기능
 	useEffect(() => {
 		if (isBatch && selectedKey && currentPointer) {
-			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey);
+			emit(UPDATE_NODE_STORE_KEY.REQUEST_KEY, selectedKey)
 		}
-	}, [currentPointer?.nodeId]);
+	}, [currentPointer?.nodeId, isBatch, currentPointer, selectedKey])
 
 	return (
 		<Fragment>
@@ -217,6 +219,6 @@ function LabelSearch() {
 			</Toggle>
 			<SearchArea search={search} data={data ?? []} searchHandler={searchHandler} />
 		</Fragment>
-	);
+	)
 }
-export default LabelSearch;
+export default LabelSearch

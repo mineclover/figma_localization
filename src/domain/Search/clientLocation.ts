@@ -1,8 +1,8 @@
-import { LocationDTO } from '@/model/types';
-import { emit, on } from '@create-figma-plugin/utilities';
-import { SEARCH_STORE_LOCATION_EMIT } from '../constant';
-import { MetaData, searchStore } from './searchStore';
-import { searchStoreLocationSignal } from '@/model/signal';
+import { emit, on } from '@create-figma-plugin/utilities'
+import { searchStoreLocationSignal } from '@/model/signal'
+import type { LocationDTO } from '@/model/types'
+import { SEARCH_STORE_LOCATION_EMIT } from '../constant'
+import { MetaData, searchStore } from './searchStore'
 
 /**
  * 클라이언트용 데이터 셋
@@ -12,6 +12,6 @@ import { searchStoreLocationSignal } from '@/model/signal';
 export const onClientLocation = () => {
 	// client 로 데이터 보내기
 	return on(SEARCH_STORE_LOCATION_EMIT.RESPONSE_KEY, (nodeInfo: [string, LocationDTO][]) => {
-		searchStoreLocationSignal.value = new Map(nodeInfo);
-	});
-};
+		searchStoreLocationSignal.value = new Map(nodeInfo)
+	})
+}

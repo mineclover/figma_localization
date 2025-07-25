@@ -1,56 +1,56 @@
-import { StyleData } from '@/model/signal';
-import { ResourceDTO } from '@/model/types';
-import { deepEqual } from '@/utils/data';
+import type { StyleData } from '@/model/signal'
+import type { ResourceDTO } from '@/model/types'
+import { deepEqual } from '@/utils/data'
 
 // 스타일 객체 타입 정의
 interface StyleRange<T> {
-	start: number;
-	end: number;
-	value: T | PluginAPI['mixed'];
+	start: number
+	end: number
+	value: T | PluginAPI['mixed']
 }
 
 // Range 메서드 시그니처 정의
 interface RangeMethods {
-	getRangeFontSize(start: number, end: number): StyleRange<number>[];
-	getRangeFontName(start: number, end: number): StyleRange<FontName>[];
-	getRangeFontWeight(start: number, end: number): StyleRange<number>[];
-	getRangeLineHeight(start: number, end: number): StyleRange<LineHeight>[];
-	getRangeLetterSpacing(start: number, end: number): StyleRange<LetterSpacing>[];
-	getRangeTextDecoration(start: number, end: number): StyleRange<TextDecoration>[];
-	getRangeTextCase(start: number, end: number): StyleRange<TextCase>[];
+	getRangeFontSize(start: number, end: number): StyleRange<number>[]
+	getRangeFontName(start: number, end: number): StyleRange<FontName>[]
+	getRangeFontWeight(start: number, end: number): StyleRange<number>[]
+	getRangeLineHeight(start: number, end: number): StyleRange<LineHeight>[]
+	getRangeLetterSpacing(start: number, end: number): StyleRange<LetterSpacing>[]
+	getRangeTextDecoration(start: number, end: number): StyleRange<TextDecoration>[]
+	getRangeTextCase(start: number, end: number): StyleRange<TextCase>[]
 	// getRangeAllFontNames(start: number, end: number): StyleRange<FontName>[]
-	getRangeOpenTypeFeatures(start: number, end: number): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[];
-	getRangeHyperlink(start: number, end: number): StyleRange<HyperlinkTarget | null>[];
-	getRangeTextStyleId(start: number, end: number): StyleRange<string>[];
-	getRangeFills(start: number, end: number): StyleRange<Paint[]>[];
-	getRangeFillStyleId(start: number, end: number): StyleRange<string>[];
-	getRangeListOptions(start: number, end: number): StyleRange<TextListOptions>[];
-	getRangeIndentation(start: number, end: number): StyleRange<number>[];
+	getRangeOpenTypeFeatures(start: number, end: number): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
+	getRangeHyperlink(start: number, end: number): StyleRange<HyperlinkTarget | null>[]
+	getRangeTextStyleId(start: number, end: number): StyleRange<string>[]
+	getRangeFills(start: number, end: number): StyleRange<Paint[]>[]
+	getRangeFillStyleId(start: number, end: number): StyleRange<string>[]
+	getRangeListOptions(start: number, end: number): StyleRange<TextListOptions>[]
+	getRangeIndentation(start: number, end: number): StyleRange<number>[]
 }
 function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, end: number) => any) {
-	const length = textNode.characters.length;
+	const length = textNode.characters.length
 
-	let start = 0;
-	let end = 1;
-	const ranges: StyleRange<T>[] = [];
+	let start = 0
+	let end = 1
+	const ranges: StyleRange<T>[] = []
 
 	while (start < length) {
-		const initialStyle = getRangeMethod.call(textNode, start, end);
+		const initialStyle = getRangeMethod.call(textNode, start, end)
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
-			const currentStyle = getRangeMethod.call(textNode, start, end);
+			const currentStyle = getRangeMethod.call(textNode, start, end)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
 			if (currentStyle === figma.mixed) {
-				end = end - 1;
-				break;
+				end -= 1
+				break
 			}
 			if (end === length) {
-				end = length;
-				break;
+				end = length
+				break
 			}
-			end++;
+			end++
 		}
 
 		// 범위 정보 저장
@@ -58,14 +58,14 @@ function getStyleRanges<T>(textNode: TextNode, getRangeMethod: (start: number, e
 			start,
 			end: end, // end는 변경지점이므로 -1
 			value: initialStyle,
-		});
+		})
 
 		// 다음 범위의 시작점으로 이동 (수정된 부분)
-		start = end; // end - 1 대신 end를 사용
-		end = start + 1;
+		start = end // end - 1 대신 end를 사용
+		end = start + 1
 	}
 
-	return ranges;
+	return ranges
 }
 
 function getBoundVariableStyleRanges<T>(
@@ -73,29 +73,29 @@ function getBoundVariableStyleRanges<T>(
 	field: VariableBindableTextField,
 	getRangeMethod: (start: number, end: number, field: VariableBindableTextField) => any
 ) {
-	const length = textNode.characters.length;
+	const length = textNode.characters.length
 
-	let start = 0;
-	let end = 1;
-	const ranges: StyleRange<T>[] = [];
+	let start = 0
+	let end = 1
+	const ranges: StyleRange<T>[] = []
 
 	while (start < length) {
-		const initialStyle = getRangeMethod.call(textNode, start, end, field);
+		const initialStyle = getRangeMethod.call(textNode, start, end, field)
 
 		// 순차 탐색으로 변경
 		while (end <= length) {
-			const currentStyle = getRangeMethod.call(textNode, start, end, field);
+			const currentStyle = getRangeMethod.call(textNode, start, end, field)
 
 			// 스타일이 변경되거나 mixed이면 이전 위치까지를 하나의 범위로 저장
-			if (currentStyle == figma.mixed) {
-				end = end - 1;
-				break;
+			if (currentStyle === figma.mixed) {
+				end -= 1
+				break
 			}
 			if (end === length) {
-				end = length;
-				break;
+				end = length
+				break
 			}
-			end++;
+			end++
 		}
 
 		// 범위 정보 저장
@@ -103,23 +103,23 @@ function getBoundVariableStyleRanges<T>(
 			start,
 			end: end, // end는 변경지점이므로 -1
 			value: initialStyle,
-		});
+		})
 
 		// 다음 범위의 시작점으로 이동 (수정된 부분)
-		start = end; // end - 1 대신 end를 사용
-		end = start + 1;
+		start = end // end - 1 대신 end를 사용
+		end = start + 1
 	}
 
-	return ranges;
+	return ranges
 }
 
 // 스타일별 Range 처리 함수들
 function getFontSizeRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.fontSize === figma.mixed) {
-		return getStyleRanges<number>(textNode, textNode.getRangeFontSize);
+		return getStyleRanges<number>(textNode, textNode.getRangeFontSize)
 	}
 	if (textNode.fontSize == null) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -127,15 +127,15 @@ function getFontSizeRanges(textNode: TextNode): StyleRange<number>[] | null {
 			end: textNode.characters.length,
 			value: textNode.fontSize,
 		},
-	];
+	]
 }
 
 function getFontNameRanges(textNode: TextNode): StyleRange<FontName>[] | null {
 	if (textNode.fontName === figma.mixed) {
-		return getStyleRanges<FontName>(textNode, textNode.getRangeFontName);
+		return getStyleRanges<FontName>(textNode, textNode.getRangeFontName)
 	}
 	if (textNode.fontName == null) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -143,15 +143,15 @@ function getFontNameRanges(textNode: TextNode): StyleRange<FontName>[] | null {
 			end: textNode.characters.length,
 			value: textNode.fontName,
 		},
-	];
+	]
 }
 
 function getLineHeightRanges(textNode: TextNode): StyleRange<LineHeight>[] | null {
 	if (textNode.lineHeight === figma.mixed) {
-		return getStyleRanges<LineHeight>(textNode, textNode.getRangeLineHeight);
+		return getStyleRanges<LineHeight>(textNode, textNode.getRangeLineHeight)
 	}
 	if (textNode.lineHeight == null) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -159,15 +159,15 @@ function getLineHeightRanges(textNode: TextNode): StyleRange<LineHeight>[] | nul
 			end: textNode.characters.length,
 			value: textNode.lineHeight,
 		},
-	];
+	]
 }
 
 function getLetterSpacingRanges(textNode: TextNode): StyleRange<LetterSpacing>[] | null {
 	if (textNode.letterSpacing === figma.mixed) {
-		return getStyleRanges<LetterSpacing>(textNode, textNode.getRangeLetterSpacing);
+		return getStyleRanges<LetterSpacing>(textNode, textNode.getRangeLetterSpacing)
 	}
 	if (textNode.letterSpacing == null || textNode.letterSpacing.value === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -175,12 +175,12 @@ function getLetterSpacingRanges(textNode: TextNode): StyleRange<LetterSpacing>[]
 			end: textNode.characters.length,
 			value: textNode.letterSpacing,
 		},
-	];
+	]
 }
 
 function getParagraphSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.paragraphSpacing == null || textNode.paragraphSpacing === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -188,15 +188,15 @@ function getParagraphSpacingRanges(textNode: TextNode): StyleRange<number>[] | n
 			end: textNode.characters.length,
 			value: textNode.paragraphSpacing,
 		},
-	];
+	]
 }
 
 function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>[] | null {
 	if (textNode.textDecoration === figma.mixed) {
-		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration);
+		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration)
 	}
 	if (textNode.textDecoration == null || textNode.textDecoration === 'NONE') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -204,15 +204,15 @@ function getTextDecorationRanges(textNode: TextNode): StyleRange<TextDecoration>
 			end: textNode.characters.length,
 			value: textNode.textDecoration,
 		},
-	];
+	]
 }
 
 function getTextDecorationStyleRanges(textNode: TextNode): StyleRange<TextDecorationStyle>[] | null {
 	if (textNode.textDecorationStyle === figma.mixed) {
-		return getStyleRanges<TextDecorationStyle>(textNode, textNode.getRangeTextDecorationStyle);
+		return getStyleRanges<TextDecorationStyle>(textNode, textNode.getRangeTextDecorationStyle)
 	}
 	if (textNode.textDecorationStyle == null || textNode.textDecorationStyle) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -220,15 +220,15 @@ function getTextDecorationStyleRanges(textNode: TextNode): StyleRange<TextDecora
 			end: textNode.characters.length,
 			value: textNode.textDecorationStyle,
 		},
-	];
+	]
 }
 
 function getTextDecorationOffsetRanges(textNode: TextNode): StyleRange<TextDecorationOffset>[] | null {
 	if (textNode.textDecorationOffset === figma.mixed) {
-		return getStyleRanges<TextDecorationOffset>(textNode, textNode.getRangeTextDecorationOffset);
+		return getStyleRanges<TextDecorationOffset>(textNode, textNode.getRangeTextDecorationOffset)
 	}
 	if (textNode.textDecorationOffset == null || textNode.textDecorationOffset) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -236,15 +236,15 @@ function getTextDecorationOffsetRanges(textNode: TextNode): StyleRange<TextDecor
 			end: textNode.characters.length,
 			value: textNode.textDecorationOffset,
 		},
-	];
+	]
 }
 
 function getTextDecorationThicknessRanges(textNode: TextNode): StyleRange<TextDecorationThickness>[] | null {
 	if (textNode.textDecorationThickness === figma.mixed) {
-		return getStyleRanges<TextDecorationThickness>(textNode, textNode.getRangeTextDecorationThickness);
+		return getStyleRanges<TextDecorationThickness>(textNode, textNode.getRangeTextDecorationThickness)
 	}
 	if (textNode.textDecorationThickness == null || textNode.textDecorationThickness) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -252,14 +252,14 @@ function getTextDecorationThicknessRanges(textNode: TextNode): StyleRange<TextDe
 			end: textNode.characters.length,
 			value: textNode.textDecorationThickness,
 		},
-	];
+	]
 }
 function getTextDecorationColorRanges(textNode: TextNode): StyleRange<TextDecorationColor>[] | null {
 	if (textNode.textDecorationColor === figma.mixed) {
-		return getStyleRanges<TextDecorationColor>(textNode, textNode.getRangeTextDecorationColor);
+		return getStyleRanges<TextDecorationColor>(textNode, textNode.getRangeTextDecorationColor)
 	}
 	if (textNode.textDecorationColor == null || textNode.textDecorationColor) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -267,15 +267,15 @@ function getTextDecorationColorRanges(textNode: TextNode): StyleRange<TextDecora
 			end: textNode.characters.length,
 			value: textNode.textDecorationColor,
 		},
-	];
+	]
 }
 
 function getTextDecorationSkipInkRanges(textNode: TextNode): StyleRange<boolean>[] | null {
 	if (textNode.textDecorationSkipInk === figma.mixed) {
-		return getStyleRanges<boolean>(textNode, textNode.getRangeTextDecorationSkipInk);
+		return getStyleRanges<boolean>(textNode, textNode.getRangeTextDecorationSkipInk)
 	}
 	if (textNode.textDecorationSkipInk == null || textNode.textDecorationSkipInk) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -283,15 +283,15 @@ function getTextDecorationSkipInkRanges(textNode: TextNode): StyleRange<boolean>
 			end: textNode.characters.length,
 			value: textNode.textDecorationSkipInk,
 		},
-	];
+	]
 }
 
 export const getTextDecorationSkipInk = (textNode: TextNode): StyleRange<TextDecoration>[] | null => {
 	if (textNode.textDecoration === figma.mixed) {
-		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration);
+		return getStyleRanges<TextDecoration>(textNode, textNode.getRangeTextDecoration)
 	}
 	if (textNode.textDecoration == null || textNode.textDecoration === 'NONE') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -299,15 +299,15 @@ export const getTextDecorationSkipInk = (textNode: TextNode): StyleRange<TextDec
 			end: textNode.characters.length,
 			value: textNode.textDecoration,
 		},
-	];
-};
+	]
+}
 
 function getTextCaseRanges(textNode: TextNode): StyleRange<TextCase>[] | null {
 	if (textNode.textCase === figma.mixed) {
-		return getStyleRanges<TextCase>(textNode, textNode.getRangeTextCase);
+		return getStyleRanges<TextCase>(textNode, textNode.getRangeTextCase)
 	}
 	if (textNode.textCase == null || textNode.textCase === 'ORIGINAL') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -315,15 +315,15 @@ function getTextCaseRanges(textNode: TextNode): StyleRange<TextCase>[] | null {
 			end: textNode.characters.length,
 			value: textNode.textCase,
 		},
-	];
+	]
 }
 
 function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	if (textNode.textStyleId === figma.mixed) {
-		return getStyleRanges<string>(textNode, textNode.getRangeTextStyleId);
+		return getStyleRanges<string>(textNode, textNode.getRangeTextStyleId)
 	}
 	if (textNode.textStyleId == null || textNode.textStyleId === '') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -331,7 +331,7 @@ function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 			end: textNode.characters.length,
 			value: textNode.textStyleId,
 		},
-	];
+	]
 }
 
 // 있긴 한데 폰트 페밀리에서 얻어서 안쓰는 것 같음
@@ -368,12 +368,14 @@ function getTextStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 // 	]
 // }
 
-function getOpenTypeFeaturesRanges(textNode: TextNode): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null {
+function _getOpenTypeFeaturesRanges(
+	textNode: TextNode
+): StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null {
 	if (textNode.openTypeFeatures === figma.mixed) {
-		return getStyleRanges<{ [feature in OpenTypeFeature]: boolean }>(textNode, textNode.getRangeOpenTypeFeatures);
+		return getStyleRanges<{ [feature in OpenTypeFeature]: boolean }>(textNode, textNode.getRangeOpenTypeFeatures)
 	}
 	if (textNode.openTypeFeatures == null || Object.keys(textNode.openTypeFeatures).length === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -381,15 +383,15 @@ function getOpenTypeFeaturesRanges(textNode: TextNode): StyleRange<{ [feature in
 			end: textNode.characters.length,
 			value: textNode.openTypeFeatures,
 		},
-	];
+	]
 }
 
 function getHyperlinkRanges(textNode: TextNode): StyleRange<HyperlinkTarget | null>[] | null {
 	if (textNode.hyperlink === figma.mixed) {
-		return getStyleRanges<HyperlinkTarget | null>(textNode, textNode.getRangeHyperlink);
+		return getStyleRanges<HyperlinkTarget | null>(textNode, textNode.getRangeHyperlink)
 	}
 	if (textNode.hyperlink == null || textNode.hyperlink.value === '') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -397,15 +399,15 @@ function getHyperlinkRanges(textNode: TextNode): StyleRange<HyperlinkTarget | nu
 			end: textNode.characters.length,
 			value: textNode.hyperlink,
 		},
-	];
+	]
 }
 
 function getFillsRanges(textNode: TextNode): StyleRange<Paint[]>[] | null {
 	if (textNode.fills === figma.mixed) {
-		return getStyleRanges<Paint[]>(textNode, textNode.getRangeFills);
+		return getStyleRanges<Paint[]>(textNode, textNode.getRangeFills)
 	}
 	if (textNode.fills == null || textNode.fills.length === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -413,15 +415,15 @@ function getFillsRanges(textNode: TextNode): StyleRange<Paint[]>[] | null {
 			end: textNode.characters.length,
 			value: textNode.fills as Paint[],
 		},
-	];
+	]
 }
 
 function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 	if (textNode.fillStyleId === figma.mixed) {
-		return getStyleRanges<string>(textNode, textNode.getRangeFillStyleId);
+		return getStyleRanges<string>(textNode, textNode.getRangeFillStyleId)
 	}
 	if (textNode.fillStyleId == null || textNode.fillStyleId === '') {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -429,7 +431,7 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
 			end: textNode.characters.length,
 			value: textNode.fillStyleId,
 		},
-	];
+	]
 }
 
 /**
@@ -437,12 +439,12 @@ function getFillStyleIdRanges(textNode: TextNode): StyleRange<string>[] | null {
  * 기본적으로 줄바꿈이 있는 텍스트에서 표현되기에 조건부가 없음
  */
 function getListOptionsRanges(textNode: TextNode): StyleRange<TextListOptions>[] | null {
-	return getStyleRanges<TextListOptions>(textNode, textNode.getRangeListOptions);
+	return getStyleRanges<TextListOptions>(textNode, textNode.getRangeListOptions)
 }
 
 function getListSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.listSpacing == null || textNode.listSpacing === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -450,12 +452,12 @@ function getListSpacingRanges(textNode: TextNode): StyleRange<number>[] | null {
 			end: textNode.characters.length,
 			value: textNode.listSpacing,
 		},
-	];
+	]
 }
 
 function getParagraphIndentRanges(textNode: TextNode): StyleRange<number>[] | null {
 	if (textNode.paragraphIndent == null || textNode.paragraphIndent === 0) {
-		return null;
+		return null
 	}
 	return [
 		{
@@ -463,12 +465,12 @@ function getParagraphIndentRanges(textNode: TextNode): StyleRange<number>[] | nu
 			end: textNode.characters.length,
 			value: textNode.paragraphIndent,
 		},
-	];
+	]
 }
 
 /** 기본 값이 줄 단위로 들어가기에 */
 function getIndentationRanges(textNode: TextNode): StyleRange<number>[] | null {
-	return getStyleRanges<number>(textNode, textNode.getRangeIndentation);
+	return getStyleRanges<number>(textNode, textNode.getRangeIndentation)
 }
 
 /** TODO: 값이 약간 다름.. 체크 해야함.. */
@@ -479,18 +481,18 @@ const targetVariableBindableFields = [
 	'fontWeight',
 	'letterSpacing',
 	'lineHeight',
-];
+]
 
 function getBoundVariablesRanges(textNode: TextNode): any {
-	const keys = Object.keys(textNode.boundVariables as Record<string, string>);
+	const keys = Object.keys(textNode.boundVariables as Record<string, string>)
 
 	const values = {} as Record<
 		string,
 		ValidStyleRange<{
-			type: string;
-			id: string;
+			type: string
+			id: string
 		}>[]
-	>;
+	>
 
 	if (keys.length > 0) {
 		for (const key of keys) {
@@ -499,79 +501,79 @@ function getBoundVariablesRanges(textNode: TextNode): any {
 					textNode,
 					key as VariableBindableTextField,
 					textNode.getRangeBoundVariable
-				);
+				)
 
-				values[key] = value as any;
+				values[key] = value as any
 			}
 		}
-		return values;
+		return values
 	}
-	return {};
+	return {}
 }
 
 // 모든 스타일 Range를 가져오는 함수
 export interface AllStyleRanges {
-	fontSize?: StyleRange<number>[] | null;
-	fontName?: StyleRange<FontName>[] | null;
-	lineHeight?: StyleRange<LineHeight>[] | null;
-	letterSpacing?: StyleRange<LetterSpacing>[] | null;
+	fontSize?: StyleRange<number>[] | null
+	fontName?: StyleRange<FontName>[] | null
+	lineHeight?: StyleRange<LineHeight>[] | null
+	letterSpacing?: StyleRange<LetterSpacing>[] | null
 
-	textCase?: StyleRange<TextCase>[] | null;
-	textStyleId?: StyleRange<string>[] | null;
+	textCase?: StyleRange<TextCase>[] | null
+	textStyleId?: StyleRange<string>[] | null
 	// fontWeight?: StyleRange<number>[] | null; // styleData에서 사용하지 않음 (주석처리됨)
 
 	// openTypeFeatures?: StyleRange<{ [feature in OpenTypeFeature]: boolean }>[] | null; // styleData에서 사용하지 않음 (주석처리됨)
-	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null;
-	fills?: StyleRange<Paint[]>[] | null;
-	fillStyleId?: StyleRange<string>[] | null;
+	hyperlink?: StyleRange<HyperlinkTarget | null>[] | null
+	fills?: StyleRange<Paint[]>[] | null
+	fillStyleId?: StyleRange<string>[] | null
 	// boundVariables?: any; // 별도로 처리됨
-	listOptions: StyleRange<TextListOptions>[] | null;
-	listSpacing: StyleRange<number>[] | null;
-	indentation: StyleRange<number>[] | null;
-	textDecoration?: StyleRange<TextDecoration>[] | null;
-	textDecorationStyle?: StyleRange<TextDecorationStyle>[] | null;
-	textDecorationColor?: StyleRange<TextDecorationColor>[] | null;
-	textDecorationOffset?: StyleRange<TextDecorationOffset>[] | null;
-	textDecorationThickness?: StyleRange<TextDecorationThickness>[] | null;
-	textDecorationSkipInk?: StyleRange<boolean>[] | null;
+	listOptions: StyleRange<TextListOptions>[] | null
+	listSpacing: StyleRange<number>[] | null
+	indentation: StyleRange<number>[] | null
+	textDecoration?: StyleRange<TextDecoration>[] | null
+	textDecorationStyle?: StyleRange<TextDecorationStyle>[] | null
+	textDecorationColor?: StyleRange<TextDecorationColor>[] | null
+	textDecorationOffset?: StyleRange<TextDecorationOffset>[] | null
+	textDecorationThickness?: StyleRange<TextDecorationThickness>[] | null
+	textDecorationSkipInk?: StyleRange<boolean>[] | null
 
-	paragraphSpacing?: StyleRange<number>[] | null;
-	paragraphIndent?: StyleRange<number>[] | null;
+	paragraphSpacing?: StyleRange<number>[] | null
+	paragraphIndent?: StyleRange<number>[] | null
 
 	// strokes?: ValidStyleRange<Paint[]>[] | null; // styleData에서 사용하지 않음
 }
 
 interface ValidStyleRange<T> {
-	start: number;
-	end: number;
-	value: T;
+	start: number
+	end: number
+	value: T
 }
 
 export type ValidAllStyleRangesType = {
-	fontSize?: ValidStyleRange<number>[];
-	fontName?: ValidStyleRange<FontName>[];
-	lineHeight?: ValidStyleRange<LineHeight>[];
-	letterSpacing?: ValidStyleRange<LetterSpacing>[];
-	textDecoration?: ValidStyleRange<TextDecoration>[];
-	textCase?: ValidStyleRange<TextCase>[];
-	textStyleId?: ValidStyleRange<string>[];
-	fontWeight?: ValidStyleRange<number>[];
-	openTypeFeatures?: ValidStyleRange<{ [feature in OpenTypeFeature]: boolean }>[];
-	hyperlink?: ValidStyleRange<HyperlinkTarget>[];
-	fills?: ValidStyleRange<Paint[]>[];
-	fillStyleId?: ValidStyleRange<string>[];
-	textDecorationColor?: ValidStyleRange<TextDecorationColor>[];
-	textDecorationOffset?: ValidStyleRange<TextDecorationOffset>[];
-	textDecorationThickness?: ValidStyleRange<TextDecorationThickness>[];
-	textDecorationSkipInk?: ValidStyleRange<boolean>[];
-	leadingTrim?: ValidStyleRange<LeadingTrim>[];
-	paragraphSpacing?: ValidStyleRange<number>[];
-	paragraphIndent?: ValidStyleRange<number>[];
+	fontSize?: ValidStyleRange<number>[]
+	fontName?: ValidStyleRange<FontName>[]
+	lineHeight?: ValidStyleRange<LineHeight>[]
+	letterSpacing?: ValidStyleRange<LetterSpacing>[]
+	textDecoration?: ValidStyleRange<TextDecoration>[]
+	textCase?: ValidStyleRange<TextCase>[]
+	textStyleId?: ValidStyleRange<string>[]
+	fontWeight?: ValidStyleRange<number>[]
+	openTypeFeatures?: ValidStyleRange<{ [feature in OpenTypeFeature]: boolean }>[]
+	hyperlink?: ValidStyleRange<HyperlinkTarget>[]
+	fills?: ValidStyleRange<Paint[]>[]
+	fillStyleId?: ValidStyleRange<string>[]
+	textDecorationColor?: ValidStyleRange<TextDecorationColor>[]
+	textDecorationOffset?: ValidStyleRange<TextDecorationOffset>[]
+	textDecorationThickness?: ValidStyleRange<TextDecorationThickness>[]
+	textDecorationSkipInk?: ValidStyleRange<boolean>[]
+	leadingTrim?: ValidStyleRange<LeadingTrim>[]
+	paragraphSpacing?: ValidStyleRange<number>[]
+	paragraphIndent?: ValidStyleRange<number>[]
 
 	boundVariables?: ValidStyleRange<{
-		type: string;
-		id: string;
-	}>[];
+		type: string
+		id: string
+	}>[]
 	// boundVariables?: Record<
 	// 	string,
 	// 	ValidStyleRange<{
@@ -579,7 +581,7 @@ export type ValidAllStyleRangesType = {
 	// 		id: string
 	// 	}>[]
 	// >
-};
+}
 
 // 외부 DB 써써 데이터 저장한 다음 고유키 발급 받기?
 
@@ -626,7 +628,7 @@ const rangeFunctionMap = {
 	textStyleId: 'setRangeTextStyleIdAsync',
 	// boundVariable: 'setRangeBoundVariable'
 	// 나머지 range
-} as const;
+} as const
 
 const boundVariablesMap = {
 	fontFamily: 'fontFamily',
@@ -637,7 +639,7 @@ const boundVariablesMap = {
 	lineHeight: 'lineHeight',
 	paragraphSpacing: 'paragraphSpacing',
 	paragraphIndent: 'paragraphIndent',
-} as const;
+} as const
 const functionMap = {
 	// range에서 설정하긴 하는데 동작이 다름
 	textStyleId: 'setTextStyleIdAsync',
@@ -645,7 +647,7 @@ const functionMap = {
 	effectStyleId: 'setEffectStyleIdAsync',
 	strokeStyleId: 'setStrokeStyleIdAsync',
 	reactions: 'setReactionsAsync',
-} as const;
+} as const
 
 export const setAllStyleRanges = async ({
 	textNode,
@@ -655,14 +657,14 @@ export const setAllStyleRanges = async ({
 	xNodeId,
 }: {
 	/** 노드 데이터가 옛날 스코프일 때 실시간 조회해서 다시 찾는 목적 */
-	xNodeId: string;
-	textNode: TextNode;
-	styleData: StyleData;
+	xNodeId: string
+	textNode: TextNode
+	styleData: StyleData
 
 	range: {
-		start: number;
-		end: number;
-	};
+		start: number
+		end: number
+	}
 }) => {
 	// const functionMapSample = {
 	// 	fontSize: textNode.setRangeFontSize,
@@ -684,39 +686,39 @@ export const setAllStyleRanges = async ({
 	// 스타일데이터 내에서의 boundVariables 가 유효한게 맞음
 
 	if (range.start === range.end) {
-		return;
+		return
 	}
-	const { boundVariables, effectStyleData, styleData: tempStyleData } = styleData;
+	const { boundVariables, effectStyleData, styleData: tempStyleData } = styleData
 
 	const styles = {
 		...effectStyleData,
 		...tempStyleData,
-	};
+	}
 
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(rangeFunctionMap)) {
-		const style = styles[key as keyof ResourceDTO];
+		const style = styles[key as keyof ResourceDTO]
 		if (style == null) {
-			continue;
+			continue
 		}
 		if (key === 'fontName') {
-			await figma.loadFontAsync(style as FontName);
+			await figma.loadFontAsync(style as FontName)
 		}
 		try {
-			const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
+			const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function
 			if (setRange) {
-				textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](range.start, range.end, style as never);
+				textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](range.start, range.end, style as never)
 			}
-		} catch (error) {
-			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode;
+		} catch (_error) {
+			const targetNode = (await figma.getNodeByIdAsync(xNodeId)) as TextNode
 			if (targetNode) {
-				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
+				const setRange = targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function
 				if (setRange) {
 					await targetNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](
 						range.start,
 						range.end,
 						style as never
-					);
+					)
 				}
 			}
 		}
@@ -724,110 +726,105 @@ export const setAllStyleRanges = async ({
 
 	if (boundVariables) {
 		for (const field of Object.keys(boundVariablesMap)) {
-			const value = boundVariables[field as keyof typeof boundVariables];
+			const value = boundVariables[field as keyof typeof boundVariables]
 
 			if (value) {
-				await textNode.setRangeBoundVariable(
-					range.start,
-					range.end,
-					field as VariableBindableTextField,
-					value as never
-				);
+				await textNode.setRangeBoundVariable(range.start, range.end, field as VariableBindableTextField, value as never)
 			}
 		}
 	}
 
 	for (const key of Object.keys(effectFunctionMap)) {
-		const style = styles[key as keyof ResourceDTO];
+		const style = styles[key as keyof ResourceDTO]
 		// ;
 		if (style == null) {
-			continue;
+			continue
 		}
 
 		// 인스턴스인 경우 constraints 속성을 변경하지 않음
 		if (key === 'constraints' && textNode.parent && textNode.parent.type === 'INSTANCE') {
-			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.');
-			continue;
+			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.')
+			continue
 		}
 
 		try {
-			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never
 		} catch (error) {
-			console.error(`속성 설정 중 오류 발생: ${key}`, error);
+			console.error(`속성 설정 중 오류 발생: ${key}`, error)
 		}
 	}
 
 	// 노드에 스타일 적용
 	for (const key of Object.keys(functionMap)) {
-		const style = styles[key as keyof ResourceDTO];
+		const style = styles[key as keyof ResourceDTO]
 		if (style == null) {
-			continue;
+			continue
 		}
 
-		await textNode[functionMap[key as keyof typeof functionMap]](style);
+		await textNode[functionMap[key as keyof typeof functionMap]](style)
 	}
-};
+}
 
 export const setResetStyle = async ({
 	textNode,
 }: {
 	/** 노드 데이터가 옛날 스코프일 때 실시간 조회해서 다시 찾는 목적 */
 
-	textNode: TextNode;
+	textNode: TextNode
 }) => {
 	// textNode.setRangeBoundVariable,
 	for (const key of Object.keys(effectFunctionMap)) {
-		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData];
+		const style = defaultEffectStyleData[key as keyof typeof defaultEffectStyleData]
 		// ;
 		if (style == null) {
-			continue;
+			continue
 		}
 
 		// 인스턴스인 경우 constraints 속성을 변경하지 않음
 		if (key === 'constraints' && textNode.parent && textNode.parent.type === 'INSTANCE') {
-			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.');
-			continue;
+			console.log('인스턴스 내부의 노드에서는 constraints 속성을 변경할 수 없습니다.')
+			continue
 		}
 
 		try {
-			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never;
+			textNode[effectFunctionMap[key as keyof typeof effectFunctionMap]] = style as never
 		} catch (error) {
-			console.error(`속성 설정 중 오류 발생: ${key}`, error);
+			console.error(`속성 설정 중 오류 발생: ${key}`, error)
 		}
 	}
 	for (const key of Object.keys(rangeFunctionMap)) {
-		const style = defaultRangeData[key as keyof typeof defaultRangeData];
+		const style = defaultRangeData[key as keyof typeof defaultRangeData]
 
 		if (style == null) {
-			continue;
+			continue
 		}
 		if (key === 'fontName') {
-			await figma.loadFontAsync(style as FontName);
+			await figma.loadFontAsync(style as FontName)
 		}
-		const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function;
+		const setRange = textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]] as Function
 		if (setRange) {
 			await textNode[rangeFunctionMap[key as keyof typeof rangeFunctionMap]](
 				0,
 				textNode.characters.length,
 				style as never
-			);
+			)
 		}
 	}
-};
+}
 
-export type EffectStyleData = Record<string, any[]>;
+export type EffectStyleData = Record<string, any[]>
 type Prettify<T> = {
-	[K in keyof T]: T[K];
-} & {};
-export type PlanType = Prettify<TextNode>;
+	[K in keyof T]: T[K]
+} & {}
+export type PlanType = Prettify<TextNode>
 
 export function getAllStyleRanges(textNode: TextNode): {
-	styleData: ValidAllStyleRangesType;
-	boundVariables: any;
-	effectStyleData: EffectStyleData;
+	styleData: ValidAllStyleRangesType
+	boundVariables: any
+	effectStyleData: EffectStyleData
 } {
 	// 텍스트 노드만을 위한 개념임
-	const boundVariables = getBoundVariablesRanges(textNode);
+	const boundVariables = getBoundVariablesRanges(textNode)
 
 	const styleData: AllStyleRanges = {
 		fontSize: getFontSizeRanges(textNode),
@@ -860,8 +857,8 @@ export function getAllStyleRanges(textNode: TextNode): {
 		// 나중에는 분리해서 스타일 호출 순서를 지정하고 관리해야하는데 일단 지금은 range를 유효하게 뽑는게 중요하므로 생략함
 		fillStyleId: getFillStyleIdRanges(textNode),
 		textStyleId: getTextStyleIdRanges(textNode),
-	};
-	const singleBoundVariables = textNode.boundVariables as Record<string, VariableAlias>;
+	}
+	const singleBoundVariables = textNode.boundVariables as Record<string, VariableAlias>
 
 	const effectStyleData = {
 		strokes: textNode.strokes,
@@ -904,7 +901,7 @@ export function getAllStyleRanges(textNode: TextNode): {
 		// minHeight: textNode.minHeight,
 		// maxHeight: textNode.maxHeight,
 		boundVariables: singleBoundVariables,
-	} as const;
+	} as const
 
 	// 변수 적용 가능 필드명
 	// VariableBindableNodeField
@@ -914,28 +911,28 @@ export function getAllStyleRanges(textNode: TextNode): {
 	// 	textStyleId: getTextStyleIdRanges(textNode),
 	// };
 	for (const key of targetVariableBindableFields) {
-		delete singleBoundVariables[key];
+		delete singleBoundVariables[key]
 	}
 	for (const key in styleData) {
 		if (styleData[key as keyof AllStyleRanges] == null) {
-			delete styleData[key as keyof AllStyleRanges];
+			delete styleData[key as keyof AllStyleRanges]
 		}
 	}
 	for (const key in effectStyleData) {
-		const target = effectStyleData[key as keyof typeof effectStyleData];
+		const target = effectStyleData[key as keyof typeof effectStyleData]
 		if (target == null) {
-			delete effectStyleData[key as keyof typeof effectStyleData];
-		} else if (defaultEffectStyleData[key as keyof typeof defaultEffectStyleData] == target) {
-			delete effectStyleData[key as keyof typeof effectStyleData];
+			delete effectStyleData[key as keyof typeof effectStyleData]
+		} else if (defaultEffectStyleData[key as keyof typeof defaultEffectStyleData] === target) {
+			delete effectStyleData[key as keyof typeof effectStyleData]
 		} else if (
 			typeof target === 'object' &&
 			deepEqual(target, defaultEffectStyleData[key as keyof typeof defaultEffectStyleData])
 		) {
-			delete effectStyleData[key as keyof typeof effectStyleData];
+			delete effectStyleData[key as keyof typeof effectStyleData]
 		} else if (typeof target === 'object' && Object.keys(target).length === 0) {
-			delete effectStyleData[key as keyof typeof effectStyleData];
+			delete effectStyleData[key as keyof typeof effectStyleData]
 		} else if (Array.isArray(target) && target.length === 0) {
-			delete effectStyleData[key as keyof typeof effectStyleData];
+			delete effectStyleData[key as keyof typeof effectStyleData]
 		}
 	}
 
@@ -943,24 +940,24 @@ export function getAllStyleRanges(textNode: TextNode): {
 		styleData: styleData as ValidAllStyleRangesType,
 		boundVariables,
 		effectStyleData: effectStyleData as unknown as EffectStyleData,
-	};
+	}
 }
 
 export const textFontLoad = async (textNode: TextNode) => {
-	const arr = getFontNameRanges(textNode);
+	const arr = getFontNameRanges(textNode)
 
 	if (arr) {
 		for (const item of arr) {
-			const fontName = item.value as FontName;
+			const fontName = item.value as FontName
 			try {
-				await figma.loadFontAsync(fontName);
+				await figma.loadFontAsync(fontName)
 			} catch (error) {
-				console.log(`Failed to load font: ${fontName}`, error);
+				console.log(`Failed to load font: ${fontName}`, error)
 			}
 		}
 	}
-	return;
-};
+	return
+}
 
 const effectFunctionMap = {
 	// 스트로크 관련
@@ -1009,7 +1006,7 @@ const effectFunctionMap = {
 	// visible: 'visible',
 	isMask: 'isMask',
 	maskType: 'maskType',
-} as const;
+} as const
 
 export const defaultEffectStyleData = {
 	strokes: [],
@@ -1050,7 +1047,7 @@ export const defaultEffectStyleData = {
 	// maxWidth: null,
 	// minHeight: null,
 	// maxHeight: null,
-} as const;
+} as const
 
 export const defaultRangeData = {
 	fontSize: 14,
@@ -1097,4 +1094,4 @@ export const defaultRangeData = {
 	indentation: 0,
 	fillStyleId: '',
 	// textStyleId: '',
-};
+}

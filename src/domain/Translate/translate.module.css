@@ -77,10 +77,10 @@
 	justify-content: flex-start;
 	gap: 4px;
 	padding: 4px 8px;
-	[class^='_textbox'] {
+	[class^="_textbox"] {
 		flex-grow: 1;
 	}
-	[class^='_bold'] {
+	[class^="_bold"] {
 		flex-grow: 1;
 	}
 }

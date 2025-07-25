@@ -1,12 +1,12 @@
-import { z } from 'zod';
-import { GoogleProvider, GoogleProviderOptions } from './model';
+import { z } from 'zod'
+import { GoogleProvider, GoogleProviderOptions } from './model'
 
 // Schema for structured output
 const personSchema = z.object({
 	name: z.string(),
 	age: z.number(),
 	interests: z.array(z.string()),
-});
+})
 
 export async function main(apiKey: string) {
 	// Create a provider with initial API key
@@ -14,12 +14,12 @@ export async function main(apiKey: string) {
 		apiKey: apiKey,
 		responseModalities: ['TEXT'],
 		temperature: 0.8,
-	});
+	})
 
 	// Initialize with model ID
 	provider.initialize({
 		modelId: 'gemini-2.5-flash-preview-04-17',
-	});
+	})
 
 	try {
 		// Generate structured output
@@ -27,9 +27,9 @@ export async function main(apiKey: string) {
 			'Generate a profile for a fictional person for testing.',
 			personSchema
 			// Override temperature for this request
-		);
-		return response;
+		)
+		return response
 	} catch (error) {
-		console.error('Error generating object:', error);
+		console.error('Error generating object:', error)
 	}
 }

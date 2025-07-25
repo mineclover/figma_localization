@@ -58,7 +58,7 @@
 	gap: 4px;
 	border: 1px solid var(--figma-color-border);
 	padding: 4px;
-	[class^='_textbox'] {
+	[class^="_textbox"] {
 		flex-grow: 1;
 	}
 }

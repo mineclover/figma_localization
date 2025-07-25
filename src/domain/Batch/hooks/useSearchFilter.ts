@@ -1,6 +1,6 @@
-import { useMemo } from 'preact/hooks';
-import { PatternMatchData } from '@/model/types';
-import { SearchOption } from './useSearchState';
+import { useMemo } from 'preact/hooks'
+import type { PatternMatchData } from '@/model/types'
+import type { SearchOption } from './useSearchState'
 
 export const useSearchFilter = (
 	allPatternData: PatternMatchData[],
@@ -10,18 +10,18 @@ export const useSearchFilter = (
 	selectIds: string[]
 ) => {
 	return useMemo(() => {
-		return allPatternData.filter((item) => {
+		return allPatternData.filter(item => {
 			if (!allView) {
-				if (item.ids.some((id) => selectIds.includes(id))) {
-					return true;
+				if (item.ids.some(id => selectIds.includes(id))) {
+					return true
 				} else {
-					return false;
+					return false
 				}
 			}
 			if (searchValue === '') {
-				return true;
+				return true
 			}
-			return item[searchOption].toLowerCase().includes(searchValue.toLowerCase());
-		});
-	}, [allPatternData, searchValue, searchOption, allView, selectIds]);
-};
+			return item[searchOption].toLowerCase().includes(searchValue.toLowerCase())
+		})
+	}, [allPatternData, searchValue, searchOption, allView, selectIds])
+}

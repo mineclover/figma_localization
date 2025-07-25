@@ -12,11 +12,11 @@ export const StatusByCode = {
 	k: 'tenth',
 	l: 'eleventh',
 	m: 'twelfth',
-} as const;
+} as const
 
 export const StatusByString = Object.fromEntries(Object.entries(StatusByCode).map(([key, value]) => [value, key])) as {
-	[key in (typeof StatusByCode)[keyof typeof StatusByCode]]: keyof typeof StatusByCode;
-};
+	[key in (typeof StatusByCode)[keyof typeof StatusByCode]]: keyof typeof StatusByCode
+}
 
-export type StatusCode = keyof typeof StatusByCode;
-export type StatusString = (typeof StatusByCode)[keyof typeof StatusByCode];
+export type StatusCode = keyof typeof StatusByCode
+export type StatusString = (typeof StatusByCode)[keyof typeof StatusByCode]

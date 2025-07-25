@@ -1,9 +1,7 @@
-module.exports = function (buildOptions) {
-	return {
-		...buildOptions,
+module.exports = buildOptions => ({
+	...buildOptions,
 
-		define: {
-			global: 'window',
-		},
-	}
-}
+	define: {
+		global: 'window',
+	},
+})

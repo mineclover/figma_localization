@@ -30,13 +30,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"section_id",
-					"domain_id",
-					"section_name",
-					"created_at",
-					"updated_at"
-				],
+				"required": ["section_id", "domain_id", "section_name", "created_at", "updated_at"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -52,11 +46,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"name",
-					"domainId",
-					"link"
-				],
+				"required": ["name", "domainId", "link"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -78,10 +68,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"name",
-					"type"
-				],
+				"required": ["name", "type"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -175,10 +162,7 @@
 						"format": "double"
 					}
 				},
-				"required": [
-					"domainId",
-					"name"
-				],
+				"required": ["domainId", "name"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -226,14 +210,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"localization_id",
-					"key_id",
-					"language_code",
-					"text",
-					"created_at",
-					"updated_at"
-				],
+				"required": ["localization_id", "key_id", "language_code", "text", "created_at", "updated_at"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -249,11 +226,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"keyId",
-					"language",
-					"translation"
-				],
+				"required": ["keyId", "language", "translation"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -285,15 +258,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"location_id",
-					"project_id",
-					"page_id",
-					"node_id",
-					"is_pinned",
-					"created_at",
-					"updated_at"
-				],
+				"required": ["location_id", "project_id", "page_id", "node_id", "is_pinned", "created_at", "updated_at"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -312,11 +277,7 @@
 						"type": "boolean"
 					}
 				},
-				"required": [
-					"projectId",
-					"pageId",
-					"nodeId"
-				],
+				"required": ["projectId", "pageId", "nodeId"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -354,12 +315,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"domain_id",
-					"domain_name",
-					"created_at",
-					"updated_at"
-				],
+				"required": ["domain_id", "domain_name", "created_at", "updated_at"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -369,9 +325,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"domain"
-				],
+				"required": ["domain"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -394,10 +348,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"user_id",
-					"username"
-				],
+				"required": ["user_id", "username"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -410,10 +361,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"username",
-					"password"
-				],
+				"required": ["username", "password"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -426,10 +374,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"username",
-					"password_hash"
-				],
+				"required": ["username", "password_hash"],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -445,11 +390,7 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"currentUsername",
-					"password_hash",
-					"newUsername"
-				],
+				"required": ["currentUsername", "password_hash", "newUsername"],
 				"type": "object",
 				"additionalProperties": false
 			}
@@ -483,9 +424,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": []
 			},
@@ -503,9 +442,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -536,9 +473,7 @@
 					}
 				},
 				"description": "검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>\n도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>\nsection 이름은 수정 불가",
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -576,9 +511,7 @@
 					}
 				},
 				"description": "문서 정보 변경",
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -608,9 +541,7 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -637,9 +568,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Section Management"
-				],
+				"tags": ["Section Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -666,9 +595,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": []
 			},
@@ -684,9 +611,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -714,9 +639,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -741,9 +664,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -773,9 +694,7 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -802,9 +721,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Resource Management"
-				],
+				"tags": ["Resource Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -832,9 +749,7 @@
 					}
 				},
 				"summary": "전체 키 리스트 조회",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": []
 			}
@@ -855,9 +770,7 @@
 					}
 				},
 				"summary": "도메인 내 키 리스트 조회",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -883,9 +796,7 @@
 					}
 				},
 				"summary": "키 생성",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -916,9 +827,7 @@
 					}
 				},
 				"summary": "도메인 내 섹션 내 키 리스트 조회",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -956,9 +865,7 @@
 					}
 				},
 				"summary": "이름으로 검색",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -995,9 +902,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1025,9 +930,7 @@
 					}
 				},
 				"summary": "변수나 스타일에 대한 키 수정",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1059,9 +962,7 @@
 				},
 				"description": "하위 키 삭제 같이 해야 함",
 				"summary": "키 삭제",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1089,9 +990,7 @@
 					}
 				},
 				"summary": "키 번역 목록 조회",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1121,9 +1020,7 @@
 					}
 				},
 				"summary": "임시 키 이름으로 현재 키 검색",
-				"tags": [
-					"Localization Key Management"
-				],
+				"tags": ["Localization Key Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1155,9 +1052,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Localization Management"
-				],
+				"tags": ["Localization Management"],
 				"security": [],
 				"parameters": []
 			},
@@ -1176,9 +1071,7 @@
 					}
 				},
 				"description": "있으면 수정하고 없으면 추가함",
-				"tags": [
-					"Localization Management"
-				],
+				"tags": ["Localization Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1212,9 +1105,7 @@
 					}
 				},
 				"description": "키 아이디 기반으로 번역 목록 조회",
-				"tags": [
-					"Localization Management"
-				],
+				"tags": ["Localization Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1243,9 +1134,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Localization Management"
-				],
+				"tags": ["Localization Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1266,9 +1155,7 @@
 					}
 				},
 				"description": "번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~",
-				"tags": [
-					"Localization Management"
-				],
+				"tags": ["Localization Management"],
 				"deprecated": true,
 				"security": [],
 				"parameters": [
@@ -1301,9 +1188,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"security": [],
 				"parameters": []
 			},
@@ -1322,9 +1207,7 @@
 					}
 				},
 				"description": "피그마 위치를 식별하는 키 생성</br>\n완전히 겹치면 추가할 필요 없으니 있는 값 반환함",
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1355,9 +1238,7 @@
 					}
 				},
 				"description": "쓸 일 없어서 설계 안함",
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"deprecated": true,
 				"security": [],
 				"parameters": [
@@ -1387,9 +1268,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"deprecated": true,
 				"security": [],
 				"parameters": [
@@ -1420,9 +1299,7 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1449,9 +1326,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1467,10 +1342,7 @@
 										"type": "string"
 									}
 								},
-								"required": [
-									"locationId",
-									"keyId"
-								],
+								"required": ["locationId", "keyId"],
 								"type": "object"
 							}
 						}
@@ -1486,9 +1358,7 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Figma Management"
-				],
+				"tags": ["Figma Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1528,9 +1398,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": []
 			},
@@ -1548,9 +1416,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1580,9 +1446,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1609,9 +1473,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1641,9 +1503,7 @@
 						"description": "No content"
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1675,9 +1535,7 @@
 						}
 					}
 				},
-				"tags": [
-					"Domain Management"
-				],
+				"tags": ["Domain Management"],
 				"security": [],
 				"parameters": [
 					{
@@ -1707,9 +1565,7 @@
 					}
 				},
 				"summary": "사용자 등록",
-				"tags": [
-					"Authentication"
-				],
+				"tags": ["Authentication"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1738,9 +1594,7 @@
 											"type": "boolean"
 										}
 									},
-									"required": [
-										"isValid"
-									],
+									"required": ["isValid"],
 									"type": "object"
 								}
 							}
@@ -1748,9 +1602,7 @@
 					}
 				},
 				"summary": "사용자 인증 검증",
-				"tags": [
-					"Authentication"
-				],
+				"tags": ["Authentication"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1782,18 +1634,14 @@
 											"type": "boolean"
 										}
 									},
-									"required": [
-										"isSuccess"
-									],
+									"required": ["isSuccess"],
 									"type": "object"
 								}
 							}
 						}
 					}
 				},
-				"tags": [
-					"Authentication"
-				],
+				"tags": ["Authentication"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {
@@ -1824,9 +1672,7 @@
 					}
 				},
 				"summary": "사용자 정보 조회",
-				"tags": [
-					"Authentication"
-				],
+				"tags": ["Authentication"],
 				"security": [],
 				"parameters": [
 					{
@@ -1856,9 +1702,7 @@
 					}
 				},
 				"summary": "사용자 이름 변경",
-				"tags": [
-					"Authentication"
-				],
+				"tags": ["Authentication"],
 				"security": [],
 				"parameters": [],
 				"requestBody": {

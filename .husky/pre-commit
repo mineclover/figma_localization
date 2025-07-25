@@ -1,0 +1,1 @@
+npx @biomejs/biome check --write --files-ignore-unknown=true --no-errors-on-unmatched --max-diagnostics=50 --diagnostic-level=error

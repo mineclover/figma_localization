@@ -153,7 +153,7 @@ export const idsBaseAll = async (
 		return
 	}
 
-	const directLink = getDirectLink(baseNodeData)
+	const _directLink = getDirectLink(baseNodeData)
 
 	const baseNodeId = baseNodeData.node_id
 	const baseLocation = baseNodeData.location_id

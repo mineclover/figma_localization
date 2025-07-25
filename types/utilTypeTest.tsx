@@ -23,7 +23,7 @@ function UtilTypeTest({ hello }: Props) {
 	return <div>{hello}</div>
 }
 
-const JSXGroups = {
+const _JSXGroups = {
 	a: UtilTypeTest,
 }
 

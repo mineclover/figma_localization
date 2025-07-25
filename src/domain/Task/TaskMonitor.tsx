@@ -1,10 +1,11 @@
-import { Bold, Button, Divider, IconButton, IconTrash24, Text, VerticalSpace } from '@create-figma-plugin/ui'
+import { Bold, Button, Divider, IconButton, IconTrash24, Text, Toggle, VerticalSpace } from '@create-figma-plugin/ui'
 import ProgressBar from '@ramonak/react-progress-bar'
 import { Fragment, h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { useSignal } from '@/hooks/useSignal'
 import { patternMatchDataSignal } from '@/model/signal'
 import { PatternMatchData } from '@/model/types'
+import { applyMockData, clearMockData, isMockDataEnabled, toggleMockData } from './mockData'
 import styles from './TaskMonitor.module.css'
 import { TaskProcessor, taskProcessorSignal } from './taskProcessor'
 
@@ -33,6 +34,14 @@ const TaskMonitor = () => {
 	const taskProcessor = useSignal(taskProcessorSignal)
 	const patternMatchData = useSignal(patternMatchDataSignal)
 	const [_selectedQueue, _setSelectedQueue] = useState<string | null>(null)
+	const [mockDataEnabled, setMockDataEnabled] = useState(isMockDataEnabled())
+
+	// 컴포넌트 마운트시 목 데이터가 활성화되어 있으면 초기 데이터 로드
+	useEffect(() => {
+		if (mockDataEnabled) {
+			applyMockData()
+		}
+	}, [mockDataEnabled])
 
 	const activeQueues = Object.values(taskProcessor.queues).filter(
 		queue => queue.status !== 'completed' && queue.status !== 'failed'
@@ -80,6 +89,17 @@ const TaskMonitor = () => {
 		TaskProcessor.removeQueue(queueId)
 	}
 
+	const handleMockDataToggle = () => {
+		const newMockState = toggleMockData()
+		setMockDataEnabled(newMockState)
+
+		if (newMockState) {
+			applyMockData()
+		} else {
+			clearMockData()
+		}
+	}
+
 	const getCurrentTask = (queue: TaskQueue): TaskItem | null => {
 		return queue.tasks[queue.currentTaskIndex] || null
 	}
@@ -112,9 +132,16 @@ const TaskMonitor = () => {
 		<div className={styles.container}>
 			<div className={styles.header}>
 				<Bold>작업 모니터링</Bold>
-				<Button onClick={createTaskQueue} disabled={patternMatchData.length === 0}>
-					새 작업 큐 생성
-				</Button>
+				<div className={styles.headerActions}>
+					<div className={styles.mockToggle}>
+						<Toggle value={mockDataEnabled} onClick={handleMockDataToggle}>
+							<Text>목 데이터</Text>
+						</Toggle>
+					</div>
+					<Button onClick={createTaskQueue} disabled={!mockDataEnabled && patternMatchData.length === 0}>
+						새 작업 큐 생성
+					</Button>
+				</div>
 			</div>
 
 			<Divider />
@@ -185,6 +212,9 @@ const TaskMonitor = () => {
 												margin="2px 0"
 											/>
 										)}
+										{currentTask.status === 'failed' && currentTask.error && (
+											<Text className={styles.errorText}>오류: {currentTask.error}</Text>
+										)}
 									</div>
 								)}
 
@@ -232,7 +262,14 @@ const TaskMonitor = () => {
 			{Object.keys(taskProcessor.queues).length === 0 && (
 				<div className={styles.emptyState}>
 					<Text>생성된 작업 큐가 없습니다.</Text>
-					<Text>패턴 매치 데이터를 기반으로 새 작업 큐를 생성하세요.</Text>
+					{mockDataEnabled ? (
+						<Text>우측 상단의 "새 작업 큐 생성" 버튼을 클릭하여 목 데이터로 큐를 생성하세요.</Text>
+					) : (
+						<Fragment>
+							<Text>패턴 매치 데이터를 기반으로 새 작업 큐를 생성하세요.</Text>
+							<Text>또는 "목 데이터" 토글을 활성화하여 샘플 데이터를 확인하세요.</Text>
+						</Fragment>
+					)}
 				</div>
 			)}
 		</div>

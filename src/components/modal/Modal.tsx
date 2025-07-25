@@ -1,5 +1,5 @@
 import { signal } from '@preact/signals-core'
-import type { h } from 'preact'
+import { h } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { useSignal } from '@/hooks/useSignal'
 import ClientModal, { type ClientModalProps } from './ClientModal'

@@ -21,7 +21,7 @@ function shallowEqual(objA: any, objB: any): boolean {
 
 	for (let i = 0; i < keysA.length; i++) {
 		const key = keysA[i]
-		if (!Object.hasOwn(objB, key) || objA[key] !== objB[key]) {
+		if (!Object.prototype.hasOwnProperty.call(objB, key) || objA[key] !== objB[key]) {
 			return false
 		}
 	}

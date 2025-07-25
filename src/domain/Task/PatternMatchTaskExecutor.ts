@@ -1,6 +1,6 @@
 import { emit } from '@create-figma-plugin/utilities'
-import { domainSettingSignal } from '@/model/signal'
 import { MetaData } from '@/domain/Search/searchStore'
+import { domainSettingSignal } from '@/model/signal'
 import { baseIsAllNode } from '../Batch/batchModel'
 import { TaskExecutor, TaskItem } from './taskProcessor'
 

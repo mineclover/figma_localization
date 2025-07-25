@@ -35,6 +35,8 @@ import {
 } from '@/domain/Setting/SettingModel'
 import { onDownloadStyle, onSetStyle } from '@/domain/Style/styleModel'
 import { onSetPageLockOpen } from '@/domain/System/lock'
+import { PatternMatchTaskExecutor } from '@/domain/Task/PatternMatchTaskExecutor'
+import { TaskProcessor } from '@/domain/Task/taskProcessor'
 import {
 	onClearVariableData,
 	onCurrentSectionSelected,
@@ -50,8 +52,6 @@ import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE'
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges'
 import { runExample } from '@/utils/test'
 import type { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
-import { TaskProcessor } from '@/domain/Task/taskProcessor'
-import { PatternMatchTaskExecutor } from '@/domain/Task/PatternMatchTaskExecutor'
 
 function initializeSettings() {
 	onSetProjectId()

@@ -1,10 +1,10 @@
 import { Bold, Button, Divider, IconButton, IconTrash24, Text, VerticalSpace } from '@create-figma-plugin/ui'
 import { Fragment, h } from 'preact'
 import { useState } from 'preact/hooks'
+import ProgressBar from '@/components/ProgressBar'
+import { MetaData } from '@/domain/Search/searchStore'
 import { useSignal } from '@/hooks/useSignal'
 import { patternMatchDataSignal } from '@/model/signal'
-import { MetaData } from '@/domain/Search/searchStore'
-import ProgressBar from '@/components/ProgressBar'
 import styles from './TaskMonitor.module.css'
 import { TaskProcessor, taskProcessorSignal } from './taskProcessor'
 

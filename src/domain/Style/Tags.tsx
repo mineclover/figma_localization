@@ -2,7 +2,7 @@ import { Button, Dropdown, type DropdownOption, IconCheck16 } from '@create-figm
 import { signal } from '@preact/signals-core'
 import { Fragment, h } from 'preact'
 import type { TargetedEvent } from 'preact/compat'
-import { useEffect, useState, useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks'
 import useFp from '@/hooks/useFp'
 import { useSignal } from '@/hooks/useSignal'
 import type { LocalizationKeyAction } from '@/model/types'

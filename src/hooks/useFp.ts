@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 
 type FnState = 'pending' | 'fulfilled' | 'rejected'
 type State = Record<string, FnState>

@@ -3,13 +3,13 @@ import { MetaData } from '@/domain/Search/searchStore'
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
 import { getSyncStyleData } from '@/model/on/GET_STYLE_DATA'
 import { currentPointerSignal, domainSettingSignal, styleDataSignal, styleTagModeSignal } from '@/model/signal'
-import { baseIsAllNode } from '../Batch/batchModel'
-import { styleToXml } from '../Style/styleAction'
-import { TaskExecutor, TaskItem } from './taskProcessor'
 import { XmlFlatNode } from '@/utils/types'
 import { parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2'
-import { clientFetchDBCurry } from '../utils/fetchDB'
+import { baseIsAllNode } from '../Batch/batchModel'
 import { SET_NODE_ACTION } from '../constant'
+import { styleToXml } from '../Style/styleAction'
+import { clientFetchDBCurry } from '../utils/fetchDB'
+import { TaskExecutor, TaskItem } from './taskProcessor'
 
 const testStyles = async (baseNodeId: string) => {
 	const domainSetting = domainSettingSignal.value

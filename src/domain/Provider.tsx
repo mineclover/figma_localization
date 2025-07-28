@@ -27,6 +27,7 @@ import {
 } from './Setting/SettingModel'
 import { onProcessResponse } from './System/process'
 import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel'
+import { initializeTaskProcessor } from './Task/taskProcessor'
 
 /**
  * duplex 전용 어댑터
@@ -63,6 +64,7 @@ export const Duplex_Adapter = ({ children }: { children: ComponentChildren }) =>
 			onTranslationActionResponse(),
 		]
 
+		initializeTaskProcessor()
 		return () => {
 			events.forEach(event => event())
 		}

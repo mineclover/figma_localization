@@ -47,7 +47,7 @@ import {
 import { nodeZoom_Adapter, pageNodeZoom_Adapter, pageSelectIds_Adapter } from '@/figmaPluginUtils/utilAdapter'
 import { onGetCursorPosition } from '@/model/on/GET_CURSOR_POSITION'
 import { onGetLocalizationKeyData } from '@/model/on/GET_LOCALIZATION_KEY_VALUE'
-import { onGetStyleData, onGetStyleDataResponse } from '@/model/on/GET_STYLE_DATA'
+import { onGetStyleData, onGetStyleDataResponse, onSyncGetStyleData } from '@/model/on/GET_STYLE_DATA'
 import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE'
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges'
 import { runExample } from '@/utils/test'
@@ -88,6 +88,7 @@ function initializeStyleAndVariables() {
 	onSetStyle()
 	onDownloadStyle()
 	onGetStyleData()
+	onSyncGetStyleData()
 	onStyleChange()
 	onGetVariableData()
 	onSetVariableData()
@@ -122,11 +123,6 @@ function initializeSystemFeatures() {
 	onSetPageLockOpen()
 }
 
-function initializeTaskProcessor() {
-	// Register task executors
-	TaskProcessor.registerExecutor('pattern-match', new PatternMatchTaskExecutor())
-}
-
 function initializeUIHandlers() {
 	on<ResizeWindowHandler>('RESIZE_WINDOW', (windowSize: { width: number; height: number }) => {
 		const { width, height } = windowSize
@@ -147,7 +143,7 @@ export default function () {
 	initializeVisualizationMode()
 	initializeTranslationActions()
 	initializeSystemFeatures()
-	initializeTaskProcessor()
+
 	initializeUIHandlers()
 
 	showUI({

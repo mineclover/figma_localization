@@ -3,6 +3,7 @@ import { signal } from '@preact/signals-core'
 import { notify } from '@/figmaPluginUtils'
 import { GET_PATTERN_MATCH_KEY } from '../constant'
 import { TaskItem, TaskQueue } from './TaskMonitor'
+import { PatternMatchTaskExecutor } from './PatternMatchTaskExecutor'
 
 // Re-export TaskItem from TaskMonitor
 export type { TaskItem } from './TaskMonitor'
@@ -334,7 +335,6 @@ export const TaskProcessor = {
 		}
 
 		stopProcessing()
-		notify(`작업 큐 "${queue.name}" 일시정지됨`, 'warning')
 	},
 
 	// 패턴 매치 데이터 요청 메서드
@@ -342,4 +342,9 @@ export const TaskProcessor = {
 		// 기존 batchModel의 onPatternMatchResponse 로직 활용
 		emit(GET_PATTERN_MATCH_KEY.REQUEST_KEY, targetID)
 	},
+}
+
+export function initializeTaskProcessor() {
+	// Register task executors
+	TaskProcessor.registerExecutor('pattern-match', new PatternMatchTaskExecutor())
 }

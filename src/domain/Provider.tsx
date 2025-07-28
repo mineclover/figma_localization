@@ -26,8 +26,8 @@ import {
 	onGetUserHashResponse,
 } from './Setting/SettingModel'
 import { onProcessResponse } from './System/process'
-import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel'
 import { initializeTaskProcessor } from './Task/taskProcessor'
+import { onCurrentSectionSelectedResponse, onGetVariableDataResponse } from './Translate/TranslateModel'
 
 /**
  * duplex 전용 어댑터

@@ -19,7 +19,7 @@ import { emit } from '@create-figma-plugin/utilities'
 import { signal } from '@preact/signals-core'
 import { h } from 'preact'
 import { Suspense, type TargetedEvent } from 'preact/compat'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState, useCallback } from 'preact/hooks'
 import { modalAlert } from '@/components/alert'
 import { clc } from '@/components/modal/utils'
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
@@ -129,7 +129,7 @@ export const StyleXml = ({
 	const [resultXml, setResultXml] = useState<string>(brString)
 	const tags = useSignal<Record<string, string>>(tagsSignal)
 
-	const changeXml = async () => {
+	const changeXml = useCallback(async () => {
 		let result = brString
 		for (const [key, value] of Object.entries(tags)) {
 			if (value !== '') {
@@ -143,7 +143,7 @@ export const StyleXml = ({
 		const brString2 = result1.replace(/\n/g, '<br/>')
 
 		setResultXml(brString2)
-	}
+	}, [brString, tags])
 
 	useEffect(() => {
 		changeXml()
@@ -155,7 +155,7 @@ export const StyleXml = ({
 
 			<div className={styles.searchResultTop}>
 				<Text>피그마 저장 결과 미리보기:</Text>
-				<TranslateLine characters={resultXml}></TranslateLine>
+				{/* <TranslateLine characters={resultXml}></TranslateLine> */}
 			</div>
 			<VerticalSpace space="small" />
 			<TextboxMultiline value={resultXml} placeholder="XML 출력" />

@@ -1,8 +1,8 @@
 import { emit, on, once } from '@create-figma-plugin/utilities'
 import { GET_STYLE_DATA, SYNC_GET_STYLE_DATA } from '@/domain/constant'
 import { getAllStyleRanges } from '@/figmaPluginUtils/text'
-import { type StyleData, styleDataSignal } from '../signal'
 import { generateRandomText2 } from '@/utils/textTools'
+import { type StyleData, styleDataSignal } from '../signal'
 
 export const newGetStyleData = async (nodeId: string) => {
 	const node = await figma.getNodeByIdAsync(nodeId)

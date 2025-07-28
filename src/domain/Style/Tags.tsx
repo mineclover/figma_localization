@@ -1,8 +1,8 @@
-import { Dropdown, type DropdownOption, IconCheck16 } from '@create-figma-plugin/ui'
+import { Button, Dropdown, type DropdownOption, IconCheck16 } from '@create-figma-plugin/ui'
 import { signal } from '@preact/signals-core'
-import { h } from 'preact'
+import { Fragment, h } from 'preact'
 import type { TargetedEvent } from 'preact/compat'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState, useCallback, useMemo } from 'preact/hooks'
 import useFp from '@/hooks/useFp'
 import { useSignal } from '@/hooks/useSignal'
 import type { LocalizationKeyAction } from '@/model/types'
@@ -32,7 +32,6 @@ export const xmlParse = async (xmlString: string) => {
  */
 export const targetKeyParse = async (flatItems: XmlFlatNode[]) => {
 	const targetKey = flatItems.filter(item => item.tagName !== 'br')
-
 	return new Set(targetKey.map(item => item.tagName))
 }
 
@@ -151,22 +150,34 @@ const TagsSort = ({ list, inputTags }: { list: Record<string, string>; inputTags
 // 겹칠 경우 대체 , 겹치지 않을 경우 인터페이스에 표시
 //
 const Tags = ({ localizationKey, xmlString, action }: Props) => {
-	const { state, results, reset, allFulfilled } = useFp(xmlString, {
-		fn1: xmlParse,
-		fn2: targetKeyParse,
-		fn3: keyActionFetchCurry(localizationKey, action),
-		fn4: diff,
-	})
-	useEffect(() => {
-		reset()
-	}, [reset])
+	const stableKeyActionFetch = useCallback(
+		() => keyActionFetchCurry(localizationKey, action)(),
+		[localizationKey, action]
+	)
+
+	const config = useMemo(
+		() => ({
+			fn1: xmlParse,
+			fn2: targetKeyParse,
+			fn3: stableKeyActionFetch,
+			fn4: diff,
+		}),
+		[stableKeyActionFetch]
+	)
+
+	const { state, results, reset, allFulfilled } = useFp(xmlString, config)
 
 	const value = allFulfilled ? (results.fn4 ?? {}) : {}
 	const inputTags = allFulfilled ? (results.fn2 ?? new Set<string>()) : new Set<string>()
 	if (!allFulfilled) {
 		return <div>Loading...</div>
 	}
-	return <TagsSort key={allFulfilled} list={value} inputTags={inputTags} />
+	return (
+		<Fragment>
+			<Button onClick={reset}>reset</Button>
+			<TagsSort key={allFulfilled} list={value} inputTags={inputTags} />
+		</Fragment>
+	)
 }
 
 export default Tags

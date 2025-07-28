@@ -145,11 +145,15 @@ export const TargetNodeStyleUpdate = async (node: TextNode, localizationKey: str
 
 const labelToResource = async (localizationKey: string, action: ActionType) => {
 	/** 요청 데이터 */
-	const data = await keyActionFetchCurry(localizationKey, action)()
+	if (localizationKey) {
+		const data = await keyActionFetchCurry(localizationKey, action)()
 
-	/** 레이블 맵핑 */
-	const mapping = labelKeyMapping(data)
-	return mapping
+		/** 레이블 맵핑 */
+		const mapping = labelKeyMapping(data)
+		return mapping
+	}
+
+	return {}
 }
 
 /** 이거 클라이언트용임 */

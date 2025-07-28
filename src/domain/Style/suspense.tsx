@@ -79,13 +79,14 @@ export const ResourceProvider = <T,>({
 	// props가 변경되면 리소스를 재생성
 	useEffect(() => {
 		// props가 변경되었는지 확인
-		if (!shallowEqual({ ...prevPropsRef.current }, { ...props, focusUpdateCount })) {
+		const currentProps = { ...props, focusUpdateCount }
+		if (!shallowEqual(prevPropsRef.current, currentProps)) {
 			// 새 리소스 생성
 			setResource(createResource(fetchFn, props))
 			// 이전 props 업데이트
-			prevPropsRef.current = { ...props, focusUpdateCount }
+			prevPropsRef.current = currentProps
 		}
-	}, [fetchFn, props, focusUpdateCount])
+	}, [fetchFn, ...Object.values(props), focusUpdateCount])
 
 	return children(resource)
 }

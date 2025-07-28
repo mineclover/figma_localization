@@ -2,8 +2,8 @@ import { emit } from '@create-figma-plugin/utilities'
 import { signal } from '@preact/signals-core'
 import { notify } from '@/figmaPluginUtils'
 import { GET_PATTERN_MATCH_KEY } from '../constant'
-import { TaskItem, TaskQueue } from './TaskMonitor'
 import { PatternMatchTaskExecutor } from './PatternMatchTaskExecutor'
+import { TaskItem, TaskQueue } from './TaskMonitor'
 
 // Re-export TaskItem from TaskMonitor
 export type { TaskItem } from './TaskMonitor'

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'preact/hooks'
 
 type FnState = 'pending' | 'fulfilled' | 'rejected'
 type State = Record<string, FnState>
@@ -100,26 +100,25 @@ const useFp = <
 	}
 
 	// 각 단계별 비동기 함수 실행기
-	const executeStep = async <Input, Output>(
-		key: keyof ChainConfig<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>,
-		fn: (args: Input) => Promise<Output>,
-		args: Input
-	) => {
-		try {
-			const boundFn = fn.bind(results.current)
-			const result = await boundFn(args)
-			results.current = { ...results.current, [key]: result }
-			setState(prev => ({ ...prev, [key]: 'fulfilled' }))
-			return result
-		} catch (error) {
-			setState(prev => ({ ...prev, [key]: 'rejected' }))
-			throw error
-		}
-	}
-
-	useEffect(() => {
-		reset()
-	}, [reset])
+	const executeStep = useCallback(
+		async <Input, Output>(
+			key: keyof ChainConfig<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>,
+			fn: (args: Input) => Promise<Output>,
+			args: Input
+		) => {
+			try {
+				const boundFn = fn.bind(results.current)
+				const result = await boundFn(args)
+				results.current = { ...results.current, [key]: result }
+				setState(prev => ({ ...prev, [key]: 'fulfilled' }))
+				return result
+			} catch (error) {
+				setState(prev => ({ ...prev, [key]: 'rejected' }))
+				throw error
+			}
+		},
+		[]
+	)
 
 	useEffect(() => {
 		const executeChain = async () => {
@@ -169,7 +168,7 @@ const useFp = <
 		}
 
 		executeChain()
-	}, [state, config, start, executeStep])
+	}, [state, config, start])
 
 	return {
 		state,

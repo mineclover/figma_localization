@@ -11,8 +11,8 @@ import { NODE_STORE_KEY, SET_NODE_LOCATION, TRANSLATION_ACTION_PAIR } from '../c
 import { getCursorPosition, getExtendNodeData, getNodeData, nodeMetaData } from '../getState'
 import { getPageId, getProjectId } from '../Label/LabelModel'
 import {
-	type PutLocalizationKeyType,
 	generateLocalizationName,
+	type PutLocalizationKeyType,
 	putLocalizationKey,
 	setNodeData,
 } from '../Label/TextPluginDataModel'
@@ -308,23 +308,63 @@ export const onTranslationActionRequest = () => {
 		// }
 
 		const reg = new RegExp(`^${prefix}`, 'g')
-		const nextName = `${prefix}_${(name ?? '').replace(reg, '')}`
-		const putLocalizationData: PutLocalizationKeyType = {
-			name: nextName,
-			alias: nextName,
-			sectionId: sectionId,
-			domainId: domainSetting.domainId,
-		}
-		const result1 = await putLocalizationKey(localizationKey, putLocalizationData)
-		// 등록 실패하면 어떻게 반환할건지 정해야 함
+		const baseName = `${prefix}_${(name ?? '').replace(reg, '')}`
 
-		console.log('🚀 ~ on ~ result1:', result1)
-		if (!result1?.success) {
-			notify(result1?.message ?? '로컬라이제이션 키 업데이트 실패', 'error')
-			return
-		} else {
-			notify(result1?.message ?? '로컬라이제이션 키 업데이트 성공', 'ok')
-			updateLocalizationResponse(localizationKey, putLocalizationData)
+		// 중복 이름 관리 및 재시도 로직
+		const maxRetries = 5
+		let retryCount = 0
+		let result1 = null
+		let currentName = baseName
+		const duplicateNames: string[] = []
+		let localizationSuccess = false
+
+		while (retryCount < maxRetries) {
+			try {
+				const putLocalizationData: PutLocalizationKeyType = {
+					name: currentName,
+					alias: currentName,
+					sectionId: sectionId,
+					domainId: domainSetting.domainId,
+				}
+
+				result1 = await putLocalizationKey(localizationKey, putLocalizationData)
+
+				if (result1?.success) {
+					notify(result1?.message ?? '로컬라이제이션 키 업데이트 성공', 'ok')
+					updateLocalizationResponse(localizationKey, putLocalizationData)
+					localizationSuccess = true
+					break
+				} else {
+					// 중복 이름 에러인지 확인
+					const errorMessage = result1?.message || ''
+					if (errorMessage.includes('이미 존재하는 키') || errorMessage.includes('UNIQUE constraint')) {
+						duplicateNames.push(currentName)
+						retryCount++
+
+						if (retryCount < maxRetries) {
+							// 중복된 이름에 숫자 추가
+							currentName = `${baseName}_${retryCount}`
+							console.log(`중복된 이름 발견: ${duplicateNames.join(', ')}. 새로운 이름으로 재시도: ${currentName}`)
+							continue
+						} else {
+							notify(`중복된 이름으로 인한 실패. 시도한 이름들: ${duplicateNames.join(', ')}`, 'error')
+							break
+						}
+					} else {
+						// 다른 종류의 에러
+						notify(result1?.message ?? '로컬라이제이션 키 업데이트 실패', 'error')
+						break
+					}
+				}
+			} catch (error) {
+				retryCount++
+				if (retryCount < maxRetries) {
+					console.log(`로컬라이제이션 키 업데이트 중 오류 발생, ${retryCount}/${maxRetries} 재시도 중...`, error)
+					await new Promise(resolve => setTimeout(resolve, 1000 * retryCount))
+				} else {
+					notify('로컬라이제이션 키 업데이트 중 오류 발생 (최대 재시도 횟수 초과)', 'error')
+				}
+			}
 		}
 
 		// 스타일 추출과 텍스트 업데이트
@@ -350,10 +390,13 @@ export const onTranslationActionRequest = () => {
 			const data = await result.json()
 			console.log('🚀 ~ on ~ data:', data)
 
-			// 성공했기 때문에 이름 일괄 반영
-			console.log('🚀 ~ locations.ts:355 ~ onTranslationActionRequest ~ targetNodes:', targetNodes, nextName)
-			for (const node of targetNodes) {
-				node.name = nextName
+			// 로컬라이제이션 키 업데이트가 성공한 경우에만 노드 이름 변경
+			if (localizationSuccess) {
+				console.log('🚀 ~ locations.ts:355 ~ onTranslationActionRequest ~ targetNodes:', targetNodes, currentName)
+				for (const node of targetNodes) {
+					console.log('🚀 ~ locations.ts:397 ~ onTranslationActionRequest ~ currentName:', currentName)
+					node.name = currentName
+				}
 			}
 		}
 	})

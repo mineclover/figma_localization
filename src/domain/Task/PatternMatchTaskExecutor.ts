@@ -147,6 +147,7 @@ const handleKeySelection = async (data: MetaData) => {
 	const apiKey = apiKeySignal.value
 
 	if (apiKey == null) {
+		console.log('🚀 ~ PatternMatchTaskExecutor.ts:149 ~ handleKeySelection ~ apiKey:', apiKey)
 		return
 	}
 
@@ -156,6 +157,7 @@ const handleKeySelection = async (data: MetaData) => {
 	console.log('🚀 ~ PatternMatchTaskExecutor.ts:156 ~ handleKeySelection ~ recommends:', recommends)
 
 	if (recommends == null) {
+		console.log('🚀 ~ PatternMatchTaskExecutor.ts:159 ~ handleKeySelection ~ recommends:', recommends)
 		return
 	}
 	const centerName = recommends.data[2]
@@ -165,7 +167,7 @@ const handleKeySelection = async (data: MetaData) => {
 	const ids = patternMatchData.filter(item => item.localizationKey === keyId).map(item => item.id)
 
 	const baseNodeId = await getSyncBatchBaseId(ids)
-	console.log({
+	console.log('🚀 ~ PatternMatchTaskExecutor.ts:168', {
 		localizationKey: keyId,
 		action: 'default',
 		baseNodeId,
@@ -177,12 +179,11 @@ const handleKeySelection = async (data: MetaData) => {
 		// 이름을 변경해야할 대상
 	})
 	if (baseNodeId === 'mixed' || baseNodeId === 'none') {
-		console.log('선택된 노드들에 baseId가 두개 이상이거나 없음')
+		console.log('🚀 ~ PatternMatchTaskExecutor.ts:180 선택된 노드들에 baseId가 두개 이상이거나 없음')
 		return
 	}
 	if (centerName?.variableName == null) {
-		console.log('🚀 ~ PatternMatchTaskExecutor.ts:182 ~ handleKeySelection ~ centerName:', centerName)
-
+		console.log('🚀 ~ PatternMatchTaskExecutor.ts:184 ~ handleKeySelection ~ centerName:', centerName)
 		return
 	}
 
@@ -260,7 +261,7 @@ export class PatternMatchTaskExecutor implements TaskExecutor<MetaData> {
 			console.log('🚀 ~ PatternMatchTaskExecutor.ts:176 ~ PatternMatchTaskExecutor ~ execute ~ data:', last)
 			// 이름 부여
 
-			handleKeySelection(nodeData)
+			await handleKeySelection(nodeData)
 
 			onProgress(100)
 		} else {

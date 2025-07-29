@@ -88,7 +88,7 @@ export const onSetApiKey = () => {
 	})
 }
 export const mainGetApiKey = async () => {
-	const apiKey = await figma.clientStorage.getAsync(CLIENT_STORE_KEY.API_KEY)
+	return await figma.clientStorage.getAsync(CLIENT_STORE_KEY.API_KEY)
 }
 
 export const onGetApiKey = () => {

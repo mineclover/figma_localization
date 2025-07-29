@@ -201,7 +201,6 @@ export const onNodeSelectionChange = () => {
 
 		for (const node of nextSelectionNodes) {
 			const metaData = getFrameNodeMetaData(node as FrameNode)
-
 			// 화면에 보이지 않는 노드는 무시하도록 구성
 			if (metaData && !isHideNode(metaData)) {
 				hasKey.push(metaData)

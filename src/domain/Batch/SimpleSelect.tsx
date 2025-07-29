@@ -50,19 +50,19 @@ export const nextBaseSignal = signal<{
 	projectId: '',
 })
 
-const Test = ({ id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId }: Props) => {
-	console.log(
-		'🚀 ~ Test ~  id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId:',
-		id,
-		selected,
-		keyMatch,
-		current,
-		hide,
-		isNext,
-		locationId,
-		pageId,
-		projectId
-	)
+const TestBaseLabel = ({ id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId }: Props) => {
+	// console.log(
+	// 	'🚀 ~ Test ~  id, selected, keyMatch, current, hide, isNext, locationId, pageId, projectId:',
+	// 	id,
+	// 	selected,
+	// 	keyMatch,
+	// 	current,
+	// 	hide,
+	// 	isNext,
+	// 	locationId,
+	// 	pageId,
+	// 	projectId
+	// )
 	const badRequestPrams = !locationId || !pageId || !projectId
 
 	return (
@@ -214,6 +214,7 @@ function SimpleSelect() {
 
 	// const targetKey = target?.localizationKey;
 
+	console.log('🚀 ~ SimpleSelect.tsx:217 ~ SimpleSelect ~ allKeys:', allKeys)
 	return (
 		<div className={styles.root}>
 			{Array.from(allKeys).map(key => {
@@ -224,6 +225,7 @@ function SimpleSelect() {
 				// const batchSum = targetKey === key;
 				// const batchText = batchSum ? '' : ` => ${targetKey}`;
 				const ids = patternMatchData.filter(item => item.localizationKey === key).map(item => item.id)
+				console.log('🚀 ~ SimpleSelect.tsx:228 ~ SimpleSelect ~ ids:', ids)
 
 				const baseNodeName = keyNameStore[key] ?? ''
 
@@ -273,7 +275,7 @@ function SimpleSelect() {
 
 						<div className={styles.container}>
 							{Array.from(keyObject.get(key) ?? []).map((item, _, _arr) => {
-								console.log('🚀 ~ {Array.from ~ item:', item)
+								// console.log('🚀 ~ {Array.from ~ item:', item)
 								const selected = selectItems.includes(item.id)
 
 								const keyMatch = selectKey === item.localizationKey
@@ -284,7 +286,7 @@ function SimpleSelect() {
 								// const current = currentId === item.id;
 								const isNext = item.id === nodeId
 								return (
-									<Test
+									<TestBaseLabel
 										id={item.id}
 										selected={selected}
 										keyMatch={keyMatch}

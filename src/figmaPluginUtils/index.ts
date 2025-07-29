@@ -128,7 +128,6 @@ export const notify = (message: string, closeLabel: string, timeout = 2000) => {
 			},
 		})
 	}
-	console.trace('🚀 ~ notify ~ message:', message)
 }
 
 const notifyMap = {} as Record<string, number>

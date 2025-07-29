@@ -248,11 +248,13 @@ export const onTranslationActionRequest = () => {
 			name,
 			targetNodeId,
 			sectionId,
+			beforeIds,
 		})
 		// 1. 베이스 아이디의 기준 location 이 변경 될 수 있다
 		// 2. 일단 키 등록 된 상태로 오지만 origin은 등록되지 않았다
 		// 3. 이름 변경되서 올 수 있다
-
+		const x = await searchStore.getBaseLocationInfo(beforeIds)
+		console.log('🚀 ~ locations.ts:256 ~ onTranslationActionRequest ~ x:', x)
 		const nodeInfo = searchStore.baseLocationStore
 		const location = nodeInfo.get(locationId)
 		if (!location) {

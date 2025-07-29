@@ -1,7 +1,7 @@
 import { Button } from '@create-figma-plugin/ui'
 import { emit } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import type { ProviderResponse } from '@/ai/provider'
 import { textRecommend } from '@/ai/textRecommend'
 import { modalAlert } from '@/components/alert'
@@ -44,10 +44,11 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 
 	const [selectName, setSelectName] = useState<string>('')
 	const [selectKeyName, setSelectKeyName] = useState<SelectKeyNameType[]>([])
+	console.log('🚀 ~ KeyIds.tsx:47 ~ KeyIds ~ selectKeyName:', selectKeyName)
 
 	const selectLocation = searchStoreLocation.get(baseNodeId)
 	const tempSelectKeyId = patternMatchData.filter(item => selectIds.includes(item.id)).map(item => item.localizationKey)
-	const selectKeyId = new Set(tempSelectKeyId)
+	const selectKeyId = useRef(new Set(tempSelectKeyId))
 
 	const { data, loading, error, executeAsync } =
 		useAsync<
@@ -64,7 +65,7 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 		const prevSelectKeyName = selectKeyName.filter(item => item.type !== 'normal')
 		const nextSelectKeyName: SelectKeyNameType[] = []
 
-		for (const item of selectKeyId) {
+		for (const item of selectKeyId.current) {
 			const keyName = keyNameStore[item]
 			nextSelectKeyName.push({
 				id: item,
@@ -73,7 +74,7 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 			})
 		}
 		setSelectKeyName(() => [...prevSelectKeyName, ...nextSelectKeyName])
-	}, [keyNameStore, localizationKey, selectKeyId, selectKeyName.filter])
+	}, [keyNameStore, localizationKey, selectKeyId.current])
 
 	useEffect(() => {
 		const prevSelectKeyName = selectKeyName.filter(item => item.type !== 'ai')
@@ -89,7 +90,7 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 			}
 		}
 		setSelectKeyName([...prevSelectKeyName, ...nextSelectKeyName])
-	}, [loading, data, selectKeyName.filter])
+	}, [loading, data])
 
 	const handleRecommendation = () => {
 		if (apiKey) {

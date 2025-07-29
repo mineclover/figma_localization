@@ -11,6 +11,7 @@ import {
 	SET_NODE_ACTION,
 	SET_PRESET,
 	SET_PROJECT_ID,
+	SET_TARGET_NODE_ACTION,
 	STORE_KEY,
 } from '../constant'
 import { ERROR_CODE } from '../errorCode'
@@ -78,6 +79,36 @@ export const sectionNameParser = (text: string) => {
 export const onSetNodeAction = () => {
 	on(SET_NODE_ACTION.REQUEST_KEY, (data: NodeData) => {
 		const node = figma.currentPage.selection[0]
+
+		for (const [key, value] of Object.entries(data)) {
+			// 널이 아닐 때만 설정
+
+			if (key === 'localizationKey' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.LOCALIZATION_KEY, value)
+			} else if (key === 'location' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.LOCATION, value)
+			} else if (key === 'domainId' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.DOMAIN_ID, value)
+			} else if (key === 'ignore' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.IGNORE, value)
+			} else if (key === 'action' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.ACTION, value)
+			} else if (key === 'modifier' && value != null) {
+				node.setPluginData(NODE_STORE_KEY.MODIFIER, value)
+			}
+		}
+		const result = getCursorPosition(node)
+		emit(GET_CURSOR_POSITION.RESPONSE_KEY, result)
+	})
+}
+
+export const onTargetSetNodeAction = () => {
+	on(SET_TARGET_NODE_ACTION.REQUEST_KEY, async (nodeId: string, data: NodeData) => {
+		const node = await figma.getNodeByIdAsync(nodeId)
+		if (node == null) {
+			notify('노드가 없습니다', '닫기')
+			return
+		}
 
 		for (const [key, value] of Object.entries(data)) {
 			// 널이 아닐 때만 설정

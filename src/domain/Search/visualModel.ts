@@ -1,4 +1,4 @@
-import { emit, on } from '@create-figma-plugin/utilities'
+import { emit, on, once } from '@create-figma-plugin/utilities'
 import { newGetStyleData } from '@/model/on/GET_STYLE_DATA'
 import { isOverlayFrame } from '@/model/on/onChanges'
 import {
@@ -20,6 +20,7 @@ import {
 	BACKGROUND_STORE_KEY,
 	BASE_KEY_INJECTION,
 	DISABLE_RENDER_PAIR,
+	GET_NODES_BASE_ID,
 	NODE_STORE_KEY,
 	RENDER_MODE_STATE,
 	RENDER_PAIR,
@@ -38,6 +39,7 @@ import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB'
 import { safeJsonParse } from '../utils/getStore'
 import { idSetLocation, setNodeLocation } from './locations'
 import { getFrameNodeMetaData, type MetaData, searchStore, setFrameNodeMetaData } from './searchStore'
+import { notify } from '@/figmaPluginUtils'
 
 // 데이터 전송은 비활성화 시 발생
 // 인터렉션은 활성화 중에 발생
@@ -45,10 +47,9 @@ import { getFrameNodeMetaData, type MetaData, searchStore, setFrameNodeMetaData 
 // 충분한 정보가 메인 프로세스에도 있으면 전파하지 않고 내부에서 서버로 보낸 후 해당 내용들을 전파 후 클라에도 업데이트
 // 선택한 섹션 아이디는 뭐고, 액션은 뭐고, 로컬라이제이션 키는 뭐고, 위치 값은 뭐고, 스타일 키에 매핑되는 이름은 뭐고
 
-export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
+export const autoSelectNodeEmit = (nodes: MetaData[]) => {
 	console.log('autoSelectNodeEmit 전송함', nodes)
 	emit(AUTO_SELECT_NODE_EMIT.RESPONSE_KEY, nodes)
-
 	const style = nodes.map(node => node.baseNodeId)
 	const styleSet = new Set(style)
 	console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', styleSet)
@@ -71,6 +72,78 @@ export const autoSelectNodeEmit = async (nodes: MetaData[]) => {
 		emit(AUTO_SELECT_STYLE_EMIT.RESPONSE_KEY, 'none')
 		console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 2)
 	}
+}
+
+/** 등록 */
+export const onGetBaseNode2 = () => {
+	on(GET_NODES_BASE_ID.REQUEST_KEY, async (nodes: string[], pairKey: string) => {
+		console.log('🚀 ~ visualModel.ts:80 ~ onGetBaseNode2 ~ nodes:', nodes)
+		const hasKey: MetaData[] = []
+		for (const nodeId of nodes) {
+			const node = await figma.getNodeByIdAsync(nodeId)
+			if (node?.type === 'TEXT') {
+				const metaData = nodeMetaData(node)
+				// 화면에 보이지 않는 노드는 무시하도록 구성
+				if (metaData && !isHideNode(metaData)) {
+					hasKey.push(metaData)
+				}
+			}
+		}
+		const style = hasKey.map(node => node.baseNodeId).filter(node => node)
+		const styleSet = new Set(style)
+		if (styleSet.size === 1) {
+			const baseNodeId = styleSet.values().next().value
+			emit(GET_NODES_BASE_ID.RESPONSE_KEY + pairKey, baseNodeId)
+		} else if (styleSet.size > 1) {
+			emit(GET_NODES_BASE_ID.RESPONSE_KEY + pairKey, 'mixed')
+			console.log('🚀 ~ autoSelectNodeEmit ~ styleSet:', 1)
+		} else {
+			if (hasKey.length === 0) {
+				notify('입력된 키가 존재하지 않음', '닫기')
+				return
+			}
+
+			const newBaseNode = await figma.getNodeByIdAsync(hasKey[0].id)
+
+			if (newBaseNode == null) {
+				notify('키가 존재하지 않음', '닫기')
+				return
+			}
+			const newBaseLocationDTO = await setNodeLocation(newBaseNode as SceneNode)
+			console.log('🚀 ~ visualModel.ts:107 ~ onGetBaseNode2 ~ newBaseLocationDTO:', newBaseLocationDTO)
+			if (newBaseLocationDTO == null) {
+				notify('서버가 정상이 아님', '닫기')
+			}
+
+			emit(GET_NODES_BASE_ID.RESPONSE_KEY + pairKey, newBaseLocationDTO?.location_id)
+		}
+	})
+}
+
+export const getSyncBatchBaseId = (nodeIds: string[], timeoutMs: number = 5000): Promise<string | null> => {
+	const pairKey = generateRandomText2()
+	return new Promise((resolve, reject) => {
+		// 타임아웃 설정
+		const timeoutId = setTimeout(() => {
+			reject(new Error(`Style data request timeout for nodeId: ${nodeIds}`))
+		}, timeoutMs)
+
+		// 응답 핸들러
+		const handleResponse = (baseId: string) => {
+			clearTimeout(timeoutId)
+			resolve(baseId)
+		}
+
+		try {
+			// 응답 이벤트 리스너 등록
+			once(GET_NODES_BASE_ID.RESPONSE_KEY + pairKey, handleResponse)
+			// 요청 전송
+			emit(GET_NODES_BASE_ID.REQUEST_KEY, nodeIds, pairKey)
+		} catch (error) {
+			clearTimeout(timeoutId)
+			reject(new Error(`Failed to send style data request: ${error}`))
+		}
+	})
 }
 
 export const nullSelectEmit = () => {

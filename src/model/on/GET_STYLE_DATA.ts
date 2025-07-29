@@ -42,7 +42,7 @@ export const onSyncGetStyleData = () => {
 			return
 		}
 		const styleData = await newGetStyleData(nodeId)
-		emit(GET_STYLE_DATA.RESPONSE_KEY + pairKey, styleData)
+		emit(SYNC_GET_STYLE_DATA.RESPONSE_KEY + pairKey, styleData)
 	})
 }
 
@@ -63,7 +63,7 @@ export const getSyncStyleData = (nodeId: string, timeoutMs: number = 5000): Prom
 
 		try {
 			// 응답 이벤트 리스너 등록
-			once(GET_STYLE_DATA.RESPONSE_KEY + pairKey, handleResponse)
+			once(SYNC_GET_STYLE_DATA.RESPONSE_KEY + pairKey, handleResponse)
 
 			// 요청 전송
 			emit(SYNC_GET_STYLE_DATA.REQUEST_KEY, nodeId, pairKey)

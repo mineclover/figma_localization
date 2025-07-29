@@ -40,7 +40,7 @@ export async function textRecommend(apiKey: string, text: string, prefix: string
 
 	// Initialize with model ID
 	provider.initialize({
-		modelId: 'gemini-2.5-flash-preview-04-17',
+		modelId: 'gemini-2.5-flash-lite',
 	})
 
 	try {

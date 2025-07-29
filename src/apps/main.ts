@@ -5,7 +5,7 @@ import {
 	onSetNodeLocalizationKeyBatch,
 	onUpdateNodeLocalizationKeyBatch,
 } from '@/domain/Batch/batchModel'
-import { onGetProjectId, onSetNodeAction, onSetProjectId } from '@/domain/Label/LabelModel'
+import { onGetProjectId, onSetNodeAction, onSetProjectId, onTargetSetNodeAction } from '@/domain/Label/LabelModel'
 import {
 	onNodeReload,
 	onPutLocalizationKey,
@@ -13,12 +13,18 @@ import {
 	onTargetSetNodeLocation,
 	onUpdateNodeStoreBatchKey,
 } from '@/domain/Label/TextPluginDataModel'
-import { onTextToFrameSelect, onTranslationActionRequest, onTranslationActionResponse } from '@/domain/Search/locations'
+import {
+	onGetBaseNode,
+	onTextToFrameSelect,
+	onTranslationActionRequest,
+	onTranslationActionResponse,
+} from '@/domain/Search/locations'
 import {
 	onAutoSelectModeRequest,
 	onBaseKeyInjection,
 	onBaseUpdate,
 	onDisableRender,
+	onGetBaseNode2,
 	onRender,
 	onSelectModeMain,
 } from '@/domain/Search/visualModel'
@@ -52,6 +58,7 @@ import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE'
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges'
 import { runExample } from '@/utils/test'
 import type { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
+import { onSyncGetNodeData } from '@/domain/Search/searchModel'
 
 function initializeSettings() {
 	onSetProjectId()
@@ -89,6 +96,7 @@ function initializeStyleAndVariables() {
 	onDownloadStyle()
 	onGetStyleData()
 	onSyncGetStyleData()
+	onSyncGetNodeData()
 	onStyleChange()
 	onGetVariableData()
 	onSetVariableData()
@@ -102,7 +110,9 @@ function initializeViewportAndSelection() {
 	pageSelectIds_Adapter()
 	onCurrentSectionSelected()
 	onSetNodeAction()
+	onTargetSetNodeAction()
 	onGetCursorPosition()
+	onGetBaseNode2()
 }
 
 function initializeVisualizationMode() {

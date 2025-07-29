@@ -1,4 +1,5 @@
 import { emit, on, once } from '@create-figma-plugin/utilities'
+import { notify } from '@/figmaPluginUtils'
 import { newGetStyleData } from '@/model/on/GET_STYLE_DATA'
 import { isOverlayFrame } from '@/model/on/onChanges'
 import {
@@ -39,7 +40,6 @@ import { clientFetchDBCurry, fetchDB, pureFetch } from '../utils/fetchDB'
 import { safeJsonParse } from '../utils/getStore'
 import { idSetLocation, setNodeLocation } from './locations'
 import { getFrameNodeMetaData, type MetaData, searchStore, setFrameNodeMetaData } from './searchStore'
-import { notify } from '@/figmaPluginUtils'
 
 // 데이터 전송은 비활성화 시 발생
 // 인터렉션은 활성화 중에 발생

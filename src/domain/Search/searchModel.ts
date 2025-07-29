@@ -1,10 +1,10 @@
 import { emit, on, once } from '@create-figma-plugin/utilities'
 import { keyIdNameSignal, removeKeyIdsSignal } from '@/model/signal'
+import { generateRandomText2 } from '@/utils/textTools'
+import { SYNC_GET_NODE_DATA } from '../constant'
+import { nodeMetaData } from '../getState'
 import { clientFetchDBCurry } from '../utils/fetchDB'
 import { getFrameNodeMetaData, MetaData } from './searchStore'
-import { generateRandomText2 } from '@/utils/textTools'
-import { nodeMetaData } from '../getState'
-import { SYNC_GET_NODE_DATA } from '../constant'
 
 const clientFetch = clientFetchDBCurry()
 

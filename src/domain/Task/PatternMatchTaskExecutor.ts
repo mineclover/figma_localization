@@ -1,4 +1,5 @@
 import { emit } from '@create-figma-plugin/utilities'
+import { textRecommend } from '@/ai/textRecommend'
 import { MetaData } from '@/domain/Search/searchStore'
 import { pageNodeZoomAction } from '@/figmaPluginUtils/utilAction'
 import { getSyncStyleData } from '@/model/on/GET_STYLE_DATA'
@@ -14,12 +15,11 @@ import { XmlFlatNode } from '@/utils/types'
 import { parseXmlToFlatStructure, replaceTagNames } from '@/utils/xml2'
 import { baseIsAllNode } from '../Batch/batchModel'
 import { SET_NODE_ACTION, SET_TARGET_NODE_ACTION, TRANSLATION_ACTION_PAIR } from '../constant'
+import { getSyncNodeData } from '../Search/searchModel'
+import { getSyncBatchBaseId } from '../Search/visualModel'
 import { styleToXml } from '../Style/styleAction'
 import { clientFetchDBCurry } from '../utils/fetchDB'
 import { TaskExecutor, TaskItem } from './taskProcessor'
-import { getSyncNodeData } from '../Search/searchModel'
-import { textRecommend } from '@/ai/textRecommend'
-import { getSyncBatchBaseId } from '../Search/visualModel'
 
 const testStyles = async (nodeData: MetaData) => {
 	const baseId = nodeData.baseNodeId

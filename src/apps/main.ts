@@ -19,6 +19,7 @@ import {
 	onTranslationActionRequest,
 	onTranslationActionResponse,
 } from '@/domain/Search/locations'
+import { onSyncGetNodeData } from '@/domain/Search/searchModel'
 import {
 	onAutoSelectModeRequest,
 	onBaseKeyInjection,
@@ -58,7 +59,6 @@ import { onGetKeyTranslations } from '@/model/on/GET_TRANSLATION_KEY_VALUE'
 import { onNodeSelectionChange, onStyleChange } from '@/model/on/onChanges'
 import { runExample } from '@/utils/test'
 import type { CloseHandler, ResizeWindowHandler } from '../figmaPluginUtils/types'
-import { onSyncGetNodeData } from '@/domain/Search/searchModel'
 
 function initializeSettings() {
 	onSetProjectId()

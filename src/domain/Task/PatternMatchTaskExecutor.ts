@@ -153,11 +153,13 @@ const handleKeySelection = async (data: MetaData) => {
 	const testPrefix = 'pageName'
 
 	const recommends = await textRecommend(apiKey, text, testPrefix)
+	console.log('🚀 ~ PatternMatchTaskExecutor.ts:156 ~ handleKeySelection ~ recommends:', recommends)
 
 	if (recommends == null) {
 		return
 	}
-	const centerName = recommends.data.find(item => item.normalizePoint === 0.6)
+	const centerName = recommends.data[2]
+	console.log('🚀 ~ PatternMatchTaskExecutor.ts:162 ~ handleKeySelection ~ centerName:', centerName)
 
 	const patternMatchData = patternMatchDataSignal.value
 	const ids = patternMatchData.filter(item => item.localizationKey === keyId).map(item => item.id)
@@ -168,7 +170,7 @@ const handleKeySelection = async (data: MetaData) => {
 		action: 'default',
 		baseNodeId,
 		prefix: testPrefix,
-		name: centerName,
+		name: centerName?.variableName,
 		// 베이스노드 삼고 싶은 nodeId
 		targetNodeId: nodeId,
 		beforeIds: ids,
@@ -178,15 +180,20 @@ const handleKeySelection = async (data: MetaData) => {
 		console.log('선택된 노드들에 baseId가 두개 이상이거나 없음')
 		return
 	}
+	if (centerName?.variableName == null) {
+		console.log('🚀 ~ PatternMatchTaskExecutor.ts:182 ~ handleKeySelection ~ centerName:', centerName)
+
+		return
+	}
 
 	emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
 		localizationKey: keyId,
 		action: 'default',
-		baseNodeId,
+		locationId: baseNodeId,
 		prefix: testPrefix,
-		name: centerName,
-		// 베이스노드 삼고 싶은 nodeId
-		targetNodeId: nodeId,
+		name: centerName?.variableName,
+		// 베이스노드 삼고 싶은 nodeId 있을 떄만 보내면 되고 로직 구현 안됨
+		// targetNodeId: nodeId,
 		beforeIds: ids,
 		// 이름을 변경해야할 대상
 	})

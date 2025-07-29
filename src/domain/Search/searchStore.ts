@@ -388,6 +388,9 @@ class SearchStore {
 	}
 
 	async updateBaseNode(baseNodeId: string, { nodeId, pageId, projectId }: BaseNodeProperty) {
+		if (baseNodeId == null) {
+			console.log('🚀 ~ searchStore.ts:391 ~ SearchStore ~ updateBaseNode ~ baseNodeId:', baseNodeId)
+		}
 		console.log('🚀 ~ SearchStore ~ updateBaseNode ~ updateBaseNode:', baseNodeId, nodeId, pageId, projectId)
 		const response = await fetchDB(`/figma/locations/${baseNodeId}` as '/figma/locations/{id}', {
 			method: 'PUT',

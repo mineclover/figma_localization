@@ -8,15 +8,20 @@ import type { LocalizationKeyAction, LocalizationTranslationDTO, LocationDTO } f
 import type { XmlFlatNode } from '@/utils/types'
 import { parseXmlToFlatStructure, replaceTagNames, unwrapTag, wrapTextWithTag } from '@/utils/xml2'
 import { NODE_STORE_KEY, SET_NODE_LOCATION, TRANSLATION_ACTION_PAIR } from '../constant'
-import { getCursorPosition, getExtendNodeData, getNodeData } from '../getState'
+import { getCursorPosition, getExtendNodeData, getNodeData, nodeMetaData } from '../getState'
 import { getPageId, getProjectId } from '../Label/LabelModel'
-import { type PutLocalizationKeyType, putLocalizationKey, setNodeData } from '../Label/TextPluginDataModel'
+import {
+	type PutLocalizationKeyType,
+	generateLocalizationName,
+	putLocalizationKey,
+	setNodeData,
+} from '../Label/TextPluginDataModel'
 import { getDomainSetting } from '../Setting/SettingModel'
 import { keyActionFetchCurry } from '../Style/actionFetch'
 import { styleToXml } from '../Style/styleAction'
 import type { ActionType } from '../System/ActionResourceDTO'
 import { fetchDB } from '../utils/fetchDB'
-import { getFrameNodeMetaData, searchStore } from './searchStore'
+import { getFrameNodeMetaData, MetaData, searchStore } from './searchStore'
 import { overlayRender, postClientLocation } from './visualModel'
 
 export const setNodeLocation = async (node: SceneNode) => {
@@ -237,7 +242,7 @@ export const addTranslationV2 = async (node: TextNode, localizationKey: string, 
 
 export const onTranslationActionRequest = () => {
 	on(TRANSLATION_ACTION_PAIR.REQUEST_KEY, async (data: TranslationInputType) => {
-		const { localizationKey, locationId, action, prefix: tempPrefix, name, targetNodeId, sectionId, beforeIds } = data
+		const { localizationKey, locationId, action, prefix: tempPrefix, name, sectionId, beforeIds } = data
 
 		const prefix = tempPrefix.toUpperCase()
 		console.log(`🚀 ~ on ~  { localizationKey, baseNodeId, action, prefix, name, nodeId, sectionId }:`, {
@@ -246,29 +251,38 @@ export const onTranslationActionRequest = () => {
 			action,
 			prefix,
 			name,
-			targetNodeId,
+
 			sectionId,
 			beforeIds,
 		})
 		// 1. 베이스 아이디의 기준 location 이 변경 될 수 있다
 		// 2. 일단 키 등록 된 상태로 오지만 origin은 등록되지 않았다
 		// 3. 이름 변경되서 올 수 있다
-		const x = await searchStore.getBaseLocationInfo(beforeIds)
-		console.log('🚀 ~ locations.ts:256 ~ onTranslationActionRequest ~ x:', x)
-		const nodeInfo = searchStore.baseLocationStore
-		const location = nodeInfo.get(locationId)
-		if (!location) {
-			notify('location id를 찾을 수 없음', 'error')
 
+		const baseIds = new Map()
+		const idsNodeData = [] as MetaData[]
+		const targetNodes = [] as TextNode[]
+
+		for (const nodeId of beforeIds) {
+			const node = await figma.getNodeByIdAsync(nodeId)
+			if (node && node.type === 'TEXT') {
+				const metadata = nodeMetaData(node)
+				targetNodes.push(node)
+				idsNodeData.push(metadata)
+				if (metadata.baseNodeId) {
+					baseIds.set(metadata.baseNodeId, metadata)
+				}
+			}
+		}
+		if (baseIds.size !== 1) {
+			notify('baseId가 1이 아님', '닫기')
 			return
 		}
+		const baseNodeData = baseIds.values().next().value as MetaData
+		const location_node_id = baseNodeData.baseNodeId
+		// const idsNodeData = nextIdsNode.map(item => getFrameNodeMetaData(item as FrameNode))
 
-		const { node_id: location_node_id } = location
-		const nextIdsNode = figma.currentPage.selection
-		const idsNodeData = nextIdsNode.map(item => getFrameNodeMetaData(item as FrameNode))
-
-		const baseNodeData = idsNodeData.find(item => item?.id === location_node_id)
-		if (!baseNodeData) {
+		if (!location_node_id) {
 			notify('베이스 아이디를 찾을 수 없음', 'error')
 			return
 		}
@@ -284,28 +298,17 @@ export const onTranslationActionRequest = () => {
 		const pageId = getPageId()
 		if (!projectId || !pageId || !domainSetting) {
 			notify('프로젝트 아이디 또는 페이지 아이디를 찾을 수 없음', 'error')
-
 			return
 		}
 
-		// 		단일화 키를 쓰는 기존 노드들 : prev
-		// 다음 그룹 값 : next
-
-		const prev1 = searchStore.baseLocationStore.get(locationId)
-		console.log('🚀 ~ on ~ prev1:', prev1)
-		const prev2 = searchStore.baseNodeStore.get(location_node_id)
-		console.log('🚀 ~ on ~ prev2:', prev2)
-
 		// 로케이션 베이스 아이디 업데이트 > 변경 요청
-		if (targetNodeId && targetNodeId !== '') {
-			console.log('🚀 ~ on ~ targetNodeId:', targetNodeId)
-			await searchStore.updateBaseNode(locationId, { nodeId: targetNodeId, pageId, projectId })
-		}
+		// if (targetNodeId && targetNodeId !== '') {
+		// 	console.log('🚀 ~ on ~ targetNodeId:', targetNodeId)
+		// 	await searchStore.updateBaseNode(locationId, { nodeId: targetNodeId, pageId, projectId })
+		// }
 
 		const reg = new RegExp(`^${prefix}`, 'g')
-
-		const nextName = `${prefix}_${name.replace(reg, '')}`
-
+		const nextName = `${prefix}_${(name ?? '').replace(reg, '')}`
 		const putLocalizationData: PutLocalizationKeyType = {
 			name: nextName,
 			alias: nextName,
@@ -314,6 +317,7 @@ export const onTranslationActionRequest = () => {
 		}
 		const result1 = await putLocalizationKey(localizationKey, putLocalizationData)
 		// 등록 실패하면 어떻게 반환할건지 정해야 함
+
 		console.log('🚀 ~ on ~ result1:', result1)
 		if (!result1?.success) {
 			notify(result1?.message ?? '로컬라이제이션 키 업데이트 실패', 'error')
@@ -345,6 +349,12 @@ export const onTranslationActionRequest = () => {
 		if (result) {
 			const data = await result.json()
 			console.log('🚀 ~ on ~ data:', data)
+
+			// 성공했기 때문에 이름 일괄 반영
+			console.log('🚀 ~ locations.ts:355 ~ onTranslationActionRequest ~ targetNodes:', targetNodes, nextName)
+			for (const node of targetNodes) {
+				node.name = nextName
+			}
 		}
 	})
 }

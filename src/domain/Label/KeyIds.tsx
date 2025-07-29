@@ -104,19 +104,55 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 		setSelectName(name)
 
 		const { nodeId: nextNodeId, baseNodeId: nextBaseNode } = nextBase
+
+		console.log(
+			'🚀 쉬프트 우클릭 보라색에 대한 데이터라 없을 떄가 더 많음 ~ KeyIds.tsx:107 ~ handleKeySelection ~ nextBase:',
+			nextBase
+		)
+
 		const isNextBase = nextBaseNode === baseNodeId
 		const nodeId = selectLocation?.node_id
 		const ids = patternMatchData.filter(item => item.localizationKey === id).map(item => item.id)
+		console.log('🚀 ~ KeyIds.tsx:110 ~ handleKeySelection ~ ids:', ids)
 
-		emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+		const locationId = ''
+		console.log(
+			`🚀 ~ KeyIds.tsx:129 ~ handleKeySelection ~ {
 			localizationKey,
 			action,
 			baseNodeId,
 			prefix,
 			name,
-			targetNodeId: isNextBase ? nextNodeId : nodeId,
+			locationId,
+			// 베이스 아이디를 변경 하기 위한 로직인데 구분 이 안되서 지워둠 원래 nullable 이라 없어도 됨
+			// targetNodeId: isNextBase ? nextNodeId : nodeId,
 			beforeIds: ids,
-		})
+		}:`,
+			{
+				localizationKey,
+				action,
+				// baseNodeId,
+				prefix,
+				name,
+				locationId: baseNodeId,
+				// 베이스 아이디를 변경 하기 위한 로직인데 구분 이 안되서 지워둠 원래 nullable 이라 없어도 됨
+				// targetNodeId: isNextBase ? nextNodeId : nodeId,
+				beforeIds: ids,
+			}
+		)
+		if (locationId) {
+			emit(TRANSLATION_ACTION_PAIR.REQUEST_KEY, {
+				localizationKey,
+				action,
+
+				prefix,
+				name,
+				locationId: baseNodeId,
+				// 베이스 아이디를 변경 하기 위한 로직인데 구분 이 안되서 지워둠 원래 nullable 이라 없어도 됨
+				// targetNodeId: isNextBase ? nextNodeId : nodeId,
+				beforeIds: ids,
+			})
+		}
 	}
 
 	const sortedKeyNames = [...selectKeyName].sort((a, b) => {
@@ -126,6 +162,7 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 		}
 		return a.id.localeCompare(b.id)
 	})
+	console.log('🚀 ~ KeyIds.tsx:129 ~ KeyIds ~ sortedKeyNames:', sortedKeyNames)
 
 	return (
 		<div className={styles.keyIds}>
@@ -141,7 +178,7 @@ export const KeyIds = ({ localizationKey, action, text, prefix }: KeyIdsProps) =
 					type="button"
 					key={`${type}-${id}`}
 					className={clc(styles.keyId, selectName === name && styles.keyMatch)}
-					onClick={() => handleKeySelection(name, id)}
+					onClick={() => handleKeySelection(name, localizationKey)}
 				>
 					{type === 'ai' ? '표준화 추천 ' : '#'}
 					{id} : {name}

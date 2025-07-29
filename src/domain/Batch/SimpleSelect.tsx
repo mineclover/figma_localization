@@ -225,7 +225,6 @@ function SimpleSelect() {
 				// const batchSum = targetKey === key;
 				// const batchText = batchSum ? '' : ` => ${targetKey}`;
 				const ids = patternMatchData.filter(item => item.localizationKey === key).map(item => item.id)
-				console.log('🚀 ~ SimpleSelect.tsx:228 ~ SimpleSelect ~ ids:', ids)
 
 				const baseNodeName = keyNameStore[key] ?? ''
 

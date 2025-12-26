@@ -1,28 +1,28 @@
 .table {
-	border-collapse: collapse;
+  border-collapse: collapse;
 }
 
 .table th,
 .table td {
-	border: 1px solid;
-	text-align: left;
+  border: 1px solid;
+  text-align: left;
 }
 
 .table th {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .pagination {
-	display: flex;
-	justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .pageButton {
-	border: 1px solid;
-	cursor: pointer;
-	border-radius: 3px;
+  border: 1px solid;
+  cursor: pointer;
+  border-radius: 3px;
 }
 
 .pageButton:disabled {
-	cursor: not-allowed;
+  cursor: not-allowed;
 }

@@ -1,171 +1,171 @@
 .container {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	padding-left: 8px;
-	padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 8px;
+  padding-top: 4px;
 }
 
 .rowContainer {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8px;
-	padding-block: 8px 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-block: 8px 2px;
 }
 .top {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	position: sticky;
-	top: 0;
-	z-index: 10;
-	background-color: var(--figma-color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--figma-color-bg);
 }
 
 .containerDisabled {
-	opacity: 0.5;
+  opacity: 0.5;
 }
 
 .containerSelected {
-	background-color: var(--figma-color-bg-selected);
+  background-color: var(--figma-color-bg-selected);
 }
 
 .column {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	max-height: 100%;
-	overflow-y: auto;
-	overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .row {
-	display: flex;
-	flex-direction: row;
-	gap: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
 
-	justify-content: space-between;
-	align-items: center;
-	button {
-		flex-shrink: 0;
-	}
+  justify-content: space-between;
+  align-items: center;
+  button {
+    flex-shrink: 0;
+  }
 
-	/* _dropdown으로 시작하는 클래스 이름을 선택하는 선택자 */
-	[class^='_dropdown'] {
-		width: 72px;
-		flex-shrink: 0;
-	}
-	[class^='_iconToggleButton'] {
-		flex-shrink: 0;
-	}
-	[class^='_searchTextbox'] {
-		flex-grow: 1;
-	}
-	[class^='_textbox'] {
-		flex-grow: 1;
-	}
+  /* _dropdown으로 시작하는 클래스 이름을 선택하는 선택자 */
+  [class^="_dropdown"] {
+    width: 72px;
+    flex-shrink: 0;
+  }
+  [class^="_iconToggleButton"] {
+    flex-shrink: 0;
+  }
+  [class^="_searchTextbox"] {
+    flex-grow: 1;
+  }
+  [class^="_textbox"] {
+    flex-grow: 1;
+  }
 }
 
 .noWrapSecondary {
-	flex-shrink: 0;
-	white-space: nowrap;
-	color: var(--figma-color-text-secondary);
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: var(--figma-color-text-secondary);
 }
 
 .dangerText {
-	color: var(--figma-color-text-danger);
+  color: var(--figma-color-text-danger);
 }
 
 .text {
-	flex-grow: 1;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-weight: bold;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
 }
 
 .rowLeft {
-	display: flex;
-	flex-direction: row;
-	gap: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
 }
 .rowCenter {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
 }
 
 .miniColumn {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .ignore {
-	opacity: 0.5;
+  opacity: 0.5;
 }
 
 .disabled {
-	color: var(--figma-color-text-secondary);
+  color: var(--figma-color-text-secondary);
 }
 
 .rowExtended {
-	height: 0;
-	overflow: hidden;
+  height: 0;
+  overflow: hidden;
 }
 .wrap {
-	padding-block: 8px;
-	display: flex;
-	flex-direction: row;
-	gap: 4px;
-	flex-wrap: wrap;
+  padding-block: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 .button {
-	flex-grow: 1;
-	width: 100%;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	padding-block: 4px;
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-active);
-	}
+  flex-grow: 1;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: 4px;
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-active);
+  }
 }
 
 .width {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 .noWrap {
-	flex-shrink: 0;
-	white-space: nowrap;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .flexShrink {
-	flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .textButton {
-	flex-grow: 1;
-	text-align: left;
-	padding: 4px 8px;
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-active);
-	}
+  flex-grow: 1;
+  text-align: left;
+  padding: 4px 8px;
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-active);
+  }
 }
 
 .label {
-	display: flex;
+  display: flex;
 
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-	gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }

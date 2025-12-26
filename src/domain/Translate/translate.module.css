@@ -1,90 +1,90 @@
 /* #region 트랜스 레이트 */
 
 .translateItem {
-	display: flex;
-	flex-direction: row;
-	align-items: stretch;
-	justify-content: space-between;
-	gap: 4px;
-	width: 100%;
-	padding: 4px 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 8px;
 
-	& > div {
-		flex-grow: 1;
-	}
+  & > div {
+    flex-grow: 1;
+  }
 }
 
 .container {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .row {
-	display: flex;
+  display: flex;
 }
 
 .translateLeft {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 
-	width: 80px;
+  width: 80px;
 }
 
 .nationLeft {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 
-	width: 48px;
+  width: 48px;
 }
 
 .smallText {
-	color: var(--figma-color-text-secondary);
+  color: var(--figma-color-text-secondary);
 }
 
 .translateRight {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-	width: 60px;
-	border-radius: 4px;
-	background-color: var(--figma-color-bg-brand);
-	&:hover {
-		background-color: var(--figma-color-bg-brand-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-brand-active);
-	}
-	padding-bottom: 2px;
+  width: 60px;
+  border-radius: 4px;
+  background-color: var(--figma-color-bg-brand);
+  &:hover {
+    background-color: var(--figma-color-bg-brand-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-brand-active);
+  }
+  padding-bottom: 2px;
 }
 /* #endregion */
 
 .translateBorder {
-	/* outline: 1px solid var(--figma-color-bg-success); */
-	background-color: var(--figma-color-bg-success-tertiary);
+  /* outline: 1px solid var(--figma-color-bg-success); */
+  background-color: var(--figma-color-bg-success-tertiary);
 }
 
 .translateRow {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 4px;
-	padding: 4px 8px;
-	[class^='_textbox'] {
-		flex-grow: 1;
-	}
-	[class^='_bold'] {
-		flex-grow: 1;
-	}
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 4px 8px;
+  [class^="_textbox"] {
+    flex-grow: 1;
+  }
+  [class^="_bold"] {
+    flex-grow: 1;
+  }
 }
 
 .autoWrap {
-	flex-wrap: wrap;
+  flex-wrap: wrap;
 }

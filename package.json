@@ -1,65 +1,65 @@
 {
-	"dependencies": {
-		"@create-figma-plugin/ui": "^4.0.0",
-		"@create-figma-plugin/utilities": "^4.0.0",
-		"@preact/signals-core": "^1.8.0",
-		"@ramonak/react-progress-bar": "^5.3.0",
-		"crypto-js": "^4.2.0",
-		"dom-serializer": "^2.0.0",
-		"domhandler": "^5.0.3",
-		"domutils": "^3.2.2",
-		"fast-xml-parser": "^5.2.0",
-		"htmlparser2": "^10.0.0",
-		"preact": "^10.26.5",
-		"strnum": "^2.0.5"
-	},
-	"devDependencies": {
-		"@create-figma-plugin/build": "^4.0.0",
-		"@create-figma-plugin/tsconfig": "^4.0.0",
-		"@figma/plugin-typings": "1.109.0",
-		"@figma/widget-typings": "^1.11.0",
-		"@types/crypto-js": "^4.2.2",
-		"@types/domutils": "^1.7.8",
-		"@types/htmlparser2": "^3.10.7",
-		"@types/jest": "^29.5.14",
-		"@types/lodash": "^4.17.16",
-		"@types/node": "^22.14.0",
-		"husky": "^9.1.7",
-		"jest": "^29.7.0",
-		"lint-staged": "^15.5.0",
-		"prettier": "^3.5.3",
-		"ts-jest": "^29.3.1",
-		"typescript": "^5.8.3"
-	},
-	"scripts": {
-		"build": "build-figma-plugin --typecheck --minify",
-		"watch": "build-figma-plugin --typecheck --watch",
-		"types": "npx openapi-typescript https://raw.githubusercontent.com/figma/rest-api-spec/main/openapi/openapi.yaml -o types/restApi.d.ts && npx openapi-typescript http://localhost:6543/yaml/config -o types/i18n.d.ts",
-		"prepare": "husky",
-		"test": "jest",
-		"test:watch": "jest --watch"
-	},
-	"figma-plugin": {
-		"editorType": [
-			"figma",
-			"dev"
-		],
-		"id": "11111",
-		"capabilities": [
-			"inspect"
-		],
-		"networkAccess": {
-			"allowedDomains": [
-				"https://figma.com",
-				"https://jsonplaceholder.typicode.com"
-			],
-			"devAllowedDomains": [
-				"http://localhost:6543",
-				"https://jsonplaceholder.typicode.com"
-			]
-		},
-		"name": "Document System",
-		"main": "src/apps/main.ts",
-		"ui": "src/apps/ui.tsx"
-	}
+  "dependencies": {
+    "@create-figma-plugin/ui": "^4.0.0",
+    "@create-figma-plugin/utilities": "^4.0.0",
+    "@preact/signals-core": "^1.8.0",
+    "@ramonak/react-progress-bar": "^5.3.0",
+    "crypto-js": "^4.2.0",
+    "dom-serializer": "^2.0.0",
+    "domhandler": "^5.0.3",
+    "domutils": "^3.2.2",
+    "fast-xml-parser": "^5.2.0",
+    "htmlparser2": "^10.0.0",
+    "preact": "^10.26.5",
+    "strnum": "^2.0.5"
+  },
+  "devDependencies": {
+    "@create-figma-plugin/build": "^4.0.0",
+    "@create-figma-plugin/tsconfig": "^4.0.0",
+    "@figma/plugin-typings": "1.109.0",
+    "@figma/widget-typings": "^1.11.0",
+    "@types/crypto-js": "^4.2.2",
+    "@types/domutils": "^1.7.8",
+    "@types/htmlparser2": "^3.10.7",
+    "@types/jest": "^29.5.14",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^22.14.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.3.1",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "build": "build-figma-plugin --typecheck --minify",
+    "watch": "build-figma-plugin --typecheck --watch",
+    "types": "npx openapi-typescript https://raw.githubusercontent.com/figma/rest-api-spec/main/openapi/openapi.yaml -o types/restApi.d.ts && npx openapi-typescript http://localhost:6543/yaml/config -o types/i18n.d.ts",
+    "prepare": "husky",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "figma-plugin": {
+    "editorType": [
+      "figma",
+      "dev"
+    ],
+    "id": "11111",
+    "capabilities": [
+      "inspect"
+    ],
+    "networkAccess": {
+      "allowedDomains": [
+        "https://figma.com",
+        "https://jsonplaceholder.typicode.com"
+      ],
+      "devAllowedDomains": [
+        "http://localhost:6543",
+        "https://jsonplaceholder.typicode.com"
+      ]
+    },
+    "name": "Document System",
+    "main": "src/apps/main.ts",
+    "ui": "src/apps/ui.tsx"
+  }
 }

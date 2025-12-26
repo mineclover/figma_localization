@@ -4,4744 +4,4744 @@
  */
 
 export interface paths {
-	'/system/status': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 데이터베이스 및 서버 상태 조회 */
-		get: operations['GetSystemStatus'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/system/sqlite-stats': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** SQLite 성능 및 상태 모니터링 (sqlite3_status, sqlite3_db_status 등에 상응) */
-		get: operations['GetSQLiteStats'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/system/health': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 간단한 헬스 체크 엔드포인트 */
-		get: operations['HealthCheck'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/sections': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetSections'];
-		put?: never;
-		post: operations['CreateSection'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/sections/{name}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** @description 검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>
-		 *     도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>
-		 *     section 이름은 수정 불가 */
-		get: operations['GetSection'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/sections/id/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** @description 검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>
-		 *     도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>
-		 *     section 이름은 수정 불가 */
-		get: operations['GetSectionById'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/sections/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		/** @description 문서 정보 변경 */
-		put: operations['UpdateSection'];
-		post?: never;
-		delete: operations['DeleteSection'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/sections/{id}/keys': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** @description 섹션에 속한 로컬라이제이션 키 목록을 조회합니다. */
-		get: operations['GetKeysBySection'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 리소스 목록 조회 */
-		get: operations['GetResources'];
-		put?: never;
-		/** 리소스 생성 */
-		post: operations['CreateResource'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 리소스 상세 조회 */
-		get: operations['GetResource'];
-		/** 리소스 수정 */
-		put: operations['UpdateResource'];
-		post?: never;
-		/** 리소스 삭제 */
-		delete: operations['DeleteResource'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/{id}/keys': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 리소스와 연결된 키 목록 조회 */
-		get: operations['GetKeysByResource'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/hash/{hashValue}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 해시값으로 리소스 조회 */
-		get: operations['GetResourceByHash'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/name/{styleName}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 스타일 이름으로 리소스 조회 */
-		get: operations['GetResourceByName'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/hash/{hashValue}/exists': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 해시값으로 리소스 존재 여부 확인 */
-		get: operations['ResourceExistsByHash'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/mapping': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 스타일-번역 키 매핑 생성 */
-		post: operations['CreateResourceKeyMapping'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/mapping/{keyId}/{resourceId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/** 스타일-번역 키 매핑 삭제 */
-		delete: operations['DeleteResourceKeyMapping'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/duplicates': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 중복된 해시값을 가진 스타일 리소스 목록 조회 */
-		get: operations['GetDuplicateResources'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/usage-stats': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 스타일 사용 통계 조회 */
-		get: operations['GetResourceUsageStats'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/connect-to-key': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 로컬라이제이션 키에 리소스 연결 (기존 매핑 제거 후 새 매핑 생성) */
-		post: operations['ConnectResourceToKey'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/resources/by-key/{keyId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 로컬라이제이션 키 ID로 연결된 리소스 조회 */
-		get: operations['GetResourcesByKeyId'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/all': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 전체 키 리스트 조회 */
-		get: operations['GetKeys'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 도메인 내 키 리스트 조회 */
-		get: operations['GetKeysByDomain'];
-		put?: never;
-		/** 키 생성 */
-		post: operations['CreateKey'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/section/{sectionId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 도메인 내 섹션 내 키 리스트 조회 */
-		get: operations['GetKeysByDomainAndSection'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/name/{name}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 이름으로 검색 */
-		get: operations['GetKeyByNameSearch'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/id/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** ID로 키 조회 */
-		get: operations['GetKeyById'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		/** 키 수정 */
-		put: operations['UpdateKey'];
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/domain-matrix-flat': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** CSV 형식과 유사한 도메인 번역 매트릭스 조회 */
-		get: operations['GetDomainTranslationMatrixFlat'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/{id}/translations': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 키 번역 목록 조회 */
-		get: operations['GetTranslationsByKey'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/{id}/translation-matrix': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 키 ID를 기반으로 모든 언어별 번역 매트릭스 조회 */
-		get: operations['GetTranslationMatrixByKey'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/parent/{parentId}/children': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 부모 키에 속한 하위 키 목록 조회 */
-		get: operations['GetChildKeysByParentId'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/with-children': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 자식 키를 가진 변수 키 목록 조회 */
-		get: operations['GetKeysWithChildren'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/keys/names-by-ids': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** ID 배열로 키 이름 목록 조회 */
-		post: operations['GetKeyNamesByIds'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/actions': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 키 ID와 액션으로 리스트 조회 */
-		get: operations['GetKeyActionsByKeyIdAndAction'];
-		put?: never;
-		/** 단일 키 액션 추가 또는 편집 */
-		post: operations['CreateOrUpdateKeyAction'];
-		/** 특정 키 액션 삭제 */
-		delete: operations['DeleteKeyAction'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/actions/bulk': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 다중 키 액션 추가 또는 편집 */
-		post: operations['CreateOrUpdateKeyActionsBulk'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/actions/key/{keyId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 키 ID로 모든 액션 조회 */
-		get: operations['GetKeyActionsByKeyId'];
-		put?: never;
-		post?: never;
-		/** 키 ID 기준으로 모든 액션 삭제 */
-		delete: operations['DeleteKeyActionsByKeyId'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/actions/detail': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 단일 대상 조회 */
-		get: operations['GetKeyActionDetail'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetTranslations'];
-		/** @description 있으면 수정하고 없으면 추가함 */
-		put: operations['UpdateTranslation'];
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations/id/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetTranslationById'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations/search': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** @description 키 ID와 언어 코드로 번역 검색</br>
-		 *     하나만 벋음 */
-		get: operations['SearchTranslation'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/**
-		 * @deprecated
-		 * @description 번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~
-		 */
-		delete: operations['DeleteTranslation'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations/key/{keyId}/translations': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		/** 단일 키에 대한 여러 언어 번역 동시 업데이트 */
-		put: operations['UpdateKeyTranslations'];
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/localization/translations/domain/bulk-update': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 도메인 전체 번역 일괄 업데이트 (최적화 버전) */
-		post: operations['BulkUpdateTranslations'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/figma/locations': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetLocations'];
-		put?: never;
-		/** @description 피그마 위치를 식별하는 키 생성</br>
-		 *     완전히 겹치면 추가할 필요 없으니 있는 값 반환함 */
-		post: operations['CreateLocation'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/figma/locations/{nodeId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * @deprecated
-		 * @description 쓸 일 없어서 설계 안함
-		 */
-		get: operations['GetLocation'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/figma/locations/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		/** @deprecated */
-		put: operations['UpdateLocation'];
-		post?: never;
-		delete: operations['DeleteLocation'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/figma/locations/mapping': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** @description 로컬라이제이션 키와 피그마 위치를 매핑함 */
-		post: operations['CreateMapping'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/figma/locations/mapping/{keyId}/{locationId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		delete: operations['DeleteMapping'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/domains': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetDomains'];
-		put?: never;
-		post: operations['CreateDomain'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/domains/{name}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetDomain'];
-		put: operations['UpdateDomain'];
-		post?: never;
-		delete: operations['DeleteDomain'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/domains/{name}/sections': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get: operations['GetSectionsByDomain'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/domains/{name}/languages': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** @description 도메인의 언어 코드 목록을 조회합니다. */
-		get: operations['GetDomainLanguages'];
-		/** @description 도메인에 새로운 언어를 추가합니다. */
-		put: operations['UpdateDomainLanguages'];
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/domains/{name}/languages/{languageCode}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/** @description 도메인에서 특정 언어를 제거합니다. */
-		delete: operations['RemoveDomainLanguage'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/register': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 사용자 등록 */
-		post: operations['Register'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/validate': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 사용자 인증 검증 */
-		post: operations['Validate'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/refresh-key': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post: operations['RefreshKey'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/username/{username}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용자 정보 조회 */
-		get: operations['GetUser'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/username': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		/** 사용자 이름 변경 */
-		put: operations['UpdateUsername'];
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/key/{userId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 서버 간 통신용 사용자 인증키 조회 */
-		get: operations['GetUserKey'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/auth/users': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용자 목록 조회 */
-		get: operations['GetUsers'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 감사 로그 목록 조회 (필터링 가능) */
-		get: operations['GetAuditLogs'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/table/{tableName}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 테이블의 감사 로그 조회 */
-		get: operations['GetAuditLogsByTable'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/record/{tableName}/{recordId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 레코드의 감사 로그 조회 */
-		get: operations['GetAuditLogsByRecord'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/user/{userId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 사용자의 감사 로그 조회 */
-		get: operations['GetAuditLogsByUser'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/key-name-changes': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 로컬라이제이션 키 이름 변경 내역 조회 */
-		get: operations['GetKeyNameChanges'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/period': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 기간 내 감사 로그 조회 */
-		get: operations['GetAuditLogsByPeriod'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-creations': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 번역 생성 이력 조회 */
-		get: operations['GetTranslationCreations'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-changes': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 번역 변경 이력 조회 */
-		get: operations['GetTranslationChanges'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-creations/key/{keyId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 키의 번역 생성 이력 조회 */
-		get: operations['GetTranslationCreationsByKey'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-changes/key/{keyId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 키의 번역 변경 이력 조회 */
-		get: operations['GetTranslationChangesByKey'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-changes/localization/{localizationId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 번역 항목의 변경 이력 조회 */
-		get: operations['GetTranslationChangesByLocalization'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/audit-logs/translation-history': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/**
-		 * 번역 변경 및 생성 이력 조회 (레거시 - 새 엔드포인트 사용 권장)
-		 * @deprecated
-		 */
-		get: operations['GetTranslationHistory'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/users/{userId}/roles': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용자에게 할당된 모든 역할 조회 */
-		get: operations['GetUserRoles'];
-		/** 사용자의 역할 일괄 설정 (기존 역할 대체) */
-		put: operations['SetUserRoles'];
-		/** 사용자에게 역할 추가 */
-		post: operations['AddRoleToUser'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/users/{userId}/roles/{roleId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/** 사용자에게서 특정 역할 제거 */
-		delete: operations['RemoveRoleFromUser'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/users/{userId}/permissions': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용자가 보유한 모든 유효 권한 조회 */
-		get: operations['GetUserPermissions'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/roles': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 모든 역할 목록 조회 */
-		get: operations['GetRoles'];
-		put?: never;
-		/** 새로운 역할 생성 */
-		post: operations['CreateRole'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/roles/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 역할 세부 정보 조회 */
-		get: operations['GetRole'];
-		/** 역할 정보 수정 */
-		put: operations['UpdateRole'];
-		post?: never;
-		/** 역할 삭제 (논리적 삭제) */
-		delete: operations['DeleteRole'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/roles/{id}/permissions': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 역할에 할당된 모든 권한 조회 */
-		get: operations['GetRolePermissions'];
-		/** 역할의 전체 권한 일괄 설정 (기존 권한 대체) */
-		put: operations['SetRolePermissions'];
-		/** 역할에 권한 추가 */
-		post: operations['AddPermissionToRole'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/roles/{roleId}/permissions/{permissionId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/** 역할에서 특정 권한 제거 */
-		delete: operations['RemovePermissionFromRole'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/roles/{id}/users': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 역할이 할당된 모든 사용자 목록 조회 */
-		get: operations['GetUsersByRole'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/permissions': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 모든 권한 목록 조회 */
-		get: operations['GetPermissions'];
-		put?: never;
-		/** 새로운 권한 생성 */
-		post: operations['CreatePermission'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/permissions/{id}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 권한 세부 정보 조회 */
-		get: operations['GetPermission'];
-		/** 권한 정보 수정 */
-		put: operations['UpdatePermission'];
-		post?: never;
-		/** 권한 삭제 (논리적 삭제) */
-		delete: operations['DeletePermission'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/permissions/{id}/roles': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 권한이 할당된 모든 역할 조회 */
-		get: operations['GetRolesByPermission'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/permissions/types/resources': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용 가능한 리소스 타입 목록 조회 */
-		get: operations['GetResourceTypes'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/permissions/types/actions': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 사용 가능한 액션 타입 목록 조회 */
-		get: operations['GetActionTypes'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/domains/{domainId}/roles': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 도메인에 접근 가능한 모든 역할 조회 */
-		get: operations['GetDomainRoles'];
-		/** 도메인의 역할 접근 권한 일괄 설정 */
-		put: operations['SetDomainRoles'];
-		/** 도메인에 역할 접근 권한 추가 */
-		post: operations['AddRoleToDomain'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/domains/{domainId}/roles/{roleId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		post?: never;
-		/** 도메인에서 특정 역할의 접근 권한 제거 */
-		delete: operations['RemoveRoleFromDomain'];
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/domains/{domainId}/users': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 도메인에 접근 가능한 모든 사용자 목록 조회 */
-		get: operations['GetUsersByDomain'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/check': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		get?: never;
-		put?: never;
-		/** 권한 검증 */
-		post: operations['CheckPermission'];
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/audit-logs': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 권한 변경 감사 로그 조회 */
-		get: operations['GetRbacAuditLogs'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
-	'/rbac/audit-logs/users/{userId}': {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		/** 특정 사용자의 권한 변경 이력 */
-		get: operations['GetUserAuditLogs'];
-		put?: never;
-		post?: never;
-		delete?: never;
-		options?: never;
-		head?: never;
-		patch?: never;
-		trace?: never;
-	};
+  '/system/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 데이터베이스 및 서버 상태 조회 */
+    get: operations['GetSystemStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/sqlite-stats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** SQLite 성능 및 상태 모니터링 (sqlite3_status, sqlite3_db_status 등에 상응) */
+    get: operations['GetSQLiteStats']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/system/health': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 간단한 헬스 체크 엔드포인트 */
+    get: operations['HealthCheck']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/sections': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetSections']
+    put?: never
+    post: operations['CreateSection']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/sections/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description 검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>
+     *     도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>
+     *     section 이름은 수정 불가 */
+    get: operations['GetSection']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/sections/id/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description 검색으로 동작해야한다고 생각하고 도메인 이름은 수정될 수도 있다고 생각함 그래서 아이디를 사용함</br>
+     *     도메인 이름을 키로 쓰지 않으니까 유지하기로 함</br>
+     *     section 이름은 수정 불가 */
+    get: operations['GetSectionById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/sections/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** @description 문서 정보 변경 */
+    put: operations['UpdateSection']
+    post?: never
+    delete: operations['DeleteSection']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/sections/{id}/keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description 섹션에 속한 로컬라이제이션 키 목록을 조회합니다. */
+    get: operations['GetKeysBySection']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 리소스 목록 조회 */
+    get: operations['GetResources']
+    put?: never
+    /** 리소스 생성 */
+    post: operations['CreateResource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 리소스 상세 조회 */
+    get: operations['GetResource']
+    /** 리소스 수정 */
+    put: operations['UpdateResource']
+    post?: never
+    /** 리소스 삭제 */
+    delete: operations['DeleteResource']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/{id}/keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 리소스와 연결된 키 목록 조회 */
+    get: operations['GetKeysByResource']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/hash/{hashValue}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 해시값으로 리소스 조회 */
+    get: operations['GetResourceByHash']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/name/{styleName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 스타일 이름으로 리소스 조회 */
+    get: operations['GetResourceByName']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/hash/{hashValue}/exists': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 해시값으로 리소스 존재 여부 확인 */
+    get: operations['ResourceExistsByHash']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/mapping': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 스타일-번역 키 매핑 생성 */
+    post: operations['CreateResourceKeyMapping']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/mapping/{keyId}/{resourceId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** 스타일-번역 키 매핑 삭제 */
+    delete: operations['DeleteResourceKeyMapping']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/duplicates': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 중복된 해시값을 가진 스타일 리소스 목록 조회 */
+    get: operations['GetDuplicateResources']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/usage-stats': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 스타일 사용 통계 조회 */
+    get: operations['GetResourceUsageStats']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/connect-to-key': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 로컬라이제이션 키에 리소스 연결 (기존 매핑 제거 후 새 매핑 생성) */
+    post: operations['ConnectResourceToKey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/resources/by-key/{keyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 로컬라이제이션 키 ID로 연결된 리소스 조회 */
+    get: operations['GetResourcesByKeyId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 전체 키 리스트 조회 */
+    get: operations['GetKeys']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 도메인 내 키 리스트 조회 */
+    get: operations['GetKeysByDomain']
+    put?: never
+    /** 키 생성 */
+    post: operations['CreateKey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/section/{sectionId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 도메인 내 섹션 내 키 리스트 조회 */
+    get: operations['GetKeysByDomainAndSection']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/name/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 이름으로 검색 */
+    get: operations['GetKeyByNameSearch']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/id/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** ID로 키 조회 */
+    get: operations['GetKeyById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** 키 수정 */
+    put: operations['UpdateKey']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/domain-matrix-flat': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** CSV 형식과 유사한 도메인 번역 매트릭스 조회 */
+    get: operations['GetDomainTranslationMatrixFlat']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/{id}/translations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 키 번역 목록 조회 */
+    get: operations['GetTranslationsByKey']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/{id}/translation-matrix': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 키 ID를 기반으로 모든 언어별 번역 매트릭스 조회 */
+    get: operations['GetTranslationMatrixByKey']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/parent/{parentId}/children': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 부모 키에 속한 하위 키 목록 조회 */
+    get: operations['GetChildKeysByParentId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/with-children': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 자식 키를 가진 변수 키 목록 조회 */
+    get: operations['GetKeysWithChildren']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/keys/names-by-ids': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** ID 배열로 키 이름 목록 조회 */
+    post: operations['GetKeyNamesByIds']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/actions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 키 ID와 액션으로 리스트 조회 */
+    get: operations['GetKeyActionsByKeyIdAndAction']
+    put?: never
+    /** 단일 키 액션 추가 또는 편집 */
+    post: operations['CreateOrUpdateKeyAction']
+    /** 특정 키 액션 삭제 */
+    delete: operations['DeleteKeyAction']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/actions/bulk': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 다중 키 액션 추가 또는 편집 */
+    post: operations['CreateOrUpdateKeyActionsBulk']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/actions/key/{keyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 키 ID로 모든 액션 조회 */
+    get: operations['GetKeyActionsByKeyId']
+    put?: never
+    post?: never
+    /** 키 ID 기준으로 모든 액션 삭제 */
+    delete: operations['DeleteKeyActionsByKeyId']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/actions/detail': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 단일 대상 조회 */
+    get: operations['GetKeyActionDetail']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetTranslations']
+    /** @description 있으면 수정하고 없으면 추가함 */
+    put: operations['UpdateTranslation']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations/id/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetTranslationById']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description 키 ID와 언어 코드로 번역 검색</br>
+     *     하나만 벋음 */
+    get: operations['SearchTranslation']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * @deprecated
+     * @description 번역 삭제 인데..? 굳이 삭제 안하고 공백처리만 해도 무방하다~
+     */
+    delete: operations['DeleteTranslation']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations/key/{keyId}/translations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** 단일 키에 대한 여러 언어 번역 동시 업데이트 */
+    put: operations['UpdateKeyTranslations']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/localization/translations/domain/bulk-update': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 도메인 전체 번역 일괄 업데이트 (최적화 버전) */
+    post: operations['BulkUpdateTranslations']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/figma/locations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetLocations']
+    put?: never
+    /** @description 피그마 위치를 식별하는 키 생성</br>
+     *     완전히 겹치면 추가할 필요 없으니 있는 값 반환함 */
+    post: operations['CreateLocation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/figma/locations/{nodeId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * @deprecated
+     * @description 쓸 일 없어서 설계 안함
+     */
+    get: operations['GetLocation']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/figma/locations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** @deprecated */
+    put: operations['UpdateLocation']
+    post?: never
+    delete: operations['DeleteLocation']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/figma/locations/mapping': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** @description 로컬라이제이션 키와 피그마 위치를 매핑함 */
+    post: operations['CreateMapping']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/figma/locations/mapping/{keyId}/{locationId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete: operations['DeleteMapping']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/domains': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetDomains']
+    put?: never
+    post: operations['CreateDomain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/domains/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetDomain']
+    put: operations['UpdateDomain']
+    post?: never
+    delete: operations['DeleteDomain']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/domains/{name}/sections': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get: operations['GetSectionsByDomain']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/domains/{name}/languages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** @description 도메인의 언어 코드 목록을 조회합니다. */
+    get: operations['GetDomainLanguages']
+    /** @description 도메인에 새로운 언어를 추가합니다. */
+    put: operations['UpdateDomainLanguages']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/domains/{name}/languages/{languageCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** @description 도메인에서 특정 언어를 제거합니다. */
+    delete: operations['RemoveDomainLanguage']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/register': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 사용자 등록 */
+    post: operations['Register']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 사용자 인증 검증 */
+    post: operations['Validate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/refresh-key': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post: operations['RefreshKey']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/username/{username}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용자 정보 조회 */
+    get: operations['GetUser']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/username': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** 사용자 이름 변경 */
+    put: operations['UpdateUsername']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/key/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 서버 간 통신용 사용자 인증키 조회 */
+    get: operations['GetUserKey']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/auth/users': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용자 목록 조회 */
+    get: operations['GetUsers']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 감사 로그 목록 조회 (필터링 가능) */
+    get: operations['GetAuditLogs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/table/{tableName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 테이블의 감사 로그 조회 */
+    get: operations['GetAuditLogsByTable']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/record/{tableName}/{recordId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 레코드의 감사 로그 조회 */
+    get: operations['GetAuditLogsByRecord']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/user/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 사용자의 감사 로그 조회 */
+    get: operations['GetAuditLogsByUser']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/key-name-changes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 로컬라이제이션 키 이름 변경 내역 조회 */
+    get: operations['GetKeyNameChanges']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/period': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 기간 내 감사 로그 조회 */
+    get: operations['GetAuditLogsByPeriod']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-creations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 번역 생성 이력 조회 */
+    get: operations['GetTranslationCreations']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-changes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 번역 변경 이력 조회 */
+    get: operations['GetTranslationChanges']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-creations/key/{keyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 키의 번역 생성 이력 조회 */
+    get: operations['GetTranslationCreationsByKey']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-changes/key/{keyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 키의 번역 변경 이력 조회 */
+    get: operations['GetTranslationChangesByKey']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-changes/localization/{localizationId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 번역 항목의 변경 이력 조회 */
+    get: operations['GetTranslationChangesByLocalization']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/audit-logs/translation-history': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * 번역 변경 및 생성 이력 조회 (레거시 - 새 엔드포인트 사용 권장)
+     * @deprecated
+     */
+    get: operations['GetTranslationHistory']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/users/{userId}/roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용자에게 할당된 모든 역할 조회 */
+    get: operations['GetUserRoles']
+    /** 사용자의 역할 일괄 설정 (기존 역할 대체) */
+    put: operations['SetUserRoles']
+    /** 사용자에게 역할 추가 */
+    post: operations['AddRoleToUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/users/{userId}/roles/{roleId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** 사용자에게서 특정 역할 제거 */
+    delete: operations['RemoveRoleFromUser']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/users/{userId}/permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용자가 보유한 모든 유효 권한 조회 */
+    get: operations['GetUserPermissions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 모든 역할 목록 조회 */
+    get: operations['GetRoles']
+    put?: never
+    /** 새로운 역할 생성 */
+    post: operations['CreateRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/roles/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 역할 세부 정보 조회 */
+    get: operations['GetRole']
+    /** 역할 정보 수정 */
+    put: operations['UpdateRole']
+    post?: never
+    /** 역할 삭제 (논리적 삭제) */
+    delete: operations['DeleteRole']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/roles/{id}/permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 역할에 할당된 모든 권한 조회 */
+    get: operations['GetRolePermissions']
+    /** 역할의 전체 권한 일괄 설정 (기존 권한 대체) */
+    put: operations['SetRolePermissions']
+    /** 역할에 권한 추가 */
+    post: operations['AddPermissionToRole']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/roles/{roleId}/permissions/{permissionId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** 역할에서 특정 권한 제거 */
+    delete: operations['RemovePermissionFromRole']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/roles/{id}/users': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 역할이 할당된 모든 사용자 목록 조회 */
+    get: operations['GetUsersByRole']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/permissions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 모든 권한 목록 조회 */
+    get: operations['GetPermissions']
+    put?: never
+    /** 새로운 권한 생성 */
+    post: operations['CreatePermission']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/permissions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 권한 세부 정보 조회 */
+    get: operations['GetPermission']
+    /** 권한 정보 수정 */
+    put: operations['UpdatePermission']
+    post?: never
+    /** 권한 삭제 (논리적 삭제) */
+    delete: operations['DeletePermission']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/permissions/{id}/roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 권한이 할당된 모든 역할 조회 */
+    get: operations['GetRolesByPermission']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/permissions/types/resources': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용 가능한 리소스 타입 목록 조회 */
+    get: operations['GetResourceTypes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/permissions/types/actions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 사용 가능한 액션 타입 목록 조회 */
+    get: operations['GetActionTypes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/domains/{domainId}/roles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 도메인에 접근 가능한 모든 역할 조회 */
+    get: operations['GetDomainRoles']
+    /** 도메인의 역할 접근 권한 일괄 설정 */
+    put: operations['SetDomainRoles']
+    /** 도메인에 역할 접근 권한 추가 */
+    post: operations['AddRoleToDomain']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/domains/{domainId}/roles/{roleId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** 도메인에서 특정 역할의 접근 권한 제거 */
+    delete: operations['RemoveRoleFromDomain']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/domains/{domainId}/users': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 도메인에 접근 가능한 모든 사용자 목록 조회 */
+    get: operations['GetUsersByDomain']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/check': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** 권한 검증 */
+    post: operations['CheckPermission']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/audit-logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 권한 변경 감사 로그 조회 */
+    get: operations['GetRbacAuditLogs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/rbac/audit-logs/users/{userId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** 특정 사용자의 권한 변경 이력 */
+    get: operations['GetUserAuditLogs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
-export type webhooks = Record<string, never>;
+export type webhooks = Record<string, never>
 export interface components {
-	schemas: {
-		Section: {
-			/** Format: double */
-			section_id: number;
-			/** Format: double */
-			domain_id: number;
-			section_name: string;
-			doc_link?: string;
-			created_at: string;
-			updated_at: string;
-		};
-		CreateSectionDTO: {
-			name: string;
-			domainId: string;
-			link: string;
-		};
-		UpdateSectionDTO: {
-			link?: string;
-		};
-		LocalizationKey: {
-			/** Format: double */
-			key_id: number;
-			/** Format: double */
-			domain_id: number;
-			name: string;
-			alias: string | null;
-			/** Format: double */
-			parent_key_id: number | null;
-			is_variable: boolean;
-			is_temporary: boolean;
-			/** Format: double */
-			section_id: number | null;
-			/** Format: double */
-			version: number;
-			is_deleted: boolean;
-			created_at: string;
-			updated_at: string;
-			domain_name: string;
-			section_name: string | null;
-			/** Format: double */
-			translation_count: number;
-			translated_languages: string[];
-		};
-		/** @description From T, pick a set of properties whose keys are in the union K */
-		'Pick_Resource.Exclude_keyofResource.style_value__': {
-			/** Format: double */
-			resource_id: number;
-			style_name: string;
-			style_type: string;
-			hash_value: string;
-			alias: string;
-			/** Format: double */
-			is_deleted: number;
-			created_at: string;
-			updated_at: string;
-		};
-		ResourceResponse: {
-			/** Format: double */
-			resource_id: number;
-			style_name: string;
-			style_type: string;
-			hash_value: string;
-			alias: string;
-			/** Format: double */
-			is_deleted: number;
-			created_at: string;
-			updated_at: string;
-			style_value: unknown;
-		};
-		CreateResourceDTO: {
-			styleValue: unknown;
-			hashValue: string;
-			styleType: string;
-		};
-		UpdateResourceDTO: {
-			styleName?: string;
-			styleValue?: unknown;
-			styleType?: string;
-			alias?: string;
-			isDeleted?: boolean;
-		};
-		LocalizationKeyDetail: {
-			/** Format: double */
-			key_id: number;
-			name: string;
-			/** Format: double */
-			domain_id: number;
-			domain_name: string;
-			/** Format: double */
-			section_id: number | null;
-			section_name: string | null;
-			/** @description 저장된 origin 번역 값 */
-			origin_value: string | null;
-			/**
-			 * Format: double
-			 * @description 변수 정의나 스타일 키를 정의하게 되면 부모 키가 생성되는데, 이 때 부모 키의 ID가 저장됩니다.
-			 */
-			parent_key_id: number | null;
-			/** @description 키가 변수 키라면 true 로 설정
-			 *     변수 키는 로컬라이제이션 텍스트가 없어도 됨 */
-			is_variable: boolean;
-			/** @description 임시 키인지 여부 */
-			is_temporary: boolean;
-			/**
-			 * Format: double
-			 * @description 키의 버전
-			 */
-			version: number;
-			/** @description 삭제된 키인지 여부 */
-			is_deleted: boolean;
-			/** @description 별칭 */
-			alias: string | null;
-			created_at: string;
-			updated_at: string;
-		};
-		CreateLocalizationKeyDTO: {
-			/**
-			 * Format: double
-			 * @description 도메인 ID
-			 */
-			domainId: number;
-			/** @description 키 이름 */
-			name: string;
-			/** @description 키 별칭 (optional) */
-			alias?: string;
-			/**
-			 * Format: double
-			 * @description 부모 키 ID (optional)
-			 */
-			parentKeyId?: number;
-			/** @description 변수 포함 여부 (optional) */
-			isVariable?: boolean;
-			/** @description 임시 키 여부 (optional) */
-			isTemporary?: boolean;
-			/**
-			 * Format: double
-			 * @description 섹션 ID (optional)
-			 */
-			sectionId?: number;
-		};
-		UpdateLocalizationKeyDTO: {
-			name?: string;
-			domainId?: string;
-			alias?: string;
-			parentKeyId?: string;
-			isVariable?: boolean;
-			isTemporary?: boolean;
-			sectionId?: string;
-			/** Format: double */
-			version?: number;
-			isDeleted?: boolean;
-		};
-		LocalizationKeyActionDTO: {
-			/** Format: double */
-			keyId: number;
-			action: string;
-			fromEnum: string;
-			/** Format: double */
-			styleResourceId: number;
-			/** Format: double */
-			effectResourceId: number;
-		};
-		/**
-		 * @description action : select 는 동의어
-		 * @enum {string}
-		 */
-		ActionType: 'default' | 'hover' | 'active' | 'disabled' | 'loading' | 'error' | 'visited' | 'readonly';
-		LocalizationKeyActionBulkDTO: {
-			key_id: string;
-			action: components['schemas']['ActionType'];
-			mappings: {
-				[key: string]: string;
-			};
-		};
-		Localization: {
-			/** Format: double */
-			localization_id: number;
-			/** Format: double */
-			key_id: number;
-			language_code: string;
-			text: string;
-			/** Format: double */
-			version: number;
-			is_deleted: number | boolean;
-			/** Format: double */
-			last_modified_by: number | null;
-			created_at: string;
-			updated_at: string;
-		};
-		CreateTranslationDTO: {
-			keyId: string;
-			language: string;
-			translation: string;
-			userId?: string;
-		};
-		FigmaLocation: {
-			/** Format: double */
-			location_id: number;
-			/** @description 피그마 프로젝트 ID */
-			project_id: string;
-			/** @description 피그마 페이지 ID */
-			page_id: string;
-			/** @description 피그마 노드 ID */
-			node_id: string;
-			is_pinned: boolean;
-			created_at: string;
-			updated_at: string;
-		};
-		CreateFigmaLocationDTO: {
-			projectId: string;
-			pageId: string;
-			nodeId: string;
-			isPinned?: boolean;
-		};
-		UpdateFigmaLocationDTO: {
-			projectId?: string;
-			pageId?: string;
-			nodeId?: string;
-			isPinned?: boolean;
-		};
-		Domain: {
-			/** Format: double */
-			domain_id: number;
-			domain_name: string;
-			language_codes: string[];
-			created_at: string;
-			updated_at: string;
-		};
-		CreateDomainDTO: {
-			domain: string;
-		};
-		UpdateDomainDTO: {
-			domain?: string;
-		};
-		UpdateDomainLanguagesDTO: {
-			/**
-			 * @description 추가할 언어 코드 배열
-			 * @example [
-			 *       "en",
-			 *       "ja"
-			 *     ]
-			 */
-			languageCodes: string[];
-		};
-		UserResponse: {
-			/** Format: double */
-			user_id: number;
-			username: string;
-		};
-		RegisterDTO: {
-			username: string;
-		};
-		ValidateDTO: {
-			username: string;
-		};
-		UpdateUsernameDTO: {
-			currentUsername: string;
-			newUsername: string;
-		};
-		AuditLog: {
-			/** Format: double */
-			log_id: number;
-			table_name: string;
-			/** Format: double */
-			record_id: number;
-			action: string;
-			old_values: unknown;
-			new_values: unknown;
-			/** Format: double */
-			user_id: number | null;
-			user_name?: string | null;
-			created_at: string;
-		};
-		AddRoleToUserDTO: {
-			roleId: string;
-		};
-		UserRoleDTO: {
-			userId: string;
-			roleIds: string[];
-		};
-		CreateRoleDTO: {
-			roleName: string;
-			description?: string;
-		};
-		UpdateRoleDTO: {
-			roleName?: string;
-			description?: string;
-			isDeleted?: boolean;
-		};
-		AddPermissionToRoleDTO: {
-			permissionId: string;
-		};
-		RolePermissionDTO: {
-			roleId: string;
-			permissionIds: string[];
-		};
-		CreatePermissionDTO: {
-			permissionName: string;
-			resourceType: string;
-			actionType: string;
-			description?: string;
-		};
-		UpdatePermissionDTO: {
-			permissionName?: string;
-			resourceType?: string;
-			actionType?: string;
-			description?: string;
-			isDeleted?: boolean;
-		};
-		AddRoleToDomainDTO: {
-			roleId: string;
-		};
-		DomainRoleDTO: {
-			domainId: string;
-			roleIds: string[];
-		};
-		PermissionCheckDTO: {
-			/** Format: double */
-			userId: number;
-			resourceType: string;
-			/** Format: double */
-			resourceId?: number;
-			actionType: string;
-		};
-	};
-	responses: never;
-	parameters: never;
-	requestBodies: never;
-	headers: never;
-	pathItems: never;
+  schemas: {
+    Section: {
+      /** Format: double */
+      section_id: number
+      /** Format: double */
+      domain_id: number
+      section_name: string
+      doc_link?: string
+      created_at: string
+      updated_at: string
+    }
+    CreateSectionDTO: {
+      name: string
+      domainId: string
+      link: string
+    }
+    UpdateSectionDTO: {
+      link?: string
+    }
+    LocalizationKey: {
+      /** Format: double */
+      key_id: number
+      /** Format: double */
+      domain_id: number
+      name: string
+      alias: string | null
+      /** Format: double */
+      parent_key_id: number | null
+      is_variable: boolean
+      is_temporary: boolean
+      /** Format: double */
+      section_id: number | null
+      /** Format: double */
+      version: number
+      is_deleted: boolean
+      created_at: string
+      updated_at: string
+      domain_name: string
+      section_name: string | null
+      /** Format: double */
+      translation_count: number
+      translated_languages: string[]
+    }
+    /** @description From T, pick a set of properties whose keys are in the union K */
+    'Pick_Resource.Exclude_keyofResource.style_value__': {
+      /** Format: double */
+      resource_id: number
+      style_name: string
+      style_type: string
+      hash_value: string
+      alias: string
+      /** Format: double */
+      is_deleted: number
+      created_at: string
+      updated_at: string
+    }
+    ResourceResponse: {
+      /** Format: double */
+      resource_id: number
+      style_name: string
+      style_type: string
+      hash_value: string
+      alias: string
+      /** Format: double */
+      is_deleted: number
+      created_at: string
+      updated_at: string
+      style_value: unknown
+    }
+    CreateResourceDTO: {
+      styleValue: unknown
+      hashValue: string
+      styleType: string
+    }
+    UpdateResourceDTO: {
+      styleName?: string
+      styleValue?: unknown
+      styleType?: string
+      alias?: string
+      isDeleted?: boolean
+    }
+    LocalizationKeyDetail: {
+      /** Format: double */
+      key_id: number
+      name: string
+      /** Format: double */
+      domain_id: number
+      domain_name: string
+      /** Format: double */
+      section_id: number | null
+      section_name: string | null
+      /** @description 저장된 origin 번역 값 */
+      origin_value: string | null
+      /**
+       * Format: double
+       * @description 변수 정의나 스타일 키를 정의하게 되면 부모 키가 생성되는데, 이 때 부모 키의 ID가 저장됩니다.
+       */
+      parent_key_id: number | null
+      /** @description 키가 변수 키라면 true 로 설정
+       *     변수 키는 로컬라이제이션 텍스트가 없어도 됨 */
+      is_variable: boolean
+      /** @description 임시 키인지 여부 */
+      is_temporary: boolean
+      /**
+       * Format: double
+       * @description 키의 버전
+       */
+      version: number
+      /** @description 삭제된 키인지 여부 */
+      is_deleted: boolean
+      /** @description 별칭 */
+      alias: string | null
+      created_at: string
+      updated_at: string
+    }
+    CreateLocalizationKeyDTO: {
+      /**
+       * Format: double
+       * @description 도메인 ID
+       */
+      domainId: number
+      /** @description 키 이름 */
+      name: string
+      /** @description 키 별칭 (optional) */
+      alias?: string
+      /**
+       * Format: double
+       * @description 부모 키 ID (optional)
+       */
+      parentKeyId?: number
+      /** @description 변수 포함 여부 (optional) */
+      isVariable?: boolean
+      /** @description 임시 키 여부 (optional) */
+      isTemporary?: boolean
+      /**
+       * Format: double
+       * @description 섹션 ID (optional)
+       */
+      sectionId?: number
+    }
+    UpdateLocalizationKeyDTO: {
+      name?: string
+      domainId?: string
+      alias?: string
+      parentKeyId?: string
+      isVariable?: boolean
+      isTemporary?: boolean
+      sectionId?: string
+      /** Format: double */
+      version?: number
+      isDeleted?: boolean
+    }
+    LocalizationKeyActionDTO: {
+      /** Format: double */
+      keyId: number
+      action: string
+      fromEnum: string
+      /** Format: double */
+      styleResourceId: number
+      /** Format: double */
+      effectResourceId: number
+    }
+    /**
+     * @description action : select 는 동의어
+     * @enum {string}
+     */
+    ActionType: 'default' | 'hover' | 'active' | 'disabled' | 'loading' | 'error' | 'visited' | 'readonly'
+    LocalizationKeyActionBulkDTO: {
+      key_id: string
+      action: components['schemas']['ActionType']
+      mappings: {
+        [key: string]: string
+      }
+    }
+    Localization: {
+      /** Format: double */
+      localization_id: number
+      /** Format: double */
+      key_id: number
+      language_code: string
+      text: string
+      /** Format: double */
+      version: number
+      is_deleted: number | boolean
+      /** Format: double */
+      last_modified_by: number | null
+      created_at: string
+      updated_at: string
+    }
+    CreateTranslationDTO: {
+      keyId: string
+      language: string
+      translation: string
+      userId?: string
+    }
+    FigmaLocation: {
+      /** Format: double */
+      location_id: number
+      /** @description 피그마 프로젝트 ID */
+      project_id: string
+      /** @description 피그마 페이지 ID */
+      page_id: string
+      /** @description 피그마 노드 ID */
+      node_id: string
+      is_pinned: boolean
+      created_at: string
+      updated_at: string
+    }
+    CreateFigmaLocationDTO: {
+      projectId: string
+      pageId: string
+      nodeId: string
+      isPinned?: boolean
+    }
+    UpdateFigmaLocationDTO: {
+      projectId?: string
+      pageId?: string
+      nodeId?: string
+      isPinned?: boolean
+    }
+    Domain: {
+      /** Format: double */
+      domain_id: number
+      domain_name: string
+      language_codes: string[]
+      created_at: string
+      updated_at: string
+    }
+    CreateDomainDTO: {
+      domain: string
+    }
+    UpdateDomainDTO: {
+      domain?: string
+    }
+    UpdateDomainLanguagesDTO: {
+      /**
+       * @description 추가할 언어 코드 배열
+       * @example [
+       *       "en",
+       *       "ja"
+       *     ]
+       */
+      languageCodes: string[]
+    }
+    UserResponse: {
+      /** Format: double */
+      user_id: number
+      username: string
+    }
+    RegisterDTO: {
+      username: string
+    }
+    ValidateDTO: {
+      username: string
+    }
+    UpdateUsernameDTO: {
+      currentUsername: string
+      newUsername: string
+    }
+    AuditLog: {
+      /** Format: double */
+      log_id: number
+      table_name: string
+      /** Format: double */
+      record_id: number
+      action: string
+      old_values: unknown
+      new_values: unknown
+      /** Format: double */
+      user_id: number | null
+      user_name?: string | null
+      created_at: string
+    }
+    AddRoleToUserDTO: {
+      roleId: string
+    }
+    UserRoleDTO: {
+      userId: string
+      roleIds: string[]
+    }
+    CreateRoleDTO: {
+      roleName: string
+      description?: string
+    }
+    UpdateRoleDTO: {
+      roleName?: string
+      description?: string
+      isDeleted?: boolean
+    }
+    AddPermissionToRoleDTO: {
+      permissionId: string
+    }
+    RolePermissionDTO: {
+      roleId: string
+      permissionIds: string[]
+    }
+    CreatePermissionDTO: {
+      permissionName: string
+      resourceType: string
+      actionType: string
+      description?: string
+    }
+    UpdatePermissionDTO: {
+      permissionName?: string
+      resourceType?: string
+      actionType?: string
+      description?: string
+      isDeleted?: boolean
+    }
+    AddRoleToDomainDTO: {
+      roleId: string
+    }
+    DomainRoleDTO: {
+      domainId: string
+      roleIds: string[]
+    }
+    PermissionCheckDTO: {
+      /** Format: double */
+      userId: number
+      resourceType: string
+      /** Format: double */
+      resourceId?: number
+      actionType: string
+    }
+  }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
-export type $defs = Record<string, never>;
+export type $defs = Record<string, never>
 export interface operations {
-	GetSystemStatus: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetSQLiteStats: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	HealthCheck: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						timestamp: string;
-						status: string;
-					};
-				};
-			};
-		};
-	};
-	GetSections: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'][];
-				};
-			};
-		};
-	};
-	CreateSection: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateSectionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'];
-				};
-			};
-		};
-	};
-	GetSection: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'];
-				};
-			};
-		};
-	};
-	GetSectionById: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'];
-				};
-			};
-		};
-	};
-	UpdateSection: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateSectionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'];
-				};
-			};
-		};
-	};
-	DeleteSection: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	GetKeysBySection: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				/** @description - 섹션 ID (0인 경우 section_id가 NULL인 키들을 조회) */
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description 로컬라이제이션 키 목록 */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKey'][];
-				};
-			};
-		};
-	};
-	GetResources: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'][];
-				};
-			};
-		};
-	};
-	CreateResource: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateResourceDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'];
-				};
-			};
-		};
-	};
-	GetResource: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'];
-				};
-			};
-		};
-	};
-	UpdateResource: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateResourceDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'];
-				};
-			};
-		};
-	};
-	DeleteResource: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	GetKeysByResource: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetResourceByHash: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				hashValue: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'] | Record<string, never>;
-				};
-			};
-		};
-	};
-	GetResourceByName: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				styleName: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'][];
-				};
-			};
-		};
-	};
-	ResourceExistsByHash: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				hashValue: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CreateResourceKeyMapping: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					resourceId: string;
-					keyId: string;
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeleteResourceKeyMapping: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-				resourceId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetDuplicateResources: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetResourceUsageStats: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	ConnectResourceToKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					resourceInfo: {
-						resource?: {
-							alias?: string;
-							hashValue: string;
-							styleValue: string;
-							styleType?: string;
-							styleName: string;
-						};
-						resourceId?: string;
-					};
-					keyId: string;
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetResourcesByKeyId: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['ResourceResponse'][];
-				};
-			};
-		};
-	};
-	GetKeys: {
-		parameters: {
-			query?: {
-				/** @description 페이지 번호 (기본값: 1) */
-				page?: number;
-				/** @description 페이지당 항목 수 (기본값: 10) */
-				limit?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						/** Format: double */
-						total: number;
-						keys: unknown[];
-					};
-				};
-			};
-		};
-	};
-	GetKeysByDomain: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKeyDetail'];
-				};
-			};
-		};
-	};
-	CreateKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateLocalizationKeyDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetKeysByDomainAndSection: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path: {
-				sectionId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKeyDetail'];
-				};
-			};
-		};
-	};
-	GetKeyByNameSearch: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKeyDetail'];
-				};
-			};
-		};
-	};
-	GetKeyById: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKeyDetail'];
-				};
-			};
-		};
-	};
-	UpdateKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateLocalizationKeyDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetDomainTranslationMatrixFlat: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetTranslationsByKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetTranslationMatrixByKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetChildKeysByParentId: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				parentId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['LocalizationKeyDetail'];
-				};
-			};
-		};
-	};
-	GetKeysWithChildren: {
-		parameters: {
-			query?: never;
-			header?: {
-				'X-Domain-Id'?: string;
-			};
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetKeyNamesByIds: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					ids: string[];
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						[key: string]: string;
-					};
-				};
-			};
-		};
-	};
-	GetKeyActionsByKeyIdAndAction: {
-		parameters: {
-			query: {
-				key_id: string;
-				action: components['schemas']['ActionType'];
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CreateOrUpdateKeyAction: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['LocalizationKeyActionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeleteKeyAction: {
-		parameters: {
-			query: {
-				key_id: string;
-				action: components['schemas']['ActionType'];
-				from_enum: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CreateOrUpdateKeyActionsBulk: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['LocalizationKeyActionBulkDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetKeyActionsByKeyId: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeleteKeyActionsByKeyId: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetKeyActionDetail: {
-		parameters: {
-			query: {
-				key_id: string;
-				action: components['schemas']['ActionType'];
-				from_enum: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetTranslations: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Localization'][];
-				};
-			};
-		};
-	};
-	UpdateTranslation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateTranslationDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Localization'];
-				};
-			};
-		};
-	};
-	GetTranslationById: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Localization'];
-				};
-			};
-		};
-	};
-	SearchTranslation: {
-		parameters: {
-			query: {
-				keyId: string;
-				language: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Localization'] | null;
-				};
-			};
-		};
-	};
-	DeleteTranslation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	UpdateKeyTranslations: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					userId: string;
-					translations: {
-						[key: string]: string;
-					};
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	BulkUpdateTranslations: {
-		parameters: {
-			query?: never;
-			header: {
-				'X-Domain-Id': string;
-			};
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					userId: string;
-					rows: ({
-						name: string;
-						/** Format: double */
-						key_id: number;
-					} & {
-						[key: string]: (string | number) | null;
-					})[];
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetLocations: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['FigmaLocation'][];
-				};
-			};
-		};
-	};
-	CreateLocation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateFigmaLocationDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['FigmaLocation'];
-				};
-			};
-		};
-	};
-	GetLocation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				nodeId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['FigmaLocation'];
-				};
-			};
-		};
-	};
-	UpdateLocation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateFigmaLocationDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['FigmaLocation'];
-				};
-			};
-		};
-	};
-	DeleteLocation: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	CreateMapping: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': {
-					locationId: string;
-					keyId: string;
-				};
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeleteMapping: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				keyId: string;
-				locationId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	GetDomains: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Domain'][];
-				};
-			};
-		};
-	};
-	CreateDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateDomainDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Domain'];
-				};
-			};
-		};
-	};
-	GetDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Domain'];
-				};
-			};
-		};
-	};
-	UpdateDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateDomainDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Domain'];
-				};
-			};
-		};
-	};
-	DeleteDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	GetSectionsByDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['Section'][];
-				};
-			};
-		};
-	};
-	GetDomainLanguages: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': string[];
-				};
-			};
-		};
-	};
-	UpdateDomainLanguages: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateDomainLanguagesDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': string[];
-				};
-			};
-		};
-	};
-	RemoveDomainLanguage: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				name: string;
-				languageCode: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description No content */
-			204: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content?: never;
-			};
-		};
-	};
-	Register: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['RegisterDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['UserResponse'];
-				};
-			};
-		};
-	};
-	Validate: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['ValidateDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						isValid: boolean;
-					};
-				};
-			};
-		};
-	};
-	RefreshKey: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['ValidateDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						new_key?: string;
-						isSuccess: boolean;
-					};
-				};
-			};
-		};
-	};
-	GetUser: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				username: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['UserResponse'];
-				};
-			};
-		};
-	};
-	UpdateUsername: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateUsernameDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['UserResponse'];
-				};
-			};
-		};
-	};
-	GetUserKey: {
-		parameters: {
-			query?: never;
-			header: {
-				/** @description 서버 간 통신을 위한 시크릿 키 */
-				'X-Server-Secret': string;
-			};
-			path: {
-				/** @description 조회할 사용자 ID */
-				userId: number;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						auth_key: string;
-						username: string;
-					};
-				};
-			};
-		};
-	};
-	GetUsers: {
-		parameters: {
-			query?: {
-				/** @description 페이지 번호 (기본값: 1) */
-				page?: number;
-				/** @description 페이지당 항목 수 (기본값: 10) */
-				limit?: number;
-				/** @description 활성 사용자만 필터링 (선택 사항) */
-				isActive?: boolean;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						/** Format: double */
-						total: number;
-						users: components['schemas']['UserResponse'][];
-					};
-				};
-			};
-		};
-	};
-	GetAuditLogs: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				tableName?: string;
-				action?: string;
-				/** @description 시작 날짜 (형식: YYYY-MM-DD HH:MM:SS, 예: 2025-03-14 01:35:10) */
-				startDate?: string;
-				/** @description 종료 날짜 (형식: YYYY-MM-DD HH:MM:SS, 예: 2025-03-14 01:35:10) */
-				endDate?: string;
-				userId?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: components['schemas']['AuditLog'][];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetAuditLogsByTable: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-			};
-			header?: never;
-			path: {
-				tableName: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: components['schemas']['AuditLog'][];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetAuditLogsByRecord: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				tableName: string;
-				recordId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': components['schemas']['AuditLog'][];
-				};
-			};
-		};
-	};
-	GetAuditLogsByUser: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-			};
-			header?: never;
-			path: {
-				userId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: components['schemas']['AuditLog'][];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetKeyNameChanges: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: components['schemas']['AuditLog'][];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetAuditLogsByPeriod: {
-		parameters: {
-			query: {
-				startDate: string;
-				endDate: string;
-				limit?: number;
-				offset?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: components['schemas']['AuditLog'][];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationCreations: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				keyId?: string;
-				localizationId?: string;
-				languageCode?: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: unknown[];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationChanges: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				keyId?: string;
-				localizationId?: string;
-				languageCode?: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: unknown[];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationCreationsByKey: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				languageCode?: string;
-			};
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: unknown[];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationChangesByKey: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				languageCode?: string;
-			};
-			header?: never;
-			path: {
-				keyId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: unknown[];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationChangesByLocalization: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-			};
-			header?: never;
-			path: {
-				localizationId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						logs: unknown[];
-						/** Format: double */
-						total: number;
-					};
-				};
-			};
-		};
-	};
-	GetTranslationHistory: {
-		parameters: {
-			query?: {
-				limit?: number;
-				offset?: number;
-				keyId?: string;
-				localizationId?: string;
-				languageCode?: string;
-				includeCreation?: boolean;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': {
-						message: string;
-					};
-				};
-			};
-		};
-	};
-	GetUserRoles: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				userId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	SetUserRoles: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				userId: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UserRoleDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	AddRoleToUser: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				userId: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['AddRoleToUserDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	RemoveRoleFromUser: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				userId: string;
-				roleId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetUserPermissions: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				userId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetRoles: {
-		parameters: {
-			query?: {
-				name?: string;
-				page?: number;
-				limit?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CreateRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreateRoleDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	UpdateRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdateRoleDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeleteRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetRolePermissions: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	SetRolePermissions: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['RolePermissionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	AddPermissionToRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['AddPermissionToRoleDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	RemovePermissionFromRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				roleId: string;
-				permissionId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetUsersByRole: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetPermissions: {
-		parameters: {
-			query?: {
-				resourceType?: string;
-				actionType?: string;
-				name?: string;
-				page?: number;
-				limit?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CreatePermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['CreatePermissionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetPermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	UpdatePermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['UpdatePermissionDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	DeletePermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetRolesByPermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				id: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetResourceTypes: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetActionTypes: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetDomainRoles: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				domainId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	SetDomainRoles: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				domainId: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['DomainRoleDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	AddRoleToDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				domainId: string;
-			};
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['AddRoleToDomainDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	RemoveRoleFromDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				domainId: string;
-				roleId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetUsersByDomain: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path: {
-				domainId: string;
-			};
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	CheckPermission: {
-		parameters: {
-			query?: never;
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody: {
-			content: {
-				'application/json': components['schemas']['PermissionCheckDTO'];
-			};
-		};
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetRbacAuditLogs: {
-		parameters: {
-			query?: {
-				userId?: string;
-				roleId?: string;
-				permissionId?: string;
-				actionType?: string;
-				startDate?: string;
-				endDate?: string;
-				page?: number;
-				limit?: number;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
-	GetUserAuditLogs: {
-		parameters: {
-			query: {
-				userId: string;
-			};
-			header?: never;
-			path?: never;
-			cookie?: never;
-		};
-		requestBody?: never;
-		responses: {
-			/** @description Ok */
-			200: {
-				headers: {
-					[name: string]: unknown;
-				};
-				content: {
-					'application/json': unknown;
-				};
-			};
-		};
-	};
+  GetSystemStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetSQLiteStats: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  HealthCheck: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            timestamp: string
+            status: string
+          }
+        }
+      }
+    }
+  }
+  GetSections: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section'][]
+        }
+      }
+    }
+  }
+  CreateSection: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSectionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section']
+        }
+      }
+    }
+  }
+  GetSection: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section']
+        }
+      }
+    }
+  }
+  GetSectionById: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section']
+        }
+      }
+    }
+  }
+  UpdateSection: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSectionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section']
+        }
+      }
+    }
+  }
+  DeleteSection: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GetKeysBySection: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description - 섹션 ID (0인 경우 section_id가 NULL인 키들을 조회) */
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description 로컬라이제이션 키 목록 */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKey'][]
+        }
+      }
+    }
+  }
+  GetResources: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse'][]
+        }
+      }
+    }
+  }
+  CreateResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateResourceDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse']
+        }
+      }
+    }
+  }
+  GetResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse']
+        }
+      }
+    }
+  }
+  UpdateResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateResourceDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse']
+        }
+      }
+    }
+  }
+  DeleteResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GetKeysByResource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetResourceByHash: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        hashValue: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse'] | Record<string, never>
+        }
+      }
+    }
+  }
+  GetResourceByName: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        styleName: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse'][]
+        }
+      }
+    }
+  }
+  ResourceExistsByHash: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        hashValue: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CreateResourceKeyMapping: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          resourceId: string
+          keyId: string
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeleteResourceKeyMapping: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+        resourceId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetDuplicateResources: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetResourceUsageStats: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  ConnectResourceToKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          resourceInfo: {
+            resource?: {
+              alias?: string
+              hashValue: string
+              styleValue: string
+              styleType?: string
+              styleName: string
+            }
+            resourceId?: string
+          }
+          keyId: string
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetResourcesByKeyId: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ResourceResponse'][]
+        }
+      }
+    }
+  }
+  GetKeys: {
+    parameters: {
+      query?: {
+        /** @description 페이지 번호 (기본값: 1) */
+        page?: number
+        /** @description 페이지당 항목 수 (기본값: 10) */
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            /** Format: double */
+            total: number
+            keys: unknown[]
+          }
+        }
+      }
+    }
+  }
+  GetKeysByDomain: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKeyDetail']
+        }
+      }
+    }
+  }
+  CreateKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateLocalizationKeyDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetKeysByDomainAndSection: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path: {
+        sectionId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKeyDetail']
+        }
+      }
+    }
+  }
+  GetKeyByNameSearch: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKeyDetail']
+        }
+      }
+    }
+  }
+  GetKeyById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKeyDetail']
+        }
+      }
+    }
+  }
+  UpdateKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateLocalizationKeyDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetDomainTranslationMatrixFlat: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetTranslationsByKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetTranslationMatrixByKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetChildKeysByParentId: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        parentId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LocalizationKeyDetail']
+        }
+      }
+    }
+  }
+  GetKeysWithChildren: {
+    parameters: {
+      query?: never
+      header?: {
+        'X-Domain-Id'?: string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetKeyNamesByIds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          ids: string[]
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            [key: string]: string
+          }
+        }
+      }
+    }
+  }
+  GetKeyActionsByKeyIdAndAction: {
+    parameters: {
+      query: {
+        key_id: string
+        action: components['schemas']['ActionType']
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CreateOrUpdateKeyAction: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LocalizationKeyActionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeleteKeyAction: {
+    parameters: {
+      query: {
+        key_id: string
+        action: components['schemas']['ActionType']
+        from_enum: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CreateOrUpdateKeyActionsBulk: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LocalizationKeyActionBulkDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetKeyActionsByKeyId: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeleteKeyActionsByKeyId: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetKeyActionDetail: {
+    parameters: {
+      query: {
+        key_id: string
+        action: components['schemas']['ActionType']
+        from_enum: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetTranslations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Localization'][]
+        }
+      }
+    }
+  }
+  UpdateTranslation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTranslationDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Localization']
+        }
+      }
+    }
+  }
+  GetTranslationById: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Localization']
+        }
+      }
+    }
+  }
+  SearchTranslation: {
+    parameters: {
+      query: {
+        keyId: string
+        language: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Localization'] | null
+        }
+      }
+    }
+  }
+  DeleteTranslation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  UpdateKeyTranslations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          userId: string
+          translations: {
+            [key: string]: string
+          }
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  BulkUpdateTranslations: {
+    parameters: {
+      query?: never
+      header: {
+        'X-Domain-Id': string
+      }
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          userId: string
+          rows: ({
+            name: string
+            /** Format: double */
+            key_id: number
+          } & {
+            [key: string]: (string | number) | null
+          })[]
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetLocations: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FigmaLocation'][]
+        }
+      }
+    }
+  }
+  CreateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateFigmaLocationDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FigmaLocation']
+        }
+      }
+    }
+  }
+  GetLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        nodeId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FigmaLocation']
+        }
+      }
+    }
+  }
+  UpdateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateFigmaLocationDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['FigmaLocation']
+        }
+      }
+    }
+  }
+  DeleteLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  CreateMapping: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          locationId: string
+          keyId: string
+        }
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeleteMapping: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        keyId: string
+        locationId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GetDomains: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Domain'][]
+        }
+      }
+    }
+  }
+  CreateDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDomainDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Domain']
+        }
+      }
+    }
+  }
+  GetDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Domain']
+        }
+      }
+    }
+  }
+  UpdateDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDomainDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Domain']
+        }
+      }
+    }
+  }
+  DeleteDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GetSectionsByDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['Section'][]
+        }
+      }
+    }
+  }
+  GetDomainLanguages: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': string[]
+        }
+      }
+    }
+  }
+  UpdateDomainLanguages: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDomainLanguagesDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': string[]
+        }
+      }
+    }
+  }
+  RemoveDomainLanguage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        languageCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description No content */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  Register: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserResponse']
+        }
+      }
+    }
+  }
+  Validate: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            isValid: boolean
+          }
+        }
+      }
+    }
+  }
+  RefreshKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            new_key?: string
+            isSuccess: boolean
+          }
+        }
+      }
+    }
+  }
+  GetUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        username: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserResponse']
+        }
+      }
+    }
+  }
+  UpdateUsername: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUsernameDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserResponse']
+        }
+      }
+    }
+  }
+  GetUserKey: {
+    parameters: {
+      query?: never
+      header: {
+        /** @description 서버 간 통신을 위한 시크릿 키 */
+        'X-Server-Secret': string
+      }
+      path: {
+        /** @description 조회할 사용자 ID */
+        userId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            auth_key: string
+            username: string
+          }
+        }
+      }
+    }
+  }
+  GetUsers: {
+    parameters: {
+      query?: {
+        /** @description 페이지 번호 (기본값: 1) */
+        page?: number
+        /** @description 페이지당 항목 수 (기본값: 10) */
+        limit?: number
+        /** @description 활성 사용자만 필터링 (선택 사항) */
+        isActive?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            /** Format: double */
+            total: number
+            users: components['schemas']['UserResponse'][]
+          }
+        }
+      }
+    }
+  }
+  GetAuditLogs: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        tableName?: string
+        action?: string
+        /** @description 시작 날짜 (형식: YYYY-MM-DD HH:MM:SS, 예: 2025-03-14 01:35:10) */
+        startDate?: string
+        /** @description 종료 날짜 (형식: YYYY-MM-DD HH:MM:SS, 예: 2025-03-14 01:35:10) */
+        endDate?: string
+        userId?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: components['schemas']['AuditLog'][]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetAuditLogsByTable: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path: {
+        tableName: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: components['schemas']['AuditLog'][]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetAuditLogsByRecord: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        tableName: string
+        recordId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AuditLog'][]
+        }
+      }
+    }
+  }
+  GetAuditLogsByUser: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path: {
+        userId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: components['schemas']['AuditLog'][]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetKeyNameChanges: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: components['schemas']['AuditLog'][]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetAuditLogsByPeriod: {
+    parameters: {
+      query: {
+        startDate: string
+        endDate: string
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: components['schemas']['AuditLog'][]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationCreations: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        keyId?: string
+        localizationId?: string
+        languageCode?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: unknown[]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationChanges: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        keyId?: string
+        localizationId?: string
+        languageCode?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: unknown[]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationCreationsByKey: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        languageCode?: string
+      }
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: unknown[]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationChangesByKey: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        languageCode?: string
+      }
+      header?: never
+      path: {
+        keyId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: unknown[]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationChangesByLocalization: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path: {
+        localizationId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            logs: unknown[]
+            /** Format: double */
+            total: number
+          }
+        }
+      }
+    }
+  }
+  GetTranslationHistory: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+        keyId?: string
+        localizationId?: string
+        languageCode?: string
+        includeCreation?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            message: string
+          }
+        }
+      }
+    }
+  }
+  GetUserRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        userId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  SetUserRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        userId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UserRoleDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  AddRoleToUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        userId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddRoleToUserDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  RemoveRoleFromUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        userId: string
+        roleId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetUserPermissions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        userId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetRoles: {
+    parameters: {
+      query?: {
+        name?: string
+        page?: number
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CreateRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateRoleDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  UpdateRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRoleDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeleteRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetRolePermissions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  SetRolePermissions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RolePermissionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  AddPermissionToRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddPermissionToRoleDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  RemovePermissionFromRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        roleId: string
+        permissionId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetUsersByRole: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetPermissions: {
+    parameters: {
+      query?: {
+        resourceType?: string
+        actionType?: string
+        name?: string
+        page?: number
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CreatePermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePermissionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetPermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  UpdatePermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePermissionDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  DeletePermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetRolesByPermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetResourceTypes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetActionTypes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetDomainRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        domainId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  SetDomainRoles: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        domainId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DomainRoleDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  AddRoleToDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        domainId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddRoleToDomainDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  RemoveRoleFromDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        domainId: string
+        roleId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetUsersByDomain: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        domainId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  CheckPermission: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PermissionCheckDTO']
+      }
+    }
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetRbacAuditLogs: {
+    parameters: {
+      query?: {
+        userId?: string
+        roleId?: string
+        permissionId?: string
+        actionType?: string
+        startDate?: string
+        endDate?: string
+        page?: number
+        limit?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
+  GetUserAuditLogs: {
+    parameters: {
+      query: {
+        userId: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Ok */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
+        }
+      }
+    }
+  }
 }

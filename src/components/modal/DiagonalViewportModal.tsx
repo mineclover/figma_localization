@@ -1,24 +1,22 @@
-import { h } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks'
+import styles from './modal.module.css'
 import {
-	DiagonalAxis,
-	diagonalAxisToAxis,
-	Axis,
-	rectToStyle,
-	rectToStyleOffset,
-	BaseProps,
-	clc,
-	rectToViewportStyleOffset,
-} from './utils';
-import styles from './modal.module.css';
+  type Axis,
+  type BaseProps,
+  clc,
+  type DiagonalAxis,
+  diagonalAxisToAxis,
+  rectToStyleOffset,
+  rectToViewportStyleOffset,
+} from './utils'
 
 type Props = {
-	target: HTMLElement;
-	offset: number;
-	axis: DiagonalAxis;
-	align: Axis;
-	children: React.ReactNode;
-};
+  target: HTMLElement
+  offset: number
+  axis: DiagonalAxis
+  align: Axis
+  children: React.ReactNode
+}
 
 /**
  * 화면 끝에 붙이는 기능을 가짐
@@ -27,27 +25,27 @@ type Props = {
  * @returns
  */
 const DiagonalViewportModal = ({ target, offset, axis, align, children }: Props & BaseProps['div']) => {
-	const direction = diagonalAxisToAxis(axis);
-	const temp = rectToStyleOffset(target, offset, direction);
+  const direction = diagonalAxisToAxis(axis)
+  const temp = rectToStyleOffset(target, offset, direction)
 
-	const [next, setNext] = useState(rectToViewportStyleOffset(temp, offset, align));
+  const [next, setNext] = useState(rectToViewportStyleOffset(temp, offset, align))
 
-	useEffect(() => {
-		const handleResize = () => {
-			setNext(rectToViewportStyleOffset(temp, offset, align));
-		};
+  useEffect(() => {
+    const handleResize = () => {
+      setNext(rectToViewportStyleOffset(temp, offset, align))
+    }
 
-		window.addEventListener('resize', handleResize);
-		return () => {
-			window.removeEventListener('resize', handleResize);
-		};
-	}, [target, offset, axis]);
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [target, offset, axis])
 
-	return (
-		<div style={{ ...next }} className={clc(styles[axis])}>
-			{children}
-		</div>
-	);
-};
+  return (
+    <div style={{ ...next }} className={clc(styles[axis])}>
+      {children}
+    </div>
+  )
+}
 
-export default DiagonalViewportModal;
+export default DiagonalViewportModal

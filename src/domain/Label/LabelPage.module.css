@@ -1,61 +1,61 @@
 .container {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	justify-content: flex-start;
-	padding-inline: 4px;
-	gap: 8px;
-	& > div {
-		flex-grow: 1;
-	}
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: flex-start;
+  padding-inline: 4px;
+  gap: 8px;
+  & > div {
+    flex-grow: 1;
+  }
 }
 
 .aliasRow {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4px;
-	width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
 
-	& > div {
-		flex-grow: 1;
-	}
+  & > div {
+    flex-grow: 1;
+  }
 }
 .descriptionTag {
-	position: fixed;
+  position: fixed;
 
-	padding: 4px 8px;
-	white-space: nowrap;
-	z-index: 3;
-	top: -100%;
-	left: 100%;
-	background-color: var(--figma-color-bg);
+  padding: 4px 8px;
+  white-space: nowrap;
+  z-index: 3;
+  top: -100%;
+  left: 100%;
+  background-color: var(--figma-color-bg);
 }
 
 /* #region 라벨 */
 
 .labelRow {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4px;
-	width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
 
-	& > div {
-		flex-grow: 1;
-	}
+  & > div {
+    flex-grow: 1;
+  }
 }
 
 .labelText {
-	color: var(--figma-color-text-disabled);
+  color: var(--figma-color-text-disabled);
 }
 
 .inputText {
-	flex-grow: 1;
-	font-weight: 700;
-	width: 100%;
-	padding: 4px 8px;
-	background-color: var(--figma-color-bg-brand);
+  flex-grow: 1;
+  font-weight: 700;
+  width: 100%;
+  padding: 4px 8px;
+  background-color: var(--figma-color-bg-brand);
 }
 
 /* #endregion */
@@ -63,16 +63,16 @@
 /* #region 섹션 */
 
 .sectionRow {
-	padding-block: 4px;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4px;
-	width: 100%;
+  padding-block: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
 }
 .sectionTitle {
-	flex-grow: 1;
-	font-weight: 700;
+  flex-grow: 1;
+  font-weight: 700;
 }
 
 /* #endregion */
@@ -80,82 +80,82 @@
 /* #region 검색 */
 
 .searchResult {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	max-height: 100%;
-	overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .searchResultItem {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	padding: 4px;
-	background-color: var(--figma-color-bg);
-	box-sizing: border-box;
-	border: 2px solid transparent;
-	&:hover {
-		background-color: var(--figma-color-bg-selected-tertiary);
-	}
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--figma-color-bg);
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  &:hover {
+    background-color: var(--figma-color-bg-selected-tertiary);
+  }
 }
 
 .searchResultItemSelected {
-	position: sticky;
-	top: 0;
-	z-index: 10;
-	background-color: var(--figma-color-bg-tertiary);
-	border: 2px solid var(--figma-color-bg-selected);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--figma-color-bg-tertiary);
+  border: 2px solid var(--figma-color-bg-selected);
 }
 
 .searchResultTop {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
-	flex-wrap: nowrap;
-	justify-content: space-between;
-	gap: 4px;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .searchResultBottom {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: nowrap;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
 
-	gap: 4px;
+  gap: 4px;
 }
 
 .searchResultAlias {
-	flex-grow: 1;
-	font-weight: 700;
+  flex-grow: 1;
+  font-weight: 700;
 }
 .searchResultName {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 
 .searchResultSubmitButton {
-	padding: 4px 8px;
+  padding: 4px 8px;
 
-	&:hover {
-		background-color: var(--figma-color-bg-success);
-	}
+  &:hover {
+    background-color: var(--figma-color-bg-success);
+  }
 }
 
 .searchSectionTagBox {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	padding: 2px 8px;
-	border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
 
-	background-color: var(--figma-color-bg-brand-secondary);
+  background-color: var(--figma-color-bg-brand-secondary);
 }
 
 .textDisabled {
-	color: var(--figma-color-text-disabled);
+  color: var(--figma-color-text-disabled);
 }
 
 /* #endregion */
@@ -163,128 +163,128 @@
 /* #region 버튼들 */
 
 .brandButton {
-	height: 24px;
-	padding: 4px 8px;
-	background-color: var(--figma-color-bg-brand);
-	&:hover {
-		background-color: var(--figma-color-bg-brand-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-brand-secondary);
-	}
+  height: 24px;
+  padding: 4px 8px;
+  background-color: var(--figma-color-bg-brand);
+  &:hover {
+    background-color: var(--figma-color-bg-brand-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-brand-secondary);
+  }
 }
 
 .dangerButton {
-	height: 24px;
-	padding: 4px 8px;
-	background-color: var(--figma-color-bg-danger);
-	&:hover {
-		background-color: var(--figma-color-bg-danger-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-danger-secondary);
-	}
+  height: 24px;
+  padding: 4px 8px;
+  background-color: var(--figma-color-bg-danger);
+  &:hover {
+    background-color: var(--figma-color-bg-danger-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-danger-secondary);
+  }
 }
 
 .normalButton {
-	height: 24px;
-	padding: 4px 8px;
-	background-color: var(--figma-color-bg);
-	border: 1px solid var(--figma-color-border);
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-selected);
-	}
+  height: 24px;
+  padding: 4px 8px;
+  background-color: var(--figma-color-bg);
+  border: 1px solid var(--figma-color-border);
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-selected);
+  }
 }
 
 .componentButton {
-	height: 24px;
-	padding: 4px 8px;
-	background-color: var(--figma-color-bg-component);
-	&:hover {
-		background-color: var(--figma-color-bg-component-hover);
-	}
-	&:active {
-		background-color: var(--figma-color-bg-component-secondary);
-	}
+  height: 24px;
+  padding: 4px 8px;
+  background-color: var(--figma-color-bg-component);
+  &:hover {
+    background-color: var(--figma-color-bg-component-hover);
+  }
+  &:active {
+    background-color: var(--figma-color-bg-component-secondary);
+  }
 }
 
 /* #endregion */
 
 .styleContainer {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	padding: 8px 8px;
-	gap: 8px;
-	border: 1px solid transparent;
-	background-color: var(--figma-color-bg);
-	& > div {
-		flex-grow: 1;
-	}
-	&:hover {
-		/* border: 1px solid var(--figma-color-bg-brand-tertiary); */
-		background-color: var(--figma-color-bg-brand-tertiary);
-	}
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 8px 8px;
+  gap: 8px;
+  border: 1px solid transparent;
+  background-color: var(--figma-color-bg);
+  & > div {
+    flex-grow: 1;
+  }
+  &:hover {
+    /* border: 1px solid var(--figma-color-bg-brand-tertiary); */
+    background-color: var(--figma-color-bg-brand-tertiary);
+  }
 }
 
 .rowContainer {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
-	gap: 4px;
+  gap: 4px;
 
-	[class^='_textbox'] {
-		flex-grow: 1;
-	}
-	[class^='_bold'] {
-		flex-grow: 1;
-	}
+  [class^="_textbox"] {
+    flex-grow: 1;
+  }
+  [class^="_bold"] {
+    flex-grow: 1;
+  }
 }
 
 .buttonOverride {
-	border-radius: 4px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .padding {
-	padding: 8px;
+  padding: 8px;
 }
 
 .metadataContainer {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	justify-content: flex-start;
-	padding-inline: 4px;
-	gap: 2px;
-	& > div {
-		flex-grow: 1;
-	}
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: flex-start;
+  padding-inline: 4px;
+  gap: 2px;
+  & > div {
+    flex-grow: 1;
+  }
 }
 
 .dangerText {
-	color: var(--figma-color-text-danger);
+  color: var(--figma-color-text-danger);
 }
 
 .span {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 
 .action {
-	position: relative;
-	z-index: var(--z-index-1);
-	display: flex;
-	/* 왜 12만큼 여백을 넓이를 정하지?? 전체 크기가 아니다 */
-	width: 12px;
-	min-width: 0;
-	height: var(--space-24);
-	align-items: center;
-	border: var(--border-width-1) solid var(--figma-color-border);
-	border-radius: var(--border-radius-4);
-	color: var(--figma-color-text);
+  position: relative;
+  z-index: var(--z-index-1);
+  display: flex;
+  /* 왜 12만큼 여백을 넓이를 정하지?? 전체 크기가 아니다 */
+  width: 12px;
+  min-width: 0;
+  height: var(--space-24);
+  align-items: center;
+  border: var(--border-width-1) solid var(--figma-color-border);
+  border-radius: var(--border-radius-4);
+  color: var(--figma-color-text);
 }

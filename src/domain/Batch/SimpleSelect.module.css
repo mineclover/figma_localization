@@ -1,121 +1,121 @@
 .root {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .outline {
-	background-color: transparent;
-	padding: 2px;
-	border: 2px solid transparent;
-	border-radius: 8px;
+  background-color: transparent;
+  padding: 2px;
+  border: 2px solid transparent;
+  border-radius: 8px;
 }
 
 .inline {
-	background-color: var(--figma-color-bg);
-	width: 18px;
-	height: 18px;
-	border: 3px solid var(--figma-color-border);
-	border-radius: 6px;
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-		border-color: var(--figma-color-border-hover);
-	}
+  background-color: var(--figma-color-bg);
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--figma-color-border);
+  border-radius: 6px;
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+    border-color: var(--figma-color-border-hover);
+  }
 }
 
 .container {
-	display: flex;
-	flex-direction: row;
-	gap: 2px;
-	flex-wrap: wrap;
-	max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .keyIds {
-	display: flex;
-	flex-direction: row;
-	gap: 2px;
-	flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  flex-wrap: wrap;
 
-	max-width: 100%;
+  max-width: 100%;
 }
 
 .keyId {
-	padding: 2px 16px;
-	background-color: var(--figma-color-bg);
-	border: 3px solid var(--figma-color-border);
-	border-radius: 6px;
+  padding: 2px 16px;
+  background-color: var(--figma-color-bg);
+  border: 3px solid var(--figma-color-border);
+  border-radius: 6px;
 
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-		border-color: var(--figma-color-border);
-	}
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+    border-color: var(--figma-color-border);
+  }
 
-	color: var(--figma-color-text);
+  color: var(--figma-color-text);
 }
 
 /* 오버라이드 되는 애는 가장 아래로 */
 .current {
-	/* border-color: #ffc943;
+  /* border-color: #ffc943;
 	background-color: #f24822; */
-	border-color: var(--figma-color-bg-danger);
-	&:hover {
-		border-color: var(--figma-color-border-danger);
-	}
+  border-color: var(--figma-color-bg-danger);
+  &:hover {
+    border-color: var(--figma-color-border-danger);
+  }
 }
 
 .keyMatch {
-	background-color: var(--figma-color-bg-success);
-	border-color: var(--figma-color-border-success);
-	&:hover {
-		background-color: var(--figma-color-bg-success-hover);
-		border-color: var(--figma-color-border-success);
-	}
+  background-color: var(--figma-color-bg-success);
+  border-color: var(--figma-color-border-success);
+  &:hover {
+    background-color: var(--figma-color-bg-success-hover);
+    border-color: var(--figma-color-border-success);
+  }
 }
 
 .selected {
-	background-color: var(--figma-color-bg-warning);
-	border-color: var(--figma-color-border-warning);
-	&:hover {
-		background-color: var(--figma-color-bg-warning-hover);
-		border-color: var(--figma-color-border-warning);
-	}
+  background-color: var(--figma-color-bg-warning);
+  border-color: var(--figma-color-border-warning);
+  &:hover {
+    background-color: var(--figma-color-bg-warning-hover);
+    border-color: var(--figma-color-border-warning);
+  }
 }
 
 .ignoreButton {
-	padding: 4px 12px;
-	background-color: var(--figma-color-bg);
-	border-radius: 6px;
+  padding: 4px 12px;
+  background-color: var(--figma-color-bg);
+  border-radius: 6px;
 
-	&:hover {
-		background-color: var(--figma-color-bg-hover);
-		outline: 1px solid var(--figma-color-border);
-	}
+  &:hover {
+    background-color: var(--figma-color-bg-hover);
+    outline: 1px solid var(--figma-color-border);
+  }
 
-	color: var(--figma-color-text);
+  color: var(--figma-color-text);
 }
 
 .active {
-	background-color: var(--figma-color-bg-brand);
-	&:hover {
-		background-color: var(--figma-color-bg-brand-hover);
-	}
+  background-color: var(--figma-color-bg-brand);
+  &:hover {
+    background-color: var(--figma-color-bg-brand-hover);
+  }
 }
 /* 제외 리스트에 있는데 섹션 리스트에 없는 대상 */
 .currentSection {
-	background-color: var(--figma-color-bg-warning);
+  background-color: var(--figma-color-bg-warning);
 
-	&:hover {
-		background-color: var(--figma-color-bg-warning-hover);
-	}
+  &:hover {
+    background-color: var(--figma-color-bg-warning-hover);
+  }
 }
 
 .row {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 
-	gap: 8px;
-	align-items: center;
-	width: 100%;
-	justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
 }

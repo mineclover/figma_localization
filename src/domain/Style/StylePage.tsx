@@ -249,7 +249,7 @@ const StylePage = () => {
     domainValid: currentPointer?.data.domainId === domainSetting?.domainId,
   }
 
-  if (currentPointer && styleData && domainSetting && domainSetting.domainId) {
+  if (currentPointer && styleData && domainSetting?.domainId) {
     return (
       <div>
         <MetadataBlock {...currentMetadata} />

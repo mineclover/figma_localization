@@ -12,6 +12,7 @@ export interface LocalizationKeyActionBulkDTO {
 }
 
 import { StatusByCode, StatusByString } from './identifier'
+
 // code : a,b,c,d
 // name : default, first, second, third
 export { StatusByCode as IdentifiersCode, StatusByString as IdentifiersName }

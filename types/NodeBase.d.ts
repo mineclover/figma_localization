@@ -1,6 +1,6 @@
 import { JSX } from 'react'
+import { AtomMap, extendsComponent, tagMap } from './functions'
 import { ExtractProps, Prettify } from './utilType'
-import { extendsComponent, AtomMap, tagMap } from './functions'
 
 export type HTMLTags = Prettify<keyof JSX.IntrinsicElements>
 export type ExtendsTagNames = keyof extendsComponent
